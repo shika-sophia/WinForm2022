@@ -1,0 +1,4 @@
+﻿/**
+ *@title WinFormGUI / WinFormSample / WinFormSample_analysis.txt
+ *@content WinFormSampleフォルダーの考察をまとめるファイル
+ */
