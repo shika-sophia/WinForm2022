@@ -1,0 +1,364 @@
+
+Home > C# フォーム入門 > コントロールの基本
+■ かいてい.net
+◆C# フォーム入門
+●コントロールの基本
+http://kaitei.net/csforms/controls-basics/
+
+目次
+ラベル
+ボタン
+コレクション
+コンテナ
+
+ 
+ラベル
+作例：Hello World
+「ラベル」というコントロールを使って，フォームの中に「Hello, world!」と表示します。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    Label label = new Label();  // ラベルコントロール
+
+    public Form1()
+    {
+        label.Text = "Hello, world!";        // テキスト
+        label.Location = new Point(10, 10);  // 位置
+        label.AutoSize = true;               // 自動サイズ調整
+
+        this.Controls.Add(label); //コントロールをフォームに貼り付け
+        // または
+        // label.Parent = this;
+    }
+}
+解説
+ボタンやチェックボックスなどといった部品を，コントロール (control) と呼びます。
+広義にはフォームやコンテナ (3.4 節) もコントロールに含まれます。
+
+各アプリケーションで共通して使えるコモンコントロール (common control) として，次のようなものが利用できます。
+
+コモンコントロール-1 コモンコントロール-2
+
+今回使ったラベルコントロールは，プレーンテキストを表示するための単純なコントールです。
+フォームの雛型として Form クラスが提供されていたのと同様，ラベルコントールの雛型として Label クラスが提供されています。
+ラベルコントロールを利用する数だけ，Label クラスのインスタンスを用意する必要があります。
+
+System.Windows.Forms 名前空間
+Label クラス [MSDN]
+ラベルコントロールを表現します。
+
+プロパティ
+項目	説明
+string Text	テキスト
+Point Location	位置
+Size Size	サイズ
+bool AutoSize	自動サイズ調整
+Control Parent	親コントロール
+※ 今後いちいちリストされていなくても，Text，Location，Size など基本的なプロパティの多くは，フォームおよび各コントロールに共通して利用できます。
+
+Form クラスの持っていた基本的なプロパティの多くは，Label クラスも共通して持っています。
+プロパティに値を代入することで，コントロールの属性を設定することができます。
+
+
+ 
+AutoSize プロパティは，自動サイズ調整を設定するためのプロパティです。
+true を設定しておくと，テキストの長さに応じて自動的にサイズを調節してくれます。
+
+Label クラスのインスタンスを生成しただけでは，コントロールはどのフォームにも所属していない状態なので，フォーム上に表示されません。
+各種コントロールをフォームに貼り付けるには，登録先のフォームの Controls.Add メソッドを使用します。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+Controls.Add メソッド
+コントロールを追加します。
+
+void Add(
+    Control value
+)
+または，コントロールの Parent プロパティを設定しても，コントロールをフォームに貼り付けることができます。
+よって，次の 2 つは同じ効果を持ちます。
+
+    // 1) フォームの Controls.Add メソッドを使った登録
+    this.Controls.Add(label);
+
+    // 2) コントロールの Parent プロパティを使った登録
+    label.Parent = this;
+ボタン
+作例：機能しないボタン
+「ボタン」というコントロールを使って，機能しないボタンを表示するだけのプログラムを作成します。
+トマソンに通じるものがあるような感じがします。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles(); // ビジュアルスタイルを有効化
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    Button button = new Button(); // ボタンコントロール
+
+    public Form1()
+    {
+        button.Text = "OK";                  // テキスト
+        button.Location = new Point(10, 10); // 位置
+        button.Size = new Size(120, 40);     // サイズ
+
+        this.Controls.Add(button); //コントロールをフォームに貼り付け
+    }
+}
+解説
+ボタンコントールは，その名の通り，普通のプッシュボタンを表示するためのコントロールです。
+ラベルコントロールの設置の仕方がわかっていれば，ボタンコントロールの設置は簡単です。
+
+System.Windows.Forms 名前空間
+Button クラス [MSDN]
+ボタンコントロールを表現します。
+
+プロパティ
+項目	説明
+string Text	テキスト
+Point Location	位置
+Size Size	サイズ
+Label クラスのインスタンスを生成しただけでは，コントロールはどのフォームにも所属していない状態なので，フォーム上に表示されません。
+各種コントロールをフォームに貼り付けるには，登録先のフォームの Controls.Add メソッドを使用します。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+Controls.Add メソッド
+コントロールを追加します。
+
+void Add(
+    Control value
+)
+ビジュアルスタイルが無効のときの表示例
+Main メソッド内の Application.EnableVisualStyles は，ビジュアルスタイルを有効にするためのメソッドです。
+これを書くか書かないかは任意ですが，書かないと残念なデザインになってしまいます…。
+
+System.Windows.Forms 名前空間
+Application.EnableVisualStyles メソッド
+ビジュアルスタイルを有効にします。
+
+static void EnableVisualStyles()
+コレクション
+作例：複数のコントロール
+複数のコントロールをフォームに貼り付けます。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    Label label1 = new Label();
+    Label label2 = new Label();
+    Button button1 = new Button();
+    Button button2 = new Button();
+
+    public Form1()
+    {
+        label1.Text = "label1";
+        label1.Location = new Point(10, 10);
+        label1.AutoSize = true;
+
+        label2.Text = "label2";
+        label2.Location = new Point(10, 30);
+        label2.AutoSize = true;
+
+        button1.Text = "button1";
+        button1.Location = new Point(10, 50);
+
+        button2.Text = "button2";
+        button2.Location = new Point(10, 80);
+
+        // コントロール群を配列化してまとめて追加
+        this.Controls.AddRange(new Control[]
+        {
+            label1, label2, button1, button2
+        });
+
+        // または次のように 1 つずつ追加
+        // this.Controls.Add(label1);
+        // this.Controls.Add(label2);
+        // this.Controls.Add(button1);
+        // this.Controls.Add(button2);
+    }
+}
+解説
+Label や Button など，コントロールを表すクラスは，いずれも Control クラス (System.Windows.Forms 名前空間) を継承しています。
+そのため，各種コントールは Control[] 型の配列にまとめることができます。
+
+System.Windows.Forms 名前空間
+Control クラス [MSDN]
+コントロールを表現します。
+
+複数のコントロールの登録は，Controls.Add をコントロールの個数分書いてもできます。
+あるいは，配列の形式であれば Controls.AddRange メソッドでまとめて登録することも可能です。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+Controls.Add メソッド
+コントロールを追加します。
+
+void Add(
+    Control control
+)
+Controls.AddRange メソッド
+配列として表現されたコントロール群を追加します。
+
+void AddRange(
+    Control[] controls
+)
+Add や AddRange が出てきた時点で，Controls は List<Control> のようなコレクションだとお気付きのことでしょう。
+改めて紹介すると，Controls はフォームの有するプロパティの 1 つであり，型は Control.ControlCollection 型となっています。
+Control.ControlCollection は System.Collections.IList を実装したもので，実質的に List<Control> と同等の機能を提供します。
+したがって，Controls プロパティは List<Control> 型コレクションと見なしてしまっても差し支えない，と筆者は思っています。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+プロパティ
+項目	説明
+Control.ControlCollection Controls
+(List<Control> Controls と見なしてよい)	コントロールのコレクション
+コンテナ
+作例：パネルの利用
+フォームの上にパネルを貼り付け，パネルの上にボタンを貼り付けます。
+わかりやすいように，パネルの境界線が見えるようにしてあります。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    Panel panel = new Panel();  // パネル
+    Button[] button = new Button[3];
+
+    public Form1()
+    {
+        panel.BorderStyle = BorderStyle.FixedSingle;  // 境界線
+        panel.Size = new Size(200, 200);
+        panel.Location = new Point(20, 20);
+
+        for (int i = 0; i < 3; i++)
+        {
+            button[i] = new Button();
+            button[i].Text = "ボタン " + i;
+            button[i].Top = i * 40;
+            panel.Controls.Add(button[i]);  // ボタンをパネルに登録
+        }
+
+        this.Controls.Add(panel);  // パネルをフォームに登録
+    }
+}
+解説
+複数のコントロールをまとめる役割を持つ，コンテナ (container) という種類のコントロールがあります。
+コンテナを使うと，コントロールをより簡単で綺麗に並べることができます。
+
+コンテナ
+
+図に挙げたコンテナのうち，最も単純なコンテナである Panel を今回プログラムの中で使いました。
+
+System.Windows.Forms 名前空間
+Panel クラス [MSDN]
+パネルを表現します。
+
+プロパティ
+項目	説明
+Point Location	位置
+Size Size	サイズ
+BorderStyle BorderStyle	境界線
+いままでコントロールはフォームに貼り付けていたので，コントロールの座標はフォーム (のクライアント領域) の座標を指定していました。
+今回のプログラムは，フォームにパネル (Panel) を貼り付け，パネルにコントロールを貼り付けるという，手間なことをしています。
+こうすると，コントロールの座標はパネルの左上端を原点に取った座標で指定すればいいので，複数のコントロールを整列させるのが簡単になる場合があります。
+
+コンテナはもちろんその上にコントロールを貼り付けて使う訳なので，フォームと同様 Controls プロパティを持っています。
+
+System.Windows.Forms 名前空間
+Panel クラス [MSDN]
+プロパティ
+項目	説明
+Control.ControlCollection Controls	コントロールのコレクション
+Controls.Add メソッド
+コントロールを追加します。
+
+void Add(
+    Control control
+)
+Controls.AddRange メソッド
+配列として表現されたコントロール群を追加します。
+
+void AddRange(
+    Control[] controls
+)
+今回のプログラムでは，わかりやすいようにパネルの境界線を表示しています。
+境界線のスタイルを指定するには，BorderStyle 列挙体で表現される BorderStyle プロパティを設定します。
+
+System.Windows.Forms 名前空間
+BorderStyle 列挙体 [MSDN]
+境界線のスタイルを表現します。
+
+enum BorderStyle
+{
+    None = 0,        // なし
+    FixedSigle = 1,  // 単線
+    Fixed3D = 2,     // 3D スタイル
+}
+スポンサーリンク
+ 
+« 前のページ 目次 次のページ »
+サイト概要 | お問合せ | プライバシーポリシー
+© 2018 kaitei.net

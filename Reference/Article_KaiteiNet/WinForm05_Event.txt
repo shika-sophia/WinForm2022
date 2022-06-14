@@ -1,0 +1,811 @@
+
+◆イベント
+http://kaitei.net/csforms/events/
+
+目次
+イベントの基礎
+ボタンのイベント
+フォームの終了
+マウス入力
+キー入力
+文字入力
+タイマ
+再描画
+オーバーライド
+ 
+イベントの基礎
+作例：クリックの検知
+フォーム上 (クライアント領域内) をクリックすると，メッセージボックスを表示します。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    public Form1()
+    {
+        // イベントハンドラを登録
+        this.Click += new EventHandler(Form1_Click);
+    }
+
+    // イベントハンドラ本体
+    void Form1_Click(object sender, EventArgs e)
+    {
+        MessageBox.Show("フォームがクリックされました。", "Form1_Click");
+    }
+}
+解説
+Windows アプリケーションは，「マウスがクリックされた」とか「キーが押された」といったイベント (event) に従って次の動作が決まります。
+このようなプログラムの方式をイベントドリブン (event driven，イベント駆動) 方式といいます。
+Windows アプリケーションはイベントドリブン方式のプログラムです。
+
+イベンドドリブン方式
+
+イベントが発生したときに呼び出されるメソッドのことを，イベントハンドラ (event handler) と呼びます。
+例えば「マウスがクリックされた」イベント用のイベントハンドラを作っておけば，「マウスがクリックされた」イベントが発生する度に，このイベントハンドラで決まった処理を行うことができます。
+今回のプログラムでは，Form1_Click メソッドが「マウスがクリックされた」イベント用のイベントハンドラです。
+
+Form クラスは Click という名前のメンバを持っています。
+これは，イベント (event) と呼ばれる種類の特殊なメンバで，デリゲート型プロパティの特殊なものです。
+この Click メンバに，イベントハンドラのデリゲートを代入すると，「マウスをクリックした」イベントが発生する度に，このイベントハンドラが自動的に呼び出されるようになります。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+イベント
+項目	説明
+EventHandler Click	クリック
+メンバ Click の型は，EventHandler デリゲート型 (System 名前空間) です。
+
+System 名前空間
+delegate void EventHandler(object sender, EventArgs e);
+Click 用のイベントハンドラは，この EventHandler デリゲート型に合わせた形で用意する必要があります。
+つまり，返り値が void で，引数が (object sender, EventArgs e) であるメソッドを用意する必要があります。
+2 つの引数の意味・役割については，追々説明していきますので，今回はスキップします。
+
+今回のプログラムでは，Form1_Click メソッドが「マウスがクリックされた」イベント用のイベントハンドラです。
+ちゃんと EventHandler デリゲート型に合わせた形になっていますね。
+メソッドの返り値と引数の型さえ合っていれば，イベントハンドラの中身は自由に記述できます。
+
+ 
+メンバ Click に Form1_Click イベントハンドラを登録するために，this.Click += new EventHandler(Form1_Click) という処理を書いています。
+一般に，イベントにデリゲートのインスタンスを登録するには，加算代入演算子 += を使って次のように書くことになっています。
+
+イベント名 += new デリゲート名(イベントハンドラ名);
+こうして登録されたイベントハンドラは，イベントが発生する度に，システムが自動的に呼び出してくれます。
+
+おまけ：糖衣構文
+イベントに代入できるのはデリゲートのインスタンスですが，そのことを明示しない (省略した) 書き方も許されています。
+よって，次の 2 つは同じ意味です。
+
+    // 1) デリゲートのインスタンスであることを明示した書き方
+    this.Click += new EventHandler(Form1_Click);
+
+    // 2) 省略した書き方
+    this.Click += Form1_Click;
+匿名メソッドを使うと，もっと簡単にイベントハンドラを用意することができます。
+
+    // a) 匿名メソッド
+    this.Click += delegate(object sender, EventArgs e) { /* ... */ };
+
+    // b) ラムダ式
+    this.Click += (object sender, EventArgs e) => { /* ... */ };
+
+    // c) 型の省略
+    this.Click += (sender, e) => { /* ... */ };
+おまけ：コンソールプログラムにおけるイベント
+イベントを利用した簡単なコンソールプログラムの例です。
+自前のイベント EnterKey を定義し，Enter キーが押される度に自分でイベントを発生させています。
+Enter キーが押される度に，イベント EnterKey を介してイベントハンドラ EnterKey_1 を呼び出し，読み込んだ文字列を出力します。
+
+using System;
+
+delegate void Handler(string str);  // デリゲートの宣言
+
+class Program
+{
+    static event Handler EnterKey;  // イベントの宣言
+
+    static void Main()
+    {
+        EnterKey += new Handler(EnterKey_1);  // イベントにメソッドを登録
+
+        while (true)
+        {
+            string str = Console.ReadLine();
+            EnterKey(str);  // イベントを介してメソッドを呼び出し
+        }
+    }
+
+    // イベントに登録されたメソッドの本体
+    static void EnterKey_1(string str)
+    {
+        Console.WriteLine(str);
+    }
+}
+ 
+※ このプログラムでイベントとイベントハンドラを static 化しているのは，これらを Main メソッド内から直接使用しているためです。一般には static 属性は必要ではありません。
+
+イベントの宣言は，次のように event キーワードを付けて書きます。
+
+event デリゲート名 イベント名;
+イベントは，フィールド，プロパティ，メソッドに並ぶ，第 4 のメンバ要素です。
+とはいえ，イベントの実体は，基本的にはデリゲート型のプロパティであり，実際，プロパティを使ってイベントの機能を実現させることも可能です。
+プロパティとデリゲートを知っている方にとっては，イベントはそこまで特別な概念ではありません。
+
+ボタンのイベント
+作例：クリックカウンタ
+ボタンのクリック回数をカウントします。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    int clickCount = 0;  // クリック回数
+    Button button;
+
+    public Form1()
+    {
+        button = new Button()
+        {
+            Text = "クリックしてください",
+            Location = new Point(10, 10),
+            Size = new Size(160, 40),
+        };
+
+        // イベントハンドラを登録
+        button.Click += new EventHandler(button_Click);
+
+        this.Controls.Add(button);
+    }
+
+    // イベントハンドラ本体
+    void button_Click(object sender, EventArgs e)
+    {
+        clickCount++;
+        button.Text = clickCount + " 回クリックされました";
+    }
+}
+解説
+今回扱うイベントの発生源 (ソース) はボタンなので，イベントハンドラはフォームではなくボタンの Click メンバに登録します。
+
+System.Windows.Forms.Button 名前空間
+Button クラス [MSDN]
+イベント
+項目	説明
+EventHandler Click	クリック
+メンバ Click の型は，EventHandler デリゲート型 (System 名前空間) です。
+
+System 名前空間
+delegate void EventHandler(object sender, EventArgs e);
+Click イベントが処理される流れは，4.1 節 の説明の通りです。
+
+今回の作例では，button_Click メソッドが Click イベント用のイベントハンドラです。
+このイベントハンドラの処理は，ボタンに Click イベントが発生するたびに実行されます。
+
+おまけ：糖衣構文
+イベントに代入できるのはデリゲートのインスタンスですが，そのことを明示しない (省略した) 書き方も許されています。
+よって，次の 2 つは同じ意味です。
+
+    // 1) デリゲートのインスタンスであることを明示した書き方
+    this.Click += new EventHandler(Form1_Click);
+
+    // 2) 省略した書き方
+    this.Click += Form1_Click;
+匿名メソッドを使うと，もっと簡単にイベントハンドラを用意することができます。
+
+    // a) 匿名メソッド
+    this.Click += delegate(object sender, EventArgs e) { /* ... */ };
+
+    // b) ラムダ式
+    this.Click += (object sender, EventArgs e) => { /* ... */ };
+
+    // c) 型の省略
+    this.Click += (sender, e) => { /* ... */ };
+フォームの終了
+作例：終了の確認
+プログラムを閉じようとすると，メッセージボックスを表示して確認します。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    public Form1()
+    {
+        this.FormClosing +=
+            new FormClosingEventHandler(Form1_FormClosing);
+    }
+
+    // FormClosing イベントのイベントハンドラ
+    void Form1_FormClosing(object sender, FormClosingEventArgs e)
+    {
+        DialogResult result = MessageBox.Show(
+               "終了しますか？", "確認",
+               MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+        if (result == DialogResult.No)  // [いいえ] の場合
+        {
+            e.Cancel = true;  // 終了処理を中止
+        }
+    }
+}
+解説
+フォームの [閉じる] ボタンが押されるなどすると，フォームが終了するより前に FormClosing イベントが発生します。
+また，フォームが実際に終了した後には FormClosed イベントが発生します。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+イベント
+項目	説明
+FormClosingEventHandler FormClosing	フォームが閉じる直前
+FormClosedEventHandler FormClosed	フォームが閉じた直後
+FormClosing イベントの型は FormClosingEventHandler です。
+EventHandler とは第 2 引数の型が異なります。
+
+System.Windows.Forms 名前空間
+delegate void FormClosingEventHandler(
+    object sender, FormClosingEventArgs e);
+
+
+delegate void FormClosedEventHandler(
+    object sender, FormClosedEventArgs e);
+
+イベントハンドラの第 2 引数には，そのイベントに関係する様々なデータが入ります。
+FormClosingEventArgs クラスは，FormClosing イベントに関係する様々なデータを提供してくれるものです。
+
+System.Windows.Forms 名前空間
+FormClosingEventArgs クラス [MSDN]
+FormClosing イベントのためのデータを提供します。
+
+プロパティ
+項目	説明
+bool Cancel	処理を中止
+FormClosingEventArgs には，bool 型の Cancel プロパティがあります。
+イベントハンドラの中で，このプロパティに true を代入すると，フォームの終了処理を中止することができます。
+
+マウス入力
+作例：カーソルの追尾
+カーソル位置に座標を表示します。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    Label label;
+
+    public Form1()
+    {
+        label = new Label() { AutoSize = true };
+
+        this.Controls.Add(label);
+
+        this.MouseMove += new MouseEventHandler(Form1_MouseMove);
+    }
+
+    // MouseMove イベントのイベントハンドラ
+    void Form1_MouseMove(object sender, MouseEventArgs e)
+    {
+        // ラベルをカーソルと同じ位置に移動
+        label.Location = e.Location;
+
+        // ラベルに座標 (x, y) を表示
+        label.Text = string.Format("({0}, {1})", e.X, e.Y);
+    }
+}
+解説
+マウスに関わるイベントには，EventHandler 型のものと，MouseEventHandler 型のものとがあります。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+イベント
+項目	説明
+EventHandler Click	クリック
+EventHandler DoubleClick	ダブルクリック
+EventHandler MouseEnter	カーソルがフォーム上に入った
+EventHandler MouseHover	カーソルがフォーム上にある
+EventHandler MouseLeave	カーソルがフォーム上を離れた
+MouseEventHandler MouseClick	クリック
+MouseEventHandler MouseDoubleClick	ダブルクリック
+MouseEventHandler MouseDown	ボタンが押された
+MouseEventHandler MouseUp	ボタンが離された
+MouseEventHandler MouseMove	カーソルが動いた
+MouseEventHandler は，第 2 引数が MouseEventArgs 型であるという点で EventHandler と異なります。
+
+System.Windows.Forms 名前空間
+delegate void MouseEventHandler(object sender, MouseEventArgs e);
+MouseEventArgs クラスは，カーソルの位置などの情報を提供することができます。
+単にクリックを検知するだけなら Click イベントで構いませんが，クリックされた位置などの情報も得たいなら，MouseClick イベントを拾うのがよいでしょう。
+
+System.Windows.Forms 名前空間
+MouseEventArgs クラス [MSDN]
+マウス関係のイベントのためのデータを提供します。
+
+プロパティ
+項目	説明
+MouseButtons Button	ボタンの左右
+int Clicks	クリック数
+Point Location	位置
+int X	x 座標
+int Y	y 座標
+System.Windows.Forms 名前空間
+MouseButtons クラス [MSDN]
+マウスのボタンを表現します。
+
+enum MouseButtons
+{
+    None = 0,
+    Left = 1048576,   // 左ボタン
+    Right = 2097152,  // 右ボタン
+    Middle = 4194304, // 中央ボタン
+    XButton1 = 8388608,
+    XButton2 = 16777216
+}
+キー入力
+作例：Shift+Esc で終了する
+Shift+Esc が押されたら，メッセージボックスを表示してプログラムを終了します (なかなかこんなキーバインドは無いですが...)。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    public Form1()
+    {
+        this.KeyDown += new KeyEventHandler(Form1_KeyDown);
+    }
+
+    // KeyDown イベントのイベントハンドラ
+    void Form1_KeyDown(object sender, KeyEventArgs e)
+    {
+        // Shift+Esc キーが押されていたら
+        if (e.KeyCode == Keys.Escape && e.Shift)
+        {
+            MessageBox.Show(
+                "Shift+Esc が押されました。フォームを終了します。",
+                "終了");
+            this.Close();  // フォームを終了
+        }
+    }
+}
+解説
+キー入力に関わるイベントには，KeyEventHandler 型のものと，KeyPressEventHandler 型のものとがあります。
+KeyEventHandler 型は「どのキーが押されたか」，KeyPressEventHandler 型は「何の文字が入力されたか」にそれぞれ重点があります。
+今回紹介するのは KeyEventHancler 型の KeyDown イベントです。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+イベント
+項目	説明
+KeyEventHandler KeyDown	キーが押された
+KeyEventHandler KeyUp	キーが離された
+System.Windows.Forms 名前空間
+delegate void KeyEventHandler(object sender, KeyEventArgs e);
+KeyeventArgs クラスの KeyCode プロパティには，押されたキーを表すキーコードが入ります。
+Control キーや Shift キーが同時に押されていたかどうかは，Control プロパティ，Shift プロパティからそれぞれ調べられます。
+
+System.Windows.Forms 名前空間
+KeyEventArgs クラス [MSDN]
+キー入力に関わるイベントのためのデータを提供します。
+
+プロパティ
+項目	説明
+Keys KeyCode	キーコード
+bool Alt	Alt キーの状態
+bool Control	Control キーの状態
+bool Shift	Shift キーの状態
+System.Windows.Forms 名前空間
+Keys 列挙体 [MSDN]
+キーコードを表現します。
+
+enum Keys     // ここでは主なキーだけ載せます
+{
+    LButton = 1, // マウスの左ボタン
+    RButton = 2, // マウスの右ボタン
+    Back = 8, // Backspace キー
+    Tab = 9,
+    Enter = 13,
+    Return 13,
+    ShiftKey = 16,   // Shift キー
+    ControlKey = 17, // Ctrl キー
+    Menu = 18,       // Alt キー
+    Left = 37,  // ← キー
+    Up = 38,    // ↑ キー
+    Right = 39, // → キー
+    Down = 40,  // ↓ キー
+    D0 = 48, // 数字の 0 キー
+    D1 = 49, // 数字の 1 キー
+    A = 65,
+    B = 66,
+    F1 = 112,
+    F2 = 113,
+}
+KeyEventHandler は，文字入力を受け付けるには適していません。
+なぜなら，アルファベットの大文字と小文字を区別して入力するだけでも，Shift キーや CapsLock の状態をいちいち調べなければならないからです。
+
+フォームを終了させるには，フォームの Close メソッドを使います。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+Close メソッド
+フォームを閉じます。
+
+void Close()
+文字入力
+作例：文字入力
+キーボードから文字入力を受け取り，入力された文字を表示していきます。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    Label label;
+
+    public Form1()
+    {
+        label = new Label()
+        {
+            Location = new Point(10, 10),
+            AutoSize = true,
+        };
+
+        this.Controls.Add(label);
+
+        this.KeyPress += new KeyPressEventHandler(Form1_KeyPress);
+    }
+
+    // KeyPress イベントのイベントハンドラ
+    void Form1_KeyPress(object sender, KeyPressEventArgs e)
+    {
+        // 入力された文字をラベルのテキスト末尾に追加
+        label.Text += e.KeyChar;
+    }
+}
+解説
+今回は「何の文字が入力されたか」に重点を置く KeyPressEventHandler 型のイベント KeyPress を扱います。
+「どのキーが押されたか」に重点を置く KeyEventHandler 型のイベントについては 4.5 節 を参照してください。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+イベント
+項目	説明
+KeyPressEventHandler KeyPress	文字が入力された
+System.Windows.Forms 名前空間
+delegate void KeyPressEventHandler(object sender, KeyPressEventArgs e);
+パラメータ KeyPressEventArgs e からは，入力された文字の情報を得ることができます。
+
+System.Windows.Forms 名前空間
+KeyPressEventArgs クラス [MSDN]
+文字入力に関わるイベントのためのデータを提供します。
+
+プロパティ
+項目	説明
+char KeyChar	文字
+KeyEventHandler とは対照的に，KeyPressEventHandler は，文字入力の受付は得意でも，特殊なキーの入力の受付は苦手です。
+KeyPressEventHandler でどうしても特殊な文字を判定したい場合は，e.KeyChar == (char) Keys.Enter などのように，Keys を char にキャストしてください。
+
+タイマ
+作例：時計
+タイトルバーに時計を表示します。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    Timer timer = new Timer();  // タイマ
+
+    public Form1()
+    {
+        timer.Interval = 1000;  // 更新間隔 (ミリ秒)
+
+        // タイマ用のイベントハンドラを登録
+        timer.Tick += new EventHandler(timer_Tick);
+
+        timer.Start();  // タイマ ON
+    }
+
+    // Tick イベントのイベントハンドラ
+    void timer_Tick(object sender, EventArgs e)
+    {
+        // 現在時を取得
+        DateTime dateTime = DateTime.Now;
+
+        // タイトルバーに現在次を表示
+        this.Text = dateTime.ToLongTimeString();
+    }
+}
+解説
+一定時間置きに処理を繰り返し実行するのに，タイマ (timer) が使われます。
+タイマを利用するには，Timer クラスのインスタンスを作成し，設定を行います。
+
+System.Windows.Forms 名前空間
+Timer クラス [MSDN]
+タイマを提供します。
+
+プロパティ
+項目	説明
+bool Enabled	有効
+int Interval	更新間隔 (ミリ秒)
+イベント
+項目	説明
+event EventHandler Tick	一定時間が経過
+Start メソッド
+タイマを開始します。
+
+void Start()
+Stop メソッド
+タイマを停止します。
+
+void Stop()
+タイマをスタートするには Start() メソッドを呼び出すか，Enabled プロパティに true を設定します。
+同様に，タイマを停止するには Stop() メソッドを呼び出すか，Enabled プロパティに false を設定します。
+
+タイマを有効にする前に，Interval プロパティにミリ秒単位で更新間隔を設定しておきます。
+タイマが有効になると，Interval に指定された一定時間が経過する度に Tick という名前のイベントが発生します (時計の「チクタク」という音から)。
+Tick イベントにイベントハンドラを登録しておけば，指定した時間置きに処理を実行することができます。
+
+ 
+今回の作例では，最初の Tick イベントが発生するまで，タイトルバーに時計は表示されません。
+フォーム起動時に直ちに時計を表示させるためには，フォームの Load イベントにも，タイマの Tick イベント用に用意したイベントハンドラを登録してみてはどうでしょう。
+Load イベントは Tick と同じ EventHandler 型なので，問題なくコンパイルできます。
+
+    // タイマ用のイベントハンドラを登録
+    timer.Tick += new EventHandler(timer_Tick);
+
+    // タイマ用のイベントハンドラをフォームにも登録
+    this.Load += new EventHandler(timer_Tick);
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+イベント
+項目	説明
+event EventHandler Load	読み込み
+event EventHandler Shown	最初の表示
+event EventHandler Activated	アクティブ化
+event EventHandler Deactivated	非アクティブ化
+再描画
+作例：時計
+再描画イベントを扱うように書き換えた時計のプログラムです (4.7 節)。
+Paint イベント発生回数の表示機能付きです。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    Timer timer;
+    int paintCount = 0;  // Paint イベントのカウンタ
+
+    public Form1()
+    {
+        timer = new Timer()
+        {
+            Interval = 1000,
+            Enabled = true,
+        };
+
+        timer.Tick += new EventHandler(timer_Tick);
+
+        this.Paint += new PaintEventHandler(Form1_Paint);
+    }
+
+    // Tick イベントのイベントハンドラ
+    void timer_Tick(object sender, EventArgs e)
+    {
+        this.Invalidate();  // 再描画を促す
+    }
+
+    // Paint イベントのイベントハンドラ
+    void Form1_Paint(object sender, PaintEventArgs e)
+    {
+        paintCount++;
+
+        this.Text =
+            DateTime.Now.ToLongTimeString() +
+            " (Paint 発生: " + paintCount + ")";
+    }
+}
+解説
+ウィンドウのサイズを拡大したり，最小化されたウィンドウを再び表示したりすると，ウィンドウの再描画が行われます。
+再描画が行われる際には，再描画イベント (Paint イベント) が発生します。
+
+再描画イベントは，次のような時に発生します。
+
+フォームが初めて表示されたとき
+フォームにコントロールが追加されたとき
+フォームのサイズが拡大されたとき
+最小化されたフォームが再び表示されたとき
+意図的に再描画を行うための Invalidate メソッドなどが呼び出されたとき
+ただし，最小化状態のときに Invalidate メソッドを呼び出しても Paint イベントは発生しません。
+
+今回のプログラムは Paint イベントのカウンタを持っています。
+フォームのサイズを変えてみたり，暫く最小化してみたりして，どのような時に Paint イベントが発生しているかを確かめてみてください。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]，他
+イベント
+項目	説明
+PaintEventHandler Paint	再描画
+Invalidate メソッド
+領域を無効化し，再描画を促します。
+
+void Invalidate()
+System.Windows.Forms 名前空間
+delegate void PaintEventHandler(object sender, PaintEventArgs e);
+オーバーライド
+作例：イベントハンドラのオーバーライド
+4.1 節 と同じプログラムですが，イベントハンドラをオーバーライドしています。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    // Click イベントのイベントハンドラ
+    protected override void OnClick(EventArgs e)
+    {
+        base.OnClick(e);  // 基底クラスのイベントハンドラ
+
+        MessageBox.Show("フォームがクリックされました。", "OnClick");
+    }
+}
+解説
+Form クラス，各コントロールのクラスは，既製のイベントハンドラを備え持っています。
+このイベントハンドラをオーバーライドすれば，自分でイベントハンドラを定義して登録する，という作業が必要なくなります。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+OnClick メソッド
+Click イベント用のイベントハンドラです。
+
+void OnClick(EventArgs e)
+OnMouseClick メソッド
+MouseClick イベント用のイベントハンドラです。
+
+void OnMouseClick(MouseEventArgs e)
+イベントハンドラの名前は OnClick，OnMouseClick などのように，OnEventName という名前になっています。
+引数は 1 つだけ取り，いままで第 2 引数に書いてきた EventArgs e などが入ります。
+
+base.OnClick(e); は，基底クラスのイベントハンドラを呼び出しています。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+イベント
+項目	説明
+EventHandler Click	クリック
+System 名前空間
+delegate void EventHandler(object sender, EventArgs e);
+スポンサーリンク
+ 
+« 前のページ 目次 次のページ »
+サイト概要 | お問合せ | プライバシーポリシー
+© 2018 kaitei.net
+

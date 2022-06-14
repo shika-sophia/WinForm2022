@@ -1,0 +1,806 @@
+
+◆ダイアログ (1)
+http://kaitei.net/csforms/dialogs/
+
+目次
+モーダルダイアログ
+モードレスダイアログ
+ボタンの割当て
+設定ダイアログ
+タブ
+バージョン情報
+
+ 
+モーダルダイアログ
+作例：モーダルダイアログ
+ユーザに応答を求めたり情報を提供したりするために用いられるサブウィンドウのことを，ダイアログボックス (dialog box) または単にダイアログと呼びます。
+既に紹介したメッセージボックスもダイアログボックスの一種ですが，今回は自分でダイアログボックスを作ってみます。
+
+公開の作例は，ダイアログが表示されている間はオーナーウィンドウの操作が効かなくなるようなダイアログです。
+このようなダイアログを，モーダル (modal, task-modal) ダイアログと言います。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    Button button;
+
+    public Form1()
+    {
+        button = new Button()
+        {
+            Text = "Dialog1",
+            Location = new Point(20, 20),
+        };
+
+        button.Click += new EventHandler(button_Click);
+
+        this.Controls.Add(button);
+
+        this.Text = "Form1";
+    }
+
+    void button_Click(object sender, EventArgs e)
+    {
+        Dialog1 dialog1 = new Dialog1();
+        dialog1.ShowDialog();  // モーダルダイアログとして表示
+    }
+}
+
+// ダイアログボックス
+class Dialog1 : Form
+{
+    public Dialog1()
+    {
+        this.Text = "Dialog1";
+
+        // ダイアログボックス用の設定
+        this.MaximizeBox = false;         // 最大化ボタン
+        this.MinimizeBox = false;         // 最小化ボタン
+        this.ShowInTaskbar = false;       // タスクバー上に表示
+        this.FormBorderStyle =
+            FormBorderStyle.FixedDialog;  // 境界のスタイル
+        this.StartPosition =
+            FormStartPosition.CenterParent;  // 親フォームの中央に配置
+    }
+}
+解説
+ダイアログボックスのための DialogBox クラスみたいなのがあるかと思いきや，そんなものは存在しません。
+Form を継承し，ダイアログ用に改造したクラスを，自分で用意します。
+
+モーダルダイアログを表示するには，フォームのインスタンスの ShowDialog メソッドを呼び出すだけです。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+ShowDialog メソッド
+フォームをモーダルダイアログとして表示します。
+
+void ShowDialog()
+一般的なダイアログボックスは次のような特徴を有します。
+これらの特徴が満たされるよう，自分でプロパティを設定する必要があります。
+
+最小化ボタン，最大化ボタンが無い
+タスクバーに表示されない
+サイズの変更が不能
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+プロパティ
+項目	説明
+bool HelpButton	[ヘルプ] ボタンを表示
+bool MaximizeBox	[最大化] ボタンを表示
+bool MinimizeBox	[最小化] ボタンを表示
+bool ControlBox	[閉じる] ボタン等を表示
+bool ShowIcon	アイコンを表示
+bool ShowInTaskbar	タスクバーに表示
+FormBorderStyle FormBorderStyle	外枠のスタイル
+また，フォームの外枠のスタイルを，ダイアログボックス用のものに設定する必要があります。
+これは FormBorderStyle プロパティに FornBorderStyle 列挙体の値を入れることで設定できます。
+
+System.Windows.Forms 名前空間
+FormBorderStyle 列挙体 [MSDN]
+フォームの境界線のスタイルを表現します。
+
+enum FormBorderStyle
+{
+    None = 0,             // 境界線なし
+    FixedSingle = 1,      // サイズ固定，一重線
+    Fixed3D = 2,          // サイズ固定，3D スタイル
+    FixedDialog = 3,      // サイズ固定，ダイアログ用
+    Sizable = 4,          // サイズ可変 (既定)
+    FixedToolWindow = 5,  // サイズ固定，ツールウィンドウ用
+    SizableToolWindow = 6 // サイズ可変，ツールウィンドウ用
+}
+ダイアログボックスは親フォームの中央 (メッセージボックスは画面の中央) に表示されるとよかったりするので，StartPosition プロパティも設定しています。
+StartPosition プロパティについては 2.5 節 を参照してください。
+
+モードレスダイアログ
+作例：モードレスダイアログ
+ダイアログが表示されている間もオーナーウィンドウの操作が有効なダイアログです。
+このようなダイアログを，モードレス (modeless, task-modeless) ダイアログと言います。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    Button button;
+
+    public Form1()
+    {
+        button = new Button()
+        {
+            Text = "Dialog1",
+            Location = new Point(20, 20),
+        };
+
+        button.Click += new EventHandler(button_Click);
+
+        this.Controls.Add(button);
+
+        this.Text = "Form1";
+    }
+
+    void button_Click(object sender, EventArgs e)
+    {
+        Dialog1 dialog1 = new Dialog1();
+        dialog1.Owner = this;  // オーナーウィンドウの設定
+        dialog1.Show();        // モードレスダイアログとして表示
+    }
+}
+
+// ダイアログボックス
+class Dialog1 : Form
+{
+    public Dialog1()
+    {
+        this.Text = "Dialog1";
+
+        // ダイアログボックス用の設定
+        this.MaximizeBox = false;
+        this.MinimizeBox = false;
+        this.ShowInTaskbar = false;
+        this.FormBorderStyle = FormBorderStyle.FixedDialog;
+
+        this.CenterToParent();
+    }
+}
+解説
+モードレスダイアログを表示するには，ShowDialog メソッドではなく Show メソッドを使います。
+
+気を付けるべきことは，Owner プロパティに必ずオーナーウィンドウを設定するということです。
+Show メソッドはダイアログ表示用のものでは特にないので，特に設定しなければ，呼び出し元のフォームとダイアログとの間に主従の関係はありません。
+Owner プロパティを設定しないと，オーナーが閉じられてもダイアログだけ残ってしまう，というような変な挙動を許してしまうことになります。
+(モードレスダイアログを呼び出し元とするモードレスダイアログを自分で作ってみると，こうなりうることが確かめられます。)
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+プロパティ
+項目	説明
+Form Owner	オーナーフォーム
+Show メソッド
+フォームを表示します。
+
+void Show()
+ボタンの割当て
+作例：結果を返すダイアログ
+メッセージボックスと同じ挙動を取るダイアログを自作します。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    public Form1()
+    {
+        this.FormClosing +=
+            new FormClosingEventHandler(Form1_FormClosing);
+    }
+
+    void Form1_FormClosing(object sender, FormClosingEventArgs e)
+    {
+        Dialog1 dialog1 = new Dialog1();
+        DialogResult result = dialog1.ShowDialog();
+        if (result != DialogResult.Yes)
+        {
+            e.Cancel = true;
+        }
+    }
+}
+
+// 自作メッセージボックス
+class Dialog1 : Form
+{
+    Label label;
+    Button buttonYes;  // [はい] ボタン
+    Button buttonNo;   // [いいえ] ボタン
+
+    public Dialog1()
+    {
+        label = new Label()
+        {
+            Text = "終了しますか？",
+            Location = new Point(30, 40),
+            AutoSize = true,
+        };
+
+        buttonYes = new Button()
+        {
+            Text = "はい(&Y)",
+            Location = new Point(30, 100),
+            AutoSize = true,
+            DialogResult = DialogResult.Yes,  //ダイアログの結果
+        };
+
+        buttonNo = new Button()
+        {
+            Text = "いいえ(&N)",
+            Location = new Point(120, 100),
+            AutoSize = true,
+            DialogResult = DialogResult.No,  //ダイアログの結果
+        };
+
+        this.Controls.AddRange(new Control[]
+        {
+            buttonYes, buttonNo, label
+        });
+
+        this.Font = new Font("メイリオ", 9);
+        this.Text = "確認";
+        this.ClientSize = new Size(220, 150);
+
+        this.MaximizeBox = false;
+        this.MinimizeBox = false;
+        this.ShowInTaskbar = false;
+        this.FormBorderStyle = FormBorderStyle.FixedDialog;
+        this.StartPosition = FormStartPosition.CenterParent;
+
+        this.AcceptButton = buttonYes;  // Enter キーで選択できるボタン
+        this.CancelButton = buttonNo;   // Esc キーで選択できるボタン
+    }
+}
+解説
+ダイアログボックスのどのボタンが押されたかという情報は，ShowDialog メソッドの返り値から得ることができます。
+DialogResult 列挙体により表現されます。
+
+System.Windows.Forms 名前空間
+DialogResult 列挙体 [MSDN]
+ダイアログの結果を表現します。
+
+enum DialogResult
+{
+    None = 0,
+    OK = 1,     // [OK]
+    Cancel = 2, // [キャンセル]
+    Abort = 3,  // [中止]
+    Retry = 4,  // [再試行]
+    Ignore = 5, // [無視]
+    Yes = 6,    // [はい]
+    No = 7      // [いいえ]
+}
+ボタンにどの値を結びつけるかは，ボタンの DialogResult プロパティに，DialogResult 列挙体により設定します。
+このプロパティを設定すると，ボタンを押した際にダイアログは自動的に閉じてくれます。
+
+System.Windows.Forms 名前空間
+Button クラス [MSDN]
+プロパティ
+項目	説明
+DialogResult DialogResult	ダイアログの返り値
+"はい(&Y)"，"いいえ(&N)" のように書くと，アンパサンド (&) 直後の 1 文字をアクセスキー (access key) として設定できます。
+アクセスキーを設定すると，Alt キーを押したときにアクセスキーが下線付きで表示され，キー操作でボタンを選択できます。
+
+※ 英語だと，"&Yes"，"&No" のようにスマートに記述できます。日本語だとこうは出来ないので括弧を使って示すのですが，この時に限っては括弧の外側にスペースを入れないのが通例です。
+
+ 
+キーボードの Enter キーを [はい] ボタン，Esc キーを [いいえ] ボタンと同等に機能させるための設定は，それぞれフォームの AcceptButton プロパティ，CancelButton プロパティに対して行います。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+プロパティ
+項目	説明
+IButtonControl AcceptButton	Enter キーで機能するボタン
+IButtonControl CancelButton	Esc キーで機能するボタン
+※ IButtonControl は Button クラスの基底であるインタフェースです。
+
+設定ダイアログ
+作例：オプションダイアログ
+フォーム起動前にこのダイアログを表示し，フォームのプロパティを設定できるようにします。
+フォームはダイアログで行われた設定に基づいて起動します。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    public Form1()
+    {
+        Dialog1 dialog1 = new Dialog1();
+        DialogResult result = dialog1.ShowDialog();
+        if (result == DialogResult.OK)
+        {
+            this.Text = dialog1.textBox.Text;
+            this.TopMost = dialog1.checkBox[0].Checked;
+            this.MaximizeBox = dialog1.checkBox[1].Checked;
+            this.MinimizeBox = dialog1.checkBox[2].Checked;
+        }
+    }
+}
+
+// オプションダイアログ
+class Dialog1 : Form
+{
+    Label label;
+    public TextBox textBox;
+    public CheckBox[] checkBox = new CheckBox[3];
+    Button okButton;
+
+    public Dialog1()
+    {
+        label = new Label()
+        {
+            Location = new Point(20, 20),
+            Text = "フォームのタイトル:",
+        };
+
+        textBox = new TextBox()
+        {
+            Location = new Point(20, 35),
+            Width = 150,
+        };
+
+        okButton = new Button()
+        {
+            Text = "OK",
+            DialogResult = DialogResult.OK,
+            Location = new Point(60, 160),
+        };
+
+        string[] textForCheckBox =
+        {
+            "最前面に表示する",
+            "最大化を有効にする",
+            "最小化を有効にする",
+        };
+        for (int i = 0; i < 3; i++)
+        {
+            checkBox[i] = new CheckBox()
+            {
+                Text = textForCheckBox[i],
+                Left = 20,
+                Top = i * 25 + 70,
+                AutoSize = true,
+            };
+        }
+
+        this.Controls.AddRange(checkBox);
+        this.Controls.AddRange(new Control[]
+        {
+            okButton, textBox , label
+        });
+
+        this.Text = "オプション";
+        this.ClientSize = new Size(200, 200);
+
+        this.MaximizeBox = false;
+        this.MinimizeBox = false;
+        this.ShowInTaskbar = false;
+        this.FormBorderStyle = FormBorderStyle.FixedDialog;
+        this.StartPosition = FormStartPosition.CenterScreen;
+
+        this.AcceptButton = okButton;
+    }
+}
+解説
+このプログラムでは，ダイアログの結果はフォーム側で受け取るようにしています。
+ダイアログ側から呼び出し元のフォームにアクセスする手法も一応可能です。
+
+フィールドを public 属性とすることに抵抗を感じる人も多いと思います。
+気になる方はプロパティを利用するなりして直しておいてください。
+
+タブ
+作例：タブ
+ダイアログにタブを持たせています。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    public Form1()
+    {
+        Dialog1 dialog1 = new Dialog1();
+        dialog1.ShowDialog();
+    }
+}
+
+// ダイアログボックス
+class Dialog1 : Form
+{
+    Label label1;
+    Label label2;
+    TabControl tabControl;
+    TabPage tabPage1;
+    TabPage tabPage2;
+
+    public Dialog1()
+    {
+        label1 = new Label()
+        {
+            Text = "ラベル 1",
+            Location = new Point(10, 10),
+        };
+
+        label2 = new Label()
+        {
+            Text = "ラベル 2",
+            Location = new Point(10, 10),
+        };
+
+        tabPage1 = new TabPage()
+        {
+            Text = "タブ 1",
+            BackColor = SystemColors.Window,
+        };
+        tabPage1.Controls.Add(label1);  // ラベル 1 をタブページ 1 に登録
+
+        tabPage2 = new TabPage()
+        {
+            Text = "タブ 2",
+            BackColor = SystemColors.Window,
+        };
+        tabPage2.Controls.Add(label2);  // ラベル 2 をタブページ 2 に登録
+
+        tabControl = new TabControl()
+        {
+            Dock = DockStyle.Fill,
+        };
+        tabControl.Controls.AddRange(new Control[]
+        {
+            tabPage1, tabPage2   // 各タブページをタブコントロールに登録
+        });
+
+        this.Controls.Add(tabControl);  // タブコントロールをフォームに登録
+
+        this.Padding = new Padding(5);  // 内側余白
+
+        this.MaximizeBox = false;
+        this.MinimizeBox = false;
+        this.ShowInTaskbar = false;
+        this.FormBorderStyle = FormBorderStyle.FixedDialog;
+    }
+}
+解説
+タブを持つフォームを作るには，まずフォームの上にタブコンテナ (TabContainer) を貼り付け，その上にタブページ (TabPage) を貼り付けます。
+
+System.Windows.Forms 名前空間
+TabContainer クラス [MSDN]
+タブコンテナを表現します。
+
+プロパティ
+項目	説明
+DockStyle Dock	結合スタイル
+メソッド
+項目	説明
+Controls.Add	コントロールの追加
+Controls.AddRange	複数コントロールの追加
+System.Windows.Forms 名前空間
+TabPage クラス [MSDN]
+タブページを表現します。
+
+プロパティ
+項目	説明
+string Text	テキスト
+メソッド
+項目	説明
+Controls.Add	コントロールの追加
+Controls.AddRange	複数コントロールの追加
+境界外側の余白をマージン (margin)，境界内側の余白をパディング (padding) と呼びます。
+今回，フォームのパディングを 5 ピクセルに設定し，タブとフォーム境界との間に間隔を開けるようにしました。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+プロパティ
+項目	説明
+Padding Padding	パディング (内側余白)
+System.Windows.Forms 名前空間
+Padding 構造体 [MSDN]
+余白を表現します。
+
+Padding コンストラクタ
+余白を指定します。
+
+Padding(
+    int all // 四辺の余白
+)
+Padding コンストラクタ
+余白を指定します。
+
+Padding(
+    int left,  // 左辺の余白
+    int top,   // 上辺の余白
+    int right, // 右辺の余白
+    int bottom // 下辺の余白
+)
+バージョン情報
+作例：バージョン情報ダイアログ
+図のようなバージョン情報ダイアログを作ります。
+フォームの [About...] ボタンを押すとこのダイアログが開くようにします。
+
+作例-1
+作例-2
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    Button button;
+
+    public Form1()
+    {
+        button = new Button()
+        {
+            Text = "About...",
+            Location = new Point(20, 20),
+        };
+
+        button.Click += new EventHandler(button_Click);
+
+        this.Controls.Add(button);
+
+        this.Text = "Form1";
+    }
+
+    void button_Click(object sender, EventArgs e)
+    {
+        Dialog1 dialog1 = new Dialog1();
+        dialog1.ShowDialog();
+    }
+}
+
+// バージョン情報ダイアログ
+class Dialog1 : Form
+{
+    Label label;
+    LinkLabel linkLabel;
+    Button okButton;
+    Icon icon;
+
+    public Dialog1()
+    {
+        // リソースアイコンを取得
+        // (プロジェクト名 Project1，リソース名 Icon の場合)
+        icon = TestCS1.Properties.Resources.Icon;
+
+        // 48 x 48 の大きさに修正
+        icon = new Icon(icon, 48, 48);
+
+        // アセンブリ情報を取得
+        System.Reflection.AssemblyName assemblyName =
+            System.Reflection.Assembly.GetExecutingAssembly().GetName();
+
+        // プログラムのバージョンを文字列化
+        string productVersion =
+            assemblyName.Version.Major + "." +  // メジャーバージョン
+            assemblyName.Version.Minor + "." +  // マイナーバージョン
+            assemblyName.Version.Build;         // ビルド番号
+
+        // ラベルの設定
+        label = new Label()
+        {
+            Location = new Point(90, 25),
+            Size = new Size(160, 40),
+            TextAlign = ContentAlignment.TopCenter,
+            Text = "Project " + productVersion + Environment.NewLine +
+                Environment.NewLine + "Copyright (c) 2012 tNagao.",
+        };
+
+        // リンクラベルの設定
+        string url = "http://www.wgag.net/";
+        linkLabel = new LinkLabel()
+        {
+            Location = new Point(90, 75),
+            Size = new Size(160, 20),
+            TextAlign = ContentAlignment.TopCenter,
+            Text = url,
+        };
+        linkLabel.Links.Add(0, url.Length, url);
+        linkLabel.LinkClicked +=
+            new LinkLabelLinkClickedEventHandler(linkLabel_LinkClicked);
+
+        // ボタンの設定
+        okButton = new Button()
+        {
+            Text = "OK",
+            DialogResult = DialogResult.OK,
+            Location = new Point(100, 110),
+        };
+
+        this.Controls.AddRange(new Control[]
+        {
+            okButton, label, linkLabel,
+        });
+
+        this.ClientSize = new Size(280, 150);
+        this.Text = "バージョン情報";
+
+        // ダイアログボックス用の設定
+        this.MaximizeBox = false;
+        this.MinimizeBox = false;
+        this.ShowInTaskbar = false;
+        this.FormBorderStyle = FormBorderStyle.FixedDialog;
+        this.StartPosition = FormStartPosition.CenterParent;
+
+        this.AcceptButton = okButton;
+    }
+
+    void linkLabel_LinkClicked(
+        object sender, LinkLabelLinkClickedEventArgs e)
+    {
+        linkLabel.LinkVisited = true;
+        System.Diagnostics.Process.Start(e.Link.LinkData as string);
+    }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        base.OnPaint(e);
+
+        // (25, 25) の位置にアイコンを描画
+        e.Graphics.DrawIcon(icon, 25, 25);
+    }
+}
+作例の図のプログラムに使用しているアイコンは こちら です。
+
+解説
+アイコンをリソースとして取り込む方法については 7.2 節 を参照してください。
+リンクラベル (LinkLabel) については 5.9 節 を参照してください。
+
+アイコンファイルに複数のサイズのアイコンが含まれている場合，そのままでは思い通りの大きさのアイコンを描画できない場合があります。
+このときは，次に示すコンストラクタを使って，指定した大きさで改めてアイコンのインスタンスを作り直します。
+
+System.Drawing 名前空間
+Icon クラス [MSDN]
+アイコンを表現します。
+
+Icon コンストラクタ
+指定した大きさで新しいアイコンのインスタンスを生成します。
+
+Icon(
+    Icon original,
+    int width,
+    int height
+)
+Graphics オブジェクトにおいてアイコンを描画するには，DrawIcon メソッドを使います。
+
+System.Drawing 名前空間
+Graphics クラス [MSDN]
+DrawIcon メソッド
+アイコンを描画します。
+
+void DrawImage(
+    Icon icon, // アイコン
+    int x,     // 始点の x 座標
+    int y      // 始点の y 座標
+)
+プログラムのバージョン番号は，アセンブリ情報として取得したものを表示しています。
+アセンブリのバージョンを編集する方法は，このページの後ろの方に書いてあります。
+
+アセンブリのバージョン番号は，AssemblyName クラス (System.Reflection 名前空間) のプロパティから取得できます。
+
+System.Reflection 名前空間
+AssemblyName クラス [MSDN]
+アセンブリの ID を表現します。
+
+プロパティ
+項目	説明
+int Version.Major	メジャーバージョン
+int Version.Minor	マイナーバージョン
+int Version.Build	ビルド番号
+int Version.Revision	リビジョン番号
+AssemblyName のインスタンスを得るには，まず Assembly クラスの GetExecutingAssembly メソッド (静的メソッド) から，現在実行中のアセンブリのインスタンスを得て，それから GetName メソッドを実行します。
+
+System.Reflection 名前空間
+Assembly クラス [MSDN]
+アセンブリを表現します。
+
+GetExecutingAssembly メソッド
+実行中のアセンブリを取得します。
+
+static Assembly GetExecutingAssembly()
+GetName メソッド
+アセンブリの AssemblyName を取得します。
+
+AssemblyName GetName()
+なお，アセンブリのバージョンを変更するには，次のように操作します。
+
+バージョン変更-1	[プロジェクト] - [(プロジェクト名) のプロパティ] を開きます。
+バージョン変更-2	[アプリケーション] タブを開き，[アセンブリ情報] を開きます。
+バージョン変更-3	アセンブリ情報を編集します。
+今回のプログラムで表示されるバージョンは，アセンブリバージョンです。
+スポンサーリンク
+ 
+« 前のページ 目次 次のページ »
+サイト概要 | お問合せ | プライバシーポリシー
+© 2018 kaitei.net

@@ -1,0 +1,548 @@
+
+◆フォームの基本
+http://kaitei.net/csforms/forms-basics/
+
+目次
+簡単なウィンドウ
+最大化ボタン
+背景色
+サイズ
+位置
+背景画像
+スポンサーリンク
+
+ 
+簡単なウィンドウ
+作例: 簡単なウィンドウ
+タイトルバーに「Hello」と表示するだけのウィンドウを作ってみましょう。
+
+作例
+
+コード
+using System;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]  // STAThread 属性をマーク (おまじない)
+    static void Main()
+    {
+        Application.Run(new Form1());  // フォームをメインウィンドウとして表示
+    }
+}
+
+class Form1 : Form
+{
+    // コンストラクタ
+    public Form1()
+    {
+        this.Text = "Hello";     // タイトルを設定
+    }
+}
+解説
+ウィンドウを表現するためのクラスとして，Form クラス (System.Windows.Forms 名前空間) が用意されています。
+ウィンドウ 1 つにつき，Form クラスのインスタンスを 1 つ用意します。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+フォームを表現します。
+
+プロパティ
+項目	説明
+string Text	フォームのタイトル
+Form クラスは string 型の Text というプロパティを持ちます。
+このプロパティに文字列を代入することで，フォームのタイトルを設定できます。
+
+Application.Run メソッドは，プログラムのメインウィンドウを表示するメソッドです。
+引数に Form クラスのインスタンスを渡します。
+
+System.Windows.Forms 名前空間
+Application.Run メソッド
+メインウィンドウを表示します。
+
+static void Run(
+    Form mainForm
+)
+Form オブジェクトを生成する作業は，ウィンドウをメモリ上に用意する作業に相当します。
+Application.Run メソッドは，メモリ上に用意したウィンドウを画面上に表示する役割を持ちます。
+
+Windows フォームプログラムは，Main メソッドに [STAThread] をマークしないとうまく動かない場合があります。
+COM のスレッドモデルを指定するためのものですが，単に「おまじない」だと思っておけば OK です。
+
+System 名前空間
+STAThread 属性 [MSDN]
+Windows フォームアプリケーションの Main メソッドにマークする必要があります。
+
+今回のプログラムでは，Form クラスの派生クラスとして Form1 を作っています。
+実際のプログラムではフォームに数多くの設定が必要となるので，このように派生クラスを用意するのが一般的です。
+今後もこのスタイルでプログラムのコードを紹介していきます。
+
+おまけ: もっと短いコード
+タイトルバーに「Hello」と表示するだけのウィンドウです。
+このように，もっと短いコードでウィンドウを作ることもできます。
+
+using System.Windows.Forms;
+
+class Program
+{
+    static void Main()
+    {
+        Form form = new Form();
+        form.Text = "Hello";   
+        Application.Run(form); 
+    }
+}
+最大化ボタン
+作例：最大化できないウィンドウ
+[最大化] ボタンが無効になったウィンドウを作ります。
+
+作例
+
+コード
+using System;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    public Form1()
+    {
+        this.Text = "Title";       // ウィンドウタイトルを設定
+        this.MaximizeBox = false;  // 最大化ボタンを無効化
+    }
+}
+解説
+Form クラスには，ウィンドウの基本属性を格納するためのさまざまなプロパティが定義されています。
+
+このプロパティに値を設定することで，ウィンドウの属性を自由に改変することができます。
+Title プロパティはフォームのタイトルを表します。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+フォームを表現します。
+
+プロパティ
+項目	説明
+string Text	フォームのタイトル
+ほかに，ウィンドウの挙動を制御するプロパティがたくさんあります。
+例えば，MaximizeBox プロパティは，最大化ボタンの表示を設定するためのプロパティです。
+最大化ボタンを有効にするには true，無効にするには false に設定します。
+デフォルトの値は true です。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+プロパティ
+項目	説明
+bool ControlBox	コントロールボックスを表示
+bool MaximizeBox	最大化ボタンを表示
+bool MinimizeBox	最小化ボタンを表示
+bool TopMost	最前面に表示
+ほかには，ウィンドウの背景やサイズを変えるプロパティも用意されています。
+これらの設定方法については，背景やサイズを指定するためのクラスを使用する必要があるため，節を分けて次節移行で説明します。
+
+背景色
+作例：背景色の設定
+ウィンドウの背景色をシステム既定の色にします。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    public Form1()
+    {
+        this.Text = "Title";
+        this.BackColor = SystemColors.Window;  // 背景色を設定
+    }
+}
+解説
+Form クラスには，背景色を設定するための BackColor プロパティや，前景色を設定するための ForeColor プロパティがあります。
+これらのプロパティは，Color 構造体 (System.Drawing 名前空間) により設定します。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+プロパティ
+項目	説明
+Color BackColor	背景色
+Color ForeColor	前景色
+System.Drawing 名前空間
+Color 構造体 [MSDN]
+色を表現します。
+
+システムカラーの Color 構造体を取得することのできる，SystemColors というクラスがあります。
+例えば，SystemColors.Window として，システム既定のウィンドウの背景色 (デフォルトは白色) を Color 構造体として取得することができます。
+
+System.Drawing 名前空間
+SystemColors クラス [MSDN]
+システムカラーを表現します。
+
+プロパティ
+項目	説明
+(static) Color Control	ダイアログボックス等の背景色 (デフォルト：グレー)
+(static) Color Window	ウィンドウの背景色 (デフォルト：白)
+(static) Color Desktop	デスクトップの背景色
+あるいは，Color 構造体自身の持つ静的プロパティから，特定の色を表す Color 構造体を取得して利用します。
+例えば，青色を背景色に指定したい場合，次のようにします。
+
+    this.BackColor = Color.Blue;
+System.Drawing 名前空間
+Color 構造体 [MSDN]
+色を表現します。
+
+プロパティ
+項目	説明
+(static) Color Black	黒
+(static) Color White	白
+(static) Color Red	赤
+(static) Color Green	緑
+(static) Color Blue	青
+(static) Color Transparent	透明？
+あるいは，自分で RGB 値を指定したい場合，Color.FromArgb() メソッド (静的メソッド) を利用します。
+例えば，(R, G, B) = (0xFF, 0xCC, 0) である色を背景色に指定したい場合，次のようにします。
+
+    this.BackColor = Color.FromArgb(0xFF, 0xCC, 0);
+System.Drawing 名前空間
+Color 構造体 [MSDN]
+色を表現します。
+
+FromArgb メソッド
+任意の RGB 値を指定します。
+
+static Color FromArgb(
+    int red,   // 赤 (0-255)
+    int green, // 緑 (0-255)
+    int blue   // 青 (0-255)
+)
+代表的な色の見本を表にまとめました。RGB カラーに馴染みのない方は，これを参考にしてください。
+
+FromArgb(r, g, b)	Color	サンプル
+FromArgb(0x00, 0x00, 0x00)	Color.Black	
+FromArgb(0xFF, 0x00, 0x00)	Color.Red	
+FromArgb(0x00, 0x80, 0x00)	Color.Green	
+FromArgb(0x00, 0xFF, 0x00)	Color.Lime	
+FromArgb(0x00, 0x00, 0xFF)	Color.Blue	
+FromArgb(0xFF, 0xFF, 0x00)	Color.Yellow	
+FromArgb(0x00, 0xFF, 0xFF)	Color.Aqua	
+FromArgb(0xFF, 0x00, 0xFF)	Color.Magenta	
+FromArgb(0xFF, 0xFF, 0xFF)	Color.White	
+サイズ
+作例：サイズの設定
+クライアント領域のサイズを 300 x 200 ピクセルに設定します。
+
+※ ウィンドウの外枠より内側の部分を，クライアント領域と言います。図の一面グレーに塗り潰されている部分がクライアント領域です。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    public Form1()
+    {
+        this.Text = "Title";
+        this.ClientSize = new Size(300, 200); // クライアント領域のサイズ
+    }
+}
+解説
+ウィンドウのクライアント領域のサイズを指定するには，ClientSize プロパティを設定します。
+また，ウィンドウ全体のサイズを指定するには，Size プロパティを設定します。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+プロパティ
+項目	説明
+Size ClientSize	クライアント領域のサイズ
+Size Size	ウィンドウのサイズ
+※ 「Size Size」という書き方が紛らわしいですが，これは「Size 型の Size プロパティ」という意味です。
+
+サイズ (幅，高さ) を表現するのには，Size 構造体 (System.Drawing 名前空間) が使われます。
+new Size(300, 200) と書いた箇所は，Size 構造体のコンストラクタを呼び出してインスタンスを生成しているので，必ず new 演算子が必要です。
+
+System.Drawing 名前空間
+Size 構造体 [MSDN]
+サイズを表現します。
+
+プロパティ
+項目	説明
+int Width	幅
+int Height	高さ
+Size コンストラクタ
+任意のサイズを指定します。
+
+Size(
+    int width,  // 幅
+    int height  // 高さ
+)
+Form クラスは，ウィンドウの幅を表す Width プロパティ，高さを表す Height プロパティも持っています。
+よって，ウィンドウサイズを指定するのであれば，次の 2 つのどちらでも同じ設定ができます。
+
+    // 1) 一括して指定
+    this.Size = new Size(400, 300);
+
+    // 2) 別々に指定
+    this.Width = 400;
+    this.Height = 300;
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+プロパティ
+項目	説明
+int Width	ウィンドウの幅
+int Height	ウィンドウの高さ
+位置
+作例：位置の設定
+スクリーン座標 (100, 50) の位置にウィンドウを表示します。
+つまり，画面左から 100 ピクセル，上から 50 ピクセルの位置にウィンドウを表示します。
+
+※ スクリーン上の座標表現には，左上端に原点，右方向に x 軸，下方向に y 軸を取る座標系が使われます。
+
+作例-1 作例-2
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    public Form1()
+    {
+        this.Text = "Title";
+        this.StartPosition = FormStartPosition.Manual;  // 位置の決定方法
+        this.Location = new Point(100, 50);  // ウィンドウの位置
+    }
+}
+解説
+フォームの位置の決定に関係するプロパティとして，Location プロパティと StartPosition プロパティがあります。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+プロパティ
+項目	説明
+Point Location	位置
+FormStartPosition StartPosition	初期位置の決定方法
+StartPosition プロパティは，フォームの初期位置の決定方法を指定するためのプロパティで，FormStartPosition 列挙体により設定します。
+デフォルトの設定は FormStartPosition.WindowsDefaultLocation です。
+FormStartPosition.Manual に設定した場合，Location プロパティの値によって位置が決定されます。
+
+System.Drawing 名前空間
+FormStartPosition 列挙体 [MSDN]
+フォームの初期位置を表します。
+
+enum FormStartPosition
+{
+    Manual = 0,                  // 手動で設定
+    CenterScreen = 1,            // 画面中央
+    WindowsDefaultLocation = 2,  // 既定の位置とサイズ
+    WindowsDefaultBounds = 3,    // 既定の位置と境界
+    CenterParent = 4,            // 親フォームの中央
+}
+Location プロパティは，フォームの位置を表すプロパティで，Point 構造体により表現されます。
+Point 構造体は，座標 (x，y) を表現する構造体です。
+Location = new Point(100, 50) と指定すると，座標 (100, 50) の位置にウィンドウの左上端が来るように，ウィンドウが配置されます。
+
+System.Drawing 名前空間
+Point 構造体 [MSDN]
+座標を表現します。
+
+プロパティ
+項目	説明
+int X	x 座標
+int Y	y 座標
+Point コンストラクタ
+座標を指定します。
+
+Point(
+    int x, // x 座標
+    int y  // y 座標
+)
+Size 構造体はサイズ (幅，高さ) を表すものであるのに対し，Point 構造体は座標 (x，y) を表すものです。
+混同しないよう注意してください。
+
+Form クラスは，水平位置を表す Left プロパティ，垂直位置を表す Top プロパティも持っています。
+よって，次の 2 つは実質的に同じ意味です。
+
+ 
+     // 1) 一括して指定
+     this.Location = new Point(20, 10);
+
+     // 2) 別々に指定
+     this.Left = 20;
+     this.Top = 10;
+また，右下端の位置を表す Right プロパティ，Bottom プロパティも提供されています。
+これらは取得のみ可能な (設定ができない) プロパティです。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+プロパティ
+項目	説明
+int Left	左上端の x 座標
+int Top	左上端の y 座標
+int Right	右下端の x 座標
+int Bottom	右下端の y 座標
+フォームを画面の中央に配置するためのメソッド CenterToScreen も用意されています。
+親フォームが子フォームを持つようなプログラムでは，フォームを親フォームの中央に配置するためのメソッド CenterToParent を利用することもできます。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+CenterToScreen メソッド
+フォームを画面の中央に配置します。
+
+void CenterToScreen()
+CenterToParent メソッド
+フォームを親フォームの中央に配置します。
+
+void CenterToParent()
+背景画像
+作例：背景画像の設定
+背景に画像をタイル状に並べて表示します。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    public Form1()
+    {
+        Bitmap bitmap = new Bitmap(@"C:\test\tile.png");
+
+        this.BackgroundImage = bitmap;                  // 背景画像
+        this.BackgroundImageLayout = ImageLayout.Tile;  // 配置
+    }
+}
+tile.png としてこのイメージファイルを使用しました。ご自由にダウンロードして使ってください。
+タイル素材
+
+解説
+フォームの背景画像を設定するには，BackgroundImage プロパティにイメージを登録します。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+プロパティ
+項目	説明
+Image BackgroundImage	背景イメージ
+ImageLayout BackgroundImageLayout	背景イメージのレイアウト
+BackgroundImageLayout プロパティは，イメージの配置方法を指定するためのものです。
+次に示すようなものが利用できるので，それぞれ試してみてください。
+
+System.Windows.Forms 名前空間
+ImageLayout 列挙体 [MSDN]
+イメージの配置方法を表現します。
+
+enum ImageLayout
+{
+    None = 0,    // 左上に配置
+    Tile = 1,    // タイル状に整列
+    Center = 2,  // 中央に配置
+    Stretch = 3, // 縦横比を維持せず拡縮
+    Zoom = 4,    // 縦横比を維持して拡縮
+}
+イメージファイルを取り扱うためのクラスに Image クラスがあります。
+ただし，Image クラスは抽象クラスです。
+
+System.Drawing 名前空間
+Image クラス [MSDN]
+イメージを表現します。
+
+今回のプログラムでは，Image クラスを継承した Bitmap クラスを利用しました。
+名前に反して，BMP 形式以外に JPG，GIF，PNG，EXIF，TIFF 形式のファイルも取り込むことができます。
+
+System.Drawing 名前空間
+Bitmap クラス [MSDN]
+ピクセルイメージを表現します。
+
+Bitmap コンストラクタ
+イメージを取得します。
+
+Bitmap(
+    string filename // イメージファイルのパス
+)
+ファイルパスは絶対パスでも (実行ファイルがあるディレクトリからの) 相対パスでも構いません。
+パスの \ 記号をいちいちエスケープするのが面倒なので，今回のプログラムではプリフィックスとして @ を付し，エスケープしなくてもいいようにしています。
+
+Bitmap クラスのコンストラクタを直接使わない別の方法として，Image クラスの静的メソッドを利用してイメージファイルを取得する方法も可能です。
+次の 2 つのどちらのコードでも，背景画像としてイメージファイルを登録することができます。
+
+ 
+    // 1) Bitmap クラスのコンストラクタを直接使う方法
+    this.BackgroudImage = new Bitmap(@"C:\test\tile.png");
+
+    // 2) Image クラスの静的メソッドを利用する方法
+    this.BackgroundImage = Image.FromFile(@"C:\test\tile.png");
+System.Drawing 名前空間
+Image クラス [MSDN]
+イメージを表現します。
+
+FromFile メソッド
+イメージファイルを取得します。
+
+static Image FromFile(
+    string filename // イメージファイルへのパス
+)
+なお，今回くらいのプログラムでは目くじらを立てる必要はないと思いますが，Bitmap オブジェクトを何回も生成するようなプログラムでは，Bitmap オブジェクトを使い終る度に Dispose メソッドでリソースを開放してあげてください。
+
+System.Drawing 名前空間
+Bitmap クラス [MSDN]
+Dispose メソッド
+イメージを破棄します。
+
+void Dispose()
+スポンサーリンク
+ 
+« 前のページ 目次 次のページ »
+サイト概要 | お問合せ | プライバシーポリシー
+© 2018 kaitei.net

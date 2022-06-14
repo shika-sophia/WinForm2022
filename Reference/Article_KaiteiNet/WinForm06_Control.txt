@@ -1,0 +1,1320 @@
+
+◆コントロール
+
+目次
+ラベルの復習
+ボタンの復習
+テキストボックス
+ピクチャボックス
+コンボボックス
+チェックボックス
+ラジオボタン
+プログレスバー
+リンクラベル
+リストビュー
+分割フォーム
+スポンサーリンク
+
+ 
+ラベルの復習
+作例：フォントと文字色の設定
+ラベルにフォントと文字色を設定してみました。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    Label label;  // ラベル
+    Font font;    // フォント
+
+    public Form1()
+    {
+        // フォントを定義
+        font = new Font("Times New Roman", 24, FontStyle.Regular);
+
+        label = new Label()
+        {
+            Text = "Hello, world!",
+            Location = new Point(10, 10),
+            ForeColor = Color.FromArgb(0x00, 0x77, 0xFF),  // 文字色
+            Font = font,  // フォント
+            AutoSize = true,
+        };
+
+        this.Controls.Add(label);
+        this.BackColor = SystemColors.Window;
+    }
+解説
+ボタンやチェックボックスなどといった部品を，コントロール (control) と呼びます。
+広義にはフォームやコンテナ (3.4 節) もコントロールに含まれます。
+
+各アプリケーションで共通して使えるコモンコントロール (common control) として，例えば次のようなものが利用できます。
+
+コモンコントロール-1 コモンコントロール-2
+
+いずれのコントロールも，System.Windows.Forms.Control クラスを継承しています。
+Label，Buttonコントロールで利用できるプロパティやイベントの多くは，他の各コントロールでも利用できます。
+
+代表的なコントロールとその機能等は一通り取り上げたいと思っていますが，すべてを紹介できる訳ではありません。
+不足な部分は他の文献を参照して補ってください。
+
+今回取り上げる Labelコントロールは，プレーンテキストを設置するためのコントロールです。
+
+System.Windows.Forms 名前空間
+Label クラス [MSDN]
+ラベルコントロールを表現します。
+
+プロパティ
+項目	説明
+string Text	テキスト
+Point Location	位置
+Size Size	サイズ
+bool AutoSize	自動サイズ
+Color ForeColor	前景色
+Font Font	フォント
+ContentAlignment TextAlign	配置
+Parent は，親コントロールを設定するためのプロパティです。
+label.Parent = this は，this.Controls.Add(label) と同じ効果を持ちます。
+
+フォントを指定するには，Font クラスを利用します。
+コンストラクタにはいくつかのオーバーロードがありますが，今回は次に示すリストの 2 番目のものを使用しました。
+なお，new によって何回も Font オブジェクトを生成するようなプログラムでは，フォントを使い終る度に Dispose メソッドで破棄するのがよいです。
+
+System.Drawing 名前空間
+Font クラス
+フォントを表現します。 [MSDN]
+
+Font コンストラクタ
+フォントを指定します。
+
+Font(
+    string familyName, // フォント名
+    float emSize       // サイズ (pt)
+)
+Font(
+    string familyName, // フォント名
+    float emSize,      // サイズ (pt)
+    FontStyle style    // スタイル
+)
+Dispose メソッド
+フォントを破棄します。
+
+void Dispose()
+あるいは SystemFonts クラスから，システム既定のフォントを利用することができます。
+SystemFonts クラスから取得したフォントは，Dispose メソッドで破棄する必要はありません。
+
+System.Drawing 名前空間
+SystemFonts クラス [MSDN]
+システム既定のフォントを表現します。
+
+プロパティ
+項目	説明
+(static) Font DefaultFont	既定のフォント
+(static) Font CaptionFont	タイトルのフォント
+(static) Font MenuFont	メニューのフォント
+Font クラスのコンストラクタにおけるフォントスタイルの指定には，FontStle 列挙体が用いられます。
+
+System.Drawing 名前空間
+FontStyle 列挙体
+フォントスタイルを表現します。 [MSDN]
+
+enum Fontstyle
+{
+    Regular = 0,   // 標準
+    Bold = 1,      // 太字
+    Italic = 2,    // 斜体
+    Underline = 4, // 下線
+    Strikeout = 8  // 取消線
+}
+お気付きの通り，FontStyle 列挙体はビットフィールドの形式を採っています。
+例えば，太斜体 (ボールドイタリック) にしたい場合には，ビット単位の論理和 | を使って次のように書くことができます。
+
+    label.Font = new Font(
+        "Times New Roman", 12, FontStyle.Bold | FontStyle.Italic);
+ 
+今回のプログラムでは登場していませんが，Label クラスの TextAlign プロパティも紹介しておきます。
+ラベルの Size を大きめに指定しておいて，TextAlign プロパティを設定すると，文字列を中央に寄せたり，右に揃えたりすることができます。
+TextAlign プロパティの値は ContentAlignment 列挙体により指定します。
+
+System.Drawing 名前空間
+ContentAlignment 列挙体
+配置位置を表現します。 [MSDN]
+
+enum ContentAlignment
+{
+    TopLeft = 1,         // 上端左寄せ
+    TopCenter = 2,       // 上端中央
+    TopRight = 4,        // 上端右寄せ
+    MiddleLeft = 16,     // 中段左寄せ
+    MiddleCenter = 32,   // 中段中央
+    MiddleRight = 64,    // 中段右寄せ
+    BottomLeft = 256,    // 下端左寄せ
+    BottomCenter = 512,  // 下端中央
+    BottomRight = 1024,  // 下端右寄せ
+}
+ボタンの復習
+作例：三つ子のボタン
+Tab キーを押したときにフォーカスが移る順位を，ボタン A，B，C の順に設定しています。
+ボタン B を使用不可にしています。
+ボタン C にマウスカーソルを重ねると，カーソルが手の形のカーソルになります。
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    Button[] button = new Button[3];  // ボタン
+
+    public Form1()
+    {
+        button[0] = new Button()
+        {
+            Text = "ボタン A",
+            TabIndex = 0,  // フォーカスの移る順位 0 (最優先)
+            Location = new Point(10, 10),
+            UseVisualStyleBackColor = true,  // ビジュアルスタイル
+        };
+        button[0].Click += new EventHandler(button_Click);
+
+        button[1] = new Button()
+        {
+            Text = "ボタン B",
+            TabIndex = 1,
+            Location = new Point(10, 40),
+            UseVisualStyleBackColor = true,
+            Enabled = false,  // 使用不可
+        };
+        button[1].Click += new EventHandler(button_Click);
+
+        button[2] = new Button()
+        {
+            Text = "ボタン C",
+            TabIndex = 2,
+            Location = new Point(10, 70),
+            UseVisualStyleBackColor = true,
+            Cursor = Cursors.Hand,  // 手形カーソル
+        };
+        button[2].Click += new EventHandler(button_Click);
+
+        this.Controls.AddRange(button);
+
+        this.BackColor = SystemColors.Window;
+    }
+
+    void button_Click(object sender, EventArgs e)
+    {
+        // 押されたボタンのテキストをタイトルバーに表示
+        this.Text = (sender as Button).Text;
+    }
+}
+解説: ボタンコントロール
+普通のプッシュボタンを設置するには，ボタンコントロール (Button) を利用します。
+今回は Button クラスのインスタンスを 3 つ作成し，3 つのボタンを設置しました。
+
+System.Windows.Forms 名前空間
+Button クラス [MSDN]
+ボタンコントロールを表現します。
+
+プロパティ
+項目	説明
+string Text	テキスト
+Point Location	位置
+Size Size	サイズ
+int TabIndex	フォーカスの移る順番
+bool Enabled	使用可能
+Cursors Cursor	カーソル
+bool UseVisualStyleBackColor	ビジュアルスタイルの背景色
+イベント
+項目	説明
+EventHandler Click	クリック
+TabIndex に値を入れることで，Tab キーを押したときにフォーカスが移る順番を設定することができます。
+最優先してフォーカスを当てるコントロールには 0 を指定し，以降は 1，2, ... と指定していきます。
+
+ボタンの背景色は，親要素の背景色の影響を受け，変な見た目になってしまうことがあります。
+これを避けるため，UseVisualStyleBackColor プロパティに true を設定し，ボタンの背景色がビジュアルスタイルにより描画されるようにしています。
+
+ 
+Enabled プロパティにより，コントロールが使用可能であるかないかを設定することができます。
+ボタン B のように false を設定するとコントロールが使用不可になり，コントロールは画面上から一切操作できなくなります。
+
+ボタン C にだけ，Cursor プロパティを設定してみました。
+Cursors クラスを使って，任意のカーソルを設定することができます。
+
+System.Windows.Forms 名前空間
+Cursors クラス [MSDN]
+カーソルを表現します。
+
+主なプロパティ (static Cursor ***)
+主なプロパティ
+テキストボックス
+作例：メモ帳
+テキストボックスコントロールを使って，簡易的なメモ帳を作成します。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    TextBox textBox;  // テキストボックス
+
+    public Form1()
+    {
+        textBox = new TextBox()
+        {
+            Dock = DockStyle.Fill,        // 結合スタイル
+            ScrollBars = ScrollBars.Both, // スクロールバー
+            Multiline = true,             // 複数行
+            WordWrap = false,             // 折り返し
+            Font = new Font("ＭＳ ゴシック", 12, FontStyle.Regular),
+        };
+
+        this.Controls.Add(textBox);
+
+        this.Text = "無題 - メモ帳";
+    }
+}
+解説
+テキストボックスコントロール (TextBox) を利用しています。
+コントロールを配置するための手順は，ラベルコントロールの場合と全く同じです。
+
+System.Windows.Forms 名前空間
+TextBox クラス [MSDN]
+テキストボックスコントロールを表現します。
+
+プロパティ
+項目	説明
+DockStyle Dock	結合スタイル
+ScrollBars ScrollBars	スクロールバー
+bool Multiline	複数行
+bool WordWrap	折り返し
+Font Font	フォント
+テキストボックスを親フォームのクライアント領域いっぱいに拡げるために，DockStyle.Fill スタイルを適用しました。
+他の結合スタイルだとどうなるかは，実際に自分で試してみるとよくわかると思います。
+
+System.Windows.Forms 名前空間
+DockStyle 列挙体 [MSDN]
+結合スタイルを表現します。
+
+enum Dockstyle
+{
+    None = 0,
+    Top = 1,    // 上方
+    Bottom = 2, // 下方
+    Left = 3,   // 左方
+    Right = 4,  // 右方
+    Fill = 5    // 四方
+}
+作例
+どの方向のスクロールバーを有効にするかは，ScrollBars 列挙体により指定します。
+
+System.Windows.Forms 名前空間
+ScrollBars 列挙体 [MSDN]
+スクロールバーの表示設定を表現します。
+
+enum ScrollBars
+{
+    None = 0,       // なし
+    Horizontal = 1, // 水平方向
+    Vertical = 2,   // 垂直方向
+    Both = 3        // 両方向
+}
+ピクチャボックス
+作例：イメージビューア
+イメージを表示するフォームを作成します。
+プログラムを走らせる前に，任意のイメージファイルを準備してください (イメージの形式は .bmp 以外でも構いません)。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    PictureBox pictureBox;  // ピクチャボックス
+    Bitmap bitmap;
+
+    public Form1()
+    {
+        bitmap = new Bitmap(@"C:\test\sample.bmp");
+
+        pictureBox = new PictureBox()
+        {
+            Image = bitmap,
+            SizeMode = PictureBoxSizeMode.Zoom,  // サイズモード
+        };
+
+        this.Controls.Add(pictureBox);
+    }
+}
+解説
+イメージファイルの表示にはピクチャボックス (PictureBox) を使います。
+
+System.Windows.Forms 名前空間
+PictureBox クラス [MSDN]
+ピクチャボックスコントロールを表現します。
+
+プロパティ
+項目	説明
+Image Image	イメージ
+Size Size	サイズ
+PictureBoxSizeMode SizeMode	サイズモード
+SizeMode プロパティは，イメージの配置方法を指定するためのものです。
+次に示すようなものが利用できるので，それぞれ試してみてください。
+
+System.Windows.Forms 名前空間
+PictureBoxSizeMode 列挙体 [MSDN]
+ピクチャボックスコントロールのサイズモードを表現します。
+
+enum PictureBoxSizeMode
+{
+    Normal = 0,       // PictureBox の左上端にそのまま配置
+    StretchImage = 1, // PictureBox に合わせてイメージを伸び縮み
+    AutoSize = 2,     // PictureBox のサイズをイメージに合わせる
+    CenterImage = 3,  // PictureBox の中央にイメージを配置
+    Zoom = 4          // 縦横比を維持したまま拡大または縮小
+}
+Image クラス，Bitmap クラスについては 2.6 節 でも扱っています。
+
+System.Drawing 名前空間
+Image クラス [MSDN]
+イメージを表現します。
+
+System.Drawing 名前空間
+Bitmap クラス [MSDN]
+ピクセルイメージを表現します。
+
+Bitmap コンストラクタ
+イメージを取得します。
+
+Bitmap(
+    string filename // イメージファイルのパス
+)
+コンボボックス
+作例：コンボボックス
+図のようなコンボボックスを持つフォームを作成します。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    Label label;
+    ComboBox comboBox;  // コンボボックス
+
+    public Form1()
+    {
+        label = new Label()
+        {
+            Location = new Point(10, 100),
+            AutoSize = true,
+        };
+
+        comboBox = new ComboBox()
+        {
+            Location = new Point(10, 10),
+            DropDownStyle = ComboBoxStyle.DropDownList,  // 表示形式
+        };
+
+        // 項目の追加
+        comboBox.Items.Add("青巻紙");
+        comboBox.Items.Add("赤巻紙");
+        comboBox.Items.Add("黄巻紙");
+
+        comboBox.SelectedIndex = 0;  // 最初に選択される項目
+
+        comboBox.SelectedIndexChanged +=
+            new EventHandler(comboBox_SelectedIndexChanged);
+
+        this.Controls.Add(label);
+        this.Controls.Add(comboBox);
+    }
+
+    // 選択項目が変更されたときのイベントハンドラ
+    void comboBox_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        label.Text = string.Format(
+            "インデックス {0} の '{1}' が選択されました。",
+            comboBox.SelectedIndex, comboBox.SelectedItem.ToString());
+    }
+}
+解説
+コンボボックス (ComboBox) やリストボックス (ListBox) は，複数の項目のリストを持つコントロールです。
+
+System.Windows.Forms 名前空間
+ComboBox クラス [MSDN]
+コンボボックスコントロールを表現します。
+
+プロパティ
+項目	説明
+object SelectedItem	選択中の項目
+int SelectedIndex	選択中のインデックス
+ComboBoxStyle DropDownStyle	ドロップダウンスタイル
+イベント
+項目	説明
+EventHandler SelectedIndexChanged	選択するインデックスが変更された
+SelectedIndex は，選択中の項目の番号を表すプロパティです。
+3 つの項目が登録されているなら，このプロパティには 0 から 2 までのいずれかの値が入ります。
+
+選択される項目が変更されると，SelectedIndexChanged イベントが発生します。
+
+コンボボックスに項目を追加するには，Items.Add メソッドか Items.AddRange メソッドを使います。
+ここで Items はコンボボックス項目を格納するためのプロパティで，ArrayList コレクションのようなものです。
+普通は文字列を入れておけば大丈夫です。
+
+System.Windows.Forms 名前空間
+ComboBox クラス [MSDN]
+プロパティ
+項目	説明
+ComboBox.ObjectCollection Item	項目のコレクション
+Items.Add メソッド
+項目を追加します。
+
+int Add(
+    Object item
+)
+Items.AddRange メソッド
+複数の項目を追加します。
+
+void AddRange(
+    Object[] items
+)
+今回のプログラムで Items.AddRange を使いたいなら，次のようにするとよいでしょう。
+
+    string[] items = { "青巻紙", "赤巻紙", "黄巻紙" };
+    comboBox.Items.AddRange(items);
+コンボボックスの表示形式は 3 通り存在します。
+それぞれ自分で試してみてください。
+
+System.Windows.Forms 名前空間
+ComboBoxStyle 列挙体 [MSDN]
+コンボ ボックス スタイルを表現します。
+
+enum ComboBoxStyle
+{
+    Simple = 0,       // シンプル
+    DropDown = 1,     // ドロップダウン
+    DropDownList = 2  // ドロップダウンリスト
+}
+おまけ：リストボックス
+コンボボックスがわかっていればこちらは簡単です。
+
+System.Windows.Forms 名前空間
+ListBox クラス [MSDN]
+リストボックスコントロールを表現します。
+
+プロパティ
+項目	説明
+object SelectedItem	選択中の項目
+int SelectedIndex	選択中のインデックス
+ListBox.ObjectCollection Items	項目のコレクション
+イベント
+項目	説明
+EventHandler SelectedIndexChanged	選択するインデックスが変更された
+作例
+
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    Label label;
+    ListBox listBox;
+
+    public Form1()
+    {
+        label = new Label()
+        {
+            Location = new Point(10, 100),
+            AutoSize = true,
+        };
+
+        listBox = new ListBox()
+        {
+            Location = new Point(10, 10),
+        };
+
+        listBox.Items.AddRange(new string[]
+        {
+            "青巻紙", "赤巻紙", "黄巻紙"
+        });
+
+        listBox.SelectedIndex = 0;
+
+        listBox.SelectedIndexChanged +=
+            new EventHandler(listBox_SelectedIndexChanged);
+
+        this.Controls.Add(label);
+        this.Controls.Add(listBox);
+    }
+
+    void listBox_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        label.Text = string.Format(
+            "インデックス {0} の '{1}' が選択されました。",
+            listBox.SelectedIndex, listBox.SelectedItem.ToString());
+    }
+}
+チェックボックス
+作例：チェックボックス
+チェックボックスを操作してフォントスタイルを変更するプログラムです。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    CheckBox cbBold;    // '太字' チェックボックス
+    CheckBox cbItalic;  // '斜体' チェックボックス
+    Label label;
+    Font font;
+
+    public Form1()
+    {
+        label = new Label()
+        {
+            Text = "Times New Roman",
+            Location = new Point(20, 70),
+            AutoSize = true,
+        };
+
+        cbBold = new CheckBox()
+        {
+            Text = "太字",
+            Location = new Point(20, 15),
+        };
+        cbBold.CheckedChanged +=
+            new EventHandler(checkBox_CheckedChanged);
+
+        cbItalic = new CheckBox()
+        {
+            Text = "斜体",
+            Location = new Point(20, 40),
+        };
+        cbItalic.CheckedChanged +=
+            new EventHandler(checkBox_CheckedChanged);
+
+        cbBold.Checked = true;
+        cbItalic.Checked = true;
+
+        this.Controls.AddRange(new Control[]
+        {
+            cbBold, cbItalic, label
+        });
+    }
+
+    // 選択状態が変更されたときのイベントハンドラ
+    void checkBox_CheckedChanged(object sender, EventArgs e)
+    {
+        if (font != null)
+        {
+            font.Dispose();
+        }
+
+        FontStyle fontStyle =
+            (cbBold.Checked   ? FontStyle.Bold   : 0) |
+            (cbItalic.Checked ? FontStyle.Italic : 0);
+
+        font = new Font("Times New Roman", 20, fontStyle);
+
+        label.Font = font;
+    }
+}
+解説
+チェックボックスコントロール (CheckBox) は，それぞれが独立に選択状態を取ることができます。
+よく似たものにラジオボタンありますが，チェックボックスとは違う性質のものなので，注意して使い分けてください。
+
+System.Windows.Forms 名前空間
+CheckBox クラス [MSDN]
+チェックボックスコントロールを表現します。
+
+プロパティ
+項目	説明
+bool Checked	選択中
+イベント
+項目	説明
+event EventHandler CheckedChanged	選択状態が変更された
+Checked プロパティの初期値を，CheckedChanged イベントハンドラよりも後に設定しています。
+こうすることで，最初から正しいフォントで表示されるようにすることができます。
+
+ラジオボタン
+作例：ラジオボタン
+ラジオボタンを使ったプログラムです。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    Label label;
+    RadioButton[] radioButton = new RadioButton[3];  // ラジオボタン
+    GroupBox groupBox;  // グループボックス
+
+    public Form1()
+    {
+        label = new Label()
+        {
+            AutoSize = true,
+            Location = new Point(20, 150),
+        };
+
+        string[] item = { "青巻紙", "赤巻紙", "黄巻紙" };
+
+        for (int i = 0; i < 3; i++)
+        {
+            radioButton[i] = new RadioButton()
+            {
+                Text = item[i],
+                Left = 10,
+                Top = i * 22 + 18,
+            };
+            radioButton[i].CheckedChanged +=
+                new EventHandler(radioButton_CheckedChanged);
+        }
+
+        radioButton[0].Checked = true;  // 最初は '青巻紙' を選択
+
+        groupBox = new GroupBox()
+        {
+            Text = "巻紙",
+            Location = new Point(20, 20),
+            Size = new Size(160, 100),
+        };
+
+        // グループボックスにラジオボタンを貼り付け
+        groupBox.Controls.AddRange(radioButton);
+
+        this.Controls.Add(label);
+        this.Controls.Add(groupBox);
+    }
+
+    // 選択項目が変更されたときのイベントハンドラ
+    void radioButton_CheckedChanged(object sender, EventArgs e)
+    {
+        RadioButton radioButton = sender as RadioButton;
+
+        if (radioButton.Checked)
+        {
+            label.Text = string.Format("'{0}' が選択されました。",
+                radioButton.Text);
+        }
+    }
+}
+解説
+ラジオボタン (RadioButton) は，カーラジオの選局ボタンからその名が来ています。
+チェックボックスと異なり，1 グループ内に必ず 1 つのボタンだけが選択された状態を取ります。
+そのため，各ラジオボタンは，必ずどこかのグループボックスに所属させます。
+
+System.Windows.Forms 名前空間
+RadioButton クラス [MSDN]
+ラジオボタンコントロールを表現します。
+
+プロパティ
+項目	説明
+bool Checked	選択中
+イベント
+項目	説明
+EventHandler CheckedChanged	選択状態が変更された
+グループボックス (GroupBox) は，コンテナの 1 つです。
+基本的な使い方はパネルと同じです (3.4 節)。
+
+System.Windows.Forms 名前空間
+GroupBox クラス [MSDN]
+グループボックスを表現します。
+
+プロパティ
+項目	説明
+string Text	タイトル
+プログレスバー
+作例：プログレスバーとスピンボックス
+スピンボックスの値に合わせて，プログレスバーの表示が変化します。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    ProgressBar progressBar;      // プログレスバー
+    NumericUpDown numericUpDown;  // スピンボックス
+
+    public Form1()
+    {
+        progressBar = new ProgressBar()
+        {
+            Location = new Point(20, 60),
+            Width = 200,
+            Style = ProgressBarStyle.Continuous,  // スタイル
+        };
+
+        numericUpDown = new NumericUpDown()
+        {
+            Location = new Point(20, 20),
+            Minimum = 0,    // 最小値
+            Maximum = 100,  // 最大値
+        };
+
+        numericUpDown.ValueChanged +=
+            new EventHandler(numericUpDown_ValueChanged);
+
+        this.Controls.AddRange(new Control[]
+        {
+            numericUpDown, progressBar
+        });
+    }
+
+    // スピンボックスの値が変更されたときのイベントハンドラ
+    void numericUpDown_ValueChanged(object sender, EventArgs e)
+    {
+        progressBar.Value = (int) numericUpDown.Value;
+    }
+}
+解説
+プログレスバー (ProgressBar) は，主に作業の進捗状況を表すために用いるコントロールです (ということは，今回の作例は本来の使い方とは違うみたいです...)。
+
+System.Windows.Forms 名前空間
+ProgressBar クラス [MSDN]
+プログレスバーコントロールを表現します。
+
+プロパティ
+項目	説明
+int Value	値
+int Maximum	最大値 (デフォルト: 100)
+int Minimum	最小値 (デフォルト: 0)
+ProgressBarStyle Style	スタイル
+プログレスバーのスタイルは ProgressBarStyle 列挙体により指定します。
+それぞれ試してみてください。
+Blocks と Continuous の違いは，Application.EnableVisualStyles(); をコメントアウトしてみるとわかると思います。
+
+System.Windows.Forms 名前空間
+ProgressBarStyle 列挙体 [MSDN]
+プログレスバーのスタイルを表現します。
+
+enum ProgressBarStyle
+{
+    Blocks = 0,      // ブロック
+    Continuous = 1,  // 連続
+    Marquee = 2,     // マーキー
+}
+スピンボックス (NumericUpDown) は，テキストボックスとスピンボタンから構成されるコントロールです。
+一部のプロパティが decimal 型であることに注意してください。
+
+System.Windows.Forms 名前空間
+NumericUpDown クラス [MSDN]
+スピンボックスコントロールを表現します。
+
+プロパティ
+項目	説明
+decimal Value	値
+decimal Maximum	最大値
+decimal Minimum	最小値
+イベント
+項目	説明
+EventHandler ValueChanged	値が変更された
+リンクラベル
+作例：リンクラベル
+ハイパーリンクを設置します。
+クリックすれば既定のアプリケーションでリンク先を開きます。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    LinkLabel linkLabel;  // リンクラベル
+
+    public Form1()
+    {
+        string url = "http://www.wgag.net/";  // URL
+
+        linkLabel = new LinkLabel()
+        {
+            Location = new Point(20, 20),
+            Text = url,
+            AutoSize = true,
+        };
+
+        linkLabel.Links.Add(0, url.Length, url);  // リンクを追加
+
+        linkLabel.LinkClicked +=
+            new LinkLabelLinkClickedEventHandler(linkLabel_LinkClicked);
+
+        this.Controls.Add(linkLabel);
+
+        this.BackColor = SystemColors.Window;
+    }
+
+    // リンクラベルがクリックされたときのイベントハンドラ
+    void linkLabel_LinkClicked(
+        object sender, LinkLabelLinkClickedEventArgs e)
+    {
+        // アクセス済とする
+        linkLabel.LinkVisited = true;
+
+        // 既定のアプリケーションで URL を開く
+        System.Diagnostics.Process.Start(e.Link.LinkData as string);
+    }
+}
+解説
+リンクラベル (LinkLabel) はその名の通り，ハイパーリンクを表示するためのラベルコントロールです。
+基本的な部分は普通のラベルコントロール (Label) と同じです。
+
+System.Windows.Forms 名前空間
+LinkLabel クラス [MSDN]
+リンクラベルコントロールを表現します。
+
+プロパティ
+項目	説明
+string Text	テキスト
+Point Location	位置
+bool AutoSize	自動サイズ
+Color ForeColor	前景色
+Font Font	フォント
+bool Visited	訪問済
+Color LinkColor	リンクの色
+Color ActiveLinkColor	アクティブ時のリンクの色
+Color VisitedLinkColor	訪問後のリンクの色
+リンクラベルにハイパーリンクを登録するには，Links.Add メソッドを使います。
+リンクラベル全体をハイパーリンクとするなら，start には 0，length にはテキストの長さを入れます。
+リンクラベルには複数のリンクを登録できるようになっているため，このような第 1，2 引数の指定が必要となっています。
+第 3 引数 linkData には URL の文字列 ("http://www.wgag.net/" など) を入れておけば OK です。
+
+System.Windows.Forms 名前空間
+LinkLabel クラス [MSDN]
+プロパティ
+項目	説明
+LinkLabel.LinkCollection Links	リンク項目のコレクション
+Links.Add メソッド
+リンク項目を追加します。
+
+int Add(
+    int start,       // 開始位置
+    int length,      // 長さ
+    Object linkData  // リンク情報
+)
+リンクラベルをクリックすると，LinkClicked イベントが発生します。
+このイベントハンドラ内でフォルダやウェブページを開くようにし，同時に Visited プロパティに true を代入するとよいでしょう。
+
+System.Windows.Forms 名前空間
+LinkLabel クラス [MSDN]
+イベント
+項目	説明
+LinkLabelLinkClickedEventHandler LinkClicked	リンクのクリック
+System.Windows.Forms 名前空間
+delegate void LinkLabelLinkClickedEventHandler(
+    object sender, LinkLabelLinkClickedEventArgs e);
+System.Windows.Forms 名前空間
+LinkLabelLinkClickedEventArgs クラス [MSDN]
+LinkClicked イベント用のデータを提供します。
+
+プロパティ
+項目	説明
+object Link.LinkData	リンク情報
+Links.Add メソッドの第 3 引数 linkData に入れた文字列が，この LinkLabelLinkClickedEventArgs の Link.LinkData プロパティに入ります。
+このプロパティは object 型なので，文字列として扱うには string に型変換する必要があります。
+
+今回，既定のアプリケーションで URL を開くために，Process.Start メソッド (System.Diagnostics 名前空間) を利用しています。
+このメソッドは，下図の「ファイル名を指定して実行」を実行するのと同等の機能を提供します。
+
+ファイル名を指定して実行
+
+System.Diagnostics 名前空間
+Process.Start メソッド [MSDN]
+ファイル名を指定して実行します。
+
+Process Start(
+    string fileName
+)
+リストビュー
+作例：ファイルリスト
+特定のフォルダ内のファイルを一覧表示します。
+ファイル名とファイルパスを表示します。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.IO;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    FileListView fileListView;
+
+    public Form1()
+    {
+        fileListView = new FileListView()
+        {
+            GridLines = true,     // グリッド線を表示
+            View = View.Details,  // 詳細ビュー
+            Dock = DockStyle.Fill,
+        };
+
+        // 指定ディレクトリ内のファイルをリストに追加
+        // (この AddFiles メソッドは自分で作ったメソッド)
+        fileListView.AddFiles(@"C:\Windows\system32");
+
+        this.Controls.Add(fileListView);
+
+        this.Text = @"C:\Windows\system32";
+    }
+}
+
+// ファイルリスト用のリストビュー
+class FileListView : ListView
+{
+    ColumnHeader clmnFileName;  // 'ファイル名' 列ヘッダ
+    ColumnHeader clmnFilePath;  // 'ファイルパス' 列ヘッダ
+
+    public FileListView()
+    {
+        clmnFileName = new ColumnHeader() { Text = "ファイル名" };
+        clmnFilePath = new ColumnHeader() { Text = "ファイルパス" };
+
+        // 2 つの列ヘッダをリストに追加
+        this.Columns.AddRange(new ColumnHeader[]
+        {
+            clmnFileName, clmnFilePath
+        });
+    }
+
+    // 指定されたディレクトリ内のファイルをリストに追加します
+    public void AddFiles(string directoryPath)
+    {
+        // ディレクトリ内のファイルそれぞれについて
+        foreach (string filePath in Directory.GetFiles(directoryPath))
+        {
+            // ファイルパスからファイル名を取得
+            string fileName = Path.GetFileName(filePath);
+
+            // リスト項目を追加
+            this.Items.Add(new ListViewItem(
+                new string[] { fileName, filePath }));
+        }
+    }
+}
+解説
+リストビュー (ListView) は，項目の一覧を表示するために使われるコントロールの 1 つです。
+今回のプログラムでは，ListView を継承した FileListView クラスを作り，ファイルの一覧表示に利用しています。
+
+System.Windows.Forms 名前空間
+ListView クラス [MSDN]
+リストビューコントロールを表現します。
+
+プロパティ
+項目	説明
+bool GridLines	グリッド線
+View View	ビューの種類
+ビューの種類を設定する View プロパティには，View 列挙体の値を指定します。
+今回は View.Details で詳細表示のビューを利用しました。
+それぞれに特徴があるので，他の種類のビューも試してみてください。
+
+System.Windows.Forms 名前空間
+View 列挙体 [MSDN]
+リストビューの表示形式を表現します。
+
+enum View
+{
+    LargeIcon = 0,  // 大アイコン表示
+    Deatils = 1,    // 詳細表示
+    SmallIcon = 2,  // 小アイコン表示
+    List = 3,       // リスト表示
+    Tile = 4,       // タイル表示
+}
+リストビューのリスト項目は，Items プロパティが提供するコレクションによって管理されます。
+Items コレクションが保有するのは，ListViewItem で表現されるリスト項目です。
+
+System.Windows.Forms 名前空間
+ListView クラス [MSDN]
+プロパティ
+項目	説明
+ListViewItemCollection Items	リスト項目のコレクション
+Items.Add メソッド
+リスト項目を追加します。
+
+int Add(
+    ListViewItem value
+)
+System.Windows.Forms 名前空間
+ListViewItem クラス [MSDN]
+リスト項目を表現します。
+
+ListViewItem コンストラクタ
+int Add(
+    string[] items  // 文字列配列
+)
+詳細表示のビューを利用するのであれば，リストビューに列ヘッダ (列の見出し) も登録する必要があります。
+列ヘッダは，Columns プロパティが提供するコレクションによって管理されます。
+Columns コレクションが保有するのは，ColumnHeader で表現される列ヘッダです。
+
+System.Windows.Forms 名前空間
+ListView クラス [MSDN]
+プロパティ
+項目	説明
+ColumnHeaderCollection Colums	列ヘッダのコレクション
+Columns.Add メソッド
+列ヘッダを追加します。
+
+int Add(
+    ColumnHeader value
+)
+System.Windows.Forms 名前空間
+ColumnHeader クラス [MSDN]
+列ヘッダを表現します。
+
+プロパティ
+項目	説明
+string Text	見出し
+分割フォーム
+作例：分割フォーム
+上下に 2 個のテキストボックスを持つフォームです。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    TextBox textBox1;
+    TextBox textBox2;
+    SplitContainer splitContainer;  // スプリットコンテナ
+
+    public Form1()
+    {
+        textBox1 = new TextBox()
+        {
+            Multiline = true,
+            Dock = DockStyle.Fill,
+        };
+
+        textBox2 = new TextBox()
+        {
+            Multiline = true,
+            Dock = DockStyle.Fill,
+        };
+
+        splitContainer = new SplitContainer()
+        {
+            Dock = DockStyle.Fill,
+            Orientation = Orientation.Horizontal,  // 分割線の方向
+        };
+
+        // textBox1 をスプリットコンテナの第 1 パネルに登録
+        splitContainer.Panel1.Controls.Add(textBox1);
+
+        // textBox2 をスプリットコンテナの第 2 パネルに登録
+        splitContainer.Panel2.Controls.Add(textBox2);
+
+        // スプリットコンテナをフォームに登録
+        this.Controls.Add(splitContainer);
+    }
+}
+解説
+スプリットコンテナ (SplitContainer) は，領域を上下または左右に 2 分割するのに使われるコンテナです。
+スプリットコンテナは初めからメンバとして 2 つのパネル (Panel1，Panel2) を持っています。
+
+System.Windows.Forms 名前空間
+SplitContainer クラス [MSDN]
+スプリットコンテナを表現します。
+
+プロパティ
+項目	説明
+DockStyle Dock	結合スタイル
+Orientation Orientation	分割境界線の方向
+int SplitterWidth	分割境界線の太さ
+int SplitterDistance	分割境界線の位置
+FixedPanel FixedPanel	サイズを固定するパネル
+int Panel1MinSize	パネル 1 の最小サイズ
+int Panel2MinSize	パネル 2 の最小サイズ
+SplitterPanel Panel1	パネル 1
+SplitterPanel Panel2	パネル 2
+Panel1 プロパティ，Panel2 プロパティ
+スプリットコンテナ内のパネルを表現します。
+
+プロパティ
+項目	説明
+Color BackColor	背景色
+メソッド
+項目	説明
+Controls.Add	コントロールの追加
+Controls.AddRange	複数コントロールの追加
+System.Windows.Forms 名前空間
+Orientation 列挙体 [MSDN]
+水平・垂直のいずれかを表現します。
+
+enum Orientation
+{
+    Horizontal = 0, // 水平
+    Vertical = 1,   // 垂直
+}
+System.Windows.Forms 名前空間
+FixedPanel 列挙体 [MSDN]
+スプリットコンテナにおいて，サイズが固定されるべきパネルを表します。
+
+enum FixedPanel
+{
+    None = 0,   // 指定しない
+    Panel1 = 1, // Panel 1
+    Panel2 = 2, // Panel 2
+}
+スポンサーリンク
+ 
+« 前のページ 目次 次のページ »
+サイト概要 | お問合せ | プライバシーポリシー
+© 2018 kaitei.net

@@ -1,0 +1,115 @@
+
+◆Windows API の呼び出し
+http://kaitei.net/csforms/windows-api/
+目次
+Windows API の呼び出し
+
+ 
+Windows API の呼び出し
+作例：他のウィンドウを操る
+起動中のウィンドウのタイトルを「ほげほげ」に変えてしまうプログラムです。
+Windows API 関数を使用しています。
+
+作例
+
+コード
+using System;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
+
+class Program
+{
+    // ウィンドウタイトルを設定する Windows API 関数
+    [DllImport("user32.dll")]
+    static extern bool SetWindowText(IntPtr hWnd, string lpString);
+
+    [STAThread]
+    static void Main()
+    {
+        DialogResult result = MessageBox.Show(
+            "すべてのウィンドウのタイトルを変更します。よろしいですか？", "",
+            MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+        if (result != DialogResult.Yes) { return; }
+
+        // 起動中の全プロセスを取得
+        foreach (Process process in Process.GetProcesses())
+        {
+            // ウィンドウハンドルを取得
+            IntPtr windowHandle = process.MainWindowHandle;
+
+            // ウィンドウが存在すれば
+            if (windowHandle != IntPtr.Zero)
+            {
+                // ウィンドウタイトルを改竄
+                SetWindowText(windowHandle, "ほげほげ");
+            }
+        }
+
+        MessageBox.Show(
+            "すべてのウィンドウのタイトルを変更しました。", "ほげほげ",
+            MessageBoxButtons.OK, MessageBoxIcon.Information);
+    }
+}
+解説
+C# のコードだけでも Windows のかなりの部分を操ることができますが，それでも Windows の深い部分は生の Windows API をいじるしかありません。
+その Windows API は C の関数として提供されているのですが，頑張れば C# から使うことが可能です。
+Windows API を巧く使うことで，痒いところに手の届くプログラムが作れるようになります。
+今回は C# から Windows API 関数を使う一例を紹介するに留め，体系的な説明は別の機会に譲ることにします。
+
+今回の作例は，他のプログラムのウィンドウタイトルを勝手に変えてしまうプログラムです。
+恐らくこれを純粋に C# のコードだけで作ることはできないので，ウィンドウのタイトルを設定する SetWindowText 関数を，Windows API の関数群から借用しています。
+
+SetWindowText 関数 [MSDN]
+ウィンドウのタイトルを設定します。
+
+BOOL SetWindowText(
+    HWND hWnd,         // ウィンドウへのハンドル
+    LPCTSTR lpString   // タイトル
+);
+この関数を C# で使うためには，次のような宣言を C# のコード中に書いておく必要があります。
+BOOL は bool または int に，HWND は System.IntPtr に，LPCSTR は string に対応します。
+
+    [DllImport("user32.dll")]
+    static extern bool SetWindowText(IntPtr hWnd, string lpString);
+ 
+初めの DllImport 属性 (System.Runtime.InteropServices 名前空間) は，決まり文句のようなものです。
+続く static extern も，決まり文句です (この 2 語の並びはやや神妙に思えます)。
+
+System.Runtime.InteropServices 名前空間
+DllImport 属性 [MSDN]
+アンマネージド DLL を利用する際に指定します。
+
+ウィンドウへのハンドルとは，個々のウィンドウを指し示す識別値のことです。
+C をご存知の方には，ウィンドウを指し示す広義のポインタ，という説明もできます。
+ポインタやハンドルを C# で扱う際には System.IntPtr を使います。
+
+System 名前空間
+IntPtr 構造体 [MSDN]
+ポインタあるいはハンドルを表現します。
+
+一方，ウィンドウへのハンドルを取得するための処理は，C# のコードだけで実現できます。
+Process.GetProcess メソッドを実行すると，実行中のすべてのプロセスについての Process オブジェクトが得られます。
+ウィンドウを持つプロセスであれば，そのメインウィンドウへのハンドルを MainWindowHandle プロパティより取得することができます。
+ウィンドウを持たないプロセスの場合には，MainWindowHandle == IntPtr.Zero が成立します。
+
+System.Diagnostics 名前空間
+Process クラス [MSDN]
+プロセスを表現します。
+
+プロパティ
+項目	説明
+IntPtr MainWindowHandle	メインウィンドウへのハンドル
+GetProcesses メソッド
+実行中のすべてのプロセスを取得します。
+
+static Process[] GetProcesses()
+MainWindowHandle プロパティより取得したハンドルに対して SetWindowText を実行することで，そのハンドルの指し示すウィンドウのタイトルを設定することができます。
+これを，ウィンドウを持つすべてのプロセスについて行うことで，すべてのメインウィンドウのタイトルを改竄することができます。
+ただ，今回の作例ではうまくタイトルを変更できないウィンドウも存在します。
+
+スポンサーリンク
+ 
+« 前のページ 目次
+サイト概要 | お問合せ | プライバシーポリシー
+© 2018 kaitei.net

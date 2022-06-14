@@ -1,0 +1,183 @@
+
+◆リストボックスのオーナードロー
+http://kaitei.net/csforms/owner-draw/
+目次
+リストボックスのオーナードロー
+
+ 
+リストボックスのオーナードロー
+作例：縞模様のリストボックス
+リストボックスの偶数番目の項目を淡い青色 (今回は AliceBlue) で塗り潰します。
+ただし，偶数番目でも選択中であればシステム既定の色で塗り潰すようにします。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    ListBox listBox;
+
+    public Form1()
+    {
+        listBox = new ListBox()
+        {
+            Location = new Point(10, 10),
+            Size = new Size(200, 200),
+            DrawMode = DrawMode.OwnerDrawFixed,  // 描画モード
+        };
+
+        listBox.Items.AddRange(new string[]
+        {
+            "Mercury", "Venus", "Earth", "Mars", "Jupiter",
+            "Saturn", "Uranus", "Neptune", "Pluto",
+        });
+
+        // オーナードロー用のイベントハンドラを登録
+        listBox.DrawItem += new DrawItemEventHandler(listBox_DrawItem);
+
+        this.Controls.Add(listBox);
+    }
+
+    // オーナードローの本体部分
+    void listBox_DrawItem(object sender, DrawItemEventArgs e)
+    {
+        // 既定の色で背景を塗り潰す
+        e.DrawBackground();
+
+        // 偶数番目 (プログラム的には奇数番目) の項目であれば
+        if (e.Index % 2 == 1)
+        {
+            // 項目が選択中であるか否かに応じてブラシを取得
+            Brush brush = (e.State & DrawItemState.Selected) != 0 ?
+                SystemBrushes.Highlight : Brushes.AliceBlue;
+
+            // 用意したブラシで塗り潰す
+            e.Graphics.FillRectangle(brush, e.Bounds);
+        }
+
+        // 描画中の項目のテキストを取得
+        string text = (sender as ListBox).Items[e.Index].ToString();
+
+        Brush foreBrush = new SolidBrush(e.ForeColor);
+
+        // テキストを描画
+        e.Graphics.DrawString(text, e.Font, foreBrush, e.Bounds);
+
+        foreBrush.Dispose();
+
+        // フォーカスを示す四角形を描画
+        e.DrawFocusRectangle();
+    }
+}
+解説
+コントロールの描画をカスタマイズするために，オーナードロー (owner draw) という手法を用いています。
+オーナードローとは，その名の通り，(オペレーティングシステムでなく) 描画する要素のオーナーが描画を行うことを意味します。
+今回は，リストボックスにおいてオーナードローを設定する方法を紹介します。
+
+リストボックスでオーナードローを有効にするには，DrawMode プロパティを DrawMode.DrawFixed または DrawMode.DrawVariable に設定します (既定は DrawMode.Normal)。
+そして，DrawItem イベントに，自前のオーナードロー用のイベントハンドラを登録します。
+
+System.Windows.Forms 名前空間
+ListBox クラス [MSDN]
+プロパティ
+項目	説明
+DrawMode DrawMode	描画モード
+イベント
+項目	説明
+DrawItemEventHandler DrawItem	項目を描画
+System.Windows.Forms 名前空間
+DrawMode 列挙体 [MSDN]
+コントロールの要素の描画モードを表現します。
+
+enum DrawMode
+{
+    Normal = 0,            // OS が自動的に描画 (既定)
+    OwnerDrawFixed = 1,    // 手動で描画
+    OwnerDrawVariable = 2, // 手動で異なるサイズに描画
+}
+DrawItem 用のイベントハンドラは，DrawItemEventHandler 型です。
+イベントハンドラの中身は，Paint イベントハンドラと同じような感じで記述します。
+このイベントハンドラは，リストボックス内のそれぞれの項目に対して呼び出されます。
+
+System.Windows.Forms 名前空間
+delegate void DrawItemEventHandler(
+    object sender, DrawItemEventArgs e);
+DrawItemEventArgs には，有用なプロパティやメソッドが一通り揃っています。
+
+System.Windows.Forms 名前空間
+DrawItemEventArgs クラス [MSDN]
+プロパティ
+項目	説明
+Color BackColor	背景色
+Color ForeColor	前景色
+Graphics Graphics	グラフィックスオブジェクト
+Rectangle Bounds	描画中の項目の境界を示す四角形
+int Index	描画中の項目のインデックス
+DrawItemState State	描画中の項目の状態
+DrawBackground メソッド
+既定の背景を描画します。
+
+void DrawBackground()
+DrawFocusRectabgle メソッド
+フォーカスを示す四角形を描画します。
+
+void DrawFocusRectangle()
+System.Windows.Forms 名前空間
+DrawItemState 列挙体 [MSDN]
+描画する項目の状態を表現します。
+
+enum DrawItemState
+{
+    None = 0,     // 状態なし
+    Selected = 1, // 選択されている
+    Grayed = 2,   // 単色表示
+    Disabled = 4, // 無効
+    Checked = 8,  // チェックされている
+    Focus = 16,   // フォーカスがある
+    Default = 32, // 既定の状態
+    // (以下省略)
+}
+DrawBackground で既定の背景を描画してくれるので，後は独自の背景を描画する処理を書きます。
+これは，6 章 を通して紹介したグラフィックス関連のメソッドを使えば OK です。
+今回の作例では，6.3 節 で扱った FillRectangle メソッドを用い，偶数番目の行を独自に塗り潰しています。
+
+listBox_DrawItem イベントハンドラの中の (e.State & DrawItemState.Selected) != 0 ? ... は，説明が必要かもしれません。
+このコードの心は e.State == DrawItemState.Selected ? ... なのですが，こうするとうまくいかない場合があります。
+なぜならば，上に掲げた定義を見てもらえればわかるように，DrawItemState 列挙体はビットフィールドとして使われうるためです。
+実際，e.State == DrawItemState.Selected | DrawItemState.Focus などとなっている場合がよくあるので，DrawItemState.Selected が入ったすべての組合せを得るためには，ちょっと面倒ですが (e.State & DrawItemState.Selected) != 0 ? ... とする必要があります。
+
+ 
+手動で描画処理を行うということは，当然テキストも手動で描画しなければなりません。
+テキストを描画するには，6.4 節 で紹介した DrawString メソッドや，TextRenderer クラスを使うとよいでしょう。
+今回用いた DrawString メソッドのオーバーロードはこちらです。
+
+System.Drawing 名前空間
+Graphics クラス [MSDN]
+DrawString メソッド
+テキストを描画します。
+
+void DrawString(
+    string s,     // 文字列
+    Font font,    // フォント
+    Brush brush,  // ブラシ
+    RectangleF rectangle  // 領域を示す四角形
+)
+スポンサーリンク
+ 
+« 前のページ 目次 次のページ »
+サイト概要 | お問合せ | プライバシーポリシー
+© 2018 kaitei.net

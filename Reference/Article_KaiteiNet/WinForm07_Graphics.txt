@@ -1,0 +1,1390 @@
+
+◆グラフィックス
+http://kaitei.net/csforms/graphics/
+目次
+基本図形 (1)
+基本図形 (2)
+塗り潰し
+テキスト
+イメージ
+ピクセル (1)
+ピクセル (2)
+部分透過
+クリッピング
+アニメーション
+マウスとの連動
+スポンサーリンク
+
+ 
+基本図形 (1)
+作例：直線の描画
+(20, 20) から (200, 200) の位置まで，青色，太さ 2 の線分を描きます。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    public Form1()
+    {
+        this.BackColor = SystemColors.Window;
+    }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        // Graphics オブジェクトを取得
+        Graphics g = e.Graphics;
+
+        // 青色，太さ 2 のペンを定義
+        Pen pen = new Pen(Color.Blue, 2);
+
+        // (20, 20) から (200, 200) まで直線を描画
+        g.DrawLine(pen, 20, 20, 200, 200);
+
+        // ペンを破棄
+        pen.Dispose();
+    }
+}
+解説
+グラフィックス処理を行うためには，描画を行う対象のフォームやコントロールに関連付けられた Graphics オブジェクトを取得する必要があります。
+この Graphics オブジェクトというのは，描画キャンバスのような存在のものです。
+
+System.Drawing 名前空間
+Graphics クラス [MSDN]
+グラフィックスオブジェクトを表現します。
+
+描画対象に結び付けられた Graphics オブジェクトは，その描画対象の Paint イベントハンドラの，引数 PaintEventArgs e から取得することができます。
+
+System.Windows.Forms 名前空間
+PaintEventArgs クラス [MSDN]
+再描画イベントに関するデータを提供します。
+
+プロパティ
+項目	説明
+Graphics Graphics	グラフィックス
+CreateGraphics メソッドによって自分で Graphics オブジェクトを生成することも可能です。
+Paint イベントハンドラ以外の場所で Graphics オブジェクトを取得したい場合には，この方法を使ってください。
+CreateGraphics メソッドによって取得した Graphics オブジェクトは，使い終る度に Dispose メソッドで破棄してください。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+CreateGraphics メソッド
+グラフィックスオブジェクトを生成します。
+
+Graphics CreateGraphics()
+Dispose メソッド
+グラフィックスオブジェクトを破棄します。
+
+void Dispose()
+図形を描画するには，Graphics オブジェクトのメソッドを扱います。
+
+System.Drawing 名前空間
+Graphics クラス [MSDN]
+描画キャンバスを表現します。
+
+DrawLine メソッド
+直線を描画します。
+
+void DrawLine(
+    Pen pen,        // ペン
+    int x1, int y1, // 始点の座標
+    int x2, int y2  // 終点の座標
+)
+Pen クラスを用いて，特定の色と太さを持つ，仮想のペンを定義することができます。
+自分で定義した Pen オブジェクトは，使い終る度に Dispose メソッドで破棄してください。
+
+System.Drawing 名前空間
+Pen クラス [MSDN]
+ペンを表現します。
+
+Pen コンストラクタ
+ペンを定義します。
+
+Pen(
+    Color color // 色
+)
+Pen(
+    Color color, // 色
+    float width  // 太さ
+)
+Dispose メソッド
+ペンを破棄します。
+
+void Dispose()
+SystemPens クラスから，システム既定のペンを取得することも可能です。
+例えば，次のようなプログラムが書けます。
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        Graphics g = e.Graphics;
+
+        // (20, 20) から (200, 200) まで直線を描画
+        g.DrawLine(SystemPens.WindowText, 20, 20, 200, 200);
+    }
+System.Drawing 名前空間
+SystemPens クラス [MSDN]
+システム既定のペンを表現します。
+
+プロパティ
+項目	説明
+(static) Pen Window	ウィンドウの背景色
+(static) Pen WindowText	ウィンドウの前景色
+基本図形 (2)
+作例：長方形と楕円の描画
+左上端 (20, 20)，右下端 (200, 200) として正方形を描きます。
+また，この正方形に内接する円を描きます。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    public Form1()
+    {
+        this.BackColor = SystemColors.Window;
+    }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        // ペンを定義
+        Pen pen1 = new Pen(Color.Red, 2);
+        Pen pen2 = new Pen(Color.Blue, 2);
+
+        // 図形を描画
+        e.Graphics.DrawRectangle(pen1, 20, 20, 200, 200); // 長方形
+        e.Graphics.DrawEllipse(pen2, 20, 20, 200, 200);   // 楕円
+
+        // ペンを破棄
+        pen1.Dispose();
+        pen2.Dispose();
+    }
+}
+解説
+長方形 (rectangle)，楕円 (ellipse) を扱いました。
+
+System.Drawing 名前空間
+Graphics クラス [MSDN]
+描画キャンバスを表現します。
+
+DrawRectangle メソッド
+長方形を描画します。
+
+void DrawRectangle(
+    Pen pen,   // ペン
+    int x,     // 始点の x 座標
+    int y,     // 始点の y 座標
+    int width, // 幅
+    int height // 高さ
+)
+void DrawRectangle(
+    Pen pen,       // ペン
+    Rectangle rect // 長方形
+)
+DrawEllipse メソッド
+楕円を描画します。
+
+void DrawEllipse(
+    Pen pen,   // ペン
+    int x,     // 始点の x 座標
+    int y,     // 始点の y 座標
+    int width, // 幅
+    int height // 高さ
+)
+void DrawEllipse(
+    Pen pen,       // ペン
+    Rectangle rect // 長方形
+)
+直線，長方形，楕円だけでなく，もっといろいろな図形のメソッドが用意されています。
+MSDN のページに飛ぶと，メソッドの一覧と説明が用意されているので，いろいろ試してみてください。
+
+塗り潰し
+作例：単色での塗り潰し
+基本的に 6.2 節 と同じですが，円を黄色で塗り潰すようにしました。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    public Form1()
+    {
+        this.BackColor = SystemColors.Window;
+    }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        // ペンを定義
+        Pen pen1 = new Pen(Color.Red, 2);
+        Pen pen2 = new Pen(Color.Blue, 2);
+
+        // ブラシを定義
+        SolidBrush brush = new SolidBrush(Color.Yellow);
+
+        // 長方形を定義
+        Rectangle rect = new Rectangle(20, 20, 200, 200);
+
+        e.Graphics.DrawRectangle(pen1, rect);  // 長方形を描画
+
+        e.Graphics.FillEllipse(brush, rect);  // 楕円を塗り潰し
+        e.Graphics.DrawEllipse(pen2, rect);   // 楕円を描画
+
+        // ペンとブラシを破棄
+        pen1.Dispose();
+        pen2.Dispose();
+        brush.Dispose();
+    }
+}
+解説
+図形を塗り潰すにも，Graphics オブジェクトのメソッドを用います。
+
+System.Drawing 名前空間
+Graphics クラス [MSDN]
+描画キャンバスを表現します。
+
+FillRectangle メソッド
+長方形を塗り潰します。
+
+void FillRectangle(
+    Brush brush, // ブラシ
+    int x,       // 始点の x 座標
+    int y,       // 始点の y 座標
+    int width,   // 幅
+    int height   // 高さ
+)
+void FillRectangle(
+    Brush brush,   // ブラシ
+    Rectangle rect // 長方形
+)
+FillEllipse メソッド
+楕円を塗り潰します。
+
+void FillEllipse(
+    Brush brush, // ブラシ
+    int x,       // 始点の x 座標
+    int y,       // 始点の y 座標
+    int width,   // 幅
+    int height   // 高さ
+)
+void FillEllipse(
+    Brush brush,   // ブラシ
+    Rectangle rect // 長方形
+)
+Brush クラスを用いて，特定の色や柄を持つ，仮想のブラシを定義することができます。
+ただし，Brush クラスそのものは抽象クラスなので，インスタンスを作りません。
+
+System.Drawing 名前空間
+Brush クラス [MSDN]
+ブラシを表現します。
+
+今回は，Brush を継承した SolidBrush を利用しています。
+SolidBrush は，単色で塗り潰すのに使われる無地のブラシです。
+自分で定義した SolidBrush オブジェクトは，使い終る度に Dispose メソッドで破棄してください。
+
+System.Drawing 名前空間
+SolidBrush クラス [MSDN]
+単色ブラシを表現します。
+
+SolidBrush コンストラクタ
+単色ブラシを定義します。
+
+SolidBrush(
+    Color color // 色
+)
+Dispose メソッド
+単色ブラシを破棄します。
+
+void Dispose()
+あるいは，SystemBrushes クラスからシステム既定のブラシを取得することもできます。
+
+System.Drawing 名前空間
+SystemBrushes クラス [MSDN]
+システム既定のブラシを表現します。
+
+プロパティ
+項目	説明
+(static) Brush Window	ウィンドウの背景色
+(static) Brush WindowText	ウィンドウの前景色
+おまけ：いろいろなブラシ
+ハッチブラシと，線型グラデーションブラシを紹介します。
+
+作例
+
+using System;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    public Form1()
+    {
+        this.BackColor = SystemColors.Window;
+    }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        Rectangle rect = new Rectangle(20, 20, 200, 200);
+
+        Pen pen1 = new Pen(Color.Blue, 1);
+        Pen pen2 = new Pen(Color.Orange, 1);
+
+        // ハッチブラシ
+        HatchBrush brush1 = new HatchBrush(
+            HatchStyle.Cross, Color.Blue, Color.Azure);
+
+        // 線型グラデーションブラシ
+        LinearGradientBrush brush2 = new LinearGradientBrush(
+            rect, Color.Yellow, Color.White,
+            LinearGradientMode.ForwardDiagonal);
+
+        e.Graphics.FillRectangle(brush1, rect);
+        e.Graphics.DrawRectangle(pen1, rect);
+
+        e.Graphics.FillEllipse(brush2, rect);
+        e.Graphics.DrawEllipse(pen2, rect);
+
+        pen1.Dispose();
+        pen2.Dispose();
+        brush1.Dispose();
+        brush2.Dispose();
+    }
+}
+HatchBrush も LinearGradientBrush も Brush を継承しています。
+ただし，この 2 つは System.Drawing ではなく System.Drawing.Drawing2D 名前空間に存在します。
+
+HatchBrush は，ハッチスタイルを持つブラシです。
+
+System.Drawing.Drawing2D 名前空間
+HatchBrush クラス [MSDN]
+ハッチブラシを表現します。
+
+HatchBrush コンストラクタ
+ハッチブラシを定義します。
+
+HatchBrush(
+    HatchStyle hatchStyle,
+    Color foreColor
+)
+HatchBrush(
+    HatchStyle hatchStyle,
+    Color foreColor,
+    Color backColor
+)
+Dispose メソッド
+ハッチブラシを破棄します。
+
+void Dispose()
+System.Drawing.Drawing2D 名前空間
+HatchStyle 列挙体 [MSDN]
+ハッチブラシのパターンを表現します。
+
+enum HatchStyle
+{
+    Horizontal = 0,       // 水平
+    Vertical = 1,         // 垂直
+    ForwardDiagonal = 2,  // 右肩下がり
+    BackwardDiagonal = 3, // 右肩上がり
+    Cross = 4,            // 交差
+    // 後略
+}
+LinearGradientBrush を使うと，線型グラデーションによる塗り潰しができます。
+
+System.Drawing.Drawing2D 名前空間
+LinearGradientBrush クラス [MSDN]
+線型グラデーションブラシを表現します。
+
+LinearGradientBrush コンストラクタ
+線型グラデーションブラシを定義します。
+
+HatchBrush(
+    Rectangle rect, // 長方形
+    Color color1,   // 開始色
+    Color color2,   // 終了色
+    LinearGradientMode linearGradientMode // 方向
+)
+Dispose メソッド
+線型グラデーションブラシを破棄します。
+
+void Dispose()
+System.Drawing.Drawing2D 名前空間
+LinearGradientMode 列挙体 [MSDN]
+線型グラデーションの方向を表現します。
+
+enum LinearGradientMode
+{
+    Horizontal = 0,       // 左から右
+    Vertical = 1,         // 上から下
+    ForwardDiagonal = 2,  // 左上から右下
+    BackwardDiagonal = 3, // 右上から左下
+}
+テキスト
+作例：Hello World
+Graphics オブジェクトを使ってテキストを表示しています。
+ラベルコントロールは使っていません。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    public Form1()
+    {
+        this.BackColor = SystemColors.Window;
+    }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        base.OnPaint(e);
+
+        // フォントを定義
+        Font font = new Font("Times New Roman", 20, FontStyle.Regular);
+
+        // (20, 20) の位置からテキストを描画
+        e.Graphics.DrawString("Hello, world!", font,
+            SystemBrushes.WindowText, 20, 20);
+
+        font.Dispose();
+    }
+}
+解説
+Graphics オブジェクトにおいてテキストを描画するには，DrawString メソッドを使います。
+ここではすべてを紹介しきれませんが，多くのオーバーライドが定義されています。
+
+System.Drawing 名前空間
+Graphics クラス [MSDN]
+DrawString メソッド
+テキストを描画します。
+
+void DrawString(
+    string s,    // 文字列
+    Font font,   // フォント
+    Brush brush, // ブラシ
+    float x,     // 始点の x 座標
+    float y      // 始点の y 座標
+)
+この作例では，ブラシにはシステム既定のブラシが定義されている SystemBrushes を使用しています。
+他のブラシについては 6.3 節 を参照してください。
+
+System.Drawing 名前空間
+SystemBrushes クラス [MSDN]
+システム既定のブラシを表現します。
+
+プロパティ
+項目	説明
+(static) Brush Window	ウィンドウの背景色
+(static) Brush WindowText	ウィンドウの前景色
+イメージ
+作例：イメージの表示
+Graphics オブジェクトを使ってイメージを表示しています。
+ついでにイメージを 0.8 倍に縮小し，水平方向に反転表示させています。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    Image image;
+
+    public Form1()
+    {
+        image = Image.FromFile(@"C:\test\image.png");
+
+        image.RotateFlip(RotateFlipType.RotateNoneFlipX);  // 反転
+
+        this.BackColor = SystemColors.Window;
+    }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        base.OnPaint(e);
+
+        // 座標 (20, 20) の位置に 0.8 倍の大きさでイメージを描画
+        e.Graphics.DrawImage(image, 20, 20,
+            (int) (image.Width * 0.8), (int) (image.Height * 0.8));
+    }
+}
+※ パブリックドメインのイメージを使用しています: http://en.wikipedia.org/wiki/File:Tux-G2.svg
+
+解説
+イメージを取り扱うためのクラスに Image クラスがあります。
+ただし Image クラスは抽象クラスなので，インスタンスを生成しません。
+コード上はあたかも Image クラスのインスタンスが生成されているかのように見えますが，実際には Bitmap クラスのインスタンスが生成されています。
+
+Image クラスや Bitmap クラスについては，2.6 節 を参照してください。
+
+イメージを反転または回転するには，RotateFlip メソッドを使います。
+
+System.Drawing 名前空間
+Image クラス [MSDN]
+RotateFlip メソッド
+イメージを回転または反転します。
+
+void RotateFlip(
+    RotateFlipType rotateFlipType // 回転・反転の種類
+)
+System.Drawing 名前空間
+RotateFlipType 列挙体 [MSDN]
+回転や反転を表現します。
+
+enum RotateFlipType
+{
+    Rotate90FlipNone = 1, // 時計回りに 90 度回転，反転なし
+    RotateNoneFlipX = 4,  // 回転なし，水平方向に反転
+    // その他省略
+}
+Graphics オブジェクトにおいてイメージを描画するには，DrawImage メソッドを使います。
+ここではすべてを紹介しきれませんが，多くのオーバーライドが定義されています。
+
+System.Drawing 名前空間
+Graphics クラス [MSDN]
+DrawImage メソッド
+イメージを描画します。
+
+void DrawImage(
+    Image image, // イメージ
+    int x,       // 始点の x 座標
+    int y,       // 始点の y 座標
+    int width,   // 幅
+    int height   // 高さ
+)
+void DrawImage(
+    Image image,   // イメージ
+    Rectangle rect // 矩形領域
+)
+おまけ：アイコンの描画
+作例
+
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    public Form1()
+    {
+        this.BackColor = SystemColors.Window;
+    }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        base.OnPaint(e);
+
+        Graphics g = e.Graphics;
+
+        g.DrawIcon(SystemIcons.Exclamation, 20, 20);
+    }
+}
+Graphics オブジェクトにおいてアイコンを描画するには，DrawIcon メソッドを使います。
+
+System.Drawing 名前空間
+Graphics クラス [MSDN]
+DrawIcon メソッド
+アイコンを描画します。
+
+void DrawImage(
+    Icon icon, // アイコン
+    int x,     // 始点の x 座標
+    int y      // 始点の y 座標
+)
+システム既定のアイコンは SystemIconsクラスから利用できます。
+
+System.Drawing 名前空間
+SystemIcons クラス [MSDN]
+システム既定のアイコンを表現します。
+
+プロパティ ((static) Icon ***)
+Application, WinLogo	Application, WinLogo
+Error, Hand	Error, Hand
+Question	Question
+Exclamation, Warning	Exclamation, Warning
+Information, Asterink	Information, Asterink
+Shield	Shield
+ピクセル (1)
+作例：カラーピッカー
+イメージをクリックすると，その位置のピクセルの色を抽出します。
+RGB の値なども出すようにすれば，実用的にも使えそうです。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    Bitmap bitmap;
+
+    Dialog1 dialog1;
+
+    public Form1()
+    {
+        bitmap = new Bitmap(@"C:\test\sample.bmp");
+
+        this.MouseClick +=
+            new MouseEventHandler(Form1_MouseClick);
+
+        this.BackColor = SystemColors.Window;
+
+        dialog1 = new Dialog1();
+        dialog1.Owner = this;
+        dialog1.Show();
+    }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        base.OnPaint(e);
+
+        e.Graphics.DrawImage(bitmap, new Point(0, 0));  // イメージを描画
+    }
+
+    void Form1_MouseClick(object sender, MouseEventArgs e)
+    {
+        // クリック時のカーソル位置
+        Point pt = e.Location;
+
+        // ピクセルの色を小ウィンドウの背景色に設定
+        dialog1.BackColor = bitmap.GetPixel(pt.X, pt.Y);
+    }
+}
+
+// 色を表示するための小ウィンドウ
+class Dialog1 : Form
+{
+    public Dialog1()
+    {
+        this.Size = new Size(150, 150);
+        this.FormBorderStyle = FormBorderStyle.FixedToolWindow;
+    }
+}
+解説
+ピクセルデータで表現されるイメージを扱うには，Image クラスを継承した Bitmap クラスを利用します。
+名前に反して，BMP 形式以外に JPG，GIF，PNG，EXIF，TIFF 形式のイメージも取り込むことができます。
+Bitmap オブジェクトでは，1 ピクセルごとに色の情報を得ることができます。
+
+System.Drawing 名前空間
+Bitmap クラス [MSDN]
+ピクセルイメージを表現します。
+
+Bitmap コンストラクタ
+イメージを取得します。
+
+Bitmap(
+    string filename // イメージファイルへのパス
+)
+GetPixel メソッド
+ピクセルの色を取得します。
+
+Color GetPixel(
+    int x,
+    int y
+)
+ピクセル (2)
+作例：グラデーション
+図のようなグラデーションを描きます。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    Bitmap bitmap;
+
+    public Form1()
+    {
+        // 256 x 256 のビットマップオブジェクトを生成
+        bitmap = new Bitmap(256, 256);
+
+        // グラデーションを描画
+        for (int j = 0; j < 256; j++)
+        {
+            for (int i = 0; i < 256; i++)
+            {
+                bitmap.SetPixel(i, j, Color.FromArgb(0, i, j));
+            }
+        }
+    }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        base.OnPaint(e);
+
+        e.Graphics.DrawImage(bitmap, new Point(0, 0));
+    }
+}
+解説
+Bitmap オブジェクトなら，1 ピクセルごとに色を操作することができます。
+前回 (6.6 節) では GetPixel でピクセルの情報を取得していましたが，今回は SetPixel でピクセルの情報を設定しています。
+また，今回のプログラムではイメージファイルを使用していないことに注目してください。
+
+System.Drawing 名前空間
+Bitmap クラス [MSDN]
+SetPixel メソッド
+ピクセルの色を設定します。
+
+void SetPixel(
+    int x,
+    int y,
+    Color color
+)
+おまけ：画像の保存
+Bitmap オブジェクトをイメージファイルとして保存することもできます。
+次の例は，先の作例と同じグラデーションを gradation.png というファイルとして保存するコンソールプログラムです。
+
+using System.Drawing;
+using System.Drawing.Imaging;
+
+class Program
+{
+    static void Main()
+    {
+        Bitmap bitmap = new Bitmap(256, 256);
+
+        for (int j = 0; j < 256; j++)
+        {
+            for (int i = 0; i < 256; i++)
+            {
+                bitmap.SetPixel(i, j, Color.FromArgb(0, i, j));
+            }
+        }
+
+        // ファイルに保存
+        bitmap.Save(@"c:\test\gradation.png", ImageFormat.Png);
+    }
+}
+System.Drawing 名前空間
+Bitmap クラス [MSDN]
+Save メソッド
+イメージを保存します。
+
+void Save(
+    string fileName,    // ファイル名
+    ImageFormat format  // 保存形式
+)
+System.Drawing.Imaging 名前空間
+ImageFormat クラス [MSDN]
+イメージのフォーマットを表現します。
+
+プロパティ
+項目	説明
+(static) ImageFormat Bmp	ビットマップ
+(static) ImageFormat Gif	GIF
+(static) ImageFormat Jpeg	JPEG
+(static) ImageFormat Png	PNG
+(static) ImageFormat Tiff	TIFF
+部分透過
+作例：部分透過
+背景イメージの上にキャラクターを浮かべています。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    PictureBox pictureBox;
+    Bitmap characterImage;
+    Bitmap backgroundImage;
+
+    public Form1()
+    {
+        pictureBox = new PictureBox()
+        {
+            Dock = DockStyle.Fill,
+            SizeMode = PictureBoxSizeMode.CenterImage,
+            BackColor = Color.Transparent,
+        };
+
+        // キャラクターのイメージ
+        characterImage = new Bitmap(@"C:\test\character.bmp");
+        // 青を透過
+        characterImage.MakeTransparent(Color.FromArgb(0, 0, 0xFF));
+        pictureBox.Image = characterImage;
+
+        this.Controls.Add(pictureBox);
+
+        // 背景のイメージ
+        backgroundImage = new Bitmap(@"C:\test\background.bmp");
+        this.BackgroundImage = backgroundImage;
+        this.BackgroundImageLayout = ImageLayout.Stretch;
+    }
+}
+※ パブリックドメインのイメージを使用しています: http://en.wikipedia.org/wiki/File:Tux-G2.svg
+
+解説
+イメージの一部分を透過させるには 2 つの方法があります。
+
+透過度情報を持つ PNG イメージなどを用意する
+透過すべき部分を特定の色で塗り潰したイメージを用意する
+今回は後者の方法でキャラクターの背景を透過させています。
+
+透過度情報をもつ PNG イメージ	単色背景の画像
+透過度情報を持つ PNG イメージ。用意可能
+であれば，この方が綺麗に出力できます。	今回の作例はこちら。透過すべき部分を
+特定の色で塗り潰してあります。
+右の図のようなイメージを用意するなら，透過すべき部分を特定の色で塗り潰しておきます。
+イメージの一部の色を透過させるには，イメージに MakeTransparent メソッドを作用させます。
+
+System.Drawing 名前空間
+Bitmap クラス [MSDN]
+MakeTransparent メソッド
+指定された色の部分を透過します。
+
+MakeTransparent(
+    Color transparentColor  // 透過すべき色
+)
+クリッピング
+作例：クリッピング
+自分で定義した図形によってイメージをくりぬいています。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    Bitmap bitmap;
+
+    public Form1()
+    {
+        bitmap = new Bitmap(@"C:\test\image.bmp");
+
+        this.BackColor = Color.White;
+    }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        base.OnPaint(e);
+
+        // グラフィックスパス
+        GraphicsPath path = new GraphicsPath();
+
+        // 多角形の頂点の配列
+        Point[] points =
+        {
+            new Point(150, 0), new Point(0, 150),
+            new Point(150, 300), new Point(300, 150)
+        };
+
+        // ◇ 形のパスを追加
+        path.AddPolygon(points);
+
+        // 更に □ 形のパスを追加
+        path.AddRectangle(new Rectangle(50, 50, 200, 200));
+
+        // リージョンを定義
+        Region region = new Region(path);
+
+        // 指定したリージョンでクリップ
+        e.Graphics.Clip = region;
+
+        e.Graphics.DrawImage(bitmap, e.Graphics.VisibleClipBounds);
+
+        // グラフィックスパスを破棄
+        path.Dispose;
+    }
+}
+解説
+図形の輪郭をなす線のことをパス (path) と言います。
+グラフィックスパス (GraphicsPath) によって，複雑な図形のパスを表現することができます。
+今回のプログラムは，グラフィックスパスに ◇ 形を追加し，更に □ 形を追加しています。
+
+System.Drawing.Drawing2D 名前空間
+GraphicsPath クラス [MSDN]
+パスを表現します。
+
+AddEllipse メソッド
+楕円のパスを追加します。
+
+void Ellipse(
+    Rectangle rect
+)
+AddRectangle メソッド
+矩形のパスを追加します。
+
+void AddRectangle(
+    Rectangle rect
+)
+AddPolygon メソッド
+多角形のパスを追加します。
+
+void AddPolygon(
+    Point[] points
+)
+AddString メソッド
+テキストのパスを追加します。
+
+多角形の描画に関するメソッドは初めて登場させましたが，Graphics クラスにも同様に DrawPolygon などのメソッドは存在します。
+AddPolygon などのメソッドには，頂点を表す Point の配列を作成し，それを引数として渡します。
+
+一口に図形と言っていますが，この図形にはテキストも含まれおり，テキストのパスを追加するための AddString メソッドも存在します。
+ただ，引数の定義がやや独特に思ったので，ここでは詳細を割愛します。
+必ずしも難解なメソッドではないので，時間があれば MSDN のドキュメントを読んで使ってみてください。
+
+ 
+グラフィックスパスは，基本的には図形の輪郭を表現するものです。
+図形内部の領域は，リージョン (Region) として表現します。
+
+System.Drawing 名前空間
+Region クラス [MSDN]
+リージョンを表現します。
+
+Region コンストラクタ
+リージョンを定義します。
+
+void Region(
+    GraphicsPath path
+)
+興味深い点は，輪郭に囲まれていれば必ずリージョンになる，という訳ではないということです。
+今回のプログラムでも確認できるように，外から偶数個の輪郭を越えて到達できる箇所は，領域外という扱いになります。
+
+描画領域の一部を切り抜いてしまうことを，クリッピング (clipping) と言います。
+イメージの Clip プロパティに定義済のリージョンを渡せば，クリッピングが行われます。
+
+ 
+クリッピング領域を設定後，クリッピング領域に外接する長方形を取得するための VisibleClipBlunds というプロパティも用意されています。
+RectangleF は，Rectangle の floatバージョンです。
+
+System.Drawing 名前空間
+Graphics クラス [MSDN]
+プロパティ
+項目	説明
+Region Clip	クリッピング領域
+RectangleF VisibleClipBounds	クリッピング領域に外接する長方形
+DrawImage メソッド
+イメージを描画します。
+
+void DraImage(
+    Image image,
+    Rectangle rect
+)
+DrawPath メソッド
+パスを描画します。
+
+void DrawPath(
+    Pen pen,
+    GraphicsPath path
+)
+アニメーション
+作例：簡単なアニメーション
+オレンジ色の円が移動するアニメーションです。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    Timer timer;
+
+    int x = 0;  // 球の x 座標
+    int y = 0;  // 球の y 座標
+
+    public Form1()
+    {
+        timer = new Timer()
+        {
+            Interval = 20,
+            Enabled = true,
+        };
+
+        timer.Tick += new EventHandler(timer_Tick);
+
+        this.DoubleBuffered = true;  // ダブルバッファリング
+        this.BackColor = SystemColors.Window;
+    }
+
+    void timer_Tick(object sender, EventArgs e)
+    {
+        this.Invalidate();  // 再描画を促す
+    }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        base.OnPaint(e);
+
+        Brush brush = new SolidBrush(Color.Orange);
+        Pen pen = new Pen(Color.Orange);
+
+        Rectangle rect = new Rectangle(x++, y++, 20, 20);
+
+        e.Graphics.FillEllipse(brush, rect);
+        e.Graphics.DrawEllipse(pen, rect);
+
+        brush.Dispose();
+        pen.Dispose();
+    }
+}
+解説
+アニメーションと言いながら，4.7 節「タイマ」の復習です。
+それほど特別なことはしていません。
+
+実験として，this.DoubleBuffered = true; の 1 行をコメントアウトしてみてください。
+画面がちらつくのが気になると思います。
+
+この画面のちらつきは，コンピュータが描画をしている様子が，そのまま見えてしまっていることが原因です。
+このちらつきを軽減するためには，一旦メモリ上のキャンバスで描画を完成させ，完成した描画を画面に表示するようにします。
+この手法を，ダブルバッファリング (double buffering) と言います。
+
+ 
+C# Windows フォームでダブルバッファリングを有効にする方法は実に簡単です。
+描画対象のフォームなどの DoubleBuffered プロパティに true を設定するだけです。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+プロパティ
+項目	説明
+bool DoubleBuffered	ダブルバッファリング
+マウスとの連動
+作例：運べるボール
+青い丸はボールのつもりです。
+マウスでドラッグして移動することができます。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    };
+}
+
+class Form1 : Form
+{
+    PictureBox pictureBox;
+
+    Point draggedPoint;  // カーソルの位置
+    bool dragged;        // ドラッグ中であるか
+
+    public Form1()
+    {
+        pictureBox = new PictureBox()
+        {
+            SizeMode = PictureBoxSizeMode.AutoSize,
+            Image = new Bitmap(@"C:\test\ball.png"),
+        }
+
+        pictureBox.MouseDown +=
+            new MouseEventHandler(pictureBox_MouseDown);
+
+        pictureBox.MouseUp +=
+            new MouseEventHandler(pictureBox_MouseUp);
+
+        pictureBox.MouseMove +=
+            new MouseEventHandler(pictureBox_MouseMove);
+
+        this.Controls.Add(pictureBox);
+
+        this.BackColor = SystemColors.Window;
+    }
+
+    void pictureBox_MouseDown(object sender, MouseEventArgs e)
+    {
+        base.OnMouseDown(e);
+
+        dragged = true;
+        draggedPoint = e.Location;
+    }
+
+    void pictureBox_MouseUp(object sender, MouseEventArgs e)
+    {
+        base.OnMouseUp(e);
+
+        dragged = false;
+        draggedPoint = e.Location;
+    }
+
+    void pictureBox_MouseMove(object sender, MouseEventArgs e)
+    {
+        base.OnMouseMove(e);
+
+        if (dragged)
+        {
+            pictureBox.Left += e.Location.X - draggedPoint.X;
+            pictureBox.Top += e.Location.Y - draggedPoint.Y;
+        }
+    }
+}
+ball.png としてこのイメージファイルを使用しました。どうぞダウンロードして使ってください。
+
+ボール素材
+
+解説
+マウスイベント関係は 4.4 節 を読み返してください。
+また，e.Location がピクチャボックスの左上端を原点とすることに注意してください。
+
+ボールに重力が働いたほうが面白いので，そうしてみたのが次の「おまけ」に示す作例です。
+ボールは 1 つのオブジェクトとして扱えるようにするのが良いでしょう。
+よって，Ball クラスを定義して，そこにボールの情報と機能を集約させています。
+この Ball クラスは PictureBox クラスを継承しています。
+
+おまけ：重力の働くボール
+ボールは重力に従って落下し，地面でバウンドします。
+
+作例
+
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    Ball ball;
+
+    public Form1()
+    {
+        ball = new Ball(this);
+
+        this.Controls.Add(ball);
+
+        this.BackColor = SystemColors.Window;
+        this.Size = new Size(640, 480);
+    }
+}
+
+// 重力の働くボール
+class Ball : PictureBox
+{
+    Timer timer;
+
+    Form ownerForm;  // オーナーフォーム
+
+    Point draggedPoint;         // カーソルの位置
+    bool dragged;               // ドラッグ中であるか
+    double velocity = 0;        // 速度
+    double acceleration = 0.5;  // 加速度
+
+    public Ball(Form caller)
+    {
+        ownerForm = caller;
+
+        timer = new Timer()
+        {
+            Interval = 20,
+            Enabled = true,
+        };
+
+        timer.Tick += new EventHandler(timer_Tick);
+
+        this.Image = new Bitmap(@"C:\test\ball.png");
+        this.SizeMode = PictureBoxSizeMode.AutoSize;
+    }
+
+    void timer_Tick(object sender, EventArgs e)
+    {
+        velocity += acceleration;
+        this.Top += (int) velocity;
+
+        if (this.Bottom >= ownerForm.ClientSize.Height)
+        {
+            velocity = -0.8 * velocity;
+            this.Top = ownerForm.ClientSize.Height - this.Height;
+        }
+    }
+
+    protected override void OnMouseDown(MouseEventArgs e)
+    {
+        base.OnMouseDown(e);
+
+        timer.Enabled = false;
+        dragged = true;
+        draggedPoint = e.Location;
+    }
+
+    protected override void OnMouseUp(MouseEventArgs e)
+    {
+        base.OnMouseUp(e);
+
+        velocity = 0;
+        timer.Enabled = true;
+        dragged = false;
+        draggedPoint = e.Location;
+    }
+
+    protected override void OnMouseMove(MouseEventArgs e)
+    {
+        base.OnMouseMove(e);
+
+        if (dragged)
+        {
+            this.Left += e.Location.X - draggedPoint.X;
+            this.Top += e.Location.Y - draggedPoint.Y;
+        }
+    }
+}
+スポンサーリンク
+ 
+« 前のページ 目次 次のページ »
+サイト概要 | お問合せ | プライバシーポリシー
+© 2018 kaitei.net

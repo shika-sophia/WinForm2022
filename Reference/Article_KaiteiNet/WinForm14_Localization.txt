@@ -1,0 +1,166 @@
+
+◆多言語対応
+http://kaitei.net/csforms/localization/
+目次
+カルチャ (ロケール)
+カルチャの切り替え
+リソースのローカライズ
+デザイナでのローカライズ
+
+ 
+カルチャ (ロケール)
+カルチャ (culture) とは，その名の通り文化圏のことで，多くは言語と地域の組合せで表現されます。
+具体的には「日本語 (日本)」「英語 (米国)」「英語 (英国)」のようなものがあります。
+Windows 的には，カルチャのことをロケール (locale) と呼んだりもします。
+
+それぞれのカルチャには，短いカルチャ名が付けられています。
+例えば「日本語 (日本)」は「ja-JP」，「英語 (米国)」は「en-US」といった具合です。
+Windows におけるカルチャ名の一覧は，次のページを参照してください。
+
+National Language Support (NLS) API Reference
+http://msdn.microsoft.com/en-us/goglobal/bb896001.aspx
+カルチャの中には「jp」や「en」といった，言語名のみからなるものがあります。
+これらはニュートラルカルチャと呼ばれ，言語圏全体を表します。
+例えば「en」は，英語圏全体 (米，英，豪，加，...) を内包します。
+
+多言語対応のプログラムを作る際には，時刻の形式などを決める「カルチャ」と，メッセージ等の表示言語を決める「UI カルチャ」の 2 つを意識する必要があります。
+... と説明したところでピンと来ないだろうと思うので，次の「カルチャの切り替え」プログラムを考察してみてください。
+
+カルチャの切り替え
+カルチャを勝手に変えてしまうプログラムを作ってみます (コンソールプログラム)。
+ここでのカルチャの変更は，実行中のスレッドの中だけで有効です。
+
+C# のコードとしては，カルチャは System.Globalization.CultureInfo オブジェクトとして表現されます。
+スレッドの「カルチャ」は， System.Threading.Thread.CurrentThread.CurrentCulture に保持されます。
+対して「UI カルチャ」は， System.Threading.Thread.CurrentThread.CurrentUICulture に保持されます。
+
+
+ 
+using System;
+using System.Globalization;
+using System.Threading;
+
+class Program
+{
+    static void Main()
+    {
+        // 現在のカルチャを表示
+        Console.WriteLine("CurrentCulture: {0}",
+           Thread.CurrentThread.CurrentCulture.Name);
+        Console.WriteLine("CurrentUICulture: {0}",
+            Thread.CurrentThread.CurrentUICulture.Name);
+
+        // 日付を表示してみる
+        Console.WriteLine("Date: {0}", DateTime.Now.ToLongDateString());
+
+        // 例外を発生させてみる
+        try { int zero = 0; zero /= zero; }
+        catch (Exception e) { Console.WriteLine(e.Message); }
+
+        Console.WriteLine();
+
+        // カルチャを変更 (このスレッド内で有効)
+        Thread.CurrentThread.CurrentCulture = new CultureInfo("fr-FR");
+        Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
+
+        // 現在のカルチャを表示
+        Console.WriteLine("CurrentCulture: {0}",
+            Thread.CurrentThread.CurrentCulture.Name);
+        Console.WriteLine("CurrentUICulture: {0}",
+            Thread.CurrentThread.CurrentUICulture.Name);
+
+        // 日付を表示してみる
+        Console.WriteLine("Date: {0}", DateTime.Now.ToLongDateString());
+
+        // 例外を発生させてみる
+        try { int zero = 0; zero /= zero; }
+        catch (Exception e) { Console.WriteLine(e.Message); }
+    }
+}
+日本語 Windows の標準的な環境で実行すれば，次のような結果になると思います。
+
+作例の出力例
+
+「カルチャ」を fr-FR に設定したところ，日付の形式が「mardi 7 aout 2012」に変りました。
+「UI カルチャ」を en-US に設定したところ，例外のメッセージが英語に変りました。
+
+※ 例外のメッセージには関しては，zh-CN などを試しても中国語の言語パックがインストールされていなければ英語で表示されてしまうと思います。
+
+リソースのローカライズ
+プログラムを多言語対応させるには，プログラム中のテキストをすべてリソース化して，各言語につき翻訳版のリソースファイルを用意して差し替える，という手法が簡単です。
+
+まずは，リソースファイル Resources.resx を開き，次の図のように String1，String2 をリソースとして追加してください。
+テキストをリソースとして追加する基本的な手順は，7.5 節 にて扱っています。
+
+リソースの編集
+
+ソリューションエクスプローラ
+
+今度は，翻訳版のリソースファイルを用意します。
+Ctrl キーを押しながら Resources.resx をドラッグしてコピーし，「Resources.ja-JP.resx」というファイル名に変えてください。
+右図のようになっていれば OK です。
+リソースファイルのファイル名には意味があるので，でたらめなファイル名にはしないでください。
+
+Resources.ja-JP.resx は，カルチャ ja-JP のリソースファイルとなります。
+このリソースファイルを開いて，次の図のように編集してください。
+
+リソースの編集
+
+これでリソースファイルの準備は完了です。
+次のプログラムをビルドして，実行してみてください。
+
+using System;
+using System.Globalization;
+using System.Threading;
+using System.Windows.Forms;
+using Project1.Properties;  // プロジェクト名 Project1 の場合
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Thread.CurrentThread.CurrentUICulture = new CultureInfo("ja-JP");
+        // "en-US"，"ar-AE" など，いろいろ試してみてください
+
+        MessageBox.Show(Resources.String1, Resources.String2);
+    }
+}
+実行結果は次のようになるはずです。
+
+ja-JP での実行例	他のカルチャでの実行例
+ja-JP で実行	他のカルチャで実行
+Resource.ja-JP.resx は，Resource.resx にあるすべてのテキストに対応している必要はありません。
+Resource.ja-JP.resx にないテキストは，Resoutce.jp.resx または Resource.resx にあるテキストで表示されます。
+例えば，リソースファイル群が Resource.ja-JP.resx，Resource.ja.resx，Resource.resx から構成されている場合，優先順位は Resource.ja-JP.resx > Resource.ja.resx > Resource.resx となります。
+
+ところで，このプログラムをビルドすると，ja-JP フォルダと，その中に *.resources.dll ファイルが生成されます。
+この *.resources.dll はサテライトアセンブリと呼ばれます。
+ローカライズに必要なので，構成を変えずに，実行ファイルと一緒に配布してください。
+
+デザイナでのローカライズ
+フォームデザイナを利用しているのであれば，ローカライズはもっと簡単です。
+
+作例
+
+フォームのプロパティの中に，Language プロパティと Localizable プロパティがあります。
+
+ja-JP 用の UI を編集する際には，右図のように Language プロパティを「日本語 (日本)」に設定します。
+(Localizable プロパティは勝手に True になります。)
+
+デザイナでのローカライズ-1
+
+他のカルチャ用の UI を編集する際には，右図のように Language プロパティを「(既定値)」にしておきます。
+
+デザイナでのローカライズ-2
+
+特定のカルチャ用の UI を作成すると，右図のようにリソースファイルが生成されます。
+
+デザイナでローカライズ用のリソースファイルを用意した場合も，同様にカルチャごとにフォルダと *.resources.dll ファイルが生成されます。
+いくつものカルチャに対応したプログラムを作ろうとすると，実行ファイルのあるディレクトリが随分と賑やかになってしまいますね。
+
+スポンサーリンク
+ 
+« 前のページ 目次 次のページ »
+サイト概要 | お問合せ | プライバシーポリシー
+© 2018 kaitei.net

@@ -1,0 +1,523 @@
+
+◆メニュー (従来版)
+http://kaitei.net/csforms/menus/
+
+目次
+メインメニュー
+コンテキストメニュー
+ステータスバー
+ツールバー
+
+ 
+メインメニュー
+作例：メインメニュー (従来版)
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    MainMenu mainMenu;
+
+    public Form1()
+    {
+        //
+        // miNew
+        //
+        MenuItem miNew = new MenuItem("新規(&N)");
+        miNew.Click += new EventHandler(miNew_Click);
+        miNew.Shortcut = Shortcut.CtrlN;
+        //
+        // miExit
+        //
+        MenuItem miExit = new MenuItem("終了(&X)");
+        miExit.Click += new EventHandler(miExit_Click);
+        miExit.Shortcut = Shortcut.AltF4;
+        //
+        // miFile
+        //
+        MenuItem miFile = new MenuItem("ファイル(&F)");
+        miFile.MenuItems.AddRange(new MenuItem[]
+        {
+            miNew, new MenuItem("-"), miExit
+        });
+        //
+        // mainMenu
+        //
+        mainMenu = new MainMenu();
+        mainMenu.MenuItems.AddRange(new MenuItem[]
+        {
+            miFile
+        });
+        //
+        // Form1
+        //
+        this.Menu = mainMenu;
+    }
+
+    void miNew_Click(object sender, EventArgs e)
+    {
+        new Form1().Show();
+    }
+
+    void miExit_Click(object sender, EventArgs e)
+    {
+        this.Close();
+    }
+}
+解説
+メニューを設置するには，メニュー項目を収めるための MainMenu クラスと，各メニュー項目を表す MenuItem クラスを利用します。
+所有・被所有の関係は，このような 4 階層になっています。
+
+Form
+MainMenu
+MenuItem (miFile)
+MenuItem (miNew, new MenuItem("-"), miExit)
+[ファイル(F)] は親になるメニュー項目，[新規(N)] などは子になるメニュー項目ですが，いずれも MenuItem を使って表します。
+子になるメニュー項目には，イベントハンドラを設定しておきましょう。
+親になるメニュー項目には，子になるメニュー項目を追加しておきましょう。
+
+メニュー項目間に境界線を設けたいときには，特殊なメニュー項目を挿入します。
+new MenuItem("-") というのがそれです。
+
+System.Windows.Forms 名前空間
+MenuItem クラス [MSDN]
+メニュー項目を表現します。
+
+プロパティ
+項目	説明
+string Text	テキスト
+Shortcut Shortcut	ショートカット
+イベント
+項目	説明
+EventHandler Click	クリック
+メソッド
+項目	説明
+MenuItems.Add	メニュー項目の追加
+MenuItems.AddRange	複数のメニュー項目の追加
+MenuItem コンストラクタ
+MenuItem()
+MenuItem(
+    string text
+)
+MenuItem(
+    string text,
+    EventHandler onClick
+)
+MenuItem(
+    string text,
+    EventHandler onClick,
+    Shortcut shortcut
+)
+ショートカットキーの組合せは Shortcut 列挙体により表します。
+
+System.Windows.Forms 名前空間
+Shortcut 列挙体 [MSDN]
+ショートカットキーを表現します。
+
+enum Shortcut
+{
+    None = 0,
+    Ins = 45,
+    // 中略
+    ShiftIns = 65581,
+    // 中略
+    CtrlIns = 131117,
+    // 中略
+    CtrlShift0 = 196656,
+    // 中略
+    AltBksp = 262152,
+    // 後略
+}
+親メニュー項目は，MainMenu に所属させます。
+
+System.Windows.Forms 名前空間
+MainMenu クラス [MSDN]
+メニューを表現します。
+
+メソッド
+項目	説明
+MainMenu	コンストラクタ
+MenuItems.Add	メニュー項目の追加
+MenuItems.AddRange	複数のメニュー項目の追加
+MainMenu コンストラクタ
+MainMenu()
+MainMenu(
+    MenuItem[] items
+)
+MainMenu をフォームの MainMenu プロパティに設定して，メニューの設置は完了です。
+
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+プロパティ
+項目	説明
+MainMenu MainManu	メインメニュー
+コンテキストメニュー
+作例：コンテキストメニュー (従来版)
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    public Form1()
+    {
+        //
+        // miNew
+        //
+        MenuItem miNew = new MenuItem("新規(&N)");
+        miNew.Click += new EventHandler(miNew_Click);
+        //
+        // miLine
+        //
+        MenuItem miLine = new MenuItem("-");
+        //
+        // miExit
+        //
+        MenuItem miExit = new MenuItem("終了(&X)");
+        miExit.Click += new EventHandler(miExit_Click));
+        //
+        // Form1
+        //
+        this.ContextMenu = new ContextMenu(new MenuItem[]
+        {
+            miNew, miLine, miExit
+        });
+    }
+
+    void miNew_Click(object sender, EventArgs e)
+    {
+        new Form1().Show();
+    }
+
+    void miExit_Click(object sender, EventArgs e)
+    {
+        this.Close();
+    }
+}
+解説
+コンテキストメニューの作り方はメインメニューとほとんど同じで，メニュー項目に MenuItem を使います。
+MainMenu クラスは使わず，代わりに ContextMenu を使います。
+ContextMenu をフォームの ContextMenu プロパティに設定して，コンテキストメニューを設置します。
+
+System.Windows.Forms 名前空間
+ContextMenu クラス [MSDN]
+コンテキストメニューを表現します。
+
+メソッド
+項目	説明
+MenuItems.Add	メニュー項目の追加
+MenuItems.AddRange	複数のメニュー項目の追加
+ContextMenu コンストラクタ
+ContextMenu()
+ContextMenu(
+    MenuItem[] items
+)
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+プロパティ
+項目	説明
+ContextMenu ContextManu	コンテキストメニュー
+ステータスバー
+作例：ステータスバー (従来版)
+ステータスバーにメニュー項目の説明を表示させます。
+最近はこういうアプリケーションをあまり見かけなくなったような気がします。
+
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+
+class Form1 : Form
+{
+    MainMenu mainMenu;
+    StatusBar statusBar;
+    StatusBarPanel statusBarPanel;
+
+    public Form1()
+    {
+        //
+        // miNew
+        //
+        MenuItem miNew = new MenuItem("新規(&N)");
+        miNew.Click += new EventHandler(miNew_Click);
+        miNew.Select += new EventHandler(miNew_Select);
+        //
+        // miLine
+        //
+        MenuItem miLine = new MenuItem("-");
+        //
+        // miExit
+        //
+        MenuItem miExit = new MenuItem("終了(&X)");
+        miExit.Click += new EventHandler(miExit_Click);
+        miExit.Select += new EventHandler(miExit_Select);
+        //
+        // miFile
+        //
+        MenuItem miFile = new MenuItem("ファイル(&F)");
+        miFile.MenuItems.AddRange(new MenuItem[] {
+            miNew, miLine, miExit });
+        //
+        // mainMenu
+        //
+        mainMenu = new MainMenu();
+        mainMenu.MenuItems.AddRange(new MenuItem[]
+        {
+            miFile
+        });
+        //
+        // statusBarPanel
+        //
+        statusBarPanel = new StatusBarPanel()
+        {
+            AutoSize = StatusBarPanelAutoSize.Spring,
+        };
+        //
+        // statusBar
+        //
+        statusBar = new StatusBar()
+        {
+            ShowPanels = true,
+        };
+        statusBar.Panels.AddRange(new StatusBarPanel[]
+        {
+            statusBarPanel
+        });
+        //
+        // Form1
+        //
+        this.Controls.AddRange(new Control[]
+        {
+            statusBar
+        });
+        this.Menu = mainMenu;
+        this.MenuComplete += new EventHandler(Form1_MenuComplete);
+    }
+
+    void miNew_Click(object sender, EventArgs e)
+    {
+        new Form1().Show();
+    }
+
+    void miExit_Click(object sender, EventArgs e)
+    {
+        this.Close();
+    }
+
+    void miNew_Select(object sender, EventArgs e)
+    {
+        statusBarPanel.Text = "新規フォームを生成します。";
+    }
+
+    void miExit_Select(object sender, EventArgs e)
+    {
+        statusBarPanel.Text = "現在のフォームを終了します。";
+    }
+
+    void Form1_MenuComplete(object sender, EventArgs e)
+    {
+        statusBarPanel.Text = "";
+    }
+}
+解説
+StatusBar の上に StatusBarPanel を乗っけています。
+StatusBar は 1 つのコントロールとしてフォームに登録します。
+
+System.Windows.Forms 名前空間
+StatusBar クラス [MSDN]
+ステータスバーを表現します。
+
+プロパティ
+項目	説明
+bool ShowPanels	パネルの表示
+メソッド
+項目	説明
+Panels.Add	パネルの追加
+Panels.AddRange	複数のパネルの追加
+System.Windows.Forms 名前空間
+StatusBarPanel クラス [MSDN]
+ステータスバーパネルを表現します。
+
+プロパティ
+項目	説明
+StatusBarPanelAutoSize AutoSize	自動サイズ
+System.Windows.Forms 名前空間
+StatusBarPanelAutoSize 列挙体 [MSDN]
+enum StatusBarPanelAutoSize
+{
+    None = 1,
+    Sprint = 2,
+    Contents = 3,
+}
+System.Windows.Forms 名前空間
+MenuItem クラス [MSDN]
+イベント
+項目	説明
+EventHandler Select	フォーカスを得た
+System.Windows.Forms 名前空間
+Form クラス [MSDN]
+イベント
+項目	説明
+EventHandler MenuComplete	メニューがフォーカスを失った
+ツールバー
+作例：ツールバー (従来版)
+作例
+
+コード
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+class Program
+{
+    [STAThread]
+    static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+    }
+}
+class Form1 : Form
+{
+    ToolBar toolBar;
+
+    public Form1()
+    {
+        //
+        // imageList
+        //
+        ImageList imageList = new ImageList();
+        imageList.Images.AddStrip(
+            new Bitmap(GetType(), "Project1.toolicon.png"));
+        imageList.TransparentColor = Color.Magenta;
+        //
+        // tbbNew
+        //
+        ToolBarButton tbbNew = new ToolBarButton()
+        {
+            ToolTipText = "新規",
+            ImageIndex = 0,
+        };
+        //
+        // tbbExit
+        //
+        ToolBarButton tbbExit = new ToolBarButton()
+        {
+            ToolTipText = "終了",
+            ImageIndex = 1,
+        };
+        //
+        // toolBar
+        //
+        toolBar = new ToolBar()
+        {
+            ImageList = imageList,
+            ShowToolTips = true,
+        };
+        toolBar.ButtonClick +=
+            new ToolBarButtonClickEventHandler(tb_ButtonClick);
+        toolBar.Buttons.AddRange(new ToolBarButton[]
+        {
+            tbbNew, tbbExit
+        });
+        //
+        // Form1
+        //
+        this.Controls.Add(toolBar);
+    }
+
+    void tb_ButtonClick(object sender, ToolBarButtonClickEventArgs e)
+    {
+        switch (e.Button.ToolTipText)
+        {
+            case "新規":
+                new Form1().Show();
+                break;
+            case "終了":
+                this.Close();
+                break;
+        }
+    }
+}
+解説
+アイコンを用意するのに ImageList を利用するのは 9.3 節 と同じです。
+今回の一工夫は，ImageList のインスタンスそのものを ToolBar に渡してしまい，ToolBarButton 各項目ではイメージのインデックスだけ指定している，という点です。
+
+System.Windows.Forms 名前空間
+ToolBar クラス [MSDN]
+ツールバーを表現します。
+
+プロパティ
+項目	説明
+ImageList ImageList	イメージリスト
+bool ShowToolTips	ツールチップの表示
+イベント
+項目	説明
+ToolBarButtonClickEventHandler ButtonClick	ボタンのクリック
+メソッド
+項目	説明
+Buttons.Add	ボタンの追加
+Buttons.AddRange	複数のボタンの追加
+System.Windows.Forms 名前空間
+ToolBarButton クラス [MSDN]
+ツールバー上のボタンを表現します。
+
+プロパティ
+項目	説明
+string Text	テキスト
+string ToolTipText	ツールチップ
+int ImageIndex	イメージのインデックス
+System.Windows.Forms 名前空間
+delegate void ToolBarButtonClickEventHandler(
+    object sender, ToolBarButtonClickEventArgs e);
+System.Windows.Forms 名前空間
+ToolBarButtonClickEventArgs クラス [MSDN]
+ツールバー上のボタンのクリックイベントに関するデータを提供します。
+
+プロパティ
+項目	説明
+ToolBarButton Button	クリックされたボタン
+スポンサーリンク
+ 
+« 前のページ 目次 次のページ »
+サイト概要 | お問合せ | プライバシーポリシー
+© 2018 kaitei.net

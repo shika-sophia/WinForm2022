@@ -1,0 +1,146 @@
+
+◆メッセージボックス
+http://kaitei.net/csforms/message-boxes/
+シンプルなメッセージボックス
+
+メッセージボックスのカスタマイズ
+
+目次
+シンプルなメッセージボックス
+メッセージボックスのカスタマイズ
+シンプルなメッセージボックス
+作例 1：メッセージボックスの表示
+簡単なメッセージボックスを表示するだけのプログラムを作ります。
+
+作例
+
+コード
+using System.Windows.Forms;
+
+class Program
+{
+    static void Main()
+    {
+        // メッセージボックスを表示
+        MessageBox.Show("起動しました。", "お知らせ");
+    }
+}
+解説
+メッセージボックスを表示するには，MessageBox クラスの Show メソッドを利用します。
+
+System.Windows.Forms 名前空間
+MessageBox クラス [MSDN]
+メッセージボックスを表現します。
+
+Show メソッド
+メッセージボックスを表示します。
+
+static DialogResult Show(
+    string text  // メッセージ
+)
+static DialogResult Show(
+    string text,    // メッセージ
+    string caption  // タイトル
+)
+メッセージボックスのカスタマイズ
+作例：メッセージボックスの返り値
+[はい] と [いいえ] のボタンがあるメッセージボックスを表示し，どちらのボタンが押されたかを判別します。
+
+作例
+
+コード
+using System.Windows.Forms;
+
+class Program
+{
+    static void Main()
+    {
+        DialogResult result = MessageBox.Show(
+           "[はい] か [いいえ] を選択してください。", "確認",
+           MessageBoxButtons.YesNo,    // ボタンの設定
+           MessageBoxIcon.Question);   // アイコンの設定
+
+        if (result == DialogResult.Yes)
+        {
+            MessageBox.Show("[はい] が選択されました。", "結果");
+        }
+        else if (result == DialogResult.No)
+        {
+            MessageBox.Show("[いいえ] が選択されました。", "結果");
+        }
+    }
+}
+解説
+メッセージボックスのボタンとアイコンを設定することもできます。
+
+System.Windows.Forms 名前空間
+MessageBox クラス [MSDN]
+メッセージボックスを表現します。
+
+Show メソッド
+メッセージボックスを表示します。
+
+static DialogResult Show(
+    string text,                // メッセージ
+    string caption,             // タイトル
+    MessageBoxButtons buttons,  // ボタン
+    MessageBoxIcon icon         // アイコン
+)
+ボタンは MessageBoxButtons 列挙体の中から，アイコンは MessageBoxIcon 列挙体の中から選びます。
+
+System.Windows.Forms 名前空間
+MessageBoxButtons 列挙体 [MSDN]
+メッセージボックスのボタンを表現します。
+
+enum MessageBoxButtons
+{
+    OK = 0,                // [OK]
+    OKCancel = 1,          // [OK]，[キャンセル]
+    AbortRetryIgnore = 2,  // [中止]，[再試行]，[無視]
+    YesNoCancel = 3,       // [はい]，[いいえ]，[キャンセル]
+    YesNo = 4,             // [はい]，[いいえ]
+    RetryCancel = 5        // [再試行]，[キャンセル]
+}
+System.Windows.Forms 名前空間
+MessageBoxIcon 列挙体 [MSDN]
+メッセージボックスのアイコンを表現します。
+
+enum MessageBoxIcon
+{
+    None = 0,
+    Error = 16,
+    Hand = 16,
+    Stop = 16,
+    Question = 32,
+    Exclamation = 48,
+    Warning = 48,
+    Information = 64,
+    Asterisk = 64
+}
+Error, Hand, Stop	Error, Hand, Stop
+Question	Question
+Exclamation, Warning	Exclamation, Warning
+Information, Asterisk	Information, Asterisk
+メッセージボックスのどのボタンが押されたかという情報は，返り値から得ることができます。
+DialogResult 列挙体により表現されます。
+
+System.Windows.Forms 名前空間
+DialogResult 列挙体 [MSDN]
+ダイアログの結果を表現します。
+
+enum DialogResult
+{
+    None = 0,
+    OK = 1,      // [OK]
+    Cancel = 2,  // [キャンセル]
+    Abort = 3,   // [中止]
+    Retry = 4,   // [再試行]
+    Ignore = 5,  // [無視]
+    Yes = 6,     // [はい]
+    No = 7       // [いいえ]
+}
+今回の作例は [はい] と [いいえ] の 2 つのボタンからなるメッセージボックスを使用しているため，DialogResult.Yes (はい) または DialogResult.No (いいえ) のどちらかが返却されます。
+
+« 前のページ 目次 次のページ »
+サイト概要 | お問合せ | プライバシーポリシー
+© 2018 kaitei.net
