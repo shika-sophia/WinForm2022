@@ -8,7 +8,7 @@
 /// </summary>
 
 /// エントリーポイントを自己定義する場合は 
-/// static class, [STAThread],static Main()をコメントアウトし、
+/// static class, [STAThread], static Main()をコメントアウトし、
 /// public Main()に変更
 
 using System;
