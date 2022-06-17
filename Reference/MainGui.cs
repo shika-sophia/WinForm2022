@@ -20,6 +20,7 @@
  *         WindowsFormを実行
  *         
  *@see WinFormButton.jpg
+ *@copyTo WinFormSample / KaiteiNet / KT01_Introduction / MainFormSample.cs
  *@author shika 
  *@date 2022-02-21 
 */
