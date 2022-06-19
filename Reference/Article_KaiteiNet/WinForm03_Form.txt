@@ -9,7 +9,6 @@ http://kaitei.net/csforms/forms-basics/
 サイズ
 位置
 背景画像
-スポンサーリンク
 
  
 簡単なウィンドウ
