@@ -10,9 +10,9 @@ namespace WinFormGUI.WinFormSample.KaiteiNet.KT03_Form
 {
     class MainFormColor
     {
-        [STAThread]
-        static void Main()
-        //public void Main()
+        //[STAThread]
+        //static void Main()
+        public void Main()
         {
             Application.Run(new FormColorSample());
         }//Main()
