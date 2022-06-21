@@ -43,11 +43,3 @@ namespace WinFormGUI.WinFormSample.KaiteiNet.KT04_ControlBasic
         }//constructor
     }//class
 }
-
-/*
-NOTE【Bug?】
-for文の条件式に「=」を入れるとプログラムが終了して
-ちゃんと描画されない不具合あり。
-                  ↓
-for(int i = 0; i <= buttonAry.Length; i++)
-*/
