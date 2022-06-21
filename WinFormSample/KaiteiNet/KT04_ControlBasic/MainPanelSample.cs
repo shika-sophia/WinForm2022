@@ -6,9 +6,9 @@ namespace WinFormGUI.WinFormSample.KaiteiNet.KT04_ControlBasic
 {
     class MainPanelSample
     {
-        [STAThread]
-        static void Main()
-        //public void Main()
+        //[STAThread]
+        //static void Main()
+        public void Main()
         {
             Application.EnableVisualStyles();
             Application.Run(new FormPanelSample());
