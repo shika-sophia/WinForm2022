@@ -1,0 +1,26 @@
+﻿/** 
+ *@title WinFormGUI / WinFormSample / KT04_ControlBasic / ControlBasicDocument.txt
+ *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
+ *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
+ *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
+ *@reference KT ナガノ  『Windows Form C#』KaiteiNet, 2010
+ *           http://kaitei.net/csforms/controls-basics/ 
+ *           =>〔~/Reference/Article_KaiteiNet/WinForm04_ControlBasic.txt〕
+ *@content KT 4. Control Basic 
+ *@subject コンテナ
+ *         ・複数の Controlをまとめる
+ *         ・FormにControlを直接追加すると Formのクライアント領域の座標
+ *           Panelに追加すると Panel左上端を原点とする座標
+ *
+ *@subject Panelクラス System.Windows.Forms
+ *         Panel new Panel()
+ *
+ *        ＊Controlを格納/追加
+ *         Control.ControlCollection        //IList 
+ *                control.Controls
+ *         void   control.Controls.Add(Control)
+ *         void   control.Controls.AddRange(Control[])        
+ * 
+ *@author shika
+ *@date 2022-06-21
+ */
