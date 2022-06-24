@@ -38,9 +38,9 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR03_Layout
 {
     class MainSplitContainer
     {
-        [STAThread]
-        static void Main()
-        //public void Main()
+        //[STAThread]
+        //static void Main()
+        public void Main()
         {
             Application.EnableVisualStyles();
             Application.Run(new FormCodeSplitContainer());
