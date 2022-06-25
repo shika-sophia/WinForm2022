@@ -5,10 +5,24 @@
  /*
 NOTE【Exception】
 配列を利用した for文において条件式に「=」を入れると
-ArrayIndexBoundsExceptionとなるはずだが、
+ArrayIndexOutOfBoundsExceptionとなるはずだが、
 WindowsFormプロジェクトでは、どこにも例外が表示されない。
 ただ、正しくFormは表示されず、プログラムは終了する。
 コンパイルエラーにもならない。
 
 for(int i = 0; i <= buttonAry.Length; i++)
 */
+
+ *@NOTE【エラー検出】
+ *      下記のように「出力の種類」を[コンソールアプリケーション]に設定すると
+ *      例外表示される。
+ *
+ *      または、try-catch構文で 例外時に MessageBoxなどで出力。
+
+ *@NOTE【実行】このプロジェクトでコンソール出力するには
+ *      WinFormGUIプロジェクトは「出力の種類」が[Windows Form]となっている。
+ *      
+ *      VS[プロジェクト] -> [プロパティ] -> [アプリケーション]タブ
+ *      -> [出力の種類] -> [コンソールアプリケーション]に変更
+ *      (終了後は元に戻しておく)
+ *
