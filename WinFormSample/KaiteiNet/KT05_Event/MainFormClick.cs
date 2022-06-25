@@ -8,11 +8,14 @@
  *           =>〔~/Reference/Article_KaiteiNet/WinForm05_Event.txt〕
  *@content KT 5. Event
  *         Formをクリックすると、MessageBoxを表示する
- *         
+ *
+ *@class   MainConsoleEvent.cs
  *@subject イベントの基本
- *         Formクラス
- *         delegate void EventHandler(object sender, EventArgs e)
+ *         
+ *@class   FormClickSample.cs : Form         
+ *@subject Formクラスのイベント/イベントハンドラ
  *         event EventHandlar Click
+ *         delegate void EventHandler(object sender, EventArgs e)
  *         
  *         this.Click += new EventHandler(form_Click)
  *           └ private void form_Click(object sender, EventArgs e)
@@ -22,8 +25,28 @@
  *         button.Click += new EventHandlar(button_Click)
  *           └ private void button_Click(object sender, EventArgs e)
  *
+ *@class   FormCloseSample : Form
+ *@subject ＊終了イベント
+ *         event FormClosing
+ *         event FormClosed
+ *         
+ *         ＊イベントハンドラ delegate
+ *         delegate void FormClosingEventHandler(
+ *            object sender, FormClosingEventArgs e);
+ *         delegate void FormClosedEventHandler(
+ *            object sender, FormClosedEventArgs e);
+ *            
+ *@subject GUI「×」ボタン
+ *         void form.Close()  //Formの終了,GUI「×」ボタンと同じ
+ *         メソッドによっても FormClosingイベントは発生するため、
+ *         FormClosingイベントから、イベントハンドラの解除が必要。
+ *         (解除をしないと、MessageBoxで終了[OK]時、またMessageBoxが出力される。)
+ *         
+ *         this.FormClosing -= this.form_Closing;
+ *            
  *@see FormClickSample.jpg
  *@see FormButtonClick.jpg
+ *@see MainConsoleEvent.cs
  *@author shika
  *@date 2022-06-24
  */
