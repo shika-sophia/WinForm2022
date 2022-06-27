@@ -16,16 +16,19 @@
  *         int   timer.Interval  時間間隔 (ミリ秒)
  *         void  timer.Start()
  *         void  timer.Stop()
- *         EventHandler timer.Tick 一定時間 Intervalで発生するイベント
- *                                 最初の表示では発生しない
- *                                 -> Form.Loadイベントを利用すると解決
+ *         EventHandler timer.Tick 
+ *               一定時間 Intervalで発生するイベント
+ *               最初の表示では発生しない
+ *               -> Form.Loadイベントを利用すると解決
  *         
  *         ＊イベントハンドラ 
  *         delegate void EventHandler(object sender, EventArgs e)
  *         
  *         timer.Tick += new EventHandler(form_Tick);
  *         
- *         ＊Form -- EventHandlerが同じ
+ *         ＊Form 
+ *         EventHandler delegateが同じなので、そのままの形で Form.Loadイベントにも追加
+ *         
  *         EventHandler form.Load        読込時
  *         EventHandler form.Shown       最初の表示時
  *         EventHandler form.Activated   アクティブ化
@@ -62,6 +65,7 @@ namespace WinFormGUI.WinFormSample.KaiteiNet.KT05_Event
         public FormTimerSample()
         {
             this.Text = "FormTimerSample";
+
             timer = new Timer()
             {
                 Interval = 1000, //1秒ごとに更新
