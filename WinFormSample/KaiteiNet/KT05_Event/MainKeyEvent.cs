@@ -1,6 +1,7 @@
 ﻿/** 
  *@title WinFormGUI / WinFormSample / KaiteiNet / KT05_Event /
  *@class MainKeyEvent.cs
+ *@class MainKeyPress.cs
  *@class FormKeyEventSample.cs
  *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
  *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
