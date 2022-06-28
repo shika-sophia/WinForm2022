@@ -803,7 +803,6 @@ Form クラス [MSDN]
 EventHandler Click	クリック
 System 名前空間
 delegate void EventHandler(object sender, EventArgs e);
-スポンサーリンク
  
 « 前のページ 目次 次のページ »
 サイト概要 | お問合せ | プライバシーポリシー
