@@ -127,7 +127,7 @@ SystemFonts クラス [MSDN]
 (static) Font DefaultFont	既定のフォント
 (static) Font CaptionFont	タイトルのフォント
 (static) Font MenuFont	メニューのフォント
-Font クラスのコンストラクタにおけるフォントスタイルの指定には，FontStle 列挙体が用いられます。
+Font クラスのコンストラクタにおけるフォントスタイルの指定には，FontStyle 列挙体が用いられます。
 
 System.Drawing 名前空間
 FontStyle 列挙体
@@ -167,6 +167,7 @@ enum ContentAlignment
     BottomCenter = 512,  // 下端中央
     BottomRight = 1024,  // 下端右寄せ
 }
+
 ボタンの復習
 作例：三つ子のボタン
 Tab キーを押したときにフォーカスが移る順位を，ボタン A，B，C の順に設定しています。
