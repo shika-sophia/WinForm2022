@@ -7,7 +7,7 @@
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
  *@reference KT ナガノ  『Windows Form C#』KaiteiNet, 2010
  *           http://kaitei.net/csforms/controls/
- *           =>〔~/Reference/Article_KaiteiNet/WinForm_.txt〕
+ *           =>〔~/Reference/Article_KaiteiNet/WinForm06_Control.txt〕
  *           
  *@content KT 6. Control
  *@subject ◆Fontクラス System.Windows.Forms
@@ -31,7 +31,6 @@
  *          
  *         ◆SystemFontsクラス システム既定のフォント
  *                            Dispose()する必要がない。
- *         ◆SystemColorsクラス システム既定の色
  *         
  *@subject ◆Labelクラス System.Windows.Forms
  *         Label new Label()
@@ -54,9 +53,11 @@
  *                BottomRight = 1024,  // 下端右寄せ
  *            }
  *
+ *         ◆SystemColorsクラス システム既定の色
+ *         
  *@see FormLabelFont.jpg
  *@author shika
- *@date 2022-06-29
+ *@date 2022-06-29, 06-30
  */
 using System;
 using System.Drawing;
