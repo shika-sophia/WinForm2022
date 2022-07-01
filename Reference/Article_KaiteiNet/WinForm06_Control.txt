@@ -1,5 +1,5 @@
 
-◆コントロール
+■コントロール
 http://kaitei.net/csforms/controls/
 
 目次
@@ -16,7 +16,7 @@ http://kaitei.net/csforms/controls/
 分割フォーム
 
  
-ラベルの復習
+◆ラベルの復習
 作例：フォントと文字色の設定
 ラベルにフォントと文字色を設定してみました。
 
@@ -168,7 +168,8 @@ enum ContentAlignment
     BottomRight = 1024,  // 下端右寄せ
 }
 
-ボタンの復習
+
+◆ボタンの復習
 作例：三つ子のボタン
 Tab キーを押したときにフォーカスが移る順位を，ボタン A，B，C の順に設定しています。
 ボタン B を使用不可にしています。
@@ -275,7 +276,9 @@ Cursors クラス [MSDN]
 
 主なプロパティ (static Cursor ***)
 主なプロパティ
-テキストボックス
+
+
+◆テキストボックス
 作例：メモ帳
 テキストボックスコントロールを使って，簡易的なメモ帳を作成します。
 
@@ -361,7 +364,9 @@ enum ScrollBars
     Vertical = 2,   // 垂直方向
     Both = 3        // 両方向
 }
-ピクチャボックス
+
+
+◆ピクチャボックス
 作例：イメージビューア
 イメージを表示するフォームを作成します。
 プログラムを走らせる前に，任意のイメージファイルを準備してください (イメージの形式は .bmp 以外でも構いません)。
@@ -444,7 +449,9 @@ Bitmap コンストラクタ
 Bitmap(
     string filename // イメージファイルのパス
 )
-コンボボックス
+
+
+◆コンボボックス
 作例：コンボボックス
 図のようなコンボボックスを持つフォームを作成します。
 
@@ -507,7 +514,8 @@ class Form1 : Form
     }
 }
 解説
-コンボボックス (ComboBox) やリストボックス (ListBox) は，複数の項目のリストを持つコントロールです。
+コンボボックス (ComboBox) やリストボックス (ListBox) は，
+複数の項目のリストを持つコントロールです。
 
 System.Windows.Forms 名前空間
 ComboBox クラス [MSDN]
@@ -564,7 +572,9 @@ enum ComboBoxStyle
     DropDown = 1,     // ドロップダウン
     DropDownList = 2  // ドロップダウンリスト
 }
-おまけ：リストボックス
+
+
+◆おまけ：リストボックス
 コンボボックスがわかっていればこちらは簡単です。
 
 System.Windows.Forms 名前空間
@@ -576,6 +586,7 @@ ListBox クラス [MSDN]
 object SelectedItem	選択中の項目
 int SelectedIndex	選択中のインデックス
 ListBox.ObjectCollection Items	項目のコレクション
+
 イベント
 項目	説明
 EventHandler SelectedIndexChanged	選択するインデックスが変更された
@@ -633,7 +644,9 @@ class Form1 : Form
             listBox.SelectedIndex, listBox.SelectedItem.ToString());
     }
 }
-チェックボックス
+
+
+◆チェックボックス
 作例：チェックボックス
 チェックボックスを操作してフォントスタイルを変更するプログラムです。
 
@@ -723,13 +736,15 @@ CheckBox クラス [MSDN]
 プロパティ
 項目	説明
 bool Checked	選択中
+
 イベント
 項目	説明
 event EventHandler CheckedChanged	選択状態が変更された
 Checked プロパティの初期値を，CheckedChanged イベントハンドラよりも後に設定しています。
 こうすることで，最初から正しいフォントで表示されるようにすることができます。
 
-ラジオボタン
+
+◆ラジオボタン
 作例：ラジオボタン
 ラジオボタンを使ったプログラムです。
 
@@ -831,7 +846,9 @@ GroupBox クラス [MSDN]
 プロパティ
 項目	説明
 string Text	タイトル
-プログレスバー
+
+
+◆プログレスバー
 作例：プログレスバーとスピンボックス
 スピンボックスの値に合わせて，プログレスバーの表示が変化します。
 
@@ -927,10 +944,13 @@ NumericUpDown クラス [MSDN]
 decimal Value	値
 decimal Maximum	最大値
 decimal Minimum	最小値
+
 イベント
 項目	説明
 EventHandler ValueChanged	値が変更された
-リンクラベル
+
+
+◆リンクラベル
 作例：リンクラベル
 ハイパーリンクを設置します。
 クリックすれば既定のアプリケーションでリンク先を開きます。
@@ -1058,7 +1078,9 @@ Process.Start メソッド [MSDN]
 Process Start(
     string fileName
 )
-リストビュー
+
+
+◆リストビュー
 作例：ファイルリスト
 特定のフォルダ内のファイルを一覧表示します。
 ファイル名とファイルパスを表示します。
@@ -1209,7 +1231,9 @@ ColumnHeader クラス [MSDN]
 プロパティ
 項目	説明
 string Text	見出し
-分割フォーム
+
+
+◆分割フォーム
 作例：分割フォーム
 上下に 2 個のテキストボックスを持つフォームです。
 
@@ -1314,7 +1338,7 @@ enum FixedPanel
     Panel1 = 1, // Panel 1
     Panel2 = 2, // Panel 2
 }
-スポンサーリンク
+
  
 « 前のページ 目次 次のページ »
 サイト概要 | お問合せ | プライバシーポリシー
