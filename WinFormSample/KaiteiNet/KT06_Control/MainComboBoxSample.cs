@@ -30,8 +30,7 @@
  *         ＊イベント
  *         EventHandler combo.SelectedChanged
  *         
- *@see FormPictureBoxSample.jpg
- *@see ../../Image/VaioSX14COREi7_10710U.jpg   // 1000×750
+ *@see FormComboBoxSample.jpg
  *@author shika
  *@date 2022-07-02
  */
