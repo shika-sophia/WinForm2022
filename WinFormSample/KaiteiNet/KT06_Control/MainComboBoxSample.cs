@@ -43,9 +43,9 @@ namespace WinFormGUI.WinFormSample.KaiteiNet.KT06_Control
 {
     class MainComboBoxSample
     {
-        [STAThread]
-        static void Main()
-        //public void Main()
+        //[STAThread]
+        //static void Main()
+        public void Main()
         {
             Application.EnableVisualStyles();
             Application.Run(new FormComboBoxSample());
