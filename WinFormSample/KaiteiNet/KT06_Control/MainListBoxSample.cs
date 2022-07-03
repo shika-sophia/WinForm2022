@@ -12,7 +12,16 @@
  *@content KT 6. Control / ListBox
  *@subject ◆ListBoxクラス System.Windows.Forms
  *         ListBox new ListBox()
- *         => see〔MainComboBoxSample.cs〕
+ *         ListBox.ObjectCollection
+ *                list.Items
+ *         int    list.Items.Add(object)
+ *         void   list.Items.AddRange(object[])    
+ *         int    list.SelectedIndex
+ *         object list.SelectedItem
+ *         EventHandler
+ *                list.SelectChanged
+ *                
+ *         =>〔MainComboBoxSample.cs〕と同様
  *
  *@see FormListBoxSample.jpg
  *@author shika
