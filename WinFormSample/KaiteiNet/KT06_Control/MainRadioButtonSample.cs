@@ -46,6 +46,7 @@ namespace WinFormGUI.WinFormSample.KaiteiNet.KT06_Control
         private Label label;
         private RadioButton[] radioAry;
         private GroupBox group;
+
         private readonly string[] itemAry = new string[]
         {
             "青巻紙", "赤巻紙", "黄巻紙"
