@@ -87,7 +87,8 @@ namespace WinFormGUI.WinFormSample.KaiteiNet.KT06_Control
             this.Controls.Add(link);
         }//constructor
 
-        private void link_Clicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void link_Clicked(
+            object sender, LinkLabelLinkClickedEventArgs e)
         {
             link.LinkVisited = true;
 
@@ -108,7 +109,6 @@ namespace WinFormGUI.WinFormSample.KaiteiNet.KT06_Control
             {
                 process.Close();
             }
-        }
+        }//link_Clicked()
     }//class
-
 }
