@@ -11,8 +11,8 @@
  *           
  *@content KT 6.Control / ListView
  *@subject ◆ListView -- System.Woindows.Forms
- *         bool                   listView.GridLine
- *         View listView.View
+ *         bool   listView.GridLine
+ *         View   listView.View
  *           └ enum View
  *             {
  *                 LargeIcon = 0,  // 大アイコン表示
