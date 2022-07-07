@@ -9,7 +9,7 @@
  *           http://kaitei.net/csforms/controls/
  *           =>〔~/Reference/Article_KaiteiNet/WinForm06_Control.txt〕
  *           
- *@content KT 6. Control
+ *@content KT 6. Control / Font, Label
  *@subject ◆Fontクラス System.Windows.Forms
  *         Font new Font(string familyname, float size, [FontStyle])
  *             enum FontStyle
@@ -25,7 +25,7 @@
  *             FontStyle.Bold | FontStyle.Strikeout
  *          
  *          void control.Dispose()        Fontオブジェクトの破棄
- *          Font SystemFonts.DefaultFont   既定のフォント
+ *          Font SystemFonts.DefaultFont   システム既定のフォント
  *          Font SystemFonts.CaptionFont   タイトルのフォント
  *          Font SystemFonts.MenuFont      メニューのフォント
  *          
