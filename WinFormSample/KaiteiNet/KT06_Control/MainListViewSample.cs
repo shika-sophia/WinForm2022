@@ -26,15 +26,19 @@
  *             
  *         ＊Columnsプロパティ
  *         int                    listView.Columns.Add(ColumnsHeader)
+ *         ColumnHeader           listView.Columns.Add(
+ *                                   string text, 
+ *                                   int width, 
+ *                                   HorizontalAlignment textAlign);
  *         void                   listView.Columns.AddRange(CoumunsHeader[])
  *         ColumnHeaderCollection listView.Columns   列ヘッダのコレクション
  *           └ ColumnsHeaderクラス
  *             string columnsHeader.Text  列の見出し
  *             
  *         ＊Itemsプロパティ
- *         ListViewItemCollection listView.Items
+ *         ListViewItemCollection listView.Items 各行のレコード
  *           └ ListViewItem new ListViewItem()
- *             int Add(string[])
+ *             int Add(string[])                 配列で１行分のレコードを追加
  *         int                    listView.Items.Add(ListViewItem)
  *         void                   listView.Items.AddRange(ListViewItem[])
  *         
@@ -45,13 +49,19 @@
  *         カレントフォルダ「.」は ~/bin/Debug/WinFormGUI.exe
  *         アプリルート「~」: ASP.NETのアプリルート記号は利用できず
  *
- *@NOTE 列幅の調整 (設定のやり方不明)
+ *@subject 列幅の調整 
+ *         listView.Columns.Add(string, int) の第2引数で widthを指定するか
+ *         listView.Columns.AddRange(ColumnHeader[])を利用した場合は
+ *         Columns[i]で各要素を指定し Widthプロパティを設定
+ *         
+ *         int listView.Columns[0].Width
  *
  *@see FormListViewSample.jpg
  *@author shika
- *@date 2022-07-06
+ *@date 2022-07-06, 07-07
  */
 using System;
+using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
@@ -75,6 +85,7 @@ namespace WinFormGUI.WinFormSample.KaiteiNet.KT06_Control
         public FormListViewSample()
         {
             this.Text = "FormListViewSample";
+            this.Size = new Size(400, 300);
 
             listView = new FileListView()
             {
@@ -104,6 +115,8 @@ namespace WinFormGUI.WinFormSample.KaiteiNet.KT06_Control
             {
                 headerFileName, headerFilePath,
             });
+            this.Columns[0].Width = 240;
+            this.Columns[1].Width = 80;
         }
 
         public void AddFiles(string directoryPath)

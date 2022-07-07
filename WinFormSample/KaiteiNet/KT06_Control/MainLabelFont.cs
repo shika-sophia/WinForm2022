@@ -24,10 +24,10 @@
  *             複数指定の場合はビット論理和「|」区切り
  *             FontStyle.Bold | FontStyle.Strikeout
  *          
- *          void font.Dispose()        Fontオブジェクトの破棄
- *          Font control.DefaultFont   既定のフォント
- *          Font control.CaptionFont   タイトルのフォント
- *          Font control.MenuFont      メニューのフォント
+ *          void control.Dispose()        Fontオブジェクトの破棄
+ *          Font SystemFonts.DefaultFont   既定のフォント
+ *          Font SystemFonts.CaptionFont   タイトルのフォント
+ *          Font SystemFonts.MenuFont      メニューのフォント
  *          
  *         ◆SystemFontsクラス システム既定のフォント
  *                            Dispose()する必要がない。
