@@ -23,9 +23,13 @@
  *                 Both = 3,
  *             }
  *         void       textBox.AppendText(string)
+ *                       Environment.
  *         void       textBox.Clear()
  *         bool       textBox.AcceptReturn  デフォルトボタン設定時も[Enter]で改行
  *         bool       textBox.AcceptTabs
+ *         
+ *         ＊Environmentクラス System.
+ *         string     Environment.NewLine   システム環境に応じた改行
  *         
  *@author shika
  *@date 2022-07-01
@@ -65,7 +69,7 @@ namespace WinFormGUI.WinFormSample.KaiteiNet.KT06_Control
                 Font = new Font("ＭＳ ゴシック", 12, FontStyle.Regular),
             };
             this.Controls.Add(txt);
-
+            
         }//constructor
     }//class
 }
