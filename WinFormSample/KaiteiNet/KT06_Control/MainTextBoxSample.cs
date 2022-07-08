@@ -22,7 +22,11 @@
  *                 Vertical = 2,
  *                 Both = 3,
  *             }
- *             
+ *         void       textBox.AppendText(string)
+ *         void       textBox.Clear()
+ *         bool       textBox.AcceptReturn  デフォルトボタン設定時も[Enter]で改行
+ *         bool       textBox.AcceptTabs
+ *         
  *@author shika
  *@date 2022-07-01
  */
