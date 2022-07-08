@@ -9,7 +9,7 @@
  *           http://kaitei.net/csforms/controls/ 
  *           =>〔~/Reference/Article_KaiteiNet/WinForm06_Control.txt〕
  *           
- *@content KT 6. Control / PictureBox
+ *@content KT 6. Control / PictureBox, Bitmap/Image
  *@subject ◆Bitmap : Image / Image -- System.Drawing.
  *         new Bitmap(string path)
  *         Image.FromFile(string path) //new Image()は不可

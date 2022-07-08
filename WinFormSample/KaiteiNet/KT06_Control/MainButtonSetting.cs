@@ -18,6 +18,8 @@
  *         bool    button.UseVisualStyleBackColor	ビジュアルスタイルの背景色
  *         Cursors button.Cursor   Cursorsクラスのオブジェクト
  *              Cursors.Hand | No | Arrow など
+ *              
+ *         EventHandler button.Click
  *
  *subject 型キャスト (型) xxxx
  *        as演算子   xxxx as 型
