@@ -10,16 +10,9 @@
  *           =>〔~/Reference/Article_KaiteiNet/WinForm06_Control.txt〕
  *           
  *@content KT 6. Control / PictureBox, Bitmap/Image
- *@subject ◆Bitmap : Image / Image -- System.Drawing.
- *         new Bitmap(string path)
- *         Image.FromFile(string path) //new Image()は不可
- *         int  image.Width
- *         int  image.Height
- *         Size image.Size
- *         
  *@subject ◆PictureBox -- System.Windows.Forms
- *         Image    pictureBox.Image
- *         SizeMode pictureBox.PictureBoxSizeMode
+ *         Image              pictureBox.Image
+ *         PictureBoxSizeMode pictureBox.SizeMode
  *             enum PictureBoxSizeMode
  *             {
  *                 Normal = 0,       // PictureBox の左上端にそのまま配置
@@ -28,6 +21,16 @@
  *                 CenterImage = 3,  // PictureBox の中央にイメージを配置
  *                 Zoom = 4          // 縦横比を維持したまま拡大または縮小
  *             }
+ *             
+ *@subject ◆Bitmap : Image / Image -- System.Drawing.
+ *         new Bitmap(string path)
+ *         Image.FromFile(string path) //new Image()は不可
+ *         int  image.Width
+ *         int  image.Height
+ *         Size image.Size
+ *         
+ *@subject リソースを参照
+ *         Properties.Resources.xxxxx
  *
  *@see FormPictureBoxSample.jpg
  *@see ../../Image/VaioSX14COREi7_10710U.jpg   // 1000×750
