@@ -15,19 +15,30 @@
  *         ListBox.ObjectCollection
  *                list.Items
  *         int    list.Items.Add(object)
- *         void   list.Items.AddRange(object[])    
- *         int    list.SelectedIndex
- *         object list.SelectedItem
+ *         void   list.Items.AddRange(object[]) 
+ *         void   list.Items.Remove(object)
+ *         void   list.Items.RemoveAt(int)
+ *         void   list.Items.Clear()
+ *         void   list.Items.Insert(int, object)
+ *         int    list.Items.Count
+ *         bool   list.GetSelected(int)
+ *         void   list.SetSelected(int, bool)
+ *         int    list.SelectedIndex   非選択: -1
+ *         object list.SelectedItem    非選択: null
+ *         SelectionMode list.SelectionMode
+ *           └ enum SelectionMode
+ *             {  None = 0,          //選択不可
+ *                One = 1,           //１つだけ選択可。デフォルト値
+ *                MultiSimple = 2,   //複数可。マウスクリック、スペース
+ *                MultiExtended = 3, //複数可。[Ctrl] or [Shift] + 矢印
+ *             }
  *         EventHandler
- *                list.SelectChanged
- *                
- *         =>〔MainComboBoxSample.cs〕と同様
+ *                list.SelectIndexChanged
  *
  *@see FormListBoxSample.jpg
  *@author shika
  *@date 2022-07-03
  */
-
 
 using System;
 using System.Drawing;
@@ -72,7 +83,7 @@ namespace WinFormGUI.WinFormSample.KaiteiNet.KT06_Control
             {
                 "赤巻紙", "青巻紙", "黄巻紙"
             });
-
+            
             list.SelectedIndexChanged += new EventHandler(list_SelectChanged);
             this.Controls.Add(list);
         }//constructor

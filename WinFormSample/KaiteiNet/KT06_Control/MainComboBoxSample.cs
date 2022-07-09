@@ -10,25 +10,43 @@
  *           =>〔~/Reference/Article_KaiteiNet/WinForm06_Control.txt〕
  *           
  *@content KT 6. Control / ComboBox ドロップダウンリスト
- *@subject ◆ComboBox System.Windows.Forms.
+ *@subject ◆ComboBox : ListControlを継承  //System.Windows.Forms.
+ *         ・TextBoxと ListBoxを融合したコントロール
  *         ComboBox new ComboBox()
  *         ComboBoxStyle     combo.DropDownStyle
  *             enum ComboBoxStyle
  *             {
- *                 Simple = 0,       // シンプル
- *                 DropDown = 1,     // ドロップダウン
- *                 DropDownList = 2  // ドロップダウンリスト
+ *                 Simple = 0,       // リストを常に表示。入力可
+ *                 DropDown = 1,     // ドロップダウン。入力可
+ *                 DropDownList = 2  // ドロップダウン。入力不可
  *             }
  *             
  *         ComboBox.ObjectCollection  combo.Items
- *         int               combo.Items.Add(object item)  項目を追加
- *         void              combo.Items.AddRange(object[] items)
- *         object combo.SelectedItem   //選択された項目
- *         int    combo.SelectedIndex  // 最初に選択される項目
- *         string combo.SelctedText    //ComboBoxStyle.DropDownList時は ""
+ *         int    list.Items.Add(object)
+ *         void   list.Items.AddRange(object[]) 
+ *         void   list.Items.Remove(object)
+ *         void   list.Items.RemoveAt(int)
+ *         void   list.Items.Clear()
+ *         void   list.Items.Insert(int, object)
+ *         int    list.Items.Count
+ *         bool   list.GetSelected(int)
+ *         void   list.SetSelected(int, bool)
  *         
+ *         int    list.SelectedIndex   非選択: -1
+ *         object list.SelectedItem    非選択: null
+ *         string combo.SelctedText    //入力された文字列
+ *                                     //ComboBoxStyle.DropDownList時は ""
+ *                                     
+ *         SelectionMode list.SelectionMode
+ *           └ enum SelectionMode
+ *             {  None = 0,          //選択不可
+ *                One = 1,           //１つだけ選択可。デフォルト値
+ *                MultiSimple = 2,   //複数可。マウスクリック、スペース
+ *                MultiExtended = 3, //複数可。[Ctrl] or [Shift] + 矢印
+ *             }
+ *             
  *         ＊イベント
- *         EventHandler combo.SelectedChanged
+ *         EventHandler combo.SelectedIndexChanged
  *         
  *@see FormComboBoxSample.jpg
  *@author shika
@@ -60,7 +78,7 @@ namespace WinFormGUI.WinFormSample.KaiteiNet.KT06_Control
         public FormComboBoxSample()
         {
             this.Text = "FormComboBoxSample";
-
+            
             label = new Label()
             {
                 Location = new Point(10, 100),
