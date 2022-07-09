@@ -9,17 +9,21 @@
  *           http://kaitei.net/csforms/controls/ 
  *           =>〔~/Reference/Article_KaiteiNet/WinForm06_Control.txt〕
  *           
- *@content KT 6. Control / CheckBox
+ *@content KT 6. Control / CheckBox | RR[64] p127 
  *@subject ◆CheckBoxクラス System.Windows.Forms
  *         CheckBox new CheckBox()
  *         bool         check.Checked        チェック状態か
+ *         bool         check.ThreeState     3つの状態(「不確定」状態)を ONにするか
+ *         CheckState   check.CheckState     3つの状態時のチェック状態。
+ *             └ enum   CheckState { Unchecked = 0, Checked = 1, Indeterminate = 2 //不確定 }
  *         EventHandler check.CheckedChanged チェック状態が変更されたときに発生するイベント
- *
+ *         EventHandler check.CheckStateChanged 3つの状態時のイベントハンドラ
+ *         
  *@subject イベントハンドラー
  *         ・２つの CheckBoxのイベントハンドラー・メソッドを作るのではなく、
  *           １つのイベントハンドラーで複合条件分岐する。
  *         ・Checkedのデフォルト値の設定をイベントハンドラーの後ろに記述する
- *           (コンストラクタなどで Checkedを先に記述すると、
+ *           (コンストラクタ, オブジェクト初期化子などで Checkedを先に記述すると、
  *            チェック状態なのに、チェック時の処理は行われていない状態で描画)
  *            
  *         ・三項条件式:   [条件式] ? [true時の値] : [false時の値] 
@@ -61,7 +65,7 @@ namespace WinFormGUI.WinFormSample.KaiteiNet.KT06_Control
         {
             this.Text = "FormCheckBoxSample";
             font = new Font("Times New Roman", 20);
-
+            
             label = new Label()
             {
                 Text = "Times New Roman",
@@ -77,7 +81,7 @@ namespace WinFormGUI.WinFormSample.KaiteiNet.KT06_Control
                 Location = new Point(20, 15),
             };
             cbBold.CheckedChanged += new EventHandler(checkBox_CheckedChanged);
-
+            
             cbItalic = new CheckBox()
             {
                 Text = "Italic (斜体)",
