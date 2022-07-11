@@ -13,7 +13,8 @@
  *         string mask.Mask           入力マスク(=形式フォーマット)文字列
  *         string mask.Text           入力した文字列
  *         Type   mask.ValidatingType 検証に用いる型
- *         bool   mask.MaskCompleted  マスク形式か、上記の型か
+ *         object mask.ValidateText() 入力文字列を検証する型に変換
+ *         bool   mask.MaskCompleted  マスク形式か (上記の型かは検証しない)
  *         char   mask.PromptChar     入力欄の文字 デフォルト「_」以外に設定する場合に利用
  *         int    control.TabIndex    デフォルトでカーソルを表示する場合に、このコントロールのインデックスにしておく
  *                                    ２番目のコントロールなら、TabIdex = 1
@@ -32,6 +33,12 @@
  *         >: 上へシフト。これ以後の文字を大文字に変換。
  *         ¥: エスケープ。これに続く１文字をそのまま表示。
  *
+ *@NOTE【考察】ValidatingType
+ *      ValidatingTypeで検証する型を設定しても、型検証するメソッドが見当たらない。
+ *      このコードでは、bool DateTime.TryParse()で変換可能かを判定しているため、
+ *      ValidatingTypeをコメントアウトしても動作する。
+ *      DateTime以外の型判定ならどうするのだろう。
+ *      
  *@design FormDesignMaskedTextBoxSample.cs
  *@see FormCodeMaskedTextBoxSample.jpg
  *@author shika
@@ -64,7 +71,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR04_Control
         public FormCodeMaskedTextboxSample()
         {
             this.Text = "FormCodeMaskedTextboxSample";
-
+            
             label1 = new Label()
             {
                 Text = "日付を「西暦<4桁>/月<2桁/日<2桁>」の形式で\n" +
@@ -119,7 +126,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR04_Control
             else
             {
                 label2.Text = "最後まで入力してください。";
-            }
+            }          
         }
     }//class
 }
