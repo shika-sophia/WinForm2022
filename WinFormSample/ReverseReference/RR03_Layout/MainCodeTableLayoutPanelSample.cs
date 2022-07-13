@@ -16,14 +16,15 @@
  *         int  table.RowCount     行数
  *         
  *         //---- 列幅、行幅を定義 ----
- *         TableLayoutColumnSyleCollection table.ColumnStyles  列幅コレクション
- *         TableLayoutRowSyleCollection    table.RowStyles     行幅コレクション
+ *         TableLayoutColumnStyleCollection table.ColumnStyles  列幅コレクション
+ *         TableLayoutRowStyleCollection    table.RowStyles     行幅コレクション
  *         int table.ColumnStyles.Add(ColumnStyle)   各列幅を登録
  *         int table.RowStyles.Add(RowStyle)         各行幅を登録
  *           └ ColumnStyle new ColumnStyle(SizeType, float width)
  *           └ RowStyle    new RowStyle(SizeType, float height)
  *               └ enum SizeType
- *                 {  AutoSize = 0,   他列、他行と共有する値に自動調整
+ *                 {  
+ *                    AutoSize = 0,   他列、他行と共有する値に自動調整
  *                    Absolute = 1,   px単位に固定
  *                    Persent = 2     Parentコントロールのパーセントで指定
  *                 }
