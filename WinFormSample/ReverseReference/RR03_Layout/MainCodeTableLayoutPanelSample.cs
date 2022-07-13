@@ -30,10 +30,10 @@
  *                 }
  *                 
  *         //---- 各コントロールを配置 ----
- *         table.Controls.Add(Control, int column, int row)  配置コントロールの(列, 行)を指定
- *         table.SetColumnSpan(Control, int value)           複数列にまたがる場合にコントロールと列数を指定
- *         table.SetRowSpan(Conteol, int value)              複数行にまたがる場合にコントロールと行数を指定
- *         form.Controls.Add(table)                          Formに TableLayoutPanelを乗せる
+ *         void  table.Controls.Add(Control, int column, int row)  配置コントロールの(列, 行)を指定
+ *         void  table.SetColumnSpan(Control, int value)           複数列にまたがる場合にコントロールと列数を指定
+ *         void  table.SetRowSpan(Conteol, int value)              複数行にまたがる場合にコントロールと行数を指定
+ *         void  form.Controls.Add(table)                          Formに TableLayoutPanelを乗せる
  *
  *@see FormCodeTableLayoutPanelSample.jpg
  *@author shika
