@@ -39,7 +39,7 @@
  *      ValidatingTypeをコメントアウトしても動作する。
  *      DateTime以外の型判定ならどうするのだろう。
  *      
- *@design FormDesignMaskedTextBoxSample.cs
+ *@design FormGuiMaskedTextBoxSample.cs
  *@see FormCodeMaskedTextBoxSample.jpg
  *@author shika
  *@date 2022-07-11
