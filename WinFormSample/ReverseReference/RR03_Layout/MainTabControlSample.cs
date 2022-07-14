@@ -1,6 +1,7 @@
 ﻿/** 
- *@title WinFormGUI / WinFormSample /
- *@class 
+ *@title WinFormGUI / WinFormSample / ReverseReference / RR03_Layout
+ *@class MainTabControlSample.cs
+ *@class FormTabControlSample.cs
  *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
  *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
@@ -26,6 +27,7 @@
  *                                        
  *         bool           tab.HotTrack   タブにマウスポイント時、外観を変化させるか
  *         bool           tab.Multiline  複数行表示するか / デフォルト: false,
+ *         
  *         TabSizeMode    tab.SizeMode
  *           └ enum TabSizeMode
  *             {
