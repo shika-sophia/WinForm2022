@@ -14,6 +14,7 @@
  *         int        calen.MaxSelectionCount   選択可能な最大日数
  *         DateTime   calen.SelectionStart      選択範囲の開始日
  *         DateTime   calen.SelectionEnd        選択範囲の終了日
+ *         int        dateTime.Subtract(DateTime/TimeSpan).Days  差分の日数
  *         DateTime   calen.MaxDate             カレンダー日付の最大値 9998/12/31まで
  *         DateTime   calen.MinDate             カレンダー日付の最小値 1753/01/01まで
  *         DateTime[] calen.BoldedDates         太字にする日
