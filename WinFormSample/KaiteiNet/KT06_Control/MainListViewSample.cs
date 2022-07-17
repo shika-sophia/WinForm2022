@@ -76,6 +76,7 @@
  *         bool  listView.FullRowSelect    マウスクリック時に1行全て選択 / false
  *         bool  listView.LabelEdit        コントロールの項目を編集可能にするか / false
  *         bool  listView.LabelWrap        アイコン表示のとき、ラベルを折り返すか / true
+ *         bool  listView.AllowColumnReorder  列ドラッグで列の並べ替え可能にするか / false
  *         
  *@subject ソート
  *         SortOrder listView.Sorting
@@ -97,8 +98,13 @@
  *            [bool ]]])   部分一致も含むか
  *         ListViewItem listView.GetItemAt(int x, int y) クライアント座標(x, y)の項目
  *         
+ *@subject ImageList
+ *         ImageList    listView.LargeImageList 
+ *         〔=> ~/WinFormSample/ReverseReference/RR04_Control/MainImageListSample.cs〕
+ *         
  *@see FormListViewSample.jpg
  *@see ~/WinFormSample/ReverseReference/RR04_Control/MainListViewSubItemSample.cs
+ *@see ~/WinFormSample/ReverseReference/RR04_Control/MainImageListSample.cs
  *@author shika
  *@date 2022-07-06, 07-07, 07-16
  */
