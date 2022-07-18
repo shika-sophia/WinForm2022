@@ -27,6 +27,8 @@
  *         int       tree.GetNodeCount(bool)  ノードの数。true: サブツリーを含む
  *         void      tree.BeginUpdate()
  *         void      tree.EndUpdate()
+ *         
+ *         ・ソート
  *         bool      tree.Sorted             ソートを行うか
  *         IComparer tree.TreeViewNodeSoter  ソート順のカスタマイズ
  *         void      tree.Sort()             ソートの実行
@@ -36,6 +38,7 @@
  *         int       tree.Nodes.Count
  *         bool      tree.Nodes.IsReadOnly
  *         
+ *         ・追加 / 削除
  *         int       tree.Nodes.Add(TreeNode)
  *         TreeNode  tree.Nodes.Add([string key], string text)
  *         void      tree.AddRange(TreeNode[])
@@ -44,6 +47,7 @@
  *         void      tree.Nodes.RemoveAt(int) / RemoveByKey(string key)
  *         void      tree.Nodes.Clear()   全てのノードを削除
  *         
+ *         ・検索
  *         bool      tree.Nodes.Contains(TreeNode) / ContainsKey(string key)
  *         int       tree.Nodes.IndexOf(TreeNode) / IndexOfKey(string key)
  *         TreeNode[] tree.Find(string key, bool)  keyで検索。 true: すべての子ノードも含む
@@ -66,11 +70,13 @@
  *         bool      node.Checked      チェックされているか
  *         string    node.FullPath     ルートノードからのpath
  *         
+ *         ・展開 / 収納
  *         void      node.Collapse([bool])  収納。true: 子ノードを含む
  *         void      node.Expand()          展開
  *         void      node.ExpandAll()       すべて展開
  *         void      node.Toggle()          展開・収納の状態を切替
  *         
+ *         ・編集
  *         void      node.BeginEdit()
  *         void      node.EndEdit(bool cancel)  編集終了。true: 保存せずにキャンセル
  *         void      node.Remove()
@@ -220,7 +226,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR04_Control
             
             if(tree.SelectedNode == null)
             {
-                ShowMessage("Where is Node Add to?", "Add Notation");
+                ShowMessage("Where does Node Add to?", "Add Notation");
                 return;
             }
             else
@@ -243,7 +249,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR04_Control
         {
             if (tree.SelectedNode == null)
             {
-                ShowMessage("Where is Node Remove?", "Remove Notation");
+                ShowMessage("Where does Node Remove from?", "Remove Notation");
                 return;
             }
             else
