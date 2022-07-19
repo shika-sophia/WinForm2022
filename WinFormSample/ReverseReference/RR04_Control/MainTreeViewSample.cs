@@ -8,7 +8,9 @@
  *
  *@content RR[90] TreeView / p171
  *         階層構造のデータをツリー表示
- *         
+ */
+#region ◆TreeView
+/*
  *@subject ◆TreeView : Control
  *         TreeView            new TreeView()
  *         TreeNodeCollection  tree.Nodes     〔下記〕
@@ -81,7 +83,10 @@
  *         void      node.EndEdit(bool cancel)  編集終了。true: 保存せずにキャンセル
  *         void      node.Remove()
  *         object    node.Clone()
- *         
+ */
+#endregion
+#region BuildInitialNode() 自己定義メソッド、初期階層の構築
+/*
  *@subject BuildInitialNode() 自己定義メソッド、初期階層の構築
  *         新規 WindowsForm -> TreeView -> [Nodeの編集]ダイアログにて編集
  *         
@@ -123,7 +128,9 @@
  *         階層構造のデータから、TreeNodeの階層構造を
  *         組み立てる自動生成アルゴリズムを考えてみるのも面白い。
  *         少なくとも、Windows Form GUIからの自動生成アルゴリズムは使えない。
- *         
+ */
+#endregion
+/*
  *@see FormTreeViewSample_withAdd.jpg
  *@author shika
  *@date 2022-07-18
