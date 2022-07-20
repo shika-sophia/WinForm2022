@@ -1,13 +1,12 @@
-﻿//==== Document Template ====
-
-/** 
+﻿/** 
  *@title WinFormGUI / WinFormSample / ReverseReference / RR04_Control
- *@class 
+ *@class MainRichTextBoxLoadFind.cs
+ *@class FormRichTextBoxLoadFind.cs
  *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
  *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
  *
- *@content RR[95][96] RichTextBox -- Find(), LoadFile()                                
+ *@content RR[96][95] RichTextBox -- LoadFile(), Find() / p182, p181
  *@subject RichTextBox ファイルをロード
  *         void   rich.LoadFile(string path, RichTextBoxStreamType)
  *         void   rich.LoadFile(Stream, RichTextBoxStreamType)
@@ -68,7 +67,7 @@
  *         
  *@NOTE 文字化け問題 Encoding
  *      元テキストは UTF-8、
- *      LoadFile()での読取は Environment(= PC環境)の Encodingである "Shift-JIS"
+ *      LoadFile()での読取は Environment(= PC環境)の Encodingである "Shift-JIS"。
  *      RichTextBoxStreamType.UnicodePlainText にすると、「応答なし」と出る。
  *      RichTextBox, LoadFile()には Encodingを定義できない。
  *      FileStreamには Encordingを定義するプロパティがない。
