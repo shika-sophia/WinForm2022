@@ -42,10 +42,11 @@
  *      
  *      [.rtf] で保存すると、ファイルを開くときに Windows[Word]が起動し、
  *      Font, Size, Colorなどが再現され、元のテキストも正しく表示される。
+ *      (ファイル内容は [.txt][.rtf]とも同じ 〔文末〕)
  *      
  *@see FormRichTextBoxSave.jpg
  *@see ./iroha.txt
- *@see ./iroha.rtf
+ *@see ./iroha.rtf =>〔文末に [iroha.rtf] の内容〕
  *@see CsharpBegin / Utility / SeekPath.cs
  *@author shika
  *@date 2022-07-21
@@ -215,3 +216,15 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR04_Control
         }//SeekDirectory()
     }//class
 }
+
+/*
+//---- iroha.rtf ----
+{\rtf1\ansi\ansicpg932\deff0\nouicompat\deflang1033\deflangfe1041{\fonttbl{\f0\fnil\fcharset128 \'82\'6c\'82\'72 \'96\'be\'92\'a9;}}
+{\*\generator Riched20 10.0.19041}\viewkind4\uc1 
+\pard\f0\fs24\lang1041\'82\'a2\'82\'eb\'82\'cd\'82\'c9\'82\'d9\'82\'d6\'82\'c6\'81\'40\'82\'bf\'82\'e8\'82\'ca\'82\'e9\'82\'f0\par
+\'82\'ed\'82\'a9\'82\'e6\'82\'bd\'82\'ea\'82\'bb \'82\'c2\'82\'cb\'82\'c8\'82\'e7\'82\'de\par
+\'82\'a4\'82\'ee\'82\'cc\'82\'a8\'82\'ad\'82\'e2\'82\'dc \'82\'af\'82\'d3\'82\'b1\'82\'a6\'82\'c4\par
+\'82\'a0\'82\'b3\'82\'ab\'82\'e4\'82\'df\'82\'dd\'82\'b5 \'82\'ef\'82\'d0\'82\'e0\'82\'b9\'82\'b7\par
+\par
+}
+*/
