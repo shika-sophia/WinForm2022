@@ -8,13 +8,17 @@
  *
  *@content RR[96][95] RichTextBox -- LoadFile(), Find() / p182, p181
  *@subject RichTextBox ファイルをロード
+ *         void   rich.LoadFile(string path)  //RTF形式を読込。それ以外の形式はエラー
  *         void   rich.LoadFile(string path, RichTextBoxStreamType)
  *         void   rich.LoadFile(Stream, RichTextBoxStreamType)
  *           |      └ FileStream(string path, FileMode) : Stream
  *           |      × StreamReader : TextReader 継承関係がないので利用不可
  *           |
  *           | OLE: Object Linking and Embedding オブジェクト
- *           | RTF: Rich Text Format
+ *           |         文字装飾に関する情報を格納するオブジェクトか？
+ *           | RTF: Rich Text Format 
+ *           |         Windows[Word]で開くテキスト、Font, Size, Colorなどの情報を含む
+ *           |
  *           └ enum RichTextBoxStreamType
  *             {
  *                 RichText = 0,        // リッチテキスト形式(= RTF: Rich Text Format) ストリーム。
