@@ -41,6 +41,7 @@
  *         ( Add(), AddRange() など  同上)
  *         
  *         EventHandler menuItem.Click
+ *         EventHandler menuItem.Select
  *
  *@subject MenuItem("-")   特殊な MenuItem
  *         Menuドロップダウン内に 区切り横線を表示
