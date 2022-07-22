@@ -164,8 +164,10 @@ System.Windows.Forms 名前空間
 Form クラス [MSDN]
 プロパティ
 項目	説明
-MainMenu MainManu	メインメニュー
-コンテキストメニュー
+MainMenu form.Manu	メインメニュー
+
+
+◆コンテキストメニュー
 作例：コンテキストメニュー (従来版)
 作例
 
