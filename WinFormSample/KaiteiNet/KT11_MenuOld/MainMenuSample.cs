@@ -1,6 +1,7 @@
 ﻿/** 
  *@title WinFormGUI / WinFormSample / KaiteiNet / KT11_MenuOld
- *@class 
+ *@class MainMenuSample.cs
+ *@class FormMenuSample.cs
  *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
  *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
@@ -14,7 +15,7 @@
  *         MainMenu  new MainMenu(IContainer)
  *         MainMenu  new MainMenu(MenuItem[])
  *         
- *         Form      mainMenu.GetForm()   格納されている上位のForm
+ *         Form      mainMenu.GetForm()   格納されている上位のFormオブジェクト
  *         MenuItemCollection   menu.MenuItems
  *         int       menu.MenuItems.Add(MenuItem item);
  *         void      menu.MenuItems.AddRange(MenuItem[] items);
@@ -41,7 +42,7 @@
  *         
  *         EventHandler menuItem.Click
  *
- *@subject MenuItem("-")   特殊な MainItem
+ *@subject MenuItem("-")   特殊な MenuItem
  *         Menuドロップダウン内に 区切り横線を表示
  *         
  *@subject Shortcut Key (子MenuItemのみ機能する)
