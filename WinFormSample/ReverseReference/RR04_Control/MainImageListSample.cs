@@ -7,17 +7,23 @@
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
  *@content RR[92] ImageList with ListView / p175
  *@subject ◆ImageList : Component
- *         ImageList new ImageList() / ImageList(IContainer)
+ *         ImageList new ImageList() 
+ *         ImageList new ImageList(IContainer)
+ *         
  *         ImageList.ImageCollection
- *         Size      imageList.ImageSize  画像サイズ / デフォルト 16×16, 最大 256×256
  *                   imageList.Images
+ *         Size      imageList.ImageSize  画像サイズ / デフォルト 16×16, 最大 256×256
  *         void      imageList.Images.Add(Image)
  *         void      imageList.Images.Add(string key, Image)  keyも同時に登録可
  *         void      imageList.Images.AddRange(Image[])
+ *         int       imageList.Images.AddStrip(Image) 短冊状のイメージから複数のアイコンを自動生成
+ *                                                    ※ ImageSize は アイコンSizeの整数倍でないと例外となる
+ *         Image     imageList.Images[i]              短冊状のイメージから個々のアイコンを indexで指定
+ *         
  *         StringCollection  imageList.Images.Keys     ImageCollection内のKeyコレクション
  *         bool      imageList.Images.Contains(Image)
  *         bool      imageList.Images.ContainsKey(string key)
- *         Color     imageList.TransparentColor  親Controlの色 (=透明になる色)
+ *         Color     imageList.TransparentColor        透過色を指定 (この色だと透明になる)
  *         void      imageList.Draw(Graphics, int x, int y, int width, int height)
  *         void      imageList.Draw(Graphics, int x, int y, int index)
  *         void      imageList.Draw(Graphics, Point pt, int index)
@@ -41,8 +47,10 @@
  *         @"..\..\..\..\SelfAspNet\SelfAspNet\Image" となる。
  *         
  *@see FormImageListSample.jpg
- *@see ~\WinFormSample\KaiteiNet\KT06_Control\MainListViewSample.cs
  *@see SelfAspNet\Image
+ *@see ~\WinFormSample\KaiteiNet\KT06_Control\MainListViewSample.cs
+ *@see ~\WinFormSample\KaiteiNet\KT11_MenuOld\MainToolBarSample.cs
+ *@see ~\WinFormSample\KaiteiNet\KT12_MenuToolStrip\MainMenuIconSample.cs
  *@author shika
  *@date 2022-07-17
  */
