@@ -20,6 +20,7 @@
  *@date 2022-06-26
  */
 using System;
+using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
@@ -29,6 +30,15 @@ namespace WinFormGUI.CsharpCode
     {
         private readonly string enumName;
         private readonly Type enumType;
+
+        //==== Test Main() as Console Application ====
+        //static void Main()
+        public void Main()
+        {
+            var here = new ShowEnumValue(typeof(Keys));
+            string content = here.BuildEnumContent(here.enumType);
+            Console.WriteLine(content);
+        }//Main()
 
         public ShowEnumValue()
         {
@@ -76,16 +86,7 @@ namespace WinFormGUI.CsharpCode
             //Console.WriteLine($"length:{length}");
             //Console.WriteLine($"bld.Length:{bld.Length}");
             return bld.ToString();
-        }
-
-        //==== Test Main() ====
-        //static void Main()
-        public void Main()
-        {
-            var here = new ShowEnumValue(typeof(MouseButtons));
-            string content = here.BuildEnumContent(here.enumType);
-            Console.WriteLine(content);
-        }//Main()
+        }        
     }//class
 }
 
