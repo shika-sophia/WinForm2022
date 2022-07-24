@@ -389,7 +389,7 @@ StatusBarPanelAutoSize 列挙体 [MSDN]
 enum StatusBarPanelAutoSize
 {
     None = 1,
-    Sprint = 2,
+    Spring = 2,
     Contents = 3,
 }
 System.Windows.Forms 名前空間
@@ -486,7 +486,8 @@ class Form1 : Form
 }
 解説
 アイコンを用意するのに ImageList を利用するのは 9.3 節 と同じです。
-今回の一工夫は，ImageList のインスタンスそのものを ToolBar に渡してしまい，ToolBarButton 各項目ではイメージのインデックスだけ指定している，という点です。
+今回の一工夫は，ImageList のインスタンスそのものを ToolBar に渡してしまい，
+ToolBarButton 各項目ではイメージのインデックスだけ指定している，という点です。
 
 System.Windows.Forms 名前空間
 ToolBar クラス [MSDN]
@@ -522,7 +523,7 @@ ToolBarButtonClickEventArgs クラス [MSDN]
 プロパティ
 項目	説明
 ToolBarButton Button	クリックされたボタン
-スポンサーリンク
+
  
 « 前のページ 目次 次のページ »
 サイト概要 | お問合せ | プライバシーポリシー
