@@ -15,7 +15,7 @@
  *         
  *@subject ◆ToolBar : Control
  *         ToolBar   new ToolBar()
- *         string    toolBar.Text          ツールバー用の文字列〔？意味不明〕
+ *         string    toolBar.Text          ツールバー用の文字列〔？用途不明〕
  *         bool      toolBar.Divider       区切線を表示するか
  *         ImageList control.ImageList     ToolBarButtonになるアイコンList
  *        (bool      control.ShowToolTips  マウスポイント時にヒントを表示するか)
@@ -55,7 +55,8 @@
  *         ToolBarButton  new ToolBarButton(string text)
  *         
  *         string  toolBarButton.Text        各ボタンの文字列 / デフォルト ""
- *         int     toolBarButton.ImageIndex  toolBar.ImageListのアイコンを指定する index
+ *         int     toolBarButton.ImageIndex  control.ImageListのアイコンを指定する index
+ *                                           imageList.Images[i] の index
  *         string  toolBarButton.ImageKey    各ボタンのアイコンの名前
  *        (string  control.ToolTipText   マウスポイント時に表示するヒントの文字列)
  *        

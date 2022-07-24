@@ -23,7 +23,7 @@
  *                         
  *@subject StatusBarPanel : Component
  *         StatusBarPanel  new StatusBarPanel()
- *         string          statusBar.Panel.Text             表示する文字列
+ *         string          statusBarPanel.Text             表示する文字列
  *         StatusBarPanelAutoSize  statusBarPanel.AutoSize
  *           └ enum StatusBarPanelAutoSize
  *             {    

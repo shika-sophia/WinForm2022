@@ -1,5 +1,5 @@
 ﻿/** 
- * @title WinFormGUI / WinFormSample / KaiteiNet / KT11_MenuOld
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT11_MenuOld
  *@class MainContextMenuSample.cs
  *@class FormContextMenuSample.cs
  *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
@@ -25,8 +25,9 @@
  *         EventHandler contextMenu.Collapse  コンテキストメニューを閉じたときのイベント
  *         
  *         MenuItemCollection  menu.MenuItems 〔 Add(), AddRange() 以下同様 〕
- *         EventHandler menuItem.Click
- *         EventHandler menuItem.Select
+ *         EventHandler menuItem.Click     メニュー項目クリック時のイベント
+ *         EventHandler menuItem.Select    メニュー項目のフォーカス時イベント
+ *         EventHandler form.MenuComplete  メニュー項目のフォーカスが外れたときのイベント
  *         
  *@subject 配置
  *         ContextMenu   control.ContextMenu
