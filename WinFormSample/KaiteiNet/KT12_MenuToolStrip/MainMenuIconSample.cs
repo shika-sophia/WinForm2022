@@ -38,8 +38,16 @@
  *      AddStrip()は整数倍のサイズに限定されてしまう。
  *      サイズ変更したい場合は imageList.Images.Add(Image)を利用すべき
  *      
+ *@NOTE【考察】ImageSize
  *      Size  imageList.ImageSize
- *      Size  menuStrip.ImageScalingSize が競合すると MenuStripの値を優先
+ *      Size  toolStrip.ImageScalingSize が競合すると MenuStripの値を優先
+ *      
+ *      どちらも デフォルト 16×16なので、元画像 36×36を利用するときは
+ *      imageList.ImageSize = new Size(36, 36);
+ *      toolStrip.ImageScalingSize= new Size(36, 36); 
+ *      とするべき。
+ *      そうしないと、16×16で登録されたものを表示サイズに拡大するため、
+ *      表示を 36×36などにする場合は アイコン画像が劣化する。
  *      
  *@see FormMenuIconSample.jpg
  *@author shika
