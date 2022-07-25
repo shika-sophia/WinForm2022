@@ -21,7 +21,7 @@
  *         Image   imageList.Images[i]              短冊状のイメージから個々のアイコンを indexで指定
  *         Color   imageList.TransparentColor       透過色を指定 (この色だと透明になる)
  *
- *@subject 相対パス "../../Image/DocumentIcon36px.png"
+ *@subject 相対パス "../../Image/Icon/DocumentIcon36px.png"
  *         「~/bin/Debug/WinFormGUI.exe」からの相対パス
  *         
  *@NOTE【Exception】imageList.Images.AddStrip(Image)
@@ -79,9 +79,9 @@ namespace WinFormGUI.WinFormSample.KaiteiNet.KT12_MenuToolStrip
                 TransparentColor = Color.Magenta,
             };
             imageList.Images.Add(
-                new Bitmap("../../Image/DocumentIcon36px.png"));
+                new Bitmap("../../Image/Icon/DocumentIcon36px.png"));
             imageList.Images.Add(
-                new Bitmap("../../Image/FileDeleteIcon36px.jpg"));
+                new Bitmap("../../Image/Icon/FileDeleteIcon36px.jpg"));
 
             //---- Menu Children ----
             var menuNew = new ToolStripMenuItem(
