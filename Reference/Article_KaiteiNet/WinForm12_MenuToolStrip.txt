@@ -531,7 +531,7 @@ enum ToolStripItemAlignment
 }
 
 
-◆ツールバー {#item-69} ### 
+◆ツールバー
 作例：ツールバー (ツールストリップ版)
 
 コード
