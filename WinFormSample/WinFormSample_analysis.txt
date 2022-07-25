@@ -25,4 +25,51 @@ for(int i = 0; i <= buttonAry.Length; i++)
  *      VS[プロジェクト] -> [プロパティ] -> [アプリケーション]タブ
  *      -> [出力の種類] -> [コンソールアプリケーション]に変更
  *      (終了後は元に戻しておく)
- *
+ */
+
+ /*
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT12_MenuToolStrip
+ *@class MainMenuIconSample.cs
+ *@NOTE【Exception】imageList.Images.AddStrip(Image)
+ *      System.ArgumentException: 
+ *      イメージ ストリップの幅は ImageSize.Width の正の倍数でなければなりません。
+ *      パラメーター名:value
+ *      場所 System.Windows.Forms.ImageList.ImageCollection.AddStrip(Image value)
+ *      
+ *      元画像 36×36のとき
+ *      => imageList.ImageSize = new Size(36, 36);を追加すると解決
+ *      => imageList.ImageSize = new Size(24, 24),だと整数倍ではないので例外のまま。
+ *      => AddStrip() -> Add()にすると解決
+ *      
+ *      AddStrip()は整数倍のサイズに限定されてしまう。
+ *      サイズ変更したい場合は imageList.Images.Add(Image)を利用すべき
+ *      
+ *@NOTE【考察】ImageSize
+ *      Size  imageList.ImageSize
+ *      Size  toolStrip.ImageScalingSize が競合すると MenuStripの値を優先
+ *      
+ *      どちらも デフォルト 16×16なので、元画像 36×36を利用するときは
+ *      imageList.ImageSize = new Size(36, 36);
+ *      toolStrip.ImageScalingSize= new Size(36, 36); 
+ *      とするべき。
+ *      そうしないと、16×16で登録されたものを表示サイズに拡大するため、
+ *      表示を 36×36などにする場合は アイコン画像が劣化する。
+ */
+ 
+ /** 
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT12_MenuToolStrip
+ *@class MainMenuStripSample.cs
+ *@subject Shotcut Key
+ *         ・Textに「&A」-> 表示「A」-> Shortcut Keyを登録
+ *         ・親ToolStripMenuItemは 「&F」-> 表示「F」 -> [Alt] + [F]で機能する
+ *         ・子ToolStripMenuItemは 「&A」-> 表示「A」と
+ *           Keys   menuItem.ShortcutKeys  メニュー項目の後ろに表示。Shortcut Keyを登録。
+ *           
+ *@NOTE 親ToolStripMenuItemに Keysを利用すると例外発生
+ *      System.ComponentModel.InvalidEnumArgumentException:
+ *      引数値 'value' は列挙型 'Keys' に対して無効です。
+ *      パラメーター名: value
+ *      場所 System.Windows.Forms.ToolStripMenuItem.set_ShortcutKeys(Keys value)
+ *      
+ *      => menuFile.ShortcutKeys = Keys.F; を削除すると解決
+ */
