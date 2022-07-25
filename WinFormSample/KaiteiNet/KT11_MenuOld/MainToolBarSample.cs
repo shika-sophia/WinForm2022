@@ -69,7 +69,7 @@
  *                 DropDownButton = 4 //クリック時に、Menu or 他Formを表示するドロップダウン
  *             }
  *        
- *@subject 相対パス "../../Image/DocumentIcon36px.png"
+ *@subject 相対パス "../../Image/Icon/DocumentIcon36px.png"
  *         「~/bin/Debug/WinFormGUI.exe」からの相対パス
  *         
  *@see FormToolBarSample.jpg
