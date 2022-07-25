@@ -11,6 +11,30 @@
  *           
  *@content KT12 MenuToolStrip / MenuStrip | RR[81] -[84] p157-161
  *
+ *@subject Inherit 継承関係
+ *
+ *         ScrollableControl
+ *           └ ToolStrip
+ *               └ MainStrip
+ *               └ ToolStripDropDown
+ *               |   └ ToolStripDropDownMenu
+ *               |       └ ContextMenuStrip  =>〔MainContextMenuStripSample.cs〕
+ *               └ StatusStrip               =>〔MainStatusStripSample.cs〕
+ *               └ ToolStripSeparator             
+ *           
+ *         Component
+ *           └ ToolStripItem
+ *              └ ToolStripItemDropDown
+ *              |   └ ToolStripMenuItem
+ *              |   └ ToolStripDropDownButton =>〔MainStatusStripSample.cs〕
+ *              |   └ ToolStripSplitButton    =>〔MainStatusStripSample.cs〕
+ *              |
+ *              └ ToolStripLabel
+ *              |   └ ToolStripStatusLabel    =>〔MainStatusStripSample.cs〕
+ *              |
+ *              └ ToolStripControlHost
+ *                  └ ToolStripProgressBar    =>〔MainStatusStripSample.cs〕
+ *           
  */
 #region ◆ToolStrip Reference
 /*
@@ -68,6 +92,10 @@
  *                 Horizontal = 0,
  *                 Vertical = 1
  *             }
+ *             
+ *@subject ◆MenuStrip : ToolStrip
+ *         MenuStrip   new MenuStrip()
+ *         (主なメンバーは ToolStripで定義済)
  *         
  *@subject ◆ToolStripItem : Component, IDropTarget, IArrangedElement, IComponent, IDisposable
  *         ToolStripItem   new ToolStripItem();
@@ -83,6 +111,13 @@
  *         ToolStripItem toolStripItem.OwnerItem
  *         ToolStrip     toolStripItem.Owner     = ToolStrip toolStripItem.Parent
  *         
+ *         ToolStripItemAlignment  toolStripItem.Alignment
+ *           └ enum ToolStripItemAlignment
+ *           {
+ *               Left = 0,
+ *               Right = 1,
+ *           }
+ *           
  *         TextImageRelation toolStripItem.TextImageRelation
  *           └ enum TextImageRelation
  *             {
@@ -123,10 +158,6 @@
  *         EventHandler toolStripDropDownItem.DropDownOpening;
  *         EventHandler toolStripDropDownItem.DropDownOpened;
  *         EventHandler toolStripDropDownItem.DropDownClosed;
- *         
- *@subject ◆MenuStrip : ToolStrip
- *         MenuStrip   new MenuStrip()
- *         (主なメンバーは ToolStripで定義済)
  *         
  *@subject ◆ToolStripMenuItem : ToolStripDropDownItem
  *         ToolStripMenuItem   new ToolStripMenuItem()
@@ -170,18 +201,7 @@
  *      場所 System.Windows.Forms.ToolStripMenuItem.set_ShortcutKeys(Keys value)
  *      
  *      => menuFile.ShortcutKeys = Keys.F; を削除すると解決
- *      
- *@subject Inherit 継承関係
- *         ScrollableControl
- *           └ ToolStrip
- *             └ MainStrip
- *             └ ToolStripSeparator
- *           
- *         Component
- *           └ ToolStripItem
- *             └ ToolStripItemDropDown
- *               └ ToolStripMenuItem
- *             
+ *               
  *@subject Deployment 配置
  *        (MainStrip Form.MainStripMenu  記述しなくても機能する)
  *         Control.ControlCollection
