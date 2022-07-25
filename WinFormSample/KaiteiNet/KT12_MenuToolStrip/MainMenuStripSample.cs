@@ -14,13 +14,13 @@
  *@subject Inherit 継承関係
  *
  *         ScrollableControl
- *           └ ToolStrip
- *               └ MainStrip
+ *           └ ToolStrip                     =>〔MainToolStripSample.cs〕
+ *               └ MenuStrip                 =>〔this〕
  *               └ ToolStripDropDown
  *               |   └ ToolStripDropDownMenu
  *               |       └ ContextMenuStrip  =>〔MainContextMenuStripSample.cs〕
  *               └ StatusStrip               =>〔MainStatusStripSample.cs〕
- *               └ ToolStripSeparator             
+ *               └ ToolStripSeparator        
  *           
  *         Component
  *           └ ToolStripItem
@@ -34,7 +34,8 @@
  *              |
  *              └ ToolStripControlHost
  *                  └ ToolStripProgressBar    =>〔MainStatusStripSample.cs〕
- *           
+ *                  └ ToolStripTextBox
+ *                  └ ToolStripComboBox
  */
 #region ◆ToolStrip Reference
 /*
@@ -93,6 +94,13 @@
  *                 Vertical = 1
  *             }
  *             
+ *         ＊Event
+ *         ToolStripItemClickedEventHandler
+ *                       toolStrip.ItemClicked   ToolStripクラスのクリック時イベント
+ *                                               (全項目を一括で１つのイベントハンドラーで処理できる)
+ *         ToolStripItemClickedEventArgs e
+ *         ToolStripItem     e.ClickedItem
+ *         
  *@subject ◆MenuStrip : ToolStrip
  *         MenuStrip   new MenuStrip()
  *         (主なメンバーは ToolStripで定義済)
@@ -139,7 +147,10 @@
  *         ToolStripTextDirection TextDirection
  *           └〔上記 ToolStrip〕
  *             
- *         EventHandler  toolStripItem.Click
+ *         ＊Event
+ *         EventHandler  toolStripItem.Click     ToolStripItemクラスのクリック時イベント
+ *                                               (項目ごとにイベントハンドラーを追加する必要がある)
+ *         ToolStripItem     (ToolStripItem) sender
  *         
  *@subject ◆ToolStripDropDownItem : ToolStripItem
  *         ToolStripDropDownItem  new ToolStripDropDownItem()
