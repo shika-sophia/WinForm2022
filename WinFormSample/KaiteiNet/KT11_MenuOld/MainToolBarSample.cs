@@ -110,8 +110,8 @@ namespace WinFormGUI.WinFormSample.KaiteiNet.KT11_MenuOld
                 ImageSize = new Size(36, 36),
                 TransparentColor = Color.Magenta,
             };
-            imageList.Images.Add(new Bitmap("../../Image/DocumentIcon36px.png"));
-            imageList.Images.Add(new Bitmap("../../Image/DeleteIcon36px.png"));
+            imageList.Images.Add(new Bitmap("../../Image/Icon/DocumentIcon36px.png"));
+            imageList.Images.Add(new Bitmap("../../Image/Icon/GavageIcon36px.png"));
 
             toolButtonNew = new ToolBarButton()
             {
