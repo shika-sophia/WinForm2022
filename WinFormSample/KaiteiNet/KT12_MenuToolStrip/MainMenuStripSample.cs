@@ -180,21 +180,24 @@
  *                                   Image image,
  *                                   EventHandler onClick,
  *                                   Keys shortcutKeys);
- *
+ *           
  *         bool   toolStripMenuItem.ShowShortcutKeys
  *         Keys   toolStripMenuItem.ShortcutKeys
- *           └ enum Keys { }   〔文末〕
+ *           └ enum Keys { }   〔文末〕           
  *         string toolStripMenuItem.ShortcutKeyDisplayString
  *         
+ *         bool   toolStripMenuItem.CheckOnClick    クリックでチェックできるか / デフォルト false
  *         bool   toolStripMenuItem.Checked         チェックされているか。中間は true / デフォルト false
- *         bool   toolStripMenuItem.CheckOnClick    自動的にチェック状態で表示、クリックでチェック解除されるか / デフォルト false
  *         CheckState toolStripMenuItem.CheckState  既定値は、Unchecked
  *           └ enum CheckState
  *             {
  *                 Unchecked = 0,
  *                 Checked = 1,
- *                 Indeterminate = 2
+ *                 Indeterminate = 2  不確定状態 (= 中間状態)  Checked -> true
  *             }
+ *         
+ *         EventHandler   toolStripMenuItem.CheckedChanged
+ *         =>〔~/WinFormSample/ReverseReference/RR05_MenuToolStrip/MainMenuStripCheck.cs〕
  *         
  *@subject ToolStripSeparator : ToolStripItem
  *         ToolStripSeparator   new ToolStripSeparator()
