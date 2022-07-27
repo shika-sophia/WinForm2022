@@ -12,22 +12,27 @@
  *@content KT12 MenuToolStrip / MenuStrip | RR[81] -[84] p157-161
  *
  *@subject Inherit 継承関係
- *
- *         ScrollableControl
+ *    Control : Component, IDropTarget, ISynchronizeInvoke, IWin32Window, IArrangedElement, IComponent, IDisposable, IBindableComponent
+ *      └ ScrollableControl : Control, IArrangedElement, IComponent, IDisposable
  *           └ ToolStrip                     =>〔MainToolStripSample.cs〕
- *               └ MenuStrip                 =>〔this〕
- *               └ ToolStripDropDown
- *               |   └ ToolStripDropDownMenu
- *               |       └ ContextMenuStrip  =>〔MainContextMenuStripSample.cs〕
- *               └ StatusStrip               =>〔MainStatusStripSample.cs〕
- *               └ ToolStripSeparator        
- *           
- *         Component
+ *           |   └ MenuStrip                 =>〔this〕
+ *           |   └ ToolStripDropDown
+ *           |   |   └ ToolStripDropDownMenu
+ *           |   |       └ ContextMenuStrip  =>〔MainContextMenuStripSample.cs〕
+ *           |   └ StatusStrip               =>〔MainStatusStripSample.cs〕
+ *           |   └ ToolStripSeparator
+ *           |
+ *           └ ContainerControl
+ *               └ ToolStripContainer        =>〔ReverseRefernce/RR05_MenuToolStrip/MainToolStripContainerSample.cs〕
+ *               
+ *    Component : MarshalByRefObject, IComponent, IDisposable
  *           └ ToolStripItem
  *              └ ToolStripItemDropDown
  *              |   └ ToolStripMenuItem
  *              |   └ ToolStripDropDownButton =>〔MainStatusStripSample.cs〕
  *              |   └ ToolStripSplitButton    =>〔MainStatusStripSample.cs〕
+ *              |
+ *              └ ToolStripButton
  *              |
  *              └ ToolStripLabel
  *              |   └ ToolStripStatusLabel    =>〔MainStatusStripSample.cs〕
@@ -49,37 +54,6 @@
  *         ToolStripItemCollection    toolStrip.DisplayedItems  現在表示されている項目のコレクション
  *                                      :  Add(), AddRange() 他 IList, ICollection系 メソッド
  *         
- *         ToolStripDropDownDirection toolStrip.DefaultDropDownDirection
- *           └ enum ToolStripDropDownDirection
- *             {
- *                 AboveLeft = 0,  // マウスの位置を使用して、親コントロールの左上
- *                 AboveRight = 1, // マウスの位置を使用して、親コントロールの右上
- *                 BelowLeft = 2,  // マウスの位置を使用して、親コントロールの左下
- *                 BelowRight = 3, // マウスの位置を使用して、親コントロールの右下
- *                 Left = 4,       //親コントロールの左側
- *                 Right = 5,      //親コントロールの右側
- *                 Default = 7     //RightToLeft の設定に応じて、Left | Right
- *             }
- *             
- *         ToolStripTextDirection  toolStrip.TextDirection  テキストの向き
- *           └ enum ToolStripTextDirection
- *             {
- *                 Inherit = 0,     //親コントロールから継承
- *                 Horizontal = 1,  //水平方向
- *                 Vertical90 = 2,  //テキストを 90 度回転
- *                 Vertical270 = 3  //テキストを 270 度回転
- *             }
- *             
- *         ToolStripLayoutStyle    toolStrip.LayoutStyle  
- *           └ enum ToolStripLayoutStyle
- *             {
- *                 StackWithOverflow = 0,           //自動的にレイアウト
- *                 HorizontalStackWithOverflow = 1, //水平方向にレイアウトし、必要に応じてオーバーフロー(=折り返し)
- *                 VerticalStackWithOverflow = 2,   //垂直方向にレイアウトし、コントロール内で中央揃えで表示し、必要に応じてオーバーフロー
- *                 Flow = 3,                        //必要に応じて水平方向または垂直方向にフロー
- *                 Table = 4                        //項目を左寄せでレイアウト
- *             }
- *   
  *         ToolStripGripStyle      toolStrip.GripStyle
  *           └ enum ToolStripGripStyle
  *             {
@@ -92,6 +66,37 @@
  *             {
  *                 Horizontal = 0,
  *                 Vertical = 1
+ *             }
+ *             
+ *         ToolStripLayoutStyle    toolStrip.LayoutStyle  
+ *           └ enum ToolStripLayoutStyle
+ *             {
+ *                 StackWithOverflow = 0,           //自動的にレイアウト
+ *                 HorizontalStackWithOverflow = 1, //水平方向にレイアウトし、必要に応じてオーバーフロー(=折り返し)
+ *                 VerticalStackWithOverflow = 2,   //垂直方向にレイアウトし、コントロール内で中央揃えで表示し、必要に応じてオーバーフロー
+ *                 Flow = 3,                        //必要に応じて水平方向または垂直方向にフロー
+ *                 Table = 4                        //項目を左寄せでレイアウト
+ *             }
+ *             
+ *         ToolStripTextDirection  toolStrip.TextDirection  テキストの向き
+ *           └ enum ToolStripTextDirection
+ *             {
+ *                 Inherit = 0,     //親コントロールから継承
+ *                 Horizontal = 1,  //水平方向
+ *                 Vertical90 = 2,  //テキストを 90 度回転
+ *                 Vertical270 = 3  //テキストを 270 度回転
+ *             }
+ *             
+ *         ToolStripDropDownDirection toolStrip.DefaultDropDownDirection
+ *           └ enum ToolStripDropDownDirection
+ *             {
+ *                 AboveLeft = 0,  // マウスの位置を使用して、親コントロールの左上
+ *                 AboveRight = 1, // マウスの位置を使用して、親コントロールの右上
+ *                 BelowLeft = 2,  // マウスの位置を使用して、親コントロールの左下
+ *                 BelowRight = 3, // マウスの位置を使用して、親コントロールの右下
+ *                 Left = 4,       //親コントロールの左側
+ *                 Right = 5,      //親コントロールの右側
+ *                 Default = 7     //RightToLeft の設定に応じて、Left | Right
  *             }
  *             
  *         ＊Event
@@ -221,8 +226,8 @@
  *         Control.ControlCollection
  *                   Form.Controls.Add(mainStrip)
  *           └ MainStrip
- *              └ mainStrip.Items.Add()                   親ToolStripMenuItem
- *                └ toolStripMenuItem.DropDownItems.Add() 子ToolStripMenuItem
+ *               └ mainStrip.Items.Add()                     親ToolStripMenuItem
+ *                   └ toolStripMenuItem.DropDownItems.Add() 子ToolStripMenuItem
  */
 #endregion
 /*
