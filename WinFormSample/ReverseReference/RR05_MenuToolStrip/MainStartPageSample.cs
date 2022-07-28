@@ -26,16 +26,16 @@
  *         string      Application.ProductName     製品名          { get; }
  *         string      Application.ProductVersion  Version情報     { get; }
  *         string      Application.CompanyName     会社名          { get; }
- *         FormCollection Application.OpenForms    { get; }
- *         CultureInfo    Application.CurrentCulture
+ *         FormCollection Application.OpenForms    実行時に開くFormのコレクション { get; }
+ *         CultureInfo    Application.CurrentCulture  カルチャー情報
  *         
- *         void  Application.Run()
- *         void  Application.Run(Form)
- *         void  Application.Run(ApplicationContext)
+ *         void  Application.Run()                   実行
+ *         void  Application.Run(Form)               Formを実行
+ *         void  Application.Run(ApplicationContext) 
  *         void  Application.Restart()               Applicationをシャットダウン後、再実行
- *         void  Application.Exit()
- *         void  Application.Exit(CancelEventArgs e)
- *         void  Application.ExitThread();
+ *         void  Application.Exit()                  すべて終了
+ *         void  Application.Exit(CancelEventArgs e) すべて終了、終了をキャンセルしたかを eで取得
+ *         void  Application.ExitThread();           現在Threadのみ終了
  *
  *@subject MultiThread
  *         ・Thread.Priopity(=優先度)を設定しても、
@@ -151,7 +151,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR05_MenuToolStrip
         {
             timer.Stop();
             this.Close();
-            Thread.Yield();
+            Application.ExitThread();
         }
     }//class
 
