@@ -11,7 +11,7 @@
  *         ・本来のコンテンツの前に、Applicationの最初だけ表示するページ
  *         ・同じ Formクラスを利用
  *         ・form.ShowDialog()  モーダル表示をする
- *         ・form.Show()        モーダレス表示だと、Timerが機能しない
+ *         ・form.Show()        モーダレス表示だと、先に ContentPageが表示される
  *         
  *         おそらく、Show()は、制御がすぐに MainThreadに戻ってしまうのかも
  *
@@ -24,7 +24,7 @@
  *@subject ◆Application
  *         bool        Application.EnableVisualStyles();
  *         string      Application.ProductName     製品名          { get; }
- *         string      Application.ProductVersion  ヴァージョン情報 { get; }
+ *         string      Application.ProductVersion  Version情報     { get; }
  *         string      Application.CompanyName     会社名          { get; }
  *         FormCollection Application.OpenForms    { get; }
  *         CultureInfo    Application.CurrentCulture
@@ -35,6 +35,7 @@
  *         void  Application.Restart()               Applicationをシャットダウン後、再実行
  *         void  Application.Exit()
  *         void  Application.Exit(CancelEventArgs e)
+ *         void  Application.ExitThread();
  *
  *@subject MultiThread
  *         ・Thread.Priopity(=優先度)を設定しても、
@@ -48,10 +49,10 @@
  *@result  実行結果
  *         new FormContentPageSample()
  *         new FormStartPageSample()
- *         ---- FormStartPageSample 表示 ----
+ *         ---- StartPage 表示 ----
  *                    :   3 seconds later
  *         FormStartPageSample Close()
- *         ---- FormContentPageSample 表示 ----
+ *         ---- ContentPage 表示 ----
  *                    :   [×] Click to Close()
  *         FormContentPageSample Close()
  *         
@@ -68,9 +69,9 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR05_MenuToolStrip
 {
     class MainStartPageSample
     {
-        [STAThread]
-        static void Main()
-        //public void Main()
+        //[STAThread]
+        //static void Main()
+        public void Main()
         {
             Application.EnableVisualStyles();
             
