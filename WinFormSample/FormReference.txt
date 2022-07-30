@@ -4,12 +4,10 @@
  *@copyFrom KT09_CustomDialog / MainModalDialogSample.cs
  *@date 2022-07-30
  */
-
-#region ◆Formクラス System.Windows.Forms
 /*
- *@subject ◆Formクラス 
+ *@subject ◆Formクラス : ContainerControl -- System.Windows.Forms
  *         ＊コンストラクタ
- *         Form      new Form()
+ *         Form      new Form() 
  *         FromXxxx  new FormXxxx() コンストラクタで初期設定
  *
  *         EventHandler   control.Load   Formロード時のイベント = 初期設定を記述
@@ -74,32 +72,38 @@
  *                              FormBorderStyle.Xxxxx で指定
  *             enum FormBorderStyle
  *             { 
- *                None = 0,
- *                Fixed3D = ,
- *                FixedDialog = ,
- *                FixedSingle = ,
- *                FixedToolWindow ,
- *                Sizable = ,        //default
- *                SizableToolWindow =
+ *                None = 0,             // 境界線なし
+ *                FixedSingle = 1,      // サイズ固定，一重線
+ *                Fixed3D = 2,          // サイズ固定，3D スタイル
+ *                FixedDialog = 3,      // サイズ固定，ダイアログ用
+ *                Sizable = 4,          // サイズ可変 (既定)
+ *                FixedToolWindow = 5,  // サイズ固定，ツールウィンドウ用
+ *                SizableToolWindow = 6 // サイズ可変，ツールウィンドウ用
  *             }
  *         
  *         ＊デバイスサイズ
  *         FormWindowState form.WindowState 
  *                              デバイスのモニターサイズを取得し、それに合わせて調整
  *                              FormWindowState.Xxxxで指定
- *                                 Nomal | Maximized | Minimized
+ *           └ enum FormWindowState { Nomal, Maximized, Minimized }  既定サイズ, 最大化, 最大化
+ *
  *         ＊Formサイズ
- *         Size control.Size     Form全体のサイズ new Size(int width, int height)
+ *         Size control.Size     Form全体のサイズ  new Size(int width, int height)
  *         int  control.Width    横幅
  *         int  control.Height   高さ
  *         Size form.ClientSize  タイトルバー以下の領域
  *                               Sizeより優先されるので、タイトルバーの表示が崩れる可能性あり。
  *                               
  *         ＊表示位置
+ *         void              form.CenterToScreen()  表示領域の中央
+ *         void              form.CenterToParent()  親要素の中央
+ *         bool              form.TopMost           最上位のFormか  / デフォルト false
+ *         bool              from.TopLevel          最上位のウインドウとして表示にするか / デフォルト true
+ *
  *         FormStartPosition form.StartPosition
  *           └ enum FormStartPosition
  *             {
- *                 Manual = 0,                //自己定義 form.Location
+ *                 Manual = 0,                //自己定義  -> control.Location
  *                 CenterScreen = 1,          //表示領域の中央
  *                 WindowsDefaultLocation = 2,//Windowsデフォルトの位置とサイズ
  *                 WindowsDefaultBounds = 3,  //Windowsデフォルトの位置と境界スタイル
@@ -113,8 +117,8 @@
  *                         //[Esc]key で キャンセル状態にするButtonコントロールを指定
  *                         
  *         ＊透過効果
- *         double form.Opacity // 0-1 (0-100%)の不透明度を指定
- *                             // フェイドイン/フェイドアウト効果: Timerコンポーネントで、この値を操作
+ *         double control.Opacity // 0-1 (0-100%)の不透明度を指定
+ *                                // フェイドイン/フェイドアウト効果: Timerコンポーネントで、この値を操作
  *         string control.Opacity.ToString() 現在のOpacity値の文字列を取得
  *         
  *         ＊アクセス修飾子
@@ -127,10 +131,11 @@
  *         ＊色指定
  *         Color control.ForeColor 文字色
  *         Color control.BackColor 背景色
- *                 Color.Xxxx        色指定
+ *                 Color.Xxxx        色指定 struct
  *                 Color.Transparent 透過色 (=透明として扱う色)
  *                 Color.FormArgb(int red, int green, int blue)
  *                 SystmColors.Color  Control | Window | Desktop
+ *         Color form.TransparencyKey 透過色 (=透明として扱う色)
  *                 
  *         ＊背景画像
  *         Image cntrol.BackgroundImage //new Bitmap(string path) -> エラーが出る
@@ -138,5 +143,11 @@
  *                                      //Image.FromFile(string path)
  *         ImageLayout control.BackgroundImageLayout
  *            └ enum ImageLayout { None, Tile, Center, Stretch, Zoom }
+ *
+ *         ＊その他
+ *         void     control.Invalidate() 現在コントロールを一旦無効にし、再描画を促す
+ *         MainMenu   form.MainMenu         旧版 MainMenu
+ *         MainMenu   form.MergedMenu       結合されたMenu??
+ *         MainStrip  form.MainMenuStrip    ToolStrip版 MenuStrip
+ *         EventHandler  form.MenuComplete  メニューのフォーカスが外れたときのイベント
  */
-#endregion
