@@ -48,7 +48,7 @@
  *@subject 戻り値 DialogResult〔System.Windows.Forms〕
  *         public enum DialogResult
  *         {
- *            None = 0, // Nothing が返されます。モーダル ダイアログ ボックスの実行が継続。
+ *            None = 0,    //戻り値 Nothing / Modalの実行が継続。
  *            OK = 1,      // [OK]
  *            Cancel = 2,  // [キャンセル]
  *            Abort = 3,   // [中止]
@@ -58,6 +58,7 @@
  *            No = 7       // [いいえ]
  *         }
  *
+ *@copyTo WinFormGUI / WinFormSample / FormReference.txt
  *@author shika
  *@date 2022-06-19
  */
