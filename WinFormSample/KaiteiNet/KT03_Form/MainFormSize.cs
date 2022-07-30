@@ -1,6 +1,7 @@
 ﻿/*
  *@title WinFormSample / KaiteiNet / KT03_Form / MainFormSize.cs
  *@see   MainFormConstruct.cs
+ *@see   WinFormGUI / WinFormSample / FormReference.txt
  */
 using System;
 using System.Drawing;
