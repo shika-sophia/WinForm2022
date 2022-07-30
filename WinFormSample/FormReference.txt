@@ -1,0 +1,142 @@
+﻿/**
+ *@title WinFormGUI / WinFormSample / FormReference.txt
+ *@copyFrom KT02_MessageBox / MessageBoxSample.cs
+ *@copyFrom KT09_CustomDialog / MainModalDialogSample.cs
+ *@date 2022-07-30
+ */
+
+#region ◆Formクラス System.Windows.Forms
+/*
+ *@subject ◆Formクラス 
+ *         ＊コンストラクタ
+ *         Form      new Form()
+ *         FromXxxx  new FormXxxx() コンストラクタで初期設定
+ *
+ *         EventHandler   control.Load   Formロード時のイベント = 初期設定を記述
+ *           └ delegate void EventHandler(object sender, EventArgs e) 
+ * 
+ *         ＊基本
+ *         string form.Text   //Formのタイトル
+ *         Icon   form.Icon   //new Icon(string path)
+ *
+ *         ＊Controlを格納/追加
+ *         Control.ControlCollection        //IList, ICollection
+ *                control.Controls
+ *         int    control.Controls.Add(Control)
+ *         void   control.Controls.AddRange(Control[])
+ *         
+ *         ＊表示 / 閉じる
+ *         モーダル Modal: 表示したFormが開いている間は、他Formの操作不可
+ *                        戻り値が必要なときに利用
+ *         モーダレス Modaless: 上記の制約なし
+ *         
+ *         DiaglgResult form.ShowDialog()   Modal表示
+ *         void         form.Show()         Modaless表示
+ *         void         form.Close()        Formを閉じる =「×」Click
+ *         bool         form.Modal          Modalかどうか { get; }
+ *         
+ *              ※Formをダイアログ形式にする設定値
+ *                  FormBorderStyle="FixedDialog"
+ *                  MaximizeBox="false"
+ *                  MinimizeBox="false"
+ *                  
+ *         ＊ダイアログの結果参照
+ *         DialogResult  form.DialogResult
+ *           └ enum DialogResult
+ *             {
+ *                 None = 0,    // 戻り値 Nothing / Modalの実行が継続。
+ *                 OK = 1,      // [OK]
+ *                 Cancel = 2,  // [キャンセル]
+ *                 Abort = 3,   // [中止]
+ *                 Retry = 4,   // [再試行]
+ *                 Ignore = 5,  // [無視]
+ *                 Yes = 6,     // [はい]
+ *                 No = 7       // [いいえ]
+ *             }
+ *
+ *         ＊Title bar (= Caption bar) / Task bar
+ *         bool form.MaximizeBox VS「最大化ボタン"□"を表示するか」となっているが
+ *                               false時も 表示。Click無効
+ *         bool form.MinimizeBox VS「最小化ボタン"＿"を表示するか」となっているが
+ *                               false時も 表示。Click有効
+ *         bool form.ControlBox 「ー □ ×」を表示するか
+ *                               falseにすると「×」も表示されなくなるので、
+ *                               別途にFormを閉じるボタンなどを用意する。
+ *         bool form.HelpButton ヘルプボタン「？」
+ *                              MaximizeBox, MinimizeBox を falseにしておく必要がある。
+ *                              event HelpRequested で処理内容を記述
+ *         bool form.ShowInTaskbar  WindowsのTaskbarにアイコン表示するか
+ *         bool form.ShowIcon   アイコンを表示するか
+ *
+ *         ＊サイズ変更 / 境界線 
+ *         FormBorderStyle form.FormBorderStyle 
+ *                              Formのサイズ変更の可否、境界線のスタイル
+ *                              FormBorderStyle.Xxxxx で指定
+ *             enum FormBorderStyle
+ *             { 
+ *                None = 0,
+ *                Fixed3D = ,
+ *                FixedDialog = ,
+ *                FixedSingle = ,
+ *                FixedToolWindow ,
+ *                Sizable = ,        //default
+ *                SizableToolWindow =
+ *             }
+ *         
+ *         ＊デバイスサイズ
+ *         FormWindowState form.WindowState 
+ *                              デバイスのモニターサイズを取得し、それに合わせて調整
+ *                              FormWindowState.Xxxxで指定
+ *                                 Nomal | Maximized | Minimized
+ *         ＊Formサイズ
+ *         Size control.Size     Form全体のサイズ new Size(int width, int height)
+ *         int  control.Width    横幅
+ *         int  control.Height   高さ
+ *         Size form.ClientSize  タイトルバー以下の領域
+ *                               Sizeより優先されるので、タイトルバーの表示が崩れる可能性あり。
+ *                               
+ *         ＊表示位置
+ *         FormStartPosition form.StartPosition
+ *           └ enum FormStartPosition
+ *             {
+ *                 Manual = 0,                //自己定義 form.Location
+ *                 CenterScreen = 1,          //表示領域の中央
+ *                 WindowsDefaultLocation = 2,//Windowsデフォルトの位置とサイズ
+ *                 WindowsDefaultBounds = 3,  //Windowsデフォルトの位置と境界スタイル
+ *                 CrnterParent = 4           //親Formの中央
+ *             }
+ *             
+ *         ＊デフォルトボタン
+ *         IButtonControl form.AccessButton 
+ *                         //[Enter]key で クリック状態にするButtonコントロールを指定
+ *         IButtonControl form.CancelButton
+ *                         //[Esc]key で キャンセル状態にするButtonコントロールを指定
+ *                         
+ *         ＊透過効果
+ *         double form.Opacity // 0-1 (0-100%)の不透明度を指定
+ *                             // フェイドイン/フェイドアウト効果: Timerコンポーネントで、この値を操作
+ *         string control.Opacity.ToString() 現在のOpacity値の文字列を取得
+ *         
+ *         ＊アクセス修飾子
+ *         ??     control.Modifier //private : (デフォルト値) 他Formから参照できない
+ *                                   //internal: 同一アセンブリ内からの参照可
+ *                                   
+ *         ＊他Formの値参照
+ *         form.(コントロール).(プロパティ)
+ *         
+ *         ＊色指定
+ *         Color control.ForeColor 文字色
+ *         Color control.BackColor 背景色
+ *                 Color.Xxxx        色指定
+ *                 Color.Transparent 透過色 (=透明として扱う色)
+ *                 Color.FormArgb(int red, int green, int blue)
+ *                 SystmColors.Color  Control | Window | Desktop
+ *                 
+ *         ＊背景画像
+ *         Image cntrol.BackgroundImage //new Bitmap(string path) -> エラーが出る
+ *                                      //bitmap.Dispose()
+ *                                      //Image.FromFile(string path)
+ *         ImageLayout control.BackgroundImageLayout
+ *            └ enum ImageLayout { None, Tile, Center, Stretch, Zoom }
+ */
+#endregion
