@@ -52,9 +52,9 @@ namespace WinFormGUI.WinFormSample.KaiteiNet.KT09_CustomDialog
 {
     class MainModalDialogSample
     {
-        [STAThread]
-        static void Main()
-        //public void Main()
+        //[STAThread]
+        //static void Main()
+        public void Main()
         {
             Console.WriteLine("new FormModalDialogSample()");
 
