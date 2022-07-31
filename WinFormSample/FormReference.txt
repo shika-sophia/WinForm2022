@@ -2,7 +2,7 @@
  *@title WinFormGUI / WinFormSample / FormReference.txt
  *@copyFrom KT02_MessageBox / MessageBoxSample.cs
  *@copyFrom KT09_CustomDialog / MainModalDialogSample.cs
- *@date 2022-07-30
+ *@date 2022-07-31
  */
 /*
  *@subject ◆Formクラス : ContainerControl -- System.Windows.Forms
@@ -32,6 +32,9 @@
  *         void         form.Show()         Modaless表示
  *         void         form.Close()        Formを閉じる =「×」Click
  *         bool         form.Modal          Modalかどうか { get; }
+ *         Form         form.Owner          親 Formを指定
+ *                      => 〔KT09_CustomDialog/MainModalessDialogSample.cs〕
+ *         Form[]       form.OwnerForms     親 Formの配列 { get; }
  *         
  *              ※Formをダイアログ形式にする設定値
  *                  FormBorderStyle="FixedDialog"
@@ -53,10 +56,12 @@
  *             }
  *
  *         ＊Title bar (= Caption bar) / Task bar
- *         bool form.MaximizeBox VS「最大化ボタン"□"を表示するか」となっているが
- *                               false時も 表示。Click無効
- *         bool form.MinimizeBox VS「最小化ボタン"＿"を表示するか」となっているが
- *                               false時も 表示。Click有効
+ *         bool          form.MaximizeBox   Show():       最大化ボタン"□"を表示するか
+ *                                          ShowDialog(): VS「最大化ボタン"□"を表示するか」となっているが
+ *                                                        false時も 表示。Click無効
+ *         bool          form.MaximizeBox   Show():       最小化ボタン"＿"を表示するか
+ *                                          ShowDialog(): VS「最小化ボタン"＿"を表示するか」となっているが
+ *                                                        false時も 表示。Click有効(親Formを最小化)
  *         bool form.ControlBox 「ー □ ×」を表示するか
  *                               falseにすると「×」も表示されなくなるので、
  *                               別途にFormを閉じるボタンなどを用意する。
