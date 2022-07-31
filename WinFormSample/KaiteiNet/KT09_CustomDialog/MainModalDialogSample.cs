@@ -1,6 +1,8 @@
 ﻿/** 
- *@title WinFormGUI / WinFormSample / 
- *@class 
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT09_CustomDialog
+ *@class MainModalDialogSample.cs
+ *@class FormModalDialogSample : Form
+ *@class ModalDialogSample : Form
  *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
  *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
@@ -20,11 +22,14 @@
  *         void          form.Show()        Modaless表示
  *         bool          form.Modal         Modalか      { get; }
  *         
- *         string        form.Text          Title
- *         bool          form.MaximizeBox   VS「最大化ボタン"□"を表示するか」となっているが
- *                                          false時も 表示。Click無効
- *         bool          form.MaximizeBox   VS「最小化ボタン"＿"を表示するか」となっているが
- *                                          false時も 表示。Click有効
+ *         string        form.Text          FormのTitle         
+ *         bool          form.MaximizeBox   Show():       最大化ボタン"□"を表示するか
+ *                                          ShowDialog(): VS「最大化ボタン"□"を表示するか」となっているが
+ *                                                        false時も 表示。Click無効
+ *         bool          form.MaximizeBox   Show():       最小化ボタン"＿"を表示するか
+ *                                          ShowDialog(): VS「最小化ボタン"＿"を表示するか」となっているが
+ *                                                        false時も 表示。Click有効(親Formを最小化)
+ *                                          
  *         bool          form.ShowInTaskbar WindowsのTaskbarにアイコン表示するか
  *         FormBorderStyle    form.FormBorderStyle =>〔../../FormReference.txt〕
  *         FormStartPosition  form.StartPosition   =>〔../../FormReference.txt〕
