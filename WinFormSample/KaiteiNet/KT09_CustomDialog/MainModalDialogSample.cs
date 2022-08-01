@@ -23,13 +23,8 @@
  *         bool          form.Modal         Modalか      { get; }
  *         
  *         string        form.Text          FormのTitle         
- *         bool          form.MaximizeBox   Show():       最大化ボタン"□"を表示するか
- *                                          ShowDialog(): VS「最大化ボタン"□"を表示するか」となっているが
- *                                                        false時も 表示。Click無効
- *         bool          form.MaximizeBox   Show():       最小化ボタン"＿"を表示するか
- *                                          ShowDialog(): VS「最小化ボタン"＿"を表示するか」となっているが
- *                                                        false時も 表示。Click有効(親Formを最小化)
- *                                          
+ *         bool          form.MaximizeBox   最大化ボタン"□"を表示するか
+ *         bool          form.MaximizeBox   最小化ボタン"＿"を表示するか                                          
  *         bool          form.ShowInTaskbar WindowsのTaskbarにアイコン表示するか
  *         FormBorderStyle    form.FormBorderStyle =>〔../../FormReference.txt〕
  *         FormStartPosition  form.StartPosition   =>〔../../FormReference.txt〕
@@ -102,7 +97,7 @@ namespace WinFormGUI.WinFormSample.KaiteiNet.KT09_CustomDialog
         {
             this.Text = "ModalDialogSample";
             this.MaximizeBox = false;
-            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.ShowInTaskbar = false;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.StartPosition = FormStartPosition.CenterScreen;
