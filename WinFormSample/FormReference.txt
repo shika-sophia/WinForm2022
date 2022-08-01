@@ -2,7 +2,7 @@
  *@title WinFormGUI / WinFormSample / FormReference.txt
  *@copyFrom KT02_MessageBox / MessageBoxSample.cs
  *@copyFrom KT09_CustomDialog / MainModalDialogSample.cs
- *@date 2022-07-31
+ *@date 2022-08-01
  */
 /*
  *@subject ◆Formクラス : ContainerControl -- System.Windows.Forms
@@ -56,12 +56,8 @@
  *             }
  *
  *         ＊Title bar (= Caption bar) / Task bar
- *         bool          form.MaximizeBox   Show():       最大化ボタン"□"を表示するか
- *                                          ShowDialog(): VS「最大化ボタン"□"を表示するか」となっているが
- *                                                        false時も 表示。Click無効
- *         bool          form.MaximizeBox   Show():       最小化ボタン"＿"を表示するか
- *                                          ShowDialog(): VS「最小化ボタン"＿"を表示するか」となっているが
- *                                                        false時も 表示。Click有効(親Formを最小化)
+ *         bool form.MaximizeBox 最大化ボタン"□"を表示するか
+ *         bool form.MaximizeBox 最小化ボタン"＿"を表示するか
  *         bool form.ControlBox 「ー □ ×」を表示するか
  *                               falseにすると「×」も表示されなくなるので、
  *                               別途にFormを閉じるボタンなどを用意する。
