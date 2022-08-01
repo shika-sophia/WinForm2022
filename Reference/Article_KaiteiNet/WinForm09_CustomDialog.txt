@@ -441,7 +441,7 @@ class Dialog1 : Form
             };
         }
 
-        this.Controls.Add(checkBox);
+        this.Controls.AddRange(checkBox);
         this.Controls.AddRange(new Control[]
         {
             okButton, textBox , label
