@@ -57,6 +57,7 @@
  *         FormContentPageSample Close()
  *         
  *@see FormStartPageSample.jpg
+ *@see ~\WinFormSample\KaiteiNet\KT09_CustomDialog\MainAssemblyNameSample.cs
  *@author shika
  *@date 2022-07-28
  */
