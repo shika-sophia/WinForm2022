@@ -139,14 +139,14 @@
  *         Color form.TransparencyKey 透過色 (=透明として扱う色)
  *                 
  *         ＊背景画像
- *         Image cntrol.BackgroundImage //new Bitmap(string path) -> エラーが出る
+ *         Image control.BackgroundImage //new Bitmap(string path) -> エラーが出る
  *                                      //bitmap.Dispose()
  *                                      //Image.FromFile(string path)
  *         ImageLayout control.BackgroundImageLayout
  *            └ enum ImageLayout { None, Tile, Center, Stretch, Zoom }
  *
  *         ＊その他
- *         void     control.Invalidate() 現在コントロールを一旦無効にし、再描画を促す
+ *         void       control.Invalidate()  現在コントロールを一旦無効にし、再描画を促す
  *         MainMenu   form.MainMenu         旧版 MainMenu
  *         MainMenu   form.MergedMenu       結合されたMenu??
  *         MainStrip  form.MainMenuStrip    ToolStrip版 MenuStrip
