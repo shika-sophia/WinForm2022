@@ -49,7 +49,8 @@
  *         void       soundPlayer.LoadAsync()    新Threadを起動し非同期読込
  *         void       soundPlayer.Play()         新Threadを起動し、音声データを再生。読込まれていないときは読込
  *         void       soundPlayer.PlayLooping()  新Threadを起動し、反復再生。読込まれていないときは読込
- *         void       soundPlayer.PlaySync()     現在Threadで同期的に再生。読込まれていないときは読込
+ *                                               
+ *         void       soundPlayer.PlaySync()     現在Threadで同期的に再生(= 再生中は待機状態)。読込まれていないときは読込
  *         void       soundPlayer.Stop()         音声データの再生を中断
  *         
  *         AsyncCompletedEventHandler LoadCompleted  非同期Load完了時のイベント
@@ -78,9 +79,9 @@ namespace WinFormGUI.WinFormSample.KaiteiNet.KT08_Resource
 {
     class MainSoundPlayerWav
     {
-        [STAThread]
-        static void Main()
-        //public void Main()
+        //[STAThread]
+        //static void Main()
+        public void Main()
         {
             Console.WriteLine("new FormSoundPlayerWav()");
 
