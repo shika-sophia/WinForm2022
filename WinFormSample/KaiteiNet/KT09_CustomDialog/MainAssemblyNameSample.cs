@@ -17,7 +17,8 @@
  *         
  *         => 「~/Properties/AssemblyInfo.cs」内の [xxx]: attribute / 属性
  *         
- *@subject ◆AssemblyName -- System.Reflection.
+ *@subject ◆AssemblyName : _AssemblyName, ICloneable, ISerializable, IDeserializationCallback
+ *             -- System.Reflection.
  *         Assembly       Assembly.GetExecutingAssembly()  現在実行中のコードを含む Assembly
  *         AssemblyName   Assembly.GetName()
  *         string         assemblyName.Name
@@ -32,7 +33,52 @@
  *
  *         => Applicationクラス
  *           〔~\WinFromSample\ReverseReference\RR05_MenuToolStrip\MainStartPageSample.cs〕
- *           
+ *
+ *@subject Assembly : _Assembly, IEvidenceFactory, ICustomAttributeProvider, ISerializable
+ *           -- System.Reflection. | RR[51] AboutBox, RR[227] Reflection / p102, p409
+ *         string      Assembly.CodeBase      AssemblyNameオブジェクトで最初に指定された場所(？)
+ *         
+ *         Assembly    Assembly.GetExecutingAssembly()   現在実行中のコードを含む Assembly
+ *         Assembly    Assembly.Load(byte[])
+ *         Assembly    Assembly.Load(AssemblyName)
+ *         Assembly    Assembly.LoadFile(string path);         「.dll」「.exe」pathを指定して読込
+ *         Assembly    Assembly.LoadFrom(string assmblyFile)   「.dll」「.exe」ファイル名 or pathを指定して読込
+ *         
+ *         object[]    Assembly.GetExecutingAssembly().GetCustomAttributes(Type, bool)
+ *                       引数 Type type:    型を指定して Assemblyのカスタム属性の配列を取得
+ *                       引数 bool inherit: Assembly型オブジェクトの場合、この引数は無視される
+ *         例: object[] attributes 
+ *                   = Assembly.GetExecutingAssembly()
+ *                             .GetCustomAttributes(typeof(AssemblyXxxxAttribute), false);
+ *         
+ *@subject Reflectionを利用して各属性値を取得する
+ *         ＊Assembly Title の取得
+ *         string   titleAttribute.Title
+ *         
+ *         例:  object[] attributes 
+ *                   = Assembly.GetExecutingAssembly()
+ *                             .GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
+ *         if (attributes.Length > 0)
+ *         {
+ *             AssemblyTitleAttribute titleAttribute = (AssemblyTitleAttribute)attributes[0];
+ *             if (titleAttribute.Title != "")
+ *             {
+ *                 return titleAttribute.Title;
+ *             }
+ *         }
+ *         
+ *         ＊Assembly Version の取得
+ *         string   assemblyName.Version.ToString()  〔上記〕
+ *          
+ *         ＊Assembly Description の取得
+ *         string  ((AssemblyDescriptionAttribute)attributes[0]).Description
+ *         
+ *         ＊Assembly Product の取得
+ *         ((AssemblyProductAttribute)attributes[0]).Product
+ *         
+ *         ＊Assembly Copyright の取得
+ *         ((AssemblyCopyrightAttribute)attributes[0]).Copyright;
+ *         
  *@subject form.OnPaint(PaintEventArgs e)
  *         再描画イベントハンドラー
  *         
@@ -44,6 +90,7 @@
  *
  *@see ImageAsseblyNameSample.jpg
  *@see ~\WinFromSample\ReverseReference\RR05_MenuToolStrip\MainStartPageSample.cs
+ *@see 
  *@author shika
  *@date 2022-08-02
  */
