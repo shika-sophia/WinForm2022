@@ -45,9 +45,9 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR07_MultiWindow
 {
     class MainMdiSample
     {
-        [STAThread]
-        static void Main()
-        //public void Main()
+        //[STAThread]
+        //static void Main()
+        public void Main()
         {
             Console.WriteLine("new FormMdiSample()");
 
