@@ -73,3 +73,9 @@ for(int i = 0; i <= buttonAry.Length; i++)
  *      
  *      => menuFile.ShortcutKeys = Keys.F; を削除すると解決
  */
+
+ *@title WinFormGUI / WinFormSample / ReverseReference / RR07_MultiWindow
+ *@class MainMdiSample.cs
+ *@NOTE【考察】Form部品はコンストラクタで記述すべき
+ *      Form部品を Form_Load(object sender, EventArgs e)に記述すると
+ *      new Form1().Show();で空のFormを表示し、Form部品は反映しない。
