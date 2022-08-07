@@ -23,15 +23,35 @@
  *@subject Form -- System.Windows.Froms.
  *         bool   親form.IsMdiContainer   親 MdiFormか
  *         Form   子form.MdiParent        親 Formを登録
+ *         Form   親form.ActiveMdiChild   現在選択中の子Form
  *         Form[] 親form.MdiChildren      子 Formの配列
  *                                        MdiParentを登録すると自動で配列に追加
  *         int    親form.MdiChildren.Length  子 Formの数を取得
  *         
+ *         MdiLayout   親form.LayoutMdi(MdiLayout)
+ *           └ enum MdiLayout
+ *             {
+ *                 Cascade = 0,        //重ねて表示
+ *                 TileHorizontal = 1, //水平に並べて表示
+ *                 TileVertical = 2,   //垂直に並べて表示
+ *                 ArrangeIcons = 3    //子アイコンを並べて表示
+ *             }
  *         
  *@NOTE【考察】Form部品はコンストラクタで記述すべき
  *      Form部品を Form_Load(object sender, EventArgs e)に記述すると
  *      new Form1().Show();で空のFormを表示し、Form部品は反映しない。
+ *
+ *@NOTE【考察】MdiChildren.LengthをTextに利用する問題点
+ *      カウンターとして利用すると、一部の子Formを削除後に新規追加した場合、
+ *      重複した子Form名になってしまう問題。
  *      
+ *      => int countをText専用に定義すべき
+ *      
+ *@NOTE【考察】途中抜けに注意
+ *      Form[]   親form.MdiChildrenは配列なので、
+ *      ActiveMdiChildを利用して途中の子Formを削除した場合、
+ *      for文で MdiChildrenの処理をする際に、途中抜けの対処が必要
+ *
  *@see ImageMdiSample.jpg
  *@see 
  *@author shika
@@ -45,9 +65,9 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR07_MultiWindow
 {
     class MainMdiSample
     {
-        //[STAThread]
-        //static void Main()
-        public void Main()
+        [STAThread]
+        static void Main()
+        //public void Main()
         {
             Console.WriteLine("new FormMdiSample()");
 
@@ -73,14 +93,16 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR07_MultiWindow
             //---- MenuStrip ----
             var menuFile = new ToolStripMenuItem("File (&F)");
             var menuNew = new ToolStripMenuItem("New Document (&N)");
+            var menuActiveClose = new ToolStripMenuItem("This Close (&C)");
             var menuExit = new ToolStripMenuItem("All Close (&X)");
 
             menuNew.Click += new EventHandler(menuNew_Click);
+            menuActiveClose.Click += new EventHandler(menuActiveClose_Click);
             menuExit.Click += new EventHandler(menuExit_Click);
 
             menuFile.DropDownItems.AddRange(new ToolStripItem[]
             {
-                menuNew, menuExit,
+                menuNew, menuActiveClose, menuExit,
             });
 
             menu = new MenuStrip() 
@@ -100,14 +122,31 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR07_MultiWindow
             this.MainMenuStrip = menu;
         }//constructor
 
+
         private void menuNew_Click(object sender, EventArgs e)
         {
             new FormNewDocument(font, this).Show();
         }//menuNew_Click()
 
+        private void menuActiveClose_Click(object sender, EventArgs e)
+        {
+            Form active = this.ActiveMdiChild;
+            if(active == null)
+            {
+                return;
+            }
+            else
+            {
+                active.Close();
+            }
+        }//menuActiveClose_Click()
+
         private void menuExit_Click(object sender, EventArgs e)
         {
-            this.Close();
+            foreach(Form child in this.MdiChildren)
+            {
+                child.Close();
+            }
         }
     }//class
 
