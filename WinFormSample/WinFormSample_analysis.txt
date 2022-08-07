@@ -79,3 +79,42 @@ for(int i = 0; i <= buttonAry.Length; i++)
  *@NOTE【考察】Form部品はコンストラクタで記述すべき
  *      Form部品を Form_Load(object sender, EventArgs e)に記述すると
  *      new Form1().Show();で空のFormを表示し、Form部品は反映しない。
+ */
+
+/* 
+ *@title WinFormGUI / WinFormSample / ReverseReference / RR07_MultiWindow
+ *@class MainMdiLayoutSample.cs
+ *@subject 親メニュー項目オブジェクトの取得
+ *         delegate void ToolStripItemClickedEventHandler(
+ *             object sender, ToolStripItemClickedEventArgs e)
+ *             
+ *         ・このイベントは親メニュー項目のイベントなので、senderは親メニュー項目のオブジェクト
+ *         ・ToolStripItemClickedEventArgs e
+ *           ToolStripItem    e.ChildClicked      クリックされた子メニュー項目オブジェクトはこちらを利用
+ *           
+ *         ToolStripMenuItem menuLayout = (ToolStripMenuItem) sender;
+ *         foreach(ToolStripMenuItem menuChild in menuLayout.DropDownItems)
+ *         {
+ *              menuChild.Checked = false;
+ *         }//foreach
+ *         
+ *         ToolStripItem selectedItem = e.ClickedItem;
+ *
+ *@NOTE【考察】新規追加時は MdiLayout.Cascadeで追加
+ *      ・新規追加前の Layoutにチェックされている
+ *      ・子Formが何もない状態で Layoutメニューを指定すると、
+ *        チェック状態にはなるが、新規追加時は MdiLayout.Cascadeで追加
+ *      
+ *@NOTE【考察】Checkの単一選択
+ *      指定したメニュー項目のみチェック状態にしたい場合、
+ *      CheckOnClicked = true;のままだと、複数項目にチェックされる。
+ *         
+ *      => Clickイベント内で、全ての Checked = false;にする。
+ *         指定メニュー項目を trueにしておくと、全ての Checkが外れてしまう。
+ *         
+ *      => 全ての項目を falseにしただけなのに、(どこも trueにしていないのに)
+ *         実行動作は意図した動作(=新たにクリックした項目だけチェック)になっている。
+ *         おそらく、メニュー項目の処理が完了したときのイベントが暗黙的に設定されている可能性あり。
+ *         暗黙的に、クリックした項目を trueにしているコードが存在するのは
+ *         望ましいコードではない。
+ */         
