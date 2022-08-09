@@ -1,7 +1,8 @@
 ﻿/** 
- *@title WinFormGUI / WinFormSample / 
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT10_CommonDialog
  *@class MainFolderBrowserSample.cs
  *@class   └ new FormFolderBrowserSample() : Form
+ *@class       └ new FolderBrowserDialog() : CommonDialog
  *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
  *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
@@ -14,11 +15,11 @@
  *          FolderBrowserDialog    new FolderBrowserDialog()
  *          string     folderBrowserDialog.SelectedPath         選択フォルダーの path
  *          Environment.SpecialFolder                           参照開始位置のルートフォルダー
- *                     folderBrowserDialog.RootFolder           
+ *                     folderBrowserDialog.RootFolder               enum SpecialFoler.Xxxx
  *          string     folderBrowserDialog.Description          Dialog上部に表示される説明文字列
  *          bool       folderBrowserDialog.ShowNewFolderButton  [新しいフォルダ]ボタンを表示するか
  *          
- *@subject ◆Environment staticクラス -- System.
+ *@subject ◆static Environmentクラス -- System.
  *         ・PC環境に関する情報を扱うクラス
  *         
  *         staticメンバー { get; }
