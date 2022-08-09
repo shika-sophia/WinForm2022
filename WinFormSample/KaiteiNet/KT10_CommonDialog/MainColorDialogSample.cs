@@ -15,7 +15,7 @@
  *         ColorDialog    new ColorDialog()
  *         Color    colorDialog.Color          選択色 struct Color
  *         int[]    colorDialog.CustomColors   カスタム色(= 自己作成した色)の配列
- *         bool     colorDialog.FullOpen       カスタム色の作成コントロールも表示するか / デフォルト値: false
+ *         bool     colorDialog.FullOpen       初期状態でカスタム色の作成コントロールも表示するか / デフォルト値: false
  *         bool     colorDialog.AllowFullOpen  カスタム色の作成コントロールを展開可能か / true
  *         bool     colorDialog.AnyColor       使用可能な基本色を全て表示するか        / false
  *         bool     colorDialog.ShowHelp       ヘルプボタンを表示するか               / false

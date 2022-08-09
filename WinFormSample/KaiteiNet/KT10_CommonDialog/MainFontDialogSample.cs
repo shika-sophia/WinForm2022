@@ -15,8 +15,8 @@
  *         FontDialog    new FontDialog()
  *         Font     fontDialog.Font           選択したフォント
  *         Color    fontDialog.Color          選択した色
- *         int      fontDialog.MaxSize        最大サイズ / デフォルト値: 0
- *         int      fontDialog.MinSize        最小サイズ / デフォルト値: 0
+ *         int      fontDialog.MaxSize        最大サイズ / 制限しない(デフォルト値): 0
+ *         int      fontDialog.MinSize        最小サイズ / 制限しない(デフォルト値): 0
  *         bool     fontDialog.ShowApply      [適用]ボタンを表示するか / false
  *         bool     fontDialog.ShowColor      色の選択肢を表示するか   / false
  *         bool     fontDialog.ShowEffects    取消線, 下線, 色選択するか / true
