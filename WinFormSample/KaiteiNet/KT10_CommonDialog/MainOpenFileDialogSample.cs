@@ -30,6 +30,7 @@
  *         bool     fileDialog.ShowHelp          ヘルプボタンを表示するか / デフォルト: false
  *            ↑
  *@subject ◆OpenFileDialog : FileDialog : CommonDialog
+ *         OpenFileDialog     new OpenFileDialog()
  *         string   openFileDialog.SafeFileName { get; }  選択したファイル名 (拡張子を含む、pathは含まない)
  *         string[] openFileDialog.SafeFileNames { get; } 選択した全てのファイル名の配列 (拡張子を含む、pathは含まない)
  *         bool     openFileDialog.Multiselect            複数選択を可能にするか / デフォルト: false

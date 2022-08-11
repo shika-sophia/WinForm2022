@@ -14,8 +14,8 @@
  *@subject ◆FolderBrowserDialog : CommonDialog
  *          FolderBrowserDialog    new FolderBrowserDialog()
  *          string     folderBrowserDialog.SelectedPath         選択フォルダーの path
- *          Environment.SpecialFolder                           参照開始位置のルートフォルダー
- *                     folderBrowserDialog.RootFolder               enum SpecialFoler.Xxxx
+ *          Environment.SpecialFolder                           参照開始位置のルートフォルダー enum SpecialFoler.Xxxx
+ *                     folderBrowserDialog.RootFolder           デスクトップをルートフォルダにしておけば，すべてのファイルおよびフォルダが参照できます。
  *          string     folderBrowserDialog.Description          Dialog上部に表示される説明文字列
  *          bool       folderBrowserDialog.ShowNewFolderButton  [新しいフォルダ]ボタンを表示するか
  *          
@@ -157,7 +157,6 @@ enum SpecialFolder
     Desktop = 0,
     Programs = 2,
     MyDocuments = 5,
-    MyDocuments = 5,
     Favorites = 6,
     Startup = 7,
     Recent = 8,
@@ -181,7 +180,7 @@ enum SpecialFolder
     Cookies = 33,
     History = 34,
     CommonApplicationData = 35,
-    Windows = 36,
+    Windows = 36,  // %windir%, %SYSTEMROOT%, C:\Windows に相当
     System = 37,
     ProgramFiles = 38,
     MyPictures = 39,
