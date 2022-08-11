@@ -24,6 +24,7 @@
  *@subject abstract CommonDialog : Component
  *         CommonDialog     new CommonDialog();
  *         DialogResult     commonDialog.ShowDialog() ダイアログを表示し、ボタン結果を返す
+ *         void             commonDialog.Reset()      派生クラスでoverride時、全てのプロパティを既定値にリセット
  *         
  *@see ImageColorDialogSample.jpg
  *@see 
