@@ -29,13 +29,13 @@
  *         bool    saveFileDialog.OverwritePrompt 
  *                   true:  すでに存在するファイルを指定時、事前に上書きするかを警告 (デフォルト)
  *                   false: 警告せずに上書き
- *         Stream  saveFileDialog.OpenFile();
+ *         Stream  saveFileDialog.OpenFile();   選択されたファイルを開く
  *
  *@subject form.OnLoad(EventArgs e)                   Formロード時 イベント
  *@subject form.OnFormClosing(FormClosingEventArgs e) Foemクローズ時 イベント
  *         FormClosingEventArgs : CancelEventArgs
  *         ComponentModel.CancelEventArgs e
- *         bool     e.Cancel
+ *         bool     e.Cancel                 イベントを取り消すか
  *
  *@see ImageSaveFileDialogSample.jpg
  *@see MainOpenFileDialogSample.cs
