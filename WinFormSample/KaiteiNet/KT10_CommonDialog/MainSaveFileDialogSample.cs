@@ -31,6 +31,11 @@
  *                   false: 警告せずに上書き
  *         Stream  saveFileDialog.OpenFile();   選択されたファイルを開く
  *
+ *@subject new StereamReader(Stream)
+ *              └ Stream  openFileDialog.OpenFile()
+ *@subject new StreamWriter(Stream)
+ *              └ Stream  saveFileDialog.OpenFile()
+ *              
  *@subject form.OnLoad(EventArgs e)                   Formロード時 イベント
  *@subject form.OnFormClosing(FormClosingEventArgs e) Foemクローズ時 イベント
  *         FormClosingEventArgs : CancelEventArgs
