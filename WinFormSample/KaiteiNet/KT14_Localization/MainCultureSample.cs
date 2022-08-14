@@ -22,7 +22,7 @@
  *         
  *         CultureInfo  CultureInfo.CurrentCulture     { get; set; } static カルチャー情報
  *                         ・現在Threadで使用する CultureInfoオブジェクト
- *                         ・日付、数値、通貨
+ *                         ・日時、数値、通貨
  *         CultureInfo  CultureInfo.CurrentUICulture   { get; set; } static UIカルチャー情報
  *                         ・現在Threadでカルチャー固有のリソースを参照する際に利用
  *                         ・「Resources.ja-JP.resx」「Resources.en-US.resx」などの参照
@@ -45,9 +45,10 @@
  *                 WindowsOnlyCultures = 32,   // (非推奨) 無視される
  *                 FrameworkCultures = 64,     // (非推奨) .NET Framework 2.0 のカルチャー
  *             }
- *              
- *         CultureInfo    CultureInfo.GetCultureInfo(string name);      読取専用 CultureInfo
- *         CultureInfo[]  CultureInfo.GetCultures(CultureTypes types)   上記 CutureTypesで利用できる すべての CultureInfo配列
+ *         
+ *         CultureInfo    CultureInfo.CreateSpecificCulture(string name)  指定した名前で関連付けられている特定のカルチャ
+ *         CultureInfo    CultureInfo.GetCultureInfo(string name);        読取専用 CultureInfo
+ *         CultureInfo[]  CultureInfo.GetCultures(CultureTypes types)     上記 CutureTypesで利用できる すべての CultureInfo配列
  *          
  *@author shika
  *@date 2022-08-13
