@@ -1,5 +1,5 @@
 ﻿/** 
- *@title WinFormGUI / WinFormSample / 
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT13_OwnerDraw
  *@class MainOwnerDrawSample.cs
  *@class   └ new FormOwnerDrawSample() : Form
  *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
@@ -10,47 +10,51 @@
  *           =>〔~/Reference/Article_KaiteiNet/WinForm13_OwnerDraw.txt〕
  *           
  *@content KT13 OwnerDraw
- *         OwnerDraw: OSによる自動描画ではなく、各コントロールによるカスタム描画
+ *         ・OwnerDraw: OSによる自動描画ではなく、各コントロールによる自己定義のカスタマイズ描画
+ *         ・位置, サイズ, 色, 文字列などを自己定義で指定する必要がある
  *         
  *@subject ◆DrawMode  control.DrawModeプロパティを変更する
  *             └ enum DrawMode
  *               {
- *                   Normal = 0,       // OSによる自動描画 (デフォルト値)
- *                   DrawFixed = 1,    // 手動で描画
- *                   DrawVariable = 2, // 手動で異なるサイズに描画
+ *                   Normal = 0,            // OSによる自動描画 (デフォルト値)
+ *                   OwnerDrawFixed = 1,    // 手動で描画
+ *                   OwnerDrawVariable = 2, // 手動で異なるサイズに描画
  *               }
  *               
  *@subject OwnerDrawイベント
- *         DrawItemEventHandler   control.DrawItem
+ *         DrawItemEventHandler   control.DrawItem   
  *           └ delegate void DrawItemEventHandler(object sender, DrawItemEventArgs e)
+ *           
+ *         ※ListBoxなどを登録するすると、各行の描画のたびにイベント発生
+ *         (for文がなくてもこの挙動をする〔下記コード参照〕)
  *
  *         DrawItemEventArgs e
  *         int        e.Index      描画中の何番目の要素か
  *         Color      e.ForeColor  文字色
  *         Color      e.BackColor  背景色
- *         Rectangle  e.Bounds     境界,位置を示す四角形
- *         Graphics   e.Graphics   描画用オブジェクト
+ *         Rectangle  e.Bounds     位置,サイズを示す四角形
+ *         Graphics   e.Graphics   描画用 Graphicsオブジェクト
  *         DrawItemState e.State   描画中の項目の状態
- *           └ enum DrawItemState
+ *           └ enum DrawItemState  「|」ビット論理和で複数指定可
  *             {
  *                 None = 0,      //状態なし、解除
  *                 Selected = 1,  //選択されている
- *                 Grayed = 2,    //単色表示
+ *                 Grayed = 2,    //淡色表示 メニューのみ
  *                 Disabled = 4,  //無効
  *                 Checked = 8,   //チェックされている
  *                 Focus = 16,    //フォーカス
  *                 Default = 32,  //デフォルト値
- *                 HotLight = 64, 
- *                 Inactive = 128,
- *                 NoAccelerator = 256,
- *                 NoFocusRect = 512,
- *                 ComboBoxEdit = 4096,
+ *                 HotLight = 64, //マウスポイント時の強調表示
+ *                 Inactive = 128,//非アクティブ
+ *                 NoAccelerator = 256,  //Keyboard Accelerator (=ショートカット, アクセスキー)なしで表示
+ *                 NoFocusRect = 512,    //フォーカスのビジュアルキューなしで表示
+ *                 ComboBoxEdit = 4096,  //ComboBoxの編集部分
  *              }
  *              
  *         void       e.DrawBackground()     既定の背景を描画。カスタム描画前に記述
  *         void       e.DrawFocusRectabgle() フォーカスを示す四角形を描画
  *
- *@subject 選択項目の取得 〔KT10〕
+ *@subject 選択項目の取得 〔KT13〕
  *         listBox_DrawItem イベントハンドラの中の 
  *         (e.State & DrawItemState.Selected) != 0 ? ... は，説明が必要かもしれません。
  *         このコードの心は e.State == DrawItemState.Selected ? ... なのですが，
@@ -72,42 +76,42 @@
  *                  )
  *@subject Brush ブラシ -- Syatem.Drawing
  *         Brush    new SolidBrush(Color)   単色ブラシ
- *         Brush    Brushs.Xxxx             システム定義の標準色
- *         Brush    Brush.SystemBrushs      システムで利用されている色
- *           └ class SystemBrushs / staticメンバー  { get; }
- *             Brush  SystemBrushs.GradientActiveCaption    アクティブなタイトルバーのグラデーションで最も明るい色
- *             Brush  SystemBrushs.GradientInactiveCaption  非アクティブなタイトルバーのグラデーションで最も明るい色
- *             Brush  SystemBrushs.Window      クライアント領域の背景色
- *             Brush  SystemBrushs.ScrollBar   スクロール バーの背景の色
- *             Brush  SystemBrushs.MenuText    メニューのテキストの色
- *             Brush  SystemBrushs.MenuHighlight フラットメニュー項目の強調表示色
- *             Brush  SystemBrushs.MenuBar     メニューバーの背景色
- *             Brush  SystemBrushs.Menu        メニュー背景色
- *             Brush  SystemBrushs.InfoText    ツールヒントのテキスト色
- *             Brush  SystemBrushs.Info        ツールヒントの背景色
- *             Brush  SystemBrushs.InactiveCaptionText 非アクティブのタイトルバーのテキスト色
- *             Brush  SystemBrushs.InactiveBorder      非アクティブなウィンドウの境界線の色
- *             Brush  SystemBrushs.InactiveCaption     非アクティブのタイトルバーの背景色
- *             Brush  SystemBrushs.HotTrack    フォーカス項目の色
- *             Brush  SystemBrushs.HighlightText 選択項目のテキスト色
- *             Brush  SystemBrushs.Highlight   選択項目の背景色
- *             Brush  SystemBrushs.GrayText    淡色表示のテキスト色
- *             Brush  SystemBrushs.WindowText  クライアント領域のテキスト色
- *             Brush  SystemBrushs.ActiveBorder  アクティブなウィンドウの境界線の色
- *             Brush  SystemBrushs.ActiveCaption アクティブなウィンドウのタイトルバーの背景色
- *             Brush  SystemBrushs.ActiveCaptionText  アクティブなウィンドウのタイトルバーのテキスト色
- *             Brush  SystemBrushs.AppWorkspace       アプリケーション作業領域の色
- *             Brush  SystemBrushs.ButtonFace         3D要素の表面の色
- *             Brush  SystemBrushs.ButtonHighlight    3D要素の強調表示色
- *             Brush  SystemBrushs.WindowFrame        ウィンドウ フレームの色
- *             Brush  SystemBrushs.ButtonShadow       3D要素の影色
- *             Brush  SystemBrushs.ControlLightLight  3D要素の強調表示色
- *             Brush  SystemBrushs.ControlLight       3D要素の明るい色
- *             Brush  SystemBrushs.ControlDark        3D要素の影色
- *             Brush  SystemBrushs.ControlDarkDark    3D要素の暗い影色
- *             Brush  SystemBrushs.ControlText        3D要素のテキストの色
- *             Brush  SystemBrushs.Desktop            デスクトップの色
- *             Brush  SystemBrushs.Control            3D要素の表面の色
+ *         Brush    Brushes.Xxxx             システム定義の標準色
+ *         Brush    Brush.SystemBrushes      システムで利用されている色
+ *           └ class SystemBrushes / staticメンバー  { get; }
+ *             Brush  SystemBrushes.GradientActiveCaption    アクティブなタイトルバーのグラデーションで最も明るい色
+ *             Brush  SystemBrushes.GradientInactiveCaption  非アクティブなタイトルバーのグラデーションで最も明るい色
+ *             Brush  SystemBrushes.Window      クライアント領域の背景色
+ *             Brush  SystemBrushes.ScrollBar   スクロール バーの背景の色
+ *             Brush  SystemBrushes.MenuText    メニューのテキストの色
+ *             Brush  SystemBrushes.MenuHighlight フラットメニュー項目の強調表示色
+ *             Brush  SystemBrushes.MenuBar     メニューバーの背景色
+ *             Brush  SystemBrushes.Menu        メニュー背景色
+ *             Brush  SystemBrushes.InfoText    ツールヒントのテキスト色
+ *             Brush  SystemBrushes.Info        ツールヒントの背景色
+ *             Brush  SystemBrushes.InactiveCaptionText 非アクティブのタイトルバーのテキスト色
+ *             Brush  SystemBrushes.InactiveBorder      非アクティブなウィンドウの境界線の色
+ *             Brush  SystemBrushes.InactiveCaption     非アクティブのタイトルバーの背景色
+ *             Brush  SystemBrushes.HotTrack    フォーカス項目の色
+ *             Brush  SystemBrushes.HighlightText 選択項目のテキスト色
+ *             Brush  SystemBrushes.Highlight   選択項目の背景色
+ *             Brush  SystemBrushes.GrayText    淡色表示のテキスト色
+ *             Brush  SystemBrushes.WindowText  クライアント領域のテキスト色
+ *             Brush  SystemBrushes.ActiveBorder  アクティブなウィンドウの境界線の色
+ *             Brush  SystemBrushes.ActiveCaption アクティブなウィンドウのタイトルバーの背景色
+ *             Brush  SystemBrushes.ActiveCaptionText  アクティブなウィンドウのタイトルバーのテキスト色
+ *             Brush  SystemBrushes.AppWorkspace       アプリケーション作業領域の色
+ *             Brush  SystemBrushes.ButtonFace         3D要素の表面の色
+ *             Brush  SystemBrushes.ButtonHighlight    3D要素の強調表示色
+ *             Brush  SystemBrushes.WindowFrame        ウィンドウ フレームの色
+ *             Brush  SystemBrushes.ButtonShadow       3D要素の影色
+ *             Brush  SystemBrushes.ControlLightLight  3D要素の強調表示色
+ *             Brush  SystemBrushes.ControlLight       3D要素の明るい色
+ *             Brush  SystemBrushes.ControlDark        3D要素の影色
+ *             Brush  SystemBrushes.ControlDarkDark    3D要素の暗い影色
+ *             Brush  SystemBrushes.ControlText        3D要素のテキストの色
+ *             Brush  SystemBrushes.Desktop            デスクトップの色
+ *             Brush  SystemBrushes.Control            3D要素の表面の色
  *         
  *@NOTE【Problem】
  *      e.Boundsのままだと、１行の高さが小さすぎて文字が入りきらない問題
@@ -185,7 +189,7 @@ namespace WinFormGUI.WinFormSample.KaiteiNet.KT13_OwnerDraw
             //---- BackColor ----
             e.DrawBackground();    //既定色で背景色を塗る
 
-            if((e.Index) % 2 == 1) //奇数番目(最初: 0)に色付け
+            if((e.Index % 2) == 1) //奇数番目(最初: 0)に色付け
             {
                 // 項目が選択中であるか否かに応じてブラシを取得
                 Brush brush = (e.State & DrawItemState.Selected) != 0 ?
