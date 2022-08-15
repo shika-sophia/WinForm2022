@@ -1,6 +1,6 @@
 ﻿/** 
  *@title WinFormGUI / WinFormSample / KaiteiNet / KT15_WinAPI
- *@class MainWinApiWindowText.cs
+ *@class MainWinApiIntPtr.cs
  *@subject ◆Process : Component -- System.Diagnostics
  *           Process   new Prcess()         
  *         ＊Member
