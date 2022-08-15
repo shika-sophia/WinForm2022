@@ -1,0 +1,94 @@
+﻿/** 
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT15_WinAPI
+ *@class MainWinApiWindowText.cs
+ *@subject ◆Process : Component -- System.Diagnostics
+ *           Process   new Prcess()         
+ *         ＊Member
+ *         int       process.Id          { get; } システムが生成した一意のID番号
+ *         string    process.MachineName { get; } プロセスを実行している PCの名前
+ *         string    process.ProcessName { get; } プロセス名
+ *         int       process.WorkingSet          { get; } プロセスに割り当てられた物理メモリ量 Byte単位
+ *         int       process.VirtualMemorySize   { get; } プロセスに割り当てられた仮想メモリ量 Byte単位
+ *         long      process.WorkingSet64        { get; } プロセスに割り当てられた物理メモリ量 Byte単位
+ *         long      process.VirtualMemorySize64 { get; } プロセスに割り当てられた仮想メモリ量 Byte単位
+ *         bool      process.Responding          { get; } プロセスの UI が応答するか
+ *         DateTime  process.StartTime           { get; } プロセスの Start日時
+ *         DateTime  process.ExitTime            { get; } プロセスの 終了日時
+ *         TimeSpan  process.UserProcessorTime   { get; }  ユーザープロセッサー時間: OSコア外部のアプリケーション処理時間
+ *         TimeSpan  process.PrivilegedProcessorTime  { get; } 特権プロセッサー時間: OSコア内部のコード処理時間
+ *         TimeSpan  process.TotalProcessorTime  { get; }  CPUを使用した合計時間 = UserProcessorTime + PrivilegedProcessorTime
+ *         ProcessStartInfo         process.StartInfo { get; set; }  〔ProcessStartInfo | 下記〕
+ *         ProcessThreadCollection  process.Threads   { get; }  プロセスに関連した すべてのThreadコレクション
+ *         IntPtr    process.ProcessorAffinity { get; set; }　  プロセスの Threadを実行できるプロセッサーの取得/設定  | デフォルト値 2n-1 (n: PCのプロセッサー数)
+ *         string    process.MainWindowTitle { get; } メインウィンドウのタイトル
+ *         int       process.HandleCount     { get; } プロセスが開いた OS ハンドル数         
+ *         IntPtr    process.Handle          { get; } プロセス起動時に OSが割り当てたハンドルを取得。システムは このハンドルを通じてプロセス属性の追跡を続ける
+ *         IntPtr    process.MainWindowHandle  { get; } メインウインドウに割り当てられたハンドルを取得
+ *           └ IntPtr.Zero  ウィンドウを持たない Processは
+ *             process.MainWindowHandle == IntPtr.Zero が成立する
+ *         int       process.BasePriority    { get; }  ProcessPriorityClassから算出された基本優先順位
+ *         ProcessPriorityClass  process.PriorityClass { get; set; }  優先順位のカテゴリーを取得/設定
+ *           └ enum ProcessPriorityClass
+ *             {
+ *                 Normal = 32,          //特別なスケジューリングを必要としないよう指定
+ *                 Idle = 64,            //システムがアイドル状態のときにだけ実行。高い優先順位クラスで実行Threadを優先
+ *                 High = 128,           //システムの負荷に関わらず すぐに応答する必要のある、即時実行を要求される重要なタスクに指定
+ *                 RealTime = 256,       //優先順位をできるだけ高く指定
+ *                 BelowNormal = 16384,  //優先順位を Idle より高く Normal より低く指定
+ *                 AboveNormal = 32768   //Normal より高く High より低く指定
+ *             }
+ *             
+ *         ＊Method
+ *         Process   Process.GetCurrentProcess();              新しい Processを取得し、呼出元のアプリケーションを実行しているプロセスに関連付ける
+ *         Process   Process.GetProcessById(                   ID, machineNameを指定して一意のプロセスを取得
+ *                     int processId, [string machineName]);
+ *         Process[] Process.GetProcesses()                    実行中の全ての Process配列を取得
+ *         Process[] Process.GetProcesses(string machineName); machineNameを指定して、実行中の全ての Process配列を取得
+ *         Process[] Process.GetProcessesByName(               processName, machineNameを指定して共有するリモートPCで実行中の全ての Process配列を取得
+ *                     string processName, [string machineName])  
+ *         void      Process.EnterDebugMode();                    デバッグモードを ONにする
+ *         void      Process.LeaveDebugMode();                    デバッグモードを OFFにする
+ *         bool      process.Start();                             プロセスを Start / 
+ *                                                                true:  新しいプロセスリソースを起動, 
+ *                                                                false: 既存のプロセスリソースを利用した際など、新しいプロセスが起動しなかった
+ *         Process   Process.Start(
+ *                     string fileName, [string arguments]);      アプリケーションファイル名「.exe」「.dll」 / URL ,引数をしてプロセスを Start
+ *         Process   Process.Start(ProcessStartInfo startInfo);   ProcessStartInfoを渡してプロセス Start
+ *         void      process.Kill();                              プロセスを即時中断
+ *         void      process.Refresh();                           キャッシュを破棄
+ *         void      process.Close();                             プロセスのすべてのリソースを解放
+ *         bool      process.CloseMainWindow();                   UIのメインウィンドゥにCloseメッセージを送信して、プロセスを終了
+ *                                                                true: 正常に送信完了
+ *                                                                false: ウィンドゥが存在しない, Modal Dialogなどでウィンドゥを利用できない
+ *         bool      process.WaitForExit([int milliseconds]);     プロセス終了までの待機時間 ミリ秒 / 0: 即時終了 / -1 or 無指定: 無限待機
+ *         bool      process.WaitForInputIdle([int milliseconds]);プロセスがアイドル状態になるまでの待機時間 ミリ秒 / 0: 即時終了 / -1 or 無指定: 無限待機
+ *         
+ *         ＊Event
+ *         bool      process.HasExited { get; }                プロセスが終了しているか
+ *         bool      process.EnableRaisingEvents { get; set; } Exitedイベントを発生させるか
+ *         void      process.OnExited();                       Exitedイベントを発生させる
+ *         EventHandler process.Exited;                        プロセス終了時のイベント
+ *         
+ *@ubject ◆ProcessStartInfo
+ *        ProcessStartInfo    new ProcessStartInfo();
+ *        ProcessStartInfo(string fileName);
+ *        ProcessStartInfo(string fileName, string arguments);
+ *        
+ *        string       processStartInfo.FileName { get; set; }            アプリケーションファイル名「.exe」「.dll」
+ *        string       processStartInfo.Arguments { get; set; }           アプリケーションに渡す引数
+ *        string       processStartInfo.UserName { get; set; }            ユーザー名
+ *        string       processStartInfo.Domain { get; set; }              ユーザードメイン名
+ *        string       processStartInfo.PasswordInClearText { get; set; } プロセス開始時のパスワードを取得/設定
+ *        SecureString processStartInfo.Password { get; set; }            ユーザーパスワードを格納するセキュリティ文字列
+ *        IDictionary<string, string>  processStartInfo.Environment { get; }  環境変数の key, valueの Dictionary
+ *        StringDictionary EnvironmentVariables { get; }                      環境変数の key, valueの Dictionary
+ *        
+ *@subject Process.Start()の利用例
+ *         Process.Start("cmd");          コマンドプロンプトを起動 「C:\WINDOWS\system32\cmd.exe」
+ *         Process.Start("notepad.exe");  メモ帳を起動            「C:\WINDOWS\system32\notepad.exe」
+ *         Process.Start(@"C:\Program Files (x86)\sakura\sakura.exe");
+ *                    「C:\Windows\System32\」外？は 絶対パスを付加して「.exe」を起動？
+ *                    
+ *         foreach (Process process in Process.GetProcesses())  すべてのProcessを取得
+ *         foreach (Process process in processAry)              Process[] processAryに登録した 各Processを取得
+ *                  
