@@ -163,7 +163,7 @@
  *@see ImageWinApiWindowText.jpg
  *@see 
  *@author shika
- *@date 2022-08-14
+ *@date 2022-08-14, 08-15
  */
 using System;
 using System.Diagnostics;
