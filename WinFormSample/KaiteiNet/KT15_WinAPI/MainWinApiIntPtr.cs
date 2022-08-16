@@ -142,11 +142,16 @@
  *        IDictionary<string, string>  processStartInfo.Environment { get; }  環境変数の key, valueの Dictionary
  *        StringDictionary EnvironmentVariables { get; }                      環境変数の key, valueの Dictionary
  *        
+ /* 
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT06_Control
+ *@class MainLinkLabelSample.cs
  *@subject Process.Start()の利用例
  *         Process.Start("cmd");          コマンドプロンプトを起動 「C:\WINDOWS\system32\cmd.exe」
  *         Process.Start("notepad.exe");  メモ帳を起動            「C:\WINDOWS\system32\notepad.exe」
  *         Process.Start(@"C:\Program Files (x86)\sakura\sakura.exe");
- *                    「C:\Windows\System32\」外？は 絶対パスを付加して「.exe」を起動？
+ *                    ・「C:\Windows\System32\」外？は 絶対パスを付加して「.exe」を起動？
+ *                    ・環境変数 PATH を検索して実行される
+ *                    ・見つからない場合は Exception 例外
  *         Process.Start("http:// ... ")  引数に URLを指定すると Web接続
  *         
  *         foreach (Process process in Process.GetProcesses())  すべてのProcessを取得
@@ -163,6 +168,7 @@
  *        
  *@see ImageWinApiWindowText.jpg
  *@see KT06_Control\MainLinkLabelSample.cs
+ *@copyTo ~/WinFormSample/ProcessReference.txt
  *@author shika
  *@date 2022-08-14, 08-15
  */
