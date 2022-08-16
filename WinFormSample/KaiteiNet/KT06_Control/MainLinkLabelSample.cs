@@ -33,7 +33,10 @@
  *@subject ◆Process -- System.Diagnostics
  *         ・Windows「ファイル名を指定して実行」([Windows] + [R]) を起動し実行
  *         ・「.exe」ファイルを指定するとアプリケーションを実行
+ *         ・環境変数 PATH を検索して実行される
+ *         ・見つからない場合は Exception 例外
  *         ・URLを指定すると Web接続
+ *         
  *         
  *         Process Process.Start(string filename)
  *         Process Process.Start(ProcessStartInfo)
@@ -42,7 +45,10 @@
  *         void    process.Close()  
  *                //関連リソースを閉じる。 try-finallyで利用すべき
  *         
+ *         =>〔~/WinFormSample/ProcessReference.txt〕
+ *         
  *@see FormLinkLabelSample.jpg
+ *@copyTo ~/WinFormSample/ProcessReference.txt
  *@author shika
  *@date 2022-07-05
  */
