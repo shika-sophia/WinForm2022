@@ -147,7 +147,8 @@
  *         Process.Start("notepad.exe");  メモ帳を起動            「C:\WINDOWS\system32\notepad.exe」
  *         Process.Start(@"C:\Program Files (x86)\sakura\sakura.exe");
  *                    「C:\Windows\System32\」外？は 絶対パスを付加して「.exe」を起動？
- *                    
+ *         Process.Start("http:// ... ")  引数に URLを指定すると Web接続
+ *         
  *         foreach (Process process in Process.GetProcesses())  すべてのProcessを取得
  *         foreach (Process process in processAry)              Process[] processAryに登録した 各Processを取得
  *                  
@@ -161,7 +162,7 @@
  *        (KaiteiNetには、Windows APIのテキストがある)
  *        
  *@see ImageWinApiWindowText.jpg
- *@see 
+ *@see KT06_Control\MainLinkLabelSample.cs
  *@author shika
  *@date 2022-08-14, 08-15
  */
@@ -173,7 +174,7 @@ using System.Windows.Forms;
 
 namespace WinFormGUI.WinFormSample.KaiteiNet.KT15_WinAPI
 {
-    class MainWinApiWindowText
+    class MainWinApiIntPtr
     {      
         //[STAThread]
         //static void Main()
