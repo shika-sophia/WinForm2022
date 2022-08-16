@@ -88,7 +88,9 @@
  *         Process.Start("notepad.exe");  メモ帳を起動            「C:\WINDOWS\system32\notepad.exe」
  *         Process.Start(@"C:\Program Files (x86)\sakura\sakura.exe");
  *                    「C:\Windows\System32\」外？は 絶対パスを付加して「.exe」を起動？
+ *         Process.Start("http:// ... ")  引数に URLを指定すると Web接続 
  *                    
  *         foreach (Process process in Process.GetProcesses())  すべてのProcessを取得
  *         foreach (Process process in processAry)              Process[] processAryに登録した 各Processを取得
- *                  
+ */
+ 
