@@ -1,0 +1,404 @@
+/**
+ *@title WinFormGUI / WinFormSample / ToolStripReference.txt
+ *@copyFrom KaiteiNet / KT12_MenuToolStrip / MainMenuStripSample.cs
+ *@copyFrom KaiteiNet / KT12_MenuToolStrip / MainContextMenuStripSample.cs
+ *@copyFrom KaiteiNet / KT12_MenuToolStrip / MainStatusStripSample.cs
+ *@copyFrom KaiteiNet / KT12_MenuToolStrip / MainToolStripSample.cs
+ *@author shika
+ *@date 2022-08-17
+ */
+ /** 
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT12_MenuToolStrip
+ *@class MainMenuStripSample.cs
+ *@subject Inherit 継承関係
+ *    Control : Component, IDropTarget, ISynchronizeInvoke, IWin32Window, IArrangedElement, IComponent, IDisposable, IBindableComponent
+ *      └ ScrollableControl : Control, IArrangedElement, IComponent, IDisposable
+ *           └ ToolStrip                     =>〔MainToolStripSample.cs〕
+ *           |   └ MenuStrip                 =>〔this〕
+ *           |   └ ToolStripDropDown
+ *           |   |   └ ToolStripDropDownMenu
+ *           |   |       └ ContextMenuStrip  =>〔MainContextMenuStripSample.cs〕
+ *           |   └ StatusStrip               =>〔MainStatusStripSample.cs〕
+ *           |   └ ToolStripSeparator
+ *           |
+ *           └ ContainerControl
+ *               └ ToolStripContainer        =>〔ReverseRefernce/RR05_MenuToolStrip/MainToolStripContainerSample.cs〕
+ *               
+ *    Component : MarshalByRefObject, IComponent, IDisposable
+ *           └ ToolStripItem
+ *              └ ToolStripItemDropDown
+ *              |   └ ToolStripMenuItem
+ *              |   └ ToolStripDropDownButton =>〔MainStatusStripSample.cs〕
+ *              |   └ ToolStripSplitButton    =>〔MainStatusStripSample.cs〕
+ *              |
+ *              └ ToolStripButton
+ *              |
+ *              └ ToolStripLabel
+ *              |   └ ToolStripStatusLabel    =>〔MainStatusStripSample.cs〕
+ *              |
+ *              └ ToolStripControlHost
+ *                  └ ToolStripProgressBar    =>〔MainStatusStripSample.cs〕
+ *                  └ ToolStripTextBox
+ *                  └ ToolStripComboBox
+ */
+/*
+ *@subject ◆ToolStrip : ScrollableControl, IArrangedElement, IComponent, IDisposable
+ *         ToolStrip   new ToolStrip();
+ *         ToolStrip   new ToolStrip(params ToolStripItem[] items);
+ *         
+ *         ImageList                  control.ImageList
+ *         Size                       toolStrip.ImageScalingSize  イメージサイズ px単位 /デフォルト値 16×16
+ *         ToolStripItemCollection    toolStrip.Items
+ *         ToolStripItemCollection    toolStrip.DisplayedItems  現在表示されている項目のコレクション
+ *                                      :  Add(), AddRange() 他 IList, ICollection系 メソッド
+ *         
+ *         ToolStripGripStyle      toolStrip.GripStyle
+ *           └ enum ToolStripGripStyle
+ *             {
+ *                 Hidden = 0,  //移動ハンドル (グリップ) を表示しない
+ *                 Visible = 1  //移動ハンドル (グリップ) を表示する / デフォルト値
+ *             }
+ *             
+ *         ToolStripGripDisplayStyle toolStrip.GripDisplayStyle 移動ハンドル(グリップ)の方向 / getのみ
+ *           └ enum ToolStripGripDisplayStyle
+ *             {
+ *                 Horizontal = 0,
+ *                 Vertical = 1
+ *             }
+ *             
+ *         ToolStripLayoutStyle    toolStrip.LayoutStyle  
+ *           └ enum ToolStripLayoutStyle
+ *             {
+ *                 StackWithOverflow = 0,           //自動的にレイアウト
+ *                 HorizontalStackWithOverflow = 1, //水平方向にレイアウトし、必要に応じてオーバーフロー(=折り返し)
+ *                 VerticalStackWithOverflow = 2,   //垂直方向にレイアウトし、コントロール内で中央揃えで表示し、必要に応じてオーバーフロー
+ *                 Flow = 3,                        //必要に応じて水平方向または垂直方向にフロー
+ *                 Table = 4                        //項目を左寄せでレイアウト
+ *             }
+ *             
+ *         ToolStripTextDirection  toolStrip.TextDirection  テキストの向き
+ *           └ enum ToolStripTextDirection
+ *             {
+ *                 Inherit = 0,     //親コントロールから継承
+ *                 Horizontal = 1,  //水平方向
+ *                 Vertical90 = 2,  //テキストを 90 度回転
+ *                 Vertical270 = 3  //テキストを 270 度回転
+ *             }
+ *             
+ *         ToolStripDropDownDirection toolStrip.DefaultDropDownDirection
+ *           └ enum ToolStripDropDownDirection
+ *             {
+ *                 AboveLeft = 0,  // マウスの位置を使用して、親コントロールの左上
+ *                 AboveRight = 1, // マウスの位置を使用して、親コントロールの右上
+ *                 BelowLeft = 2,  // マウスの位置を使用して、親コントロールの左下
+ *                 BelowRight = 3, // マウスの位置を使用して、親コントロールの右下
+ *                 Left = 4,       //親コントロールの左側
+ *                 Right = 5,      //親コントロールの右側
+ *                 Default = 7     //RightToLeft の設定に応じて、Left | Right
+ *             }
+ *             
+ *         ＊Event
+ *         ToolStripItemClickedEventHandler
+ *                       toolStrip.ItemClicked   ToolStripクラスのクリック時イベント
+ *                                               (全項目を一括で１つのイベントハンドラーで処理できる)
+ *         ToolStripItemClickedEventArgs e
+ *         ToolStripItem     e.ClickedItem
+ *         
+ *@subject ◆MenuStrip : ToolStrip
+ *         MenuStrip   new MenuStrip()
+ *         (主なメンバーは ToolStripで定義済)
+ *         
+ *@subject ◆ToolStripItem : Component, IDropTarget, IArrangedElement, IComponent, IDisposable
+ *         ToolStripItem   new ToolStripItem();
+ *         ToolStripItem   new ToolStripItem(string text, Image image, EventHandler onClick);
+ *         
+ *         bool      toolStrip.Enabled    グレーで表示。選択はできない。
+ *         string    toolStripItem.Text
+ *         Image     toolStripItem.Image       アイコン
+ *         ImageList control.ImageList
+ *         int       toolStripItem.ImageIndex  ImageList.Images[i]のindex
+ *         string    toolStripItem.ImageKey
+ *         
+ *         ToolStripItem toolStripItem.OwnerItem
+ *         ToolStrip     toolStripItem.Owner     = ToolStrip toolStripItem.Parent
+ *         
+ *         ToolStripItemAlignment  toolStripItem.Alignment
+ *           └ enum ToolStripItemAlignment
+ *           {
+ *               Left = 0,
+ *               Right = 1,
+ *           }
+ *           
+ *         TextImageRelation toolStripItem.TextImageRelation
+ *           └ enum TextImageRelation
+ *             {
+ *                  Overlay = 0,        //イメージとテキストがコントロール上で同じスペースを共有
+ *                  ImageAboveText = 1, //イメージがコントロールのテキストの上部に表示
+ *                  TextAboveImage = 2, //テキストがコントロールのイメージの上部に表示
+ *                  ImageBeforeText = 4,//イメージがコントロールのテキストの左側に表示
+ *                  TextBeforeImage = 8 //テキストがコントロールのイメージの左側に表示
+ *              }
+ *              
+ *         ToolStripItemPlacement Placement
+ *           └ enum ToolStripItemPlacement
+ *             {
+ *                 Main = 0,      //メインToolStrip 上にレイアウト
+ *                 Overflow = 1,  //オーバーフローToolStrip にレイアウト
+ *                 None = 2       //画面上にレイアウトしない
+ *             }
+ *             
+ *         ToolStripTextDirection TextDirection
+ *           └〔上記 ToolStrip〕
+ *             
+ *         ＊Event
+ *         EventHandler  toolStripItem.Click     ToolStripItemクラスのクリック時イベント
+ *                                               (項目ごとにイベントハンドラーを追加する必要がある)
+ *         ToolStripItem     (ToolStripItem) sender
+ *         
+ *@subject ◆ToolStripDropDownItem : ToolStripItem
+ *         ToolStripDropDownItem  new ToolStripDropDownItem()
+ *         ToolStripDropDownItem  new ToolStripDropDownItem(string text, Image, EventHandler onClick);
+ *         ToolStripDropDownItem  new ToolStripDropDownItem(string text, Image, params ToolStripItem[]);
+ *         
+ *         ToolStripItemCollection toolStripDropDownItem.DropDownItems
+ *                                    :  Add(), AddRange(), 他 IList, ICollection系 メソッド
+ *                                    
+ *         ToolStripDropDownDirection  toolStripDropDownItem.DropDownDirection
+ *           └〔上記 ToolStrip〕
+ *         
+ *         void   toolStripDropDownItem.HideDropDown();
+ *         void   toolStripDropDownItem.ShowDropDown();
+ *         
+ *         EventHandler toolStripDropDownItem.DropDownOpening;
+ *         EventHandler toolStripDropDownItem.DropDownOpened;
+ *         EventHandler toolStripDropDownItem.DropDownClosed;
+ *         
+ *@subject ◆ToolStripMenuItem : ToolStripDropDownItem
+ *         ToolStripMenuItem   new ToolStripMenuItem()
+ *         ToolStripMenuItem   new ToolStripMenuItem(string text);
+ *         ToolStripMenuItem   new ToolStripMenuItem(Image image);
+ *         ToolStripMenuItem   new ToolStripMenuItem(string text, Image, EventHandler onClick);
+ *         ToolStripMenuItem   new ToolStripMenuItem(
+ *                                   string text,
+ *                                   Image image,
+ *                                   EventHandler onClick,
+ *                                   Keys shortcutKeys);
+ *           
+ *         bool   toolStripMenuItem.ShowShortcutKeys
+ *         Keys   toolStripMenuItem.ShortcutKeys
+ *           └ enum Keys { }   〔文末〕           
+ *         string toolStripMenuItem.ShortcutKeyDisplayString
+ *         
+ *         bool   toolStripMenuItem.CheckOnClick    クリックでチェックできるか / デフォルト false
+ *         bool   toolStripMenuItem.Checked         チェックされているか。中間は true / デフォルト false
+ *         CheckState toolStripMenuItem.CheckState  既定値は、Unchecked
+ *           └ enum CheckState
+ *             {
+ *                 Unchecked = 0,
+ *                 Checked = 1,
+ *                 Indeterminate = 2  不確定状態 (= 中間状態)  Checked -> true
+ *             }
+ *         
+ *         EventHandler   toolStripMenuItem.CheckedChanged
+ *         =>〔~/WinFormSample/ReverseReference/RR05_MenuToolStrip/MainMenuStripCheck.cs〕
+ *         
+ *@subject ToolStripSeparator : ToolStripItem
+ *         ToolStripSeparator   new ToolStripSeparator()
+ *
+ *@subject Shotcut Key
+ *         ・Textに「&A」-> 表示「A」-> Shortcut Keyを登録
+ *         ・親ToolStripMenuItemは 「&F」-> 表示「F」 -> [Alt] + [F]で機能する
+ *         ・子ToolStripMenuItemは 「&A」-> 表示「A」と
+ *           Keys   menuItem.ShortcutKeys  メニュー項目の後ろに表示。Shortcut Keyを登録。
+ *           
+ *@NOTE 親ToolStripMenuItemに Keysを利用すると例外発生
+ *      System.ComponentModel.InvalidEnumArgumentException:
+ *      引数値 'value' は列挙型 'Keys' に対して無効です。
+ *      パラメーター名: value
+ *      場所 System.Windows.Forms.ToolStripMenuItem.set_ShortcutKeys(Keys value)
+ *      
+ *      => menuFile.ShortcutKeys = Keys.F; を削除すると解決
+ *               
+ *@subject Deployment 配置
+ *        (MainStrip Form.MainStripMenu  記述しなくても機能する)
+ *         Control.ControlCollection
+ *                   Form.Controls.Add(mainStrip)
+ *           └ MainStrip
+ *               └ mainStrip.Items.Add()                     親ToolStripMenuItem
+ *                   └ toolStripMenuItem.DropDownItems.Add() 子ToolStripMenuItem
+ */
+ /*
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT12_MenuToolStrip
+ *@class MainContextMenuStripSample.cs
+ *
+ *@subject ◆ToolStrip =>〔MainMenuStripSample.cs〕
+ *               ↑
+ *@subject ◆ToolStripDropDown : ToolStrip
+ *         ToolStripDropDown    new ToolStripDropDown()
+ *         (主なメンバーは ToolStripで定義済)
+ *         
+ *         CancelEventHandler toolStripDropDown.Opening;
+ *         EventHandler       toolStripDropDown.Opened;
+ *         EventHandler       toolStripDropDown.Enter;
+ *         EventHandler       toolStripDropDown.Leave;
+ *         ToolStripDropDownClosingEventHandler 
+ *                            toolStripDropDown.Closing;
+ *         ToolStripDropDownClosedEventHandler 
+ *                            toolStripDropDown.Closed;      
+ *               ↑
+ *@subject ◆ToolStripDropDownMenu : ToolStripDropDown
+ *          ToolStripDropDownMenu   new ToolStripDropDownMenu();
+ *          
+ *          ToolStripLayoutStyle    toolStripDropDownMenu.LayoutStyle
+ *            └ enum ToolStripLayoutStyle { } =>〔MainMenuStripSample.cs〕
+ *               ↑
+ *@subject ◆ContextMenuStrip : ToolStripDropDownMenu
+ *         ContextMenuStrip   new ContextMenuStrip();
+ *         ContextMenuStrip   new ContextMenuStrip(IContainer);
+ *         
+ *         Control      contextMenuStrip.SourceControl
+ *
+ *@subject Deployment 配置
+ *         ContextMenuStrip  control.ContextMenuStrip
+ *        〔 form.Controls.Add() は必要ない 〕
+ */
+ /* 
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT12_MenuToolStrip
+ *@class MainStatusStripSample.cs
+ *@subject ◆StatusStrip : ToolStrip
+ *         StatusStrip();
+ *         ToolStripItemCollection    toolStrip.Items
+ *                                      :  Add(), AddRange() 他 IList, ICollection系 メソッド
+ *
+ *@subject ◆ToolStripLabel : ToolStripItem
+ *         ToolStripLabel   new ToolStripLabel()
+ *         ToolStripLabel   new ToolStripLabel(string text);
+ *         ToolStripLabel   new ToolStripLabel(Image image);
+ *         ToolStripLabel   new ToolStripLabel(string text, Image);
+ *         ToolStripLabel   new ToolStripLabel(string text, Image, bool isLink);
+ *         ToolStripLabel   new ToolStripLabel(string text, Image, bool isLink, EventHandler onClick);
+ *         
+ *         LinkBehavior     toolStripLabel.LinkBehavior
+ *           └ enum LinkBehavior
+ *             {
+ *                 SystemDefault = 0,  //コントロールパネル[インターネット オプション] で設定
+ *                 AlwaysUnderline = 1,//リンクは常に下線付きテキストで表示
+ *                 HoverUnderline = 2, //マウスポイント時だけ、リンクが下線付きテキストで表示
+ *                 NeverUnderline = 3　//リンクに下線なし。LinkColorで識別可
+ *             }
+ *         (他 LinkLabel系 メンバー)
+ *         
+ *@subject ◆ToolStripStatusLabel : ToolStripLabel
+ *         ToolStripStatusLabel   new ToolStripStatusLabel()
+ *         ToolStripStatusLabel   new ToolStripStatusLabel(string text);
+ *         ToolStripStatusLabel   new ToolStripStatusLabel(Image image);
+ *         ToolStripStatusLabel   new ToolStripStatusLabel(string text, Image image);
+ *         ToolStripStatusLabel   new ToolStripStatusLabel(string text, Image, EventHandler onClick);
+ *         
+ *         bool toolStripStatusLabel.Spring   自動的に利用できる領域いっぱいに表示するか / デフォルト false
+ *         ToolStripItemAlignment toolStripItem.Alignment
+ *           └ enum ToolStripItemAlignment { Left = 0, Right = 1 }  〔ToolStripItem〕
+ *           
+ *         Border3DStyle          toolStripStatusLabel.BorderStyle
+ *           └ enum  Border3DStyle
+ *             {
+ *                 RaisedOuter = 1, //外縁だけ凸表示、内縁は非表示
+ *                 SunkenOuter = 2, //外縁だけ凹表示、内縁は非表示
+ *                 RaisedInner = 4, //内縁だけが凸表示され、外縁は非表示
+ *                 Raised = 5,      //内縁と外縁が、凸表示
+ *                 Etched = 6,      //内縁と外縁が、凹表示
+ *                 SunkenInner = 8, //凹表示され、外縁は非表示
+ *                 Bump = 9,        //内縁と外縁が、凸表示
+ *                 Sunken = 10,     //内縁と外縁が凹表示
+ *                 Adjust = 8192,   //境界線が指定した四角形の外側に描画され、四角形の大きさは保持
+ *                 Flat = 16394     //平面表示
+ *             }
+ *             
+ *         ToolStripStatusLabelBorderSides 
+ *           |                    toolStripStatusLabel.BorderSides
+ *           └ enum ToolStripStatusLabelBorderSides
+ *             {
+ *                 None = 0,  //境界線なし
+ *                 Left = 1,  //左側にのみ境界線
+ *                 Top = 2,   //上側にのみ境界線
+ *                 Right = 4, //右側にのみ境界線
+ *                 Bottom = 8,//下側にのみ境界線
+ *                 All = 15   //すべての側に境界線
+ *             }
+ *
+ *@subject ◆ToolStripControlHost : ToolStripItem
+ *         ToolStripControlHost    new ToolStripControlHost(Control c);
+ *         ToolStripControlHost    new ToolStripControlHost(Control c, string name)
+ *         
+ *         Control  toolStripControlHost.Control    コントロールを親に持ち、
+ *                                                  ToolStripItemのメンバーを付与
+ *                                                  
+ *@subject ◆ToolStripProgressBar : ToolStripControlHost
+ *         ToolStripProgressBar    new ToolStripProgressBar();
+ *         ToolStripProgressBar    new ToolStripProgressBar(string name);
+ *         (ProgressBar系 メンバー)
+ *         
+ *@subject ToolStripDropDownButton : ToolStripDropDownItem
+ *         (SelectBox系？)
+ *
+ *@subject ToolStripSplitButton : ToolStripDropDownItem
+ *         EventHandler toolStripSplitButton.ButtonClick
+ *         (通常ボタンと UpDownボタンの融合？)
+ *
+ *@subject Deplyment 配置
+ *         Form.Controls.Add(Control)
+ *           └ StatusStrip
+ *               └ status.Items.Add(ToolStripItem)
+ *                   └ ToolStripStatusLabel
+ *                   └ ToolStripProgressBar
+ *                   └ ToolStripDropDownButton
+ *                   └ ToolStripSplitButton
+ */
+ /* 
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT12_MenuToolStrip
+ *@class MainToolStripSample.cs
+ *@class FormToolStripSample.cs
+ *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
+ *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
+ *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
+ *@reference KT ナガノ  『Windows Form C#』KaiteiNet, 2018
+ *           http://kaitei.net/csforms/menu-strips/
+ *           =>〔~/Reference/Article_KaiteiNet/WinForm12_MenuToolStrip.txt〕
+ *           
+ *@content KT12 MenuToolStrip / ToolStrip
+ *         MenuOld / ToolBarのこと。
+ *         基底クラスの ToolStripと ToolBarとしての役割が同クラスなのは
+ *         混同しやすく解りずらい
+ *         
+ *@subject ◆ToolStrip : ScrollableControl, IArrangedElement, IComponent, IDisposable
+ *         =>〔MainMenuStripSample.cs〕
+ *         
+ *         ToolStripItemClickedEventHandler
+ *                       toolStrip.ItemClicked   ToolStripクラスのクリック時イベント
+ *                                               (全項目を一括で１つのイベントハンドラーで処理できる)
+ *         ToolStripItemClickedEventArgs e
+ *         ToolStripItem     e.ClickedItem
+ *         
+ *         EventHandler  toolStripItem.Click     ToolStripItemクラスのクリック時イベント
+ *                                               (項目ごとにイベントハンドラーを追加する必要がある)
+ *         ToolStripItem     (ToolStripItem) sender
+ *
+ *@subject ToolStripButton : ToolStripItem
+ *         string   toolStripButton.Text        テキスト
+ *         string   toolStripButton.ToolTipText ツールチップ
+ *         int      toolStripButton.ImageIndex  イメージのインデックス
+ *
+ *@subject Deployment 配置
+ *         Form / Panel
+ *           └ control.Controls.Add(Control)
+ *               └ ToolStrip
+ *                  └ toolStrip.Items.Add(ToolStripItem)
+ *                      └ ToolStripLabel 
+ *                      └ ToolStripButton 
+ *                      └ ToolStripDropDownButton
+ *                      └ ToolStripSplitButton
+ *                      └ ToolStripTextBox
+ *                      └ ToolStripComboBox
+ *                      └ ToolStripProgressBar
+ *                      └ ToolStripSeparator
+ */
