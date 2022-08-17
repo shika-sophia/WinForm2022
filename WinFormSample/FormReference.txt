@@ -2,7 +2,8 @@
  *@title WinFormGUI / WinFormSample / FormReference.txt
  *@copyFrom KT02_MessageBox / MessageBoxSample.cs
  *@copyFrom KT09_CustomDialog / MainModalDialogSample.cs
- *@date 2022-08-01
+ *@copyTo ColorReference.txt
+ *@date 2022-08-17
  */
 /*
  *@subject ◆Formクラス : ContainerControl -- System.Windows.Forms
@@ -124,24 +125,26 @@
  *         
  *         ＊アクセス修飾子
  *         ??     control.Modifier //private : (デフォルト値) 他Formから参照できない
- *                                   //internal: 同一アセンブリ内からの参照可
+ *                                 //internal: 同一アセンブリ内からの参照可
  *                                   
  *         ＊他Formの値参照
- *         form.(コントロール).(プロパティ)
- *         
+ *         form.(コントロール).(プロパティ)         
+ *                 
  *         ＊色指定
  *         Color control.ForeColor 文字色
  *         Color control.BackColor 背景色
- *                 Color.Xxxx        色指定 struct
- *                 Color.Transparent 透過色 (=透明として扱う色)
- *                 Color.FormArgb(int red, int green, int blue)
- *                 SystmColors.Color  Control | Window | Desktop
  *         Color form.TransparencyKey 透過色 (=透明として扱う色)
- *                 
+ *         Color Color.FormArgb(int red, int green, int blue)
+ *             struct Color.Xxxx        色指定 
+ *             class  SystmColors.Color  Control | Window | Desktop ...
+ *
+ *             enum KnownColor (= struct Color.Xxxx と class SystemColors を融合したような enum)
+ *             { ... }   =>〔ColorReference.txt〕
+ *
  *         ＊背景画像
  *         Image control.BackgroundImage //new Bitmap(string path) -> エラーが出る
- *                                      //bitmap.Dispose()
- *                                      //Image.FromFile(string path)
+ *                                       //bitmap.Dispose()
+ *                                       //Image.FromFile(string path)
  *         ImageLayout control.BackgroundImageLayout
  *            └ enum ImageLayout { None, Tile, Center, Stretch, Zoom }
  *
