@@ -232,6 +232,7 @@
 #endregion
 /*
  *@see FormMenuStripSample.jpg
+ *@copyTo ~ / WinFormSample / ToolStripReference.txt
  *@author shika
  *@date 2022-07-24
  */

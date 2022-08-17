@@ -46,6 +46,7 @@
  *         
  *@see FormContextMenuStripSample.jpg
  *@see MainMenuStripSample.cs
+ *@copyTo ~ / WinFormSample / ToolStripReference.txt
  *@author shika
  *@date 2022-07-25
  */

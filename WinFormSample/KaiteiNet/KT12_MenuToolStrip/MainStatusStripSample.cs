@@ -100,6 +100,7 @@
  *                   └ ToolStripSplitButton
  *           
  *@see FormStatusStripSample.jpg
+ *@copyTo ~ / WinFormSample / ToolStripReference.txt
  *@author shika
  *@date 2022-07-25
  */

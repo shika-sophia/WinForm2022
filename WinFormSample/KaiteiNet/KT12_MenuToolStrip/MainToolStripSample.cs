@@ -48,6 +48,7 @@
  *         
  *@see FormToolStripSample.jpg
  *@see KT11_MenuOld / MainToolBarSample.cs
+ *@copyTo ~/ WinFormSample / ToolStripReference.txt
  *@author shika
  *@date 2022-07-26
  */
