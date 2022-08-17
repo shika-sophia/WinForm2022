@@ -4,6 +4,7 @@
  *@copyFrom KaiteiNet / KT12_MenuToolStrip / MainContextMenuStripSample.cs
  *@copyFrom KaiteiNet / KT12_MenuToolStrip / MainStatusStripSample.cs
  *@copyFrom KaiteiNet / KT12_MenuToolStrip / MainToolStripSample.cs
+ *@copyFrom ReverseReference / RR05_MenuToolStrip / MainToolStripContainerSample.cs  
  *@author shika
  *@date 2022-08-17
  */
@@ -401,4 +402,47 @@
  *                      └ ToolStripComboBox
  *                      └ ToolStripProgressBar
  *                      └ ToolStripSeparator
+ */
+/** 
+ *@title WinFormGUI / WinFormSample / ReverseReference / RR05_MenuToolStrip
+ *@class MainToolStripContainerSample.cs      
+ *@content RR[88] ToolStripContainer / p167
+ *         ToolStrip, MenuStrip, StatusStripを載せて、他の位置に移動するコンテナ
+ *         toolStripItem.GripStyle = true;  Grip移動(=つかんで移動)のための十字矢印が出る。 
+ *
+ *@subject ◆ContainerControl :  ScrollableControl, IContainerControl
+ *@subject ◆ToolStripContainer : ContainerControl
+ *         ToolStripContainer    new ToolStripContainer()
+ *         
+ *         bool  toolStripContainer.TopToolStripPanelVisible    上部 Panelを表示するか / デフォルト true,
+ *         bool  toolStripContainer.BottomToolStripPanelVisible 下部 Panelを表示するか / デフォルト true,
+ *         bool  toolStripContainer.LeftToolStripPanelVisible   左端 Panelを表示するか / デフォルト true,
+ *         bool  toolStripContainer.RightToolStripPanelVisible  右端 Panelを表示するか / デフォルト true,
+ *
+ *         ToolStripContentPanel  toolStripContainer.ContentPanel    中央 Panel / getのみ
+ *                                                                   これに Add()すると Grip移動は不可
+ *         ToolStripPanel    toolStripContainer.TopToolStripPanel    getのみ / Controls.Add()は可
+ *         ToolStripPanel    toolStripContainer.BottmToolStripPanel  getのみ / Controls.Add()は可
+ *         ToolStripPanel    toolStripContainer.LeftToolStripPanel   getのみ / Controls.Add()は可
+ *         ToolStripPanel    toolStripContainer.RightToolStripPanel  getのみ / Controls.Add()は可
+ *         
+ *         ControlCollection toolStripContainer.CreateControlsInstance();  Controlsが利用不可なので ControlCollenctionの取得に利用
+ *         × ControlCollection  control.Controls          利用不可
+ *         × ContextMenuStrip   control.ContextMenuStrip  利用不可
+ *
+ *@NOTE【】ToolStripSeparator
+ *         var separator = new ToolStripSeparator();
+ *         をして、AddRange()内に separatorを載せると、
+ *         最後の区切り線しか表示されない。
+ *         
+ *         => 毎回 new ToolStripSeparator()を AddRange()内ですると解決
+ *            
+ *@subject Deployment 配置
+ *  Form / Panel
+ *   └ control.Controls.Add(Control)
+ *       └ ToolStripContainer
+ *           └ toolStripContainer.TopToolStripPanel.Controls.Add(ToolStripItem)  初期配置位置のPanel
+ *               └ ToolStrip                                  GripStyle = true; が必要
+ *                   └ toolStrip.Items.Add(ToolStripItem)    〔× ToolBarのように Buttonsではない〕
+ *                       └ ToolBarButton                      各Button
  */
