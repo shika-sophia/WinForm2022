@@ -13,7 +13,11 @@
  *          Color Color.Transparent 透過色 (=透明として扱う色)
  *          Color Color.FormArgb(int red, int green, int blue)
  *             struct Color.Xxxx        色指定 
- *             class  SystmColors.Color  Control | Window | Desktop ...
+ *             class  SystemColors.Xxxx Windows部品で使用するデフォルト色
+ *                Color  SystemColors.Control 
+ *                Color  SystemColors.Window
+ *                Color  SystemColors.Desktop
+ *                          :
  *
  *             enum KnownColor (= struct Color.Xxxx と class SystemColors を融合したような enum)
  *             {
