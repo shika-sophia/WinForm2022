@@ -50,6 +50,7 @@
  *                       └ ToolBarButton                      各Button
  *                               
  *@see FormToolStripContainerSample.jpg
+ *@copyTo WinFormGUI / WinFormSample / ToolStripReference.txt
  *@author shika
  *@date 2022-07-27
  */
