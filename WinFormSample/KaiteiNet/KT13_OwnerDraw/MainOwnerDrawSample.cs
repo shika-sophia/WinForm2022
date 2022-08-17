@@ -128,7 +128,7 @@
  *      => DrawMode.Normalなら、Fontに合わせて、ItemHeightが調整される
  *      
  *@see ImageOwnerDrawSample.jpg
- *@see 
+ *@copyTo ~/WinFormSample/ColorReference.txt
  *@author shika
  *@date 2022-08-12
  */
