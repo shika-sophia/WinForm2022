@@ -9,12 +9,14 @@
  *           http://kaitei.net/csforms/graphics/
  *           =>〔~/Reference/Article_KaiteiNet/WinForm07_Graphics.txt〕
  *           
- *@content KT07 Graphics 
+ *@content KT07 Graphics | RR[5] p31, RR[266] p616
  *@subject ◆Graphics : MarshalByRefObject, IDisposable, IDeviceContext
  *             -- System.Drawing
+ *         ・GDI+ (Graphics Device Interface): C言語?で記述されたグラフィックス機能を内部的に呼出
  *         ・描画キャンバスのような存在
  *         ・グラフィックス処理を行うためには、
  *           描画対象の Form, Controlに関連付けた Graphicsオブジェクトを取得する必要がある
+ *         ・Controlは PictureBoxなど, Bitmapクラスも可
  *         ・描画対象に結び付けられた Graphics オブジェクトは，
  *           その描画対象の Paint イベントハンドラの引数 PaintEventArgs e から取得可。
  *         ・PaintEventHandlerは control.Paint += new PaintEventHandler(...); が必要
@@ -30,6 +32,9 @@
  *         Graphics   e.Graphics
  *         
  *         Graphics   control.CreateGraphics()   // Paint イベントハンドラ以外の場所で Graphics オブジェクトを取得したい場合に利用
+ *                                               // CreateGraphics()で生成した描画は、Form/Controlが再描画される際に消えてしまう
+ *                                               // => PaintEventArgsから Graphicsオブジェクトを取得すべき
+ *                                               // => Bitmapオブジェクトに描画して保存する方法もある
  *         void       graphics.Dispose()         // CreateGraphics()で生成した Graphicsオブジェクトは 使い終わる度に 破棄する
  *         
  *         ＊直線の描画
@@ -41,11 +46,29 @@
  *         ・Pen クラスを用いて，特定の色と太さを持つ，仮想のペンを定義
  *         ・自己定義した Pen オブジェクトは，使い終る度に Dispose メソッドで破棄する
  *         
- *         Pen   　new Pen(Brush)
- *         Pen     new Pen(Bursh, float width)
  *         Pen   　new Pen(Color)
  *         Pen     new Pen(Color, float width)
+ *         Pen   　new Pen(Brush)
+ *         Pen     new Pen(Bursh, float width)
+ *         Pen     Pens.Xxxx      標準色 Xxxxを指定 Pens struct
  *         
+ *         Color      pen.Color
+ *         Brush      pen.Brush
+ *         float      pen.Width
+ *         
+ *         DashStyle  pen.DashStyle  
+ *           └ enum DashStyle  -- System.Drawing.Drawing2D.
+ *             {
+ *                Solid = 0,      //実線
+ *                Dash = 1,       //ダッシュ「―」で構成される直線
+ *                Dot = 2,        //ドット「・」で構成される直線
+ *                DashDot = 3,    //ダッシュとドットの繰り返しパターン
+ *                DashDotDot = 4, //ダッシュと 2つのドットの繰り返しパターン
+ *                Custom = 5      //ユーザー定義のカスタム ダッシュ スタイル
+ *             }
+ *         float[]    pen.DashPattern   DashStyle.Customのとき
+ *                                      破線内の代替ダッシュと空白の長さを指定する実数の配列。
+ *         float[]    pen.CompoundArray 平行線の複線。0 ～ 1 の値を昇順に並べた配列
  *         void    pen.Dispose()
  *         
  *         ＊SystemPensクラス -- Syatem.Drawing
@@ -61,6 +84,7 @@
  */
 using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
 namespace WinFormGUI.WinFormSample.KaiteiNet.KT07_Graphics
@@ -99,10 +123,19 @@ namespace WinFormGUI.WinFormSample.KaiteiNet.KT07_Graphics
         {
             base.OnPaint(e);
             Graphics g = e.Graphics;
-            Pen pen = new Pen(Color.Blue, 2);
-            g.DrawLine(pen, 20, 20, 200, 200);
+            
+            Pen pen1 = new Pen(Color.Blue, 2);
+            g.DrawLine(pen1, 20, 20, 200, 20);
+            
+            Pen pen2 = new Pen(Color.Red, 2)
+            {
+                DashStyle = DashStyle.Dot,
+            };
+            g.DrawLine(pen2, 20, 100, 200, 100);
 
-            pen.Dispose();
+            pen1.Dispose();
+            pen2.Dispose();
+            g.Dispose();
         }//OnPaint()
     }//class
 }
