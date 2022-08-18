@@ -69,7 +69,7 @@
  *                                                                true:  新しいプロセスリソースを起動, 
  *                                                                false: 既存のプロセスリソースを利用した際など、新しいプロセスが起動しなかった
  *         Process   Process.Start(
- *                     string fileName, [string arguments]);      アプリケーションファイル名「.exe」「.dll」 / URL ,引数をしてプロセスを Start
+ *                     string fileName, [string arguments]);      アプリケーションファイル名「.exe」 / URL ,引数をしてプロセスを Start
  *         Process   Process.Start(ProcessStartInfo startInfo);   ProcessStartInfoを渡してプロセス Start
  *         void      process.Kill();                              プロセスを即時中断
  *         void      process.Refresh();                           キャッシュを破棄
@@ -91,7 +91,7 @@
  *        ProcessStartInfo(string fileName);
  *        ProcessStartInfo(string fileName, string arguments);
  *        
- *        string       processStartInfo.FileName { get; set; }            アプリケーションファイル名「.exe」「.dll」
+ *        string       processStartInfo.FileName { get; set; }            アプリケーションファイル名「.exe」
  *        string       processStartInfo.Arguments { get; set; }           アプリケーションに渡す引数
  *        string       processStartInfo.UserName { get; set; }            ユーザー名
  *        string       processStartInfo.Domain { get; set; }              ユーザードメイン名
