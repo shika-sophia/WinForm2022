@@ -2,8 +2,11 @@
  *@title WinformGUI/WinFormSample/ColorReference.txt
  *@copyFrom FormReference.txt
  *@copyFrom KaiteiNet / KT13_OwnerDraw / MainOwnerDrawSample.cs 
+ *@copyFrom KaiteiNet / KT07_Graphics / MainDrawFillSample.cs
+ *@copyFrom KaiteiNet / KT07_Graphics / MainHatchBrushViewer.cs
+ *@copyFrom KaiteiNet / KT07_Graphics / MainBrushAppendix.cs
  *@author shika
- *@date 2022-08-17
+ *@date 2022-08-19
  */
 /*
  *         ＊色指定
@@ -199,10 +202,10 @@
 /*
  *@title WinFormGUI / WinFormSample / KaiteiNet / KT13_OwnerDraw
  *@class MainOwnerDrawSample.cs
- *@subject Brush ブラシ -- Syatem.Drawing
+ *@subject abstract Brush ブラシ -- Syatem.Drawing
  *         Brush    new SolidBrush(Color)    単色ブラシ
- *         Brush    Brushes.Xxxx             システム定義の標準色
- *         Brush    Brush.SystemBrushes      システムで利用されている色
+ *         Brush    Brushes.Xxxx             システム定義の標準色の SolidBrush
+ *         Brush    Brush.SystemBrushes      システムで利用されている色の SolidBrush
  *           └ class SystemBrushes / staticメンバー  { get; }
  *             Brush  SystemBrushes.GradientActiveCaption    アクティブなタイトルバーのグラデーションで最も明るい色
  *             Brush  SystemBrushes.GradientInactiveCaption  非アクティブなタイトルバーのグラデーションで最も明るい色
@@ -237,4 +240,112 @@
  *             Brush  SystemBrushes.ControlText        3D要素のテキストの色
  *             Brush  SystemBrushes.Desktop            デスクトップの色
  *             Brush  SystemBrushes.Control            3D要素の表面の色
+ */
+ /* 
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT07_Graphics
+ *@class MainDrawRectangleEllipseSample.cs
+ *@subject abstract Brush =>〔~/WinFormSample/ColorRefernce.txt〕
+ *         ＊GDI+以外のライブラリを利用する Unmangedリソース
+ *         SolidBrushクラス : Brush           単色ブラシ
+ *         HatchBrushクラス : Brush           enum HatchStyleで規定の柄で塗りつぶし
+ *         TextureBrushクラス : Brush         イメージを指定して塗りつぶし
+ *         LinierGradientBrushクラス : Brush  グラデーション
+ *           これらのBrushオブジェクトは自動破棄が行われず、アプリケーション実行の間、メモリを占有し続ける。
+ *           Brushオブジェクトを大量に利用する場合は、メモリ領域を圧迫する可能性があるので、
+ *           利用が終了するたびに Dispose()しておく
+ */
+/*
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT07_Graphics
+ *@class MainHatchBrushViewer.cs
+ *@subject ◆HatchBrush : Brush -- System.Drawing.Drawing2D.
+ *         new HatchBrush(HatchStyle, Color foreColor)
+ *         new HatchBrush(HatchStyle, Color foreColor, Color backColor)
  *         
+ *         HatchStyle   hatchBrush.HatchStyle { get; }
+ *           └ enum HatchStyle { ... }  〔下記〕
+ *         Color ForegroundColor { get; }
+ *         Color BackgroundColor { get; }
+ *
+enum HatchStyle
+{
+    Horizontal = 0,
+    Horizontal = 0,
+    Vertical = 1,
+    ForwardDiagonal = 2,
+    BackwardDiagonal = 3,
+    LargeGrid = 4,
+    LargeGrid = 4,   //Cross = 4,
+    LargeGrid = 4,
+    DiagonalCross = 5,
+    Percent05 = 6,
+    Percent10 = 7,
+    Percent20 = 8,
+    Percent25 = 9,
+    Percent30 = 10,
+    Percent40 = 11,
+    Percent50 = 12,
+    Percent60 = 13,
+    Percent70 = 14,
+    Percent75 = 15,
+    Percent80 = 16,
+    Percent90 = 17,
+    LightDownwardDiagonal = 18,
+    LightUpwardDiagonal = 19,
+    DarkDownwardDiagonal = 20,
+    DarkUpwardDiagonal = 21,
+    WideDownwardDiagonal = 22,
+    WideUpwardDiagonal = 23,
+    LightVertical = 24,
+    LightHorizontal = 25,
+    NarrowVertical = 26,
+    NarrowHorizontal = 27,
+    DarkVertical = 28,
+    DarkHorizontal = 29,
+    DashedDownwardDiagonal = 30,
+    DashedUpwardDiagonal = 31,
+    DashedHorizontal = 32,
+    DashedVertical = 33,
+    SmallConfetti = 34,
+    LargeConfetti = 35,
+    ZigZag = 36,
+    Wave = 37,
+    DiagonalBrick = 38,
+    HorizontalBrick = 39,
+    Weave = 40,
+    Plaid = 41,
+    Divot = 42,
+    DottedGrid = 43,
+    DottedDiamond = 44,
+    Shingle = 45,
+    Trellis = 46,
+    Sphere = 47,
+    SmallGrid = 48,
+    SmallCheckerBoard = 49,
+    LargeCheckerBoard = 50,
+    OutlinedDiamond = 51,
+    SolidDiamond = 52,
+}
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT07_Graphics
+ *@class MainBrushAppendix.cs
+ *@subject ◆LinearGradientBrush : Brush  -- System.Drawing.Drawing2D.
+ *         ・コンストラクタで、四角形, 開始色, 終了色, Mode, 
+ *           [角度][角度の影響を受けるか]を設定
+ *         LinearGradientBrush    new LinearGradientBrush(
+ *             PointF, PointF, Color, Color, LinearGradientMode
+ *             [, float angle, [bool isAngleScaleable]])
+ *         LinearGradientBrush    new LinearGradientBrush(
+ *             RectangleF, Color, Color, LinearGradientMode
+ *             [, float angle, [bool isAngleScaleable]])
+ *         ※ Point, Rectangleも可
+ *         
+ *         RectangleF  linearGradientBrush.Rectangle { get; }
+ *         Color[]     linearGradientBrush.LinearColors
+ *         LinearGradientMode   (None Property)
+ *           └ enum LinearGradientMode -- System.Drawing.Drawing2D.
+ *             {
+ *                 Horizontal = 0,      //左から右へのグラデーション
+ *                 Vertical = 1,        //上から下へのグラデーション
+ *                 ForwardDiagonal = 2, //左上から右下へのグラデーション
+ *                 BackwardDiagonal = 3 //右上から左下へのグラデーション
+ *             }
+ /*
