@@ -20,7 +20,7 @@
  *         void   graphics.DrawRectangles(Pen, Rectangle[]);
  *         void   graphics.DrawRectangles(Pen, RectangleF[]);
  *         
- *         ＊多角形 Polygon: 単位の点となる配列を指定
+ *         ＊多角形 Polygon: 点となる配列を指定
  *         void   graphics.DrawLines(Pen, Point[])    始点と終点は結合せず
  *         void   graphics.DrawLines(Pen, PointF[])
  *         void   graphics.DrawPolygon(Pen, Point[])  始点と終点を結合し、閉じた多角形を描画
