@@ -58,7 +58,7 @@
  *      (逆だと、輪郭線が消えて塗りつぶしだけが見える)
  *      
  *@subject abstract Brush =>〔~/WinFormSample/ColorRefernce.txt〕
- *         ＊GDI+以外のライブラリを利用する Unmangedリソース
+ *         ＊GDI+(= System.Drawing.Graphics)以外のライブラリ(=System.Drawing.Drawing2D)を利用する Unmangedリソース
  *         SolidBrushクラス : Brush           単色ブラシ
  *         HatchBrushクラス : Brush           enum HatchStyleで規定の柄で塗りつぶし
  *         TextureBrushクラス : Brush         イメージを指定して塗りつぶし
