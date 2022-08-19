@@ -13,6 +13,7 @@
  *@subject abstract Brush =>〔~/WinFormSample/ColorRefernce.txt〕
  *@subject ◆HatchBrush   => 〔MainHatchBrushViewer.cs〕
  *@subject ◆LinearGradientBrush : Brush  -- System.Drawing.Drawing2D.
+ *         ・線形グラデーション: 一定割合で、一方向へ色の濃淡を変化
  *         ・コンストラクタで、四角形, 開始色, 終了色, Mode, 
  *           [角度][角度の影響を受けるか]を設定
  *         LinearGradientBrush    new LinearGradientBrush(
