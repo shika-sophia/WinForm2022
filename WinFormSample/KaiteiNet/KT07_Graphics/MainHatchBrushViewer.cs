@@ -22,6 +22,12 @@
  *         Color ForegroundColor { get; }
  *         Color BackgroundColor { get; }
  *
+ *@subject Graphics -- System.Drawing.
+ *         void  graphics.DrawString(string, Font, Brush, PointF)
+ *         void  graphics.DrawString(
+ *                 string, Font, Brush,
+ *                 RectangleF, [StringFormat]);
+ *         
  *@see ImageHatchBrushViewer.jpg
  *@see ~/CsharpCode/ShowEnumValue.cs
  *@copyTo ~/WinFormSample/GraphicsRefernce.txt
