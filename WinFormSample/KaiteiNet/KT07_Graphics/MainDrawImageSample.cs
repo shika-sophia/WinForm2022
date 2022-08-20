@@ -14,8 +14,28 @@
  *         void   graphics.DrawImage(Image, int, int, int, int)
  *
  *@subject abstract Image : MarshalByRefObject, ISerializable, ICloneable, IDisposable
- *
- *
+ *         Image  Image.FromFile(string path)       static / ファイルからImageをロード
+ *         void   image.RotateFlip(RotateFlipType)  回転と反転のタイプを適用
+ *           └ enum RotateFlipType
+ *             {
+ *                 RotateNoneFlipNone = 0,  //回転も反転も行わない
+ *                 Rotate180FlipXY = 0,     //時計回りに 180 度回転してから、水平と垂直に反転
+ *                 Rotate90FlipNone = 1,    //反転せずに時計回りに 90 度回転
+ *                 Rotate270FlipXY = 1,     //時計回りに 270 度回転してから、水平と垂直に反転
+ *                 Rotate180FlipNone = 2,   //反転せずに時計回りに 180 度回転
+ *                 RotateNoneFlipXY = 2,    //回転せずに水平と垂直に反転
+ *                 Rotate270FlipNone = 3,  //反転せずに時計回りに 270 度回転
+ *                 Rotate90FlipXY = 3,   //時計回りに 90 度回転してから、水平方向と垂直方向に反転
+ *                 RotateNoneFlipX = 4,  //回転せずに水平方向に反転
+ *                 Rotate180FlipY = 4,   //時計回りに 180 度回転してから、垂直方向に反転
+ *                 Rotate90FlipX = 5,    //時計回りに 90 度回転してから、水平方向に反転
+ *                 Rotate270FlipY = 5,   //時計回りに 270 度回転してから、垂直方向に反転
+ *                 Rotate180FlipX = 6,   //時計回りに 180 度回転してから、水平方向に反転
+ *                 RotateNoneFlipY = 6,  //回転せずに垂直方向に反転
+ *                 Rotate270FlipX = 7,   //時計回りに 270 度回転してから、水平方向に反転
+ *                 Rotate90FlipY = 7     //時計回りに 90 度回転してから、垂直方向に反転
+ *             }
+ *             
  *@NOTE【考察】画像の反転
  *      ・KTのコード image.RotateFlip(RotateFlipType.RotateNoneFlipX)では反転しない
  *      ・RRのコード graphics.DrawImage()の 
@@ -30,7 +50,6 @@
  *        *image.RotateFlip()の解決方法を探すべき
  *         ・imageRotated.RotateFlip(RotateFlipType.RotateNoneFlipX)を
  *           DrawImage(imageRotated, ...)の後に置いても解決せず。
- *         
  *        
  *@see ImageDrawImageSample.jpg
  *@see 
