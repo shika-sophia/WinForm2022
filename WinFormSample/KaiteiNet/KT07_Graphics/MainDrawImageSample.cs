@@ -1,5 +1,5 @@
 ﻿/** 
- *@title WinFormGUI / WinFormSample / 
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT07_Graphics
  *@class MainDrawImageSample.cs
  *@class   └ new FormDrawImageSample() : Form
  *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
@@ -11,9 +11,13 @@
  *           
  *@content KT07 Graphics / DrawImageSample
  *@subject Graphics
- *         void   graphics.DrawImage(Image, int, int, int, int)
+ *         void   graphics.DrawImage(Image, int x, int y, int width, int height)
+ *         void   graphics.DrawImage(Image, float x, float y, float width, float height)
  *
  *@subject abstract Image : MarshalByRefObject, ISerializable, ICloneable, IDisposable
+ *         ・抽象クラス Image: new Image()は不可
+ *         ・インスタンスは Bitmapオブジェクトを生成している〔KT07〕
+ *         
  *         Image  Image.FromFile(string path)       static / ファイルからImageをロード
  *         void   image.RotateFlip(RotateFlipType)  回転と反転のタイプを適用
  *           └ enum RotateFlipType
@@ -41,7 +45,7 @@
  *      ・RRのコード graphics.DrawImage()の 
  *        * 反転したい Width/Heightを マイナスにして反転する方法
  *        * -Widthにすると、DrawImageの開始点より左に描画され反転するので
- *          開始点を ImageWidth分 右にずらして置く必要がある。
+ *          開始点を image.Width分 右にずらして置く必要がある。
  *          
  *        * マイナスにする方法で意図どうりの結果となるが、
  *          ２箇所(開始点と画像サイズ)を変更する必要があり、
