@@ -11,7 +11,7 @@
  *         ・ContextMenuStrip, ToolTipも載せられる
  *         ・ToolStrip系ではないが、類似コントロールとして収録
  *
- *@subject Icon : MarshalByRefObject, ISerializable, ICloneable, IDisposable
+ *@subject ◆Icon : MarshalByRefObject, ISerializable, ICloneable, IDisposable
  *         Icon   new Icon(string fileName)
  *         Icon   new Icon(Stream stream)
  *         Icon   new Icon(string fileName, Size size)
@@ -29,6 +29,8 @@
  *         Icon   static Icon.ExtractAssociatedIcon(string filename)
  *         void   icon.Save(Stream outputStream)
  *         Bitmap icon.ToBitmap()
+ *         
+ *         => copyTo〔KT07_Graphics/MainDrawIconSample.cs〕
  *         
  *@subject ◆NotifyIcon : Component
  *         NotifyIcon    new NotifyIcon();
@@ -70,7 +72,7 @@
  *         NotifyIcon : Componentのため
  *         × form.Controls.Add(Control) 利用不可。載せる必要はない。
  *                  
- *         new Form1()も タスクバーに現在開いているファイルとしてアイコンが表示される。
+ *         new FormModalessDialogSample()も タスクバーに現在開いているファイルとしてアイコンが表示される。
  *         Formは必要ないが ContextMenuStripを利用するなら、
  *         using System.Windows.Forms; は必要になる。
  *         
