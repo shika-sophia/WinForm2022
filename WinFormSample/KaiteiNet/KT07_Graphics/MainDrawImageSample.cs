@@ -11,9 +11,23 @@
  *           
  *@content KT07 Graphics / DrawImageSample
  *@subject Graphics
+ *         void   graphics.DrawImage(Image, int x, int y)
+ *         void   graphics.DrawImage(Image, float x, float y)
  *         void   graphics.DrawImage(Image, int x, int y, int width, int height)
  *         void   graphics.DrawImage(Image, float x, float y, float width, float height)
- *
+ *         
+ *         ※ Point, PointF, Point[], PointF[], Rectangle, RectangleFを用いる オーバーロードも可
+ *         ※ enum GraphicsUnit 長さの単位を指定する引数もある
+ *            {
+ *                World = 0,   //ワールド座標系を長さの単位に指定
+ *                Display = 1, //表示デバイスの長さの単位を指定します。 通常、ビデオ ディスプレイにはピクセル、プリンターには 1/100 インチを指定します。
+ *                Pixel = 2,   //デバイス ピクセルを長さの単位
+ *                Point = 3,   //プリンターポイント (1/72 インチ) を長さの単位に指定
+ *                Inch = 4,    //インチを長さの単位に指定
+ *                Document = 5,//ドキュメント単位 (1/300 インチ) を長さの単位に指定
+ *                Millimeter = 6//ミリメートルを長さの単位に指定
+ *            }
+ *            
  *@subject abstract Image : MarshalByRefObject, ISerializable, ICloneable, IDisposable
  *         ・抽象クラス Image: new Image()は不可
  *         ・インスタンスは Bitmapオブジェクトを生成している〔KT07〕
@@ -52,9 +66,15 @@
  *          保守性,可読性に欠くので、できれば避けたいコード
  *        
  *        *image.RotateFlip()の解決方法を探すべき
- *         ・imageRotated.RotateFlip(RotateFlipType.RotateNoneFlipX)を
- *           DrawImage(imageRotated, ...)の後に置いても解決せず。
- *        
+ *          ・KT サンプルコードの (int) (image.Width * 0.8)は 関係がない。
+ *            intでも floatでも DrawImage()は機能する
+ *          ・imageRotated.RotateFlip(RotateFlipType.RotateNoneFlipX)を
+ *            DrawImage(imageRotated, ...)の後に置いても解決せず。
+ *          ・form.Refresh()を OnPaint()内に記述 
+ *            => 解決せず。画面が何度も Refresh()されチラつく
+ *          ・CommandPromptで実行 => 解決せず。([Visual C#]が原因ではない)
+ *          ・ネットには [Windows Form]に同様の不具合報告あり。原因不明
+ *          
  *@see ImageDrawImageSample.jpg
  *@see 
  *@author shika
@@ -62,15 +82,16 @@
  */
 using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
 namespace WinFormGUI.WinFormSample.KaiteiNet.KT07_Graphics
 {
     class MainDrawImageSample
     {
-        [STAThread]
-        static void Main()
-        //public void Main()
+        //[STAThread]
+        //static void Main()
+        public void Main()
         {
             Console.WriteLine("new FormDrawImageSample()");
 
@@ -99,8 +120,8 @@ namespace WinFormGUI.WinFormSample.KaiteiNet.KT07_Graphics
                 .Replace("/", "");
 
             image = imageRotated = Image.FromFile(path);
-            //imageRotated.RotateFlip(RotateFlipType.RotateNoneFlipX);
-
+            imageRotated.RotateFlip(RotateFlipType.RotateNoneFlipX);
+            
             //this.Controls.AddRange(new Control[]
             //{
 
@@ -120,7 +141,7 @@ namespace WinFormGUI.WinFormSample.KaiteiNet.KT07_Graphics
             //g.DrawImage(imageRotated, (20 + imageRotated.Width * 1.2F), 200,
             //    -imageRotated.Width * 1.2F, imageRotated.Height * 1.2F);
             g.DrawImage(imageRotated, 20, 200,
-                (int)(imageRotated.Width * 1.2), (int)(imageRotated.Height * 1.2));
+                imageRotated.Width * 1.2F, imageRotated.Height * 1.2F);
             g.DrawString($"◆{fileName} Rotated-X\n" +
                 $"{imageRotated.Width * 1.2F} × {imageRotated.Height * 1.2F}",
                 this.Font, Brushes.Blue, new Point(230, 200));
