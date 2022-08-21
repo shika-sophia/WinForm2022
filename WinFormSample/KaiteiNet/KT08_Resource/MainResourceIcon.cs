@@ -15,6 +15,7 @@
  *@subject フォームのアイコン設定
  *         Icon    form.Icon       フォームのアイコン
  *         bool    form.ShowIcon   フォームのアイコンを表示するか / デフォルト: true
+ *         => 〔KT07_Graphics/MainDrawIconSample.cs〕
  *         => 〔RR05_MenuToolStrip\MainNotifyIconSample.cs〕
  *         
  *@subject 「.exe」プロジェクト実行ファイルのアイコン設定
