@@ -1,6 +1,7 @@
 
 ■グラフィックス
 http://kaitei.net/csforms/graphics/
+
 目次
 基本図形 (1)
 基本図形 (2)
@@ -59,14 +60,16 @@ class Form1 : Form
     }
 }
 解説
-グラフィックス処理を行うためには，描画を行う対象のフォームやコントロールに関連付けられた Graphics オブジェクトを取得する必要があります。
-この Graphics オブジェクトというのは，描画キャンバスのような存在のものです。
+グラフィックス処理を行うためには，
+描画を行う対象のフォームやコントロールに関連付けられた Graphics オブジェクトを取得する必要があります。
+この Graphics オブジェクトというのは，描画キャンバスのような存在です。
 
 System.Drawing 名前空間
 Graphics クラス [MSDN]
 グラフィックスオブジェクトを表現します。
 
-描画対象に結び付けられた Graphics オブジェクトは，その描画対象の Paint イベントハンドラの，引数 PaintEventArgs e から取得することができます。
+描画対象に結び付けられた Graphics オブジェクトは，
+その描画対象の Paint イベントハンドラの，引数 PaintEventArgs e から取得することができます。
 
 System.Windows.Forms 名前空間
 PaintEventArgs クラス [MSDN]
@@ -76,8 +79,10 @@ PaintEventArgs クラス [MSDN]
 項目	説明
 Graphics Graphics	グラフィックス
 CreateGraphics メソッドによって自分で Graphics オブジェクトを生成することも可能です。
-Paint イベントハンドラ以外の場所で Graphics オブジェクトを取得したい場合には，この方法を使ってください。
-CreateGraphics メソッドによって取得した Graphics オブジェクトは，使い終る度に Dispose メソッドで破棄してください。
+Paint イベントハンドラ以外の場所で Graphics オブジェクトを取得したい場合には，
+この方法を使ってください。
+CreateGraphics メソッドによって取得した Graphics オブジェクトは，
+使い終る度に Dispose メソッドで破棄してください。
 
 System.Windows.Forms 名前空間
 Form クラス [MSDN]
@@ -89,6 +94,7 @@ Dispose メソッド
 グラフィックスオブジェクトを破棄します。
 
 void Dispose()
+
 図形を描画するには，Graphics オブジェクトのメソッドを扱います。
 
 System.Drawing 名前空間
@@ -124,6 +130,8 @@ Dispose メソッド
 ペンを破棄します。
 
 void Dispose()
+
+
 SystemPens クラスから，システム既定のペンを取得することも可能です。
 例えば，次のようなプログラムが書けます。
 
@@ -597,7 +605,8 @@ http://en.wikipedia.org/wiki/File:Tux-G2.svg
 解説
 イメージを取り扱うためのクラスに Image クラスがあります。
 ただし Image クラスは抽象クラスなので，インスタンスを生成しません。
-コード上はあたかも Image クラスのインスタンスが生成されているかのように見えますが，実際には Bitmap クラスのインスタンスが生成されています。
+コード上はあたかも Image クラスのインスタンスが生成されているかのように見えますが，
+実際には Bitmap クラスのインスタンスが生成されています。
 
 Image クラスや Bitmap クラスについては，2.6 節 を参照してください。
 
@@ -621,7 +630,8 @@ enum RotateFlipType
     RotateNoneFlipX = 4,  // 回転なし，水平方向に反転
     // その他省略
 }
-Graphics オブジェクトにおいてイメージを描画するには，DrawImage メソッドを使います。
+Graphics オブジェクトにおいてイメージを描画するには，
+DrawImage メソッドを使います。
 ここではすべてを紹介しきれませんが，多くのオーバーライドが定義されています。
 
 System.Drawing 名前空間
@@ -674,14 +684,15 @@ class Form1 : Form
         g.DrawIcon(SystemIcons.Exclamation, 20, 20);
     }
 }
-Graphics オブジェクトにおいてアイコンを描画するには，DrawIcon メソッドを使います。
+Graphics オブジェクトにおいてアイコンを描画するには，
+DrawIcon メソッドを使います。
 
 System.Drawing 名前空間
 Graphics クラス [MSDN]
 DrawIcon メソッド
 アイコンを描画します。
 
-void DrawImage(
+void DrawIcon(
     Icon icon, // アイコン
     int x,     // 始点の x 座標
     int y      // 始点の y 座標
@@ -770,7 +781,8 @@ class Dialog1 : Form
     }
 }
 解説
-ピクセルデータで表現されるイメージを扱うには，Image クラスを継承した Bitmap クラスを利用します。
+ピクセルデータで表現されるイメージを扱うには，
+Image クラスを継承した Bitmap クラスを利用します。
 名前に反して，BMP 形式以外に JPG，GIF，PNG，EXIF，TIFF 形式のイメージも取り込むことができます。
 Bitmap オブジェクトでは，1 ピクセルごとに色の情報を得ることができます。
 
