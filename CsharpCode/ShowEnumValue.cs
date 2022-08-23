@@ -21,6 +21,8 @@
  */
 using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Globalization;
 using System.Text;
 using System.Windows.Forms;
 
@@ -35,7 +37,7 @@ namespace WinFormGUI.CsharpCode
         //static void Main()
         public void Main()
         {
-            var here = new ShowEnumValue(typeof(Keys));
+            var here = new ShowEnumValue(typeof(HatchStyle));
             string content = here.BuildEnumContent(here.enumType);
             Console.WriteLine(content);
         }//Main()
