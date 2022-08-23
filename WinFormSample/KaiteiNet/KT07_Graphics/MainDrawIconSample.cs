@@ -62,15 +62,21 @@
  *             static Icon Shield { get; }       シールド アイコン
  *         }
  *         
- *@subject Reflection 〔CS93〕-- System.Reflection
+ *@subject Reflection -- System.Reflection |〔CS93〕〔DJ159〕
  *         ◆Type〔CS63〕
  *         Type    typeof(T)         typeof()演算子の引数は 既定クラスのみ
- *         Type    obj.GetType()     xxxxは インスタンス
+ *         Type    xxxx.GetType()     xxxxは インスタンス
  *         
  *         ◆PropertyInfo : MemberInfo, _PropertyInfo
- *         PropertyInfo     type.GetProperty(string?)  対象型の指定したプロパティを取得
+ *         PropertyInfo     type.GetProperty(string name, [Type returnType]);  
+ *                                                     対象型のプロパティ名, [戻り値型] を指定したプロパティを取得
  *         PropertyInfo[]   type.GetProperties()       対象型のすべてのプロパティを取得
- *         string   memberInfo.Name                    プロパティ名
+ *         
+ *         string   memberInfo.Name                    メンバー名
+ *         string   memberInfo.FullName                メンバー名を完全修飾名で取得
+ *         bool     propertyInfo.CanWrite { get; }     set可能か
+ *         Type     propertyInfo.PropertyType { get; } プロパティの型 (.NET Framework型)
+ *         
  *         object   propertyInfo.GetValue(object)      指定したオブジェクトのプロパティ値を取得
  *           └> 必要に応じてキャスト
  *           
@@ -85,7 +91,7 @@
  *         }//foreach
  *         
  *@see ImageDrawIconSample.jpg
- *@see 
+ *@copyFrom ~\CsharpCode\ShowPropertyAll.cs 
  *@author shika
  *@date 2022-08-21
  */
