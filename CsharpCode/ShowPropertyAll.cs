@@ -58,8 +58,8 @@ namespace WinFormGUI.CsharpCode
     {
         private readonly Type type;
 
-        static void Main()
-        //public void Main()
+        //static void Main()
+        public void Main()
         {
             var here = new ShowPropertyAll(typeof(SystemColors));
             here.BuildReflectionPropertyInfo(false);  
