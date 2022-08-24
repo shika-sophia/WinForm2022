@@ -23,12 +23,12 @@
  *         PixelFormat  image.PixelFormat { get; }
  *           └ enum PixelFormat { ... }   カラーのデータ形式
  *           
- *         void     image.RotateFlip(RotateFlipType) 
+ *         void     image.RotateFlip(RotateFlipType)        画像の回転、反転
+ *           └ enum RotateFlipType { ... }   =>〔MainDrawImageSample.cs〕
  *         void     image.Save(string filename, ImageFormat format);
  *         void     image.Save(Stream stream, ImageFormat format);
  *           └ class ImageFormat -- System.Drawing.Imaging.ImageFormat
  *             ImageFormat   new ImageFormat(Guid guid)
- *             
  *             Guid          ImageFormat.Guid { get; }   GUID (Grobal Unique Identifer) グローバル 一意の識別子 ??
  *               └ struct System.Guid 構造体
  *             ImageFormat   ImageFormat.MemoryBmp { get; }   メモリ上のビットマップの形式
@@ -49,7 +49,8 @@
  *         ・abstract Image クラスを継承
  *         ・BMP 形式以外に JPG，GIF，PNG，EXIF，TIFF 形式も可。
  *         ・Bitmap オブジェクトでは，1 ピクセルごとに色の情報を得ることができる。
- *
+ *         ・Bitmap オブジェクトなら，1 ピクセルごとに色を操作することができる。
+ *         
  *         Bitmap   new Bitmap(string fileName)
  *         Bitmap   new Bitmap(Stream)
  *         Bitmap   new Bitmap(Image original)
