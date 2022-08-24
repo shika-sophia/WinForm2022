@@ -6,21 +6,19 @@
  *@copyFrom KaiteiNet / KT07_Graphics / MainHatchBrushViewer.cs
  *@copyFrom KaiteiNet / KT07_Graphics / MainBrushAppendix.cs
  *@author shika
- *@date 2022-08-19
+ *@date 2022-08-24
  */
 /*
- *         ＊色指定
- *          Color control.ForeColor 文字色
- *          Color control.BackColor 背景色
- *          Color form.TransparencyKey 透過色 (=透明として扱う色)
- *          Color Color.Transparent 透過色 (=透明として扱う色)
- *          Color Color.FormArgb(int red, int green, int blue)
- *             struct Color.Xxxx        色指定 
- *             class  SystemColors.Xxxx Windows部品で使用するデフォルト色
- *                Color  SystemColors.Control 
- *                Color  SystemColors.Window
- *                Color  SystemColors.Desktop
- *                          :
+ *@subject ＊色指定
+ *          Color  control.ForeColor 文字色
+ *          Color  control.BackColor 背景色
+ *          Color  form.TransparencyKey 透過色 (=透明として扱う色)
+ *          Color  Color.Transparent 透過色 (=透明として扱う色)
+ *          Color  Color.FormArgb(int red, int green, int blue)
+ *            └ struct Color.Xxxx        色指定 
+ *            └ class  SystemColors.Xxxx Windows部品で使用するデフォルト色
+ *            └ enum   KnownColors.Xxxx  Windowsで定義されている標準色
+ *
  *@subject ◆struct System.Drawing.Color
  *         ＊All Properties
  *         Color   Color.Transparent  { get; }
