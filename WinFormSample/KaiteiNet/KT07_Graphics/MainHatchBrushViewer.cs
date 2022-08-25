@@ -23,6 +23,9 @@
  *         Color BackgroundColor { get; }
  *
  *@subject Graphics -- System.Drawing.
+ *         ・画像外なら Labelでも可
+ *         ・DrawString()は 画像内に 画像としての文字列を描画 (重ねる場合は、要 透過色)
+ *         
  *         void  graphics.DrawString(string, Font, Brush, PointF)
  *         void  graphics.DrawString(
  *                 string, Font, Brush,

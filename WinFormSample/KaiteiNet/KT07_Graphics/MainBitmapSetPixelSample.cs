@@ -18,10 +18,10 @@
  *         Bitmapを Formに描画
  *         SetPixel()を変更した場合は form.Reflesh()で再描画が必要
  *         
- *@subject Bitmap
+ *@subject Bitmap =>〔MainBitmapGetPixelSample.cs〕
  *         void    bitmap.SetPixcel(int x, int y, Color)
  *         
- *@subject Color
+ *@subject Color  =>〔~/WinFormSample/ColorReference.txt〕
  *         Color   Color.FromArgb(int red, int green, int blue)
  *
  *@NOTE【註】
@@ -31,7 +31,7 @@
  *        form.Reflesh()でキャッシュを破棄し、再描画すると Formに反映する
  *        
  *@see ImageBitmapSetPixcelSample.jpg
- *@see 
+ *@see MainBitmapGetPixelSample.cs
  *@author shika
  *@date 2022-08-24
  */

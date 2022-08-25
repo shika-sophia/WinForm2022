@@ -72,9 +72,12 @@
  *               
  *         Color    bitmap.GetPixel(int x, int y)
  *         void     bitmap.SetPixel(int x, int y, Color)
+ *         void     bitmap.MakeTransparent()       既定の透過色を透明にする
+ *         void     bitmap.MakeTransparent(Color)  透過色を指定して、その色を透明にする
  *         
  *@see ImageGetPixelSample.jpg
- *@see 
+ *@see MainBitmapSetPixelSample.cs
+ *@see MainBitmapMakeTransparentSample.cs
  *@author shika
  *@date 2022-08-22
  */
