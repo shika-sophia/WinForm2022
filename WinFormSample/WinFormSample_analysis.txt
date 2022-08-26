@@ -117,4 +117,15 @@ for(int i = 0; i <= buttonAry.Length; i++)
  *         おそらく、メニュー項目の処理が完了したときのイベントが暗黙的に設定されている可能性あり。
  *         暗黙的に、クリックした項目を trueにしているコードが存在するのは
  *         望ましいコードではない。
- */         
+ */
+ /*
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT07_Graphics
+ *@class MainTimerAnimationSample.cs
+ *@NOTE【考察】Formの Size, ClientSize
+ *      Formのサイズは、X座標, Y座標に 見えていない余分の幅が存在し、
+ *      Size = 見えている幅 + 見えていない余分の幅 
+ *      ClientSize = 見えている幅
+ *      
+ *      おそらくTitleBar, ScrollBar, StatusBarの幅が Formのサイズになっている。
+ *      可視範囲の Formの枠で座標処理する場合は ClientSizeで処理すべし
+ */
