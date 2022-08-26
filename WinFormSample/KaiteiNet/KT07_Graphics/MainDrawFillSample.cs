@@ -53,6 +53,9 @@
  *         void   graphics.FillEllipse(Brush, int x, int y, int width, int height)
  *         void   graphics.FillEllipse(Brush, float x, float y, float width, float height)
  *
+ *         ＊GraphicsPathを描画
+ *         void   graphics.DrawPath(Pen, GraphicsPath)   =>〔MainGrapicsPathSample.cs〕
+ *         
  *@NOTE【考察】DrawXxxx() と FillXxxx()の順
  *      輪郭をきれいに描画するには、Fill -> Draw の順がいい
  *      (逆だと、輪郭線が消えて塗りつぶしだけが見える)

@@ -9,13 +9,14 @@
  *           http://kaitei.net/csforms/graphics/
  *           =>〔~/Reference/Article_KaiteiNet/WinForm07_Graphics.txt〕
  *           
- *@content KT07 Graphics / Cliping (= Triming)
+ *@content KT07 Graphics / Clipping (= Trimming)
  *         指定領域のみ画像を表示する
  *
  *@subject Graphics
- *         Region      graphics.Clip { get; set;}  Graphicsオブジェクトの描画領域を設定
+ *         void        graphics.DrawPath(Pen, GraphicsPath)
+ *         Region      graphics.Clip { get; set;}           Graphicsオブジェクトの描画領域を設定
  *           └ Region      new Region(GraphicPath)
- *         RectangleF  graphics.VisibleClipBounds  Clip描画領域の外接四角形
+ *         RectangleF  graphics.VisibleClipBounds  { get; } Clip描画領域の外接四角形
  *         
  *         ＊配置
  *         void graphics.DrawImage(Image, RectangleF)
@@ -48,6 +49,8 @@
  *@subject ◆GraphicsPath : MarshalByRefObject, ICloneable, IDisposable
  *         ・System.Drawing.Drawing2D 名前空間
  *         ・接続した一連の直線と曲線を表すオブジェクト
+ *         ・輪郭に囲まれていれば 必ずRegionになる訳ではない
+ *         ・外から偶数個の輪郭を越えて到達できる箇所は，領域外という扱いになります。
  *         
  *         GraphicsPath    new GraphicsPath()
  *         GraphicsPath    new GraphicsPath(FillMode)
