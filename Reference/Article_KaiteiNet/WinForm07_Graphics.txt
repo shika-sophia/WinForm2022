@@ -1,5 +1,5 @@
 
-■グラフィックス
+■ グラフィックス
 http://kaitei.net/csforms/graphics/
 
 目次
@@ -600,7 +600,10 @@ class Form1 : Form
     }
 }
 ※ パブリックドメインのイメージを使用しています:
-http://en.wikipedia.org/wiki/File:Tux-G2.svg
+http://en.wikipedia.org/wiki/File:Tux-G2.svg (すでにファイル消去)
+http://kaitei.net/csforms/graphics/ (こちらで画像ファイルを取得可)
+=>〔~/Image/penguinTransparent.png〕
+=>〔~/Image/penguinBackcolor.png〕
 
 解説
 イメージを取り扱うためのクラスに Image クラスがあります。
@@ -970,7 +973,11 @@ class Form1 : Form
     }
 }
 ※ パブリックドメインのイメージを使用しています:
-http://en.wikipedia.org/wiki/File:Tux-G2.svg
+http://en.wikipedia.org/wiki/File:Tux-G2.svg (すでにファイル消去)
+http://kaitei.net/csforms/graphics/ (こちらで画像ファイルを取得可)
+=>〔~/Image/penguinTransparent.png〕
+=>〔~/Image/penguinBackcolor.png〕
+
 
 解説
 イメージの一部分を透過させるには 2 つの方法があります。
@@ -996,7 +1003,7 @@ MakeTransparent(
 )
 
 
-◆クリッピング
+◆クリッピング (= トリミング)
 作例：クリッピング
 自分で定義した図形によってイメージをくりぬいています。
 
@@ -1133,7 +1140,7 @@ RectangleF VisibleClipBounds	クリッピング領域に外接する長方形
 DrawImage メソッド
 イメージを描画します。
 
-void DraImage(
+void DrawImage(
     Image image,
     Rectangle rect
 )
