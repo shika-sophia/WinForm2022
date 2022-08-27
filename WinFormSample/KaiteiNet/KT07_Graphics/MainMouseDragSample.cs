@@ -10,9 +10,24 @@
  *           =>〔~/Reference/Article_KaiteiNet/WinForm07_Graphics.txt〕
  *           
  *@content KT07 Graphics / MouseDragSample
- *@subject 
+ *         マウス ドラッグによる画像の移動
+ *         ・PictureBoxに画像を載せる
+ *         ・pictureBox.MouseDown, MouseUp, MouseMoveイベントだけで
+ *           マウスドラッグを表現できる
  *
- *@see ImageMouseDragSample.jpg
+ *@subject ドラッグ移動
+ *         ・現地点からドラッグ移動分だけ PictureBoxの開始点を移動させる
+ *         ・PictureBoxの幅, 高さは考慮する必要がない
+ *           control.Top, Bottom, Left, Right で 四辺の座標を取得/設定できる
+ *           (form.AutoSize = true; になっているなら、自動でFormが拡大する)
+ *         
+ *          if (dragged)
+ *          {
+ *              pictureBox.Left += e.Location.X - dragPoint.X;
+ *              pictureBox.Top += e.Location.Y - dragPoint.Y;
+ *          }
+ *
+ *@see ImageBallGravity.jpg
  *@see 
  *@author shika
  *@date 2022-08-26
@@ -25,9 +40,9 @@ namespace WinFormGUI.WinFormSample.KaiteiNet.KT07_Graphics
 {
     class MainMouseDragSample
     {
-        [STAThread]
-        static void Main()
-        //public void Main()
+        //[STAThread]
+        //static void Main()
+        public void Main()
         {
             Console.WriteLine("new FormMouseDragSample()");
 
