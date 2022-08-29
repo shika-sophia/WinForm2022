@@ -16,7 +16,7 @@
  *         void   graphics.DrawImage(Image, int x, int y, int width, int height)
  *         void   graphics.DrawImage(Image, float x, float y, float width, float height)
  *         
- *         ※ Point, PointF, Point[], PointF[], Rectangle, RectangleFを用いる オーバーロードも可
+ *         ※ Point, PointF, Point[], PointF[], Rectangle, RectangleFを用いる オーバーロード(全29個)もある
  *         ※ enum GraphicsUnit 長さの単位を指定する引数もある
  *            {
  *                World = 0,   //ワールド座標系を長さの単位に指定

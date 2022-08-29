@@ -12,7 +12,7 @@
  *@content KT07 Graphics / DrawRectangle(), DrawEllipse() | RR[367]-[369] p618-p622
  *         長方形, 楕円の描画
  *         
- *@subject Graphics -- System.Drawing.
+ *@subject ◆Graphics -- System.Drawing.
  *         ＊長方形 Rectangle: 始点, 横幅, 高さを指定
  *         void   graphics.DrawRectangle(Pen, Rectangle)
  *         void   graphics.DrawRectangle(Pen, int x, int y, int width, int height)
@@ -56,6 +56,13 @@
  *         ＊GraphicsPathを描画
  *         void   graphics.DrawPath(Pen, GraphicsPath)   =>〔MainGrapicsPathSample.cs〕
  *         
+ *         ＊Graphics 切替
+ *         void   graphics.Clear(Color) =>〔RR08_Graphics/MainPathGradientBrush.cs〕
+ *                    └ 引数 Color  SystemColors.Window
+ *                  Graphicsオブジェクトに以前に描画したものは残り続けるので、
+ *                  画面を切り替える場合は 別の Graphicsオブジェクトに描画するか、
+ *                  同一Graphicsなら Clear()して使う
+ *                  
  *@NOTE【考察】DrawXxxx() と FillXxxx()の順
  *      輪郭をきれいに描画するには、Fill -> Draw の順がいい
  *      (逆だと、輪郭線が消えて塗りつぶしだけが見える)
