@@ -129,3 +129,30 @@ for(int i = 0; i <= buttonAry.Length; i++)
  *      おそらくTitleBar, ScrollBar, StatusBarの幅が Formのサイズになっている。
  *      可視範囲の Formの枠で座標処理する場合は ClientSizeで処理すべし
  */
+/*
+ *@title WinFormGUI / WinFormSample / ReverseReference / RR08_Graphics
+ *@class MainPathGradientBrushSample.cs
+ *@NOTE【考察】PictureBox.Size と Dock, SizeMode
+ *      ・BorderStyle, Imageは Dock, SizeModeで拡大されるが 
+ *        Graphicsの描画は Dock, SizeModeで拡大しない
+ *      ・DockStyle.Fill, SizeMode = PictureBoxSizeMode.Zoomなどは
+ *        pictureBox.Imageで Imageオブジェクトを登録した場合のみ有効
+ *      ・pictrureBox.CreateGraphics()に g.DrawXxxx()/g.FillXxxx()した
+ *        グラフィックスには Dock, SizeModeの値が影響しない
+ *        (サイズが小さいまま表示される)
+ *      ・Graphicsを PictureBoxの枠線いっぱいに表示するには
+ *        pictureBox.Size / ClientSizeを 正しく指定する必要がある
+ *        (pic.Size / pic.ClientSizeは DockStyle.Fill, SizeModeで拡大する前の大きさに設定されている)
+ *      ・Size / ClientSizeを定数指定することは望ましくないので、
+ *        PictureBoxの親コントロールである Form / Panelのサイズから取得すべき
+ *      ・Panelである TableLayoutPanelも同様に Dock, ColumnStyles, RowStylesで
+ *        拡大・縮小する前のサイズが Size, Width, Heightの値になっている
+ *        
+ *       ＊例
+ *      ・form.ClientSize.Width - 5: 親Formの横幅から、PictureBoxの枠線分の 5pxを除いた横幅
+ *      ・(int)(form.ClientSize.Height * 0.83): 親Formの高さの 83%の高さ
+ *        intキャストは pic.Sizeが int指定なので要キャスト
+ *        intキャストなのに、* 0.85 -> * 0.83などの変更も ちゃんとサイズに反映する
+ *        (本来の intキャストだと、どちらの値も 0になるはずだが、
+ *         元の 0.85などの値がカプセル化されて、型のみ intになっている様子)
+ */

@@ -5,8 +5,9 @@
  *@copyFrom KaiteiNet / KT07_Graphics / MainDrawFillSample.cs
  *@copyFrom KaiteiNet / KT07_Graphics / MainHatchBrushViewer.cs
  *@copyFrom KaiteiNet / KT07_Graphics / MainBrushAppendix.cs
+ *@copyFrom ReverseReference / RR08_Graphics / MainPathGradientBrush.cs
  *@author shika
- *@date 2022-08-24
+ *@date 2022-08-29
  */
 /*
  *@subject ＊色指定
@@ -535,4 +536,28 @@ enum HatchStyle
  *                 ForwardDiagonal = 2, //左上から右下へのグラデーション
  *                 BackwardDiagonal = 3 //右上から左下へのグラデーション
  *             }
- /*
+/* 
+ *@title WinFormGUI / WinFormSample / ReverseReference / RR08_Graphics
+ *@class MainPathGradientBrushSample.cs
+ *@subject ◆PathGradientBrush : Brush -- System.Drawing.Drawing2D
+ *         ・コンストラクタで 塗りつぶし範囲を指定
+ *         ・色情報は コンストラクタに入っていないので、
+ *           CenterColor, SurroundColorsを追加で指定する必要がある
+ *           (コンストラクタで生成したオブジェクトのままだと何も描画されない)
+ *           
+ *         PathGradientBrush     new PathGradientBrush(GraphicsPath, [WrapMode])
+ *         PathGradientBrush     new PathGradientBrush(Point[], [WrapMode])  ※Point[]も可
+ *           └ enum WrapMode  -- System.Drawing.Drawing2D.  塗りつぶし範囲より Brush範囲が小さい場合の並べ方
+ *             {
+ *                 Tile = 0,        //グラデーションまたはテクスチャを並べて表示
+ *                 TileFlipX = 1,   //水平方向に反転し、並べて表示
+ *                 TileFlipY = 2,   //垂直方向に反転し、並べて表示
+ *                 TileFlipXY = 3,  //水平および垂直方向に反転し、並べて表示
+ *                 Clamp = 4        //並べて表示されません
+ *             }
+ *             
+ *         Color       pathGradientBrush.CenterColor { get; set; }    塗りつぶし範囲の中央の色  
+ *         Color[]     pathGradientBrush.SurroundColors { get; set; } 塗りつぶし範囲の path周辺の色
+ *         RectangleF  pathGradientBrush.Rectangle { get; }           塗りつぶしpathに外接する四角形
+ *         PointF      pathGradientBrush.CenterPoint { get; set; }    グラデーションの中央点
+ *         WrapMode    pathGradientBrush.WrapMode { get; set; }       塗りつぶし範囲より Brush範囲が小さい場合の並べ方
