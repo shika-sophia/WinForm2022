@@ -68,6 +68,9 @@
  *        pic.Image = new Bitmap(pic.Width, pic.Height); として、
  *        pic.CreateGraphics().DrawXxxx()で描いても、Dock, SizeModeは適用されない
  *        
+ *      ・Imageの元サイズが どうであれ、デフォルトで決まったサイズで登録される
+ *        image.Width, image.Height, image.Sizeは、デフォルトの PictureBoxのサイズになる
+ *        
  *@see ImagePathGradientBrushSample.jpg
  *@copyTo ~/WinFormSample/GraphicsRefernce.txt
  *@copyTo ~/WinFormSample/ColorRefernce.txt
