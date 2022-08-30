@@ -22,11 +22,8 @@
  *                   └ 引数 destRect: 描画する位置とサイズを四角形で指定
  *                     引数 srcRect:  描画するImageの部分画像の範囲を四角形で指定
  *                 ※ RectangleFも可、int, float, Point[], PointF[]に置換するオーバーロードあり
- *         
- *         void  graphics.DrawImage(
- *                 Image, PointF[] destPoints, RectangleF srcRect,
- *                 GraphicsUnit, ImageAttributes)
- *                 ※ Point[]不可, Rectangle不可
+ *                 ※ 元画像　srcRect -> 表示領域 destRectの比率で自動的に拡大縮小
+ *                 (= g.DrawImageに SizeModeは作用しないが、PictrueBoxSizeMode.Zoom と同様の結果)
  *                 
  *         void  graphics.DrawImage(
  *                 Image, Rectangle, int x, int y, int width, int height,
@@ -34,6 +31,15 @@
  *                   └ enum GraphicsUnits =>〔KT07_Graphics/MainDrawImageSample.cs〕
  *                 ※ RectangleF不可, floatも可
  *                 
+ *         [×] System.NotImplementedException: 実装されていません。(VSのコンパイルは通る)
+ *         void  graphics.DrawImage(
+ *                 Image, PointF[] destPoints, RectangleF srcRect,
+ *                 GraphicsUnit, ImageAttributes)
+ *                 ※ Point[]不可, Rectangle不可
+ *         ※表示位置の PointF[]が利用できないため、倍率による拡大縮小ができない
+ *           => 倍率を * 100 して intで登録し、計算後に / 100すると倍率を反映できる
+ *           =>〔MainColorMatrixSepia.cs〕
+ *         
  *@subject ImageAttributes : ICloneable, IDisposable
  *            -- System.Drawing.Imaging.
  *         ImageAttributes   new ImageAttributes()
