@@ -80,7 +80,6 @@ for(int i = 0; i <= buttonAry.Length; i++)
  *      Form部品を Form_Load(object sender, EventArgs e)に記述すると
  *      new Form1().Show();で空のFormを表示し、Form部品は反映しない。
  */
-
 /* 
  *@title WinFormGUI / WinFormSample / ReverseReference / RR07_MultiWindow
  *@class MainMdiLayoutSample.cs
@@ -155,4 +154,8 @@ for(int i = 0; i <= buttonAry.Length; i++)
  *        intキャストなのに、* 0.85 -> * 0.83などの変更も ちゃんとサイズに反映する
  *        (本来の intキャストだと、どちらの値も 0になるはずだが、
  *         元の 0.85などの値がカプセル化されて、型のみ intになっている様子)
+ *        
+ *      ・Imageの元サイズが どうであれ、デフォルトで決まったサイズで登録される
+ *        image.Width, image.Height, image.Sizeは、デフォルトの PictureBoxのサイズになる
+ *        
  */
