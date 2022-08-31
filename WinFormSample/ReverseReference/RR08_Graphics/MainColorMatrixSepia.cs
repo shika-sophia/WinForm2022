@@ -20,7 +20,7 @@
  *           変更後の B = r * Matrix20 + g * Matrix21 + b * Matrix22
  *           
  *@see ImageColorMatrixSepia.jpg
- *@see 
+ *@copyTo ~/WinFormSample/ColorReference.txt 
  *@author shika
  *@date 2022-08-30
  */
@@ -53,16 +53,18 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR08_Graphics
         private readonly PictureBox pic;
         private readonly Button btnOrigin;
         private readonly Button btnSepia;
-        private Graphics g;
+        private readonly Graphics g;
+        private readonly Bitmap bitmap1;
+        private readonly Bitmap bitmap2;
+        private readonly ImageAttributes imageAttr;
+        private readonly Rectangle rect;
         private Image image;
-        private ImageAttributes imageAttr;
-        private Rectangle rect;
 
         public FormColorMatrixSepia()
         {
             this.Text = "FormColorMatrixSepia";
             this.Font = new Font("consolas", 12, FontStyle.Regular);
-            this.Size = new Size(600, 400);
+            this.Size = new Size(640, 480);
             this.BackColor = SystemColors.Window;
 
             table = new TableLayoutPanel()
@@ -79,32 +81,30 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR08_Graphics
 
             string imgName1 = "NaziElephant.jpg";    //250×150
             string imgName2 = "NaziSpinRocket.jpg";  //740×505
+            bitmap1 = new Bitmap(Image.FromFile($"../../Image/{imgName1}"), new Size(250, 150));
+            bitmap2 = new Bitmap(Image.FromFile($"../../Image/{imgName2}"), new Size(740, 505));
 
             list = new ListBox()
             {
                 Dock = DockStyle.Fill,
                 AutoSize = true,
             };
-            list.Items.Add(imgName1);
-            list.Items.Add(imgName2);
+            list.Items.Add($"{imgName1}  ({bitmap1.Width} × {bitmap1.Height})");
+            list.Items.Add($"{imgName2}  ({bitmap2.Width} × {bitmap2.Height})");
             list.SelectedIndexChanged += new EventHandler(list_SelectedIndexChanged);
-            list.SelectedItem = imgName1;
             table.Controls.Add(list, 0, 0);
             table.SetColumnSpan(list, 2);
 
-            list_SelectedIndexChanged(list, new EventArgs()); // initialize image
-            imageAttr = BuildImageAttr();                     //self defined 〔below〕
-
             pic = new PictureBox()
             {
-                ClientSize = new Size(
+                Image = bitmap1,
+                SizeMode = PictureBoxSizeMode.StretchImage,
+                Size = new Size(
                     this.ClientSize.Width - 5,
                     (int)(this.ClientSize.Height * 0.7)),
                 Dock = DockStyle.Fill,
                 BorderStyle = BorderStyle.Fixed3D,
             };
-            g = pic.CreateGraphics();
-            rect = BuildRectangle();       //self defined 〔below〕
             table.Controls.Add(pic, 0, 1);
             table.SetColumnSpan(pic, 2);
 
@@ -127,27 +127,44 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR08_Graphics
             table.Controls.Add(btnSepia, 1, 2);
 
             this.Controls.Add(table);
+
+            //---- initialize ----
+            list.SelectedIndex = 0;
+            image = bitmap1;
+            g = pic.CreateGraphics();
+            rect = new Rectangle(0, 0, pic.Width, pic.Height);
+            imageAttr = BuildSepiaImageAttr();  //self defined 〔below〕            
         }//constructor
 
         private void list_SelectedIndexChanged(object sender, EventArgs e)
         {
-            string selectedName = (sender as ListBox).SelectedItem.ToString();
-            image = new Bitmap($"../../Image/{selectedName}");
-        }
+            string selected = (sender as ListBox).SelectedItem.ToString();
+
+            if (selected.Contains("Elephant"))
+            {
+                image = bitmap1;
+            }
+            else if (selected.Contains("SpinRocket"))
+            {
+                image = bitmap2;
+            }
+        }//list_SelectedIndexChanged()
 
         private void btnOrigin_Click(object sender, EventArgs e)
         {
+            //g.Clear(SystemColors.Window);
             imageAttr.SetNoOp();
             PictureBoxGraphicsDrawImage();
         }//btnOrigin_Click()
 
         private void btnSepia_Click(object sender, EventArgs e)
         {
+            //g.Clear(SystemColors.Window);
             imageAttr.ClearNoOp();
             PictureBoxGraphicsDrawImage();
         }//btnSepia_Click()
 
-        private ImageAttributes BuildImageAttr()
+        private ImageAttributes BuildSepiaImageAttr()
         {
             var cm = new ColorMatrix() //Change to Sepia Color
             {
@@ -168,18 +185,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR08_Graphics
             imageAttr.SetColorMatrix(cm);
 
             return imageAttr;
-        }//BuildImageAttr()
-
-        private Rectangle BuildRectangle()
-        {
-            int widthRate = pic.Width / image.Width * 100;
-            int heightRate = pic.Height / image.Height * 100;
-            int adjustRate = (widthRate < heightRate) ? widthRate : heightRate;
-
-            return new Rectangle(0, 0,
-                pic.Width * adjustRate / 100,
-                pic.Height * adjustRate / 100);
-        }//BuildRectangle()
+        }//BuildSepiaImageAttr()
 
         private void PictureBoxGraphicsDrawImage()
         {

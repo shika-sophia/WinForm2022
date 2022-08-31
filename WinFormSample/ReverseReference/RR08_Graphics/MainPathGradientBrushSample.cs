@@ -44,16 +44,21 @@
  *@NOTE【考察】PictureBox.Size と Dock, SizeMode
  *      ・BorderStyle, Imageは Dock, SizeModeで拡大されるが 
  *        Graphicsの描画は Dock, SizeModeで拡大しない
+ *        
  *      ・DockStyle.Fill, SizeMode = PictureBoxSizeMode.Zoomなどは
  *        pictureBox.Imageで Imageオブジェクトを登録した場合のみ有効
+ *        
  *      ・pictrureBox.CreateGraphics()に g.DrawXxxx()/g.FillXxxx()した
  *        グラフィックスには Dock, SizeModeの値が影響しない
  *        (サイズが小さいまま表示される)
+ *        
  *      ・Graphicsを PictureBoxの枠線いっぱいに表示するには
  *        pictureBox.Size / ClientSizeを 正しく指定する必要がある
  *        (pic.Size / pic.ClientSizeは DockStyle.Fill, SizeModeで拡大する前の大きさに設定されている)
+ *      
  *      ・Size / ClientSizeを定数指定することは望ましくないので、
  *        PictureBoxの親コントロールである Form / Panelのサイズから取得すべき
+ *      
  *      ・Panelである TableLayoutPanelも同様に Dock, ColumnStyles, RowStylesで
  *        拡大・縮小する前のサイズが Size, Width, Heightの値になっている
  *        
@@ -68,12 +73,21 @@
  *        pic.Image = new Bitmap(pic.Width, pic.Height); として、
  *        pic.CreateGraphics().DrawXxxx()で描いても、Dock, SizeModeは適用されない
  *        
- *      ・Imageの元サイズが どうであれ、デフォルトで決まったサイズで登録される
+ *      ・Image.FromFile(string fileName), new Bitmap(string)は
+ *        Imageの元サイズが どうであれ、デフォルトで決まったサイズで登録される
  *        image.Width, image.Height, image.Sizeは、デフォルトの PictureBoxのサイズになる
+ *        => new Bitmap(Image.FromFile(string fileName), Size)で登録すると、
+ *        元画像のサイズで登録される
  *        
+ *       ・初期画像を表示するには、pic.Imageプロパティを登録
+ *         Buttonイベントのメソッドを呼出ても反応しない。
+ *         Imageプロパティを登録しても、g.DrawImage()の画像を表示できる。
+ *         (ただし、上書きするので、切り替える場合は g.Clear(Color)が必要)
+ *         
  *@see ImagePathGradientBrushSample.jpg
  *@copyTo ~/WinFormSample/GraphicsRefernce.txt
  *@copyTo ~/WinFormSample/ColorRefernce.txt
+ *@copyTo ~/WinFormSample/WinFormSample_analysis.txt
  *@author shika
  *@date 2022-08-28
  */
