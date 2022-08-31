@@ -6,8 +6,10 @@
  *@copyFrom KaiteiNet / KT07_Graphics / MainHatchBrushViewer.cs
  *@copyFrom KaiteiNet / KT07_Graphics / MainBrushAppendix.cs
  *@copyFrom ReverseReference / RR08_Graphics / MainPathGradientBrush.cs
+ *@copyFrom ReverseReference / RR08_Graphics / MainColorMatrixSemiTransParent.cs
+ *@copyFrom ReverseReference / RR08_Graphics / MainColorMatrixSepia.cs
  *@author shika
- *@date 2022-08-29
+ *@date 2022-08-31
  */
 /*
  *@subject ＊色指定
@@ -561,3 +563,107 @@ enum HatchStyle
  *         RectangleF  pathGradientBrush.Rectangle { get; }           塗りつぶしpathに外接する四角形
  *         PointF      pathGradientBrush.CenterPoint { get; set; }    グラデーションの中央点
  *         WrapMode    pathGradientBrush.WrapMode { get; set; }       塗りつぶし範囲より Brush範囲が小さい場合の並べ方
+ */
+ /* 
+ *@title WinFormGUI / WinFormSample / ReverseReference / RR08_Graphics
+ *@class MainColorMatrixSemiTransParent.cs
+ *@subject ImageAttributes : ICloneable, IDisposable
+ *            -- System.Drawing.Imaging.
+ *         ImageAttributes   new ImageAttributes()
+ *         
+ *         void  imageAttr.SetColorMatrix(ColorMatrix)          色調変更のColorMatrixを設定
+ *         void  imageAttr.SetColorMatrix(ColorMatrix, [ColorMatrixFlag, [ColorAdjustType]])
+ *         void  imageAttr.ClearColorMatrix([ColorAdjustType])  指定した型のColorMatrixを削除
+ *           └ enum  ColorMatrixFlag
+ *             {
+ *                 Default = 0,   //すべてのカラー値 (灰色の網かけを含む) が同じカラー調整行列によって調整
+ *                 SkipGrays = 1, //色はすべて調整、灰色の網かけは調整されません。 灰色の網かけは、赤、緑、青の各要素の値が同じである色。
+ *                 AltGrays = 2   //灰色の網かけのみ調整
+ *             }
+ *             
+ *           └ enum ColorAdjustType      色調整する型を選択。部分的な色調整ができる
+ *             {
+ *                 Default = 0, //独自の色の調整情報がないすべての GDI+ オブジェクトにより使用される色の調整情報
+ *                 Bitmap = 1,  //Bitmap オブジェクトの色の調整情報
+ *                 Brush = 2,   //Brush オブジェクトの色の調整情報
+ *                 Pen = 3,     //Pen オブジェクトの色の調整情報
+ *                 Text = 4,    //テキストの色の調整情報
+ *                 Count = 5,   //指定した型の数
+ *                 Any = 6      //指定した型の数
+ *             }
+ *         
+ *         void  bitmap.MakeTransparent(Color)                透過色を指定して、その色を透明にする
+ *         void  imageAttr.SetColorKey(                       透過色の範囲や型を指定して、その色を透明にする
+ *                 Color colorLow, Color colorHigh, [ColorAdjustType])    
+ *         void  imageAttr.ClearColorKey([ColorAdjustType]);  型を指定した ColorKeyを削除
+ *         
+ *         void  imageAttr.SetNoOp([ColorAdjustType type])    指定した型の 色調整を停止。SetOnOp()呼出前に戻す
+ *         void  imageAttr.ClearNoOp([ColorAdjustType type])  SetOnOp()で停止していた 色調整を元に戻す
+ *
+ *         void  imageAttr.SetBrushRemapTable(ColorMap[] map)            Brush型のカラー リマップ テーブルを設定
+ *           └ class ColorMap -- System.Drawing.Imaging.
+ *             ColorMap   new ColorMap()
+ *             Color      colorMap.OldColor { get; set; }
+ *             Color      colorMap.NewColor { get; set; }
+ *         void  imageAttr.ClearBrushRemapTable()                
+ *         void  imageAttr.SetRemapTable(ColorMap[], [ColorAdjustType])  指定した型のカラー リマップ テーブルを設定
+ *         void  imageAttr.ClearRemapTable([ColorAdjustType type])
+ *
+ *         void  imageAttr.SetWrapMode(WrapMode mode, Color color)
+ *           └ enum WrapMode  -- System.Drawing.Drawing2D.  塗りつぶし範囲より Brush範囲が小さい場合の並べ方
+ *             {
+ *                 Tile = 0,        //グラデーションまたはテクスチャを並べて表示
+ *                 TileFlipX = 1,   //水平方向に反転し、並べて表示
+ *                 TileFlipY = 2,   //垂直方向に反転し、並べて表示
+ *                 TileFlipXY = 3,  //水平および垂直方向に反転し、並べて表示
+ *                 Clamp = 4        //並べて表示されません
+ *             }
+ *             
+ *@subject ◆ColorMatrix class -- System.Drawing.Imaging.
+ *         ・RGBAW空間の 5 × 5 行列を表すクラス
+ *         ・R: Red / G: Green / B: Blue / A: Alpha 透明度 / W: ?? を表す
+ *         ・ImageAttributesクラスの コンストラクタの引数やプロパティの値として利用
+ *         
+ *         ＊透明度の変更 Matrix33 = XXf;  
+ *           XX は [0 ～ 1]の float値   0f:透明, 0.xf: 半透明, 1f:元画像の透明度
+ *           
+ *         ＊色調の変更 RR[372] p626
+ *           変更後の R = r * Matrix00 + g * Matrix01 + b * Matrix02
+ *           変更後の G = r * Matrix10 + g * Matrix11 + b * Matrix12
+ *           変更後の B = r * Matrix20 + g * Matrix21 + b * Matrix22
+ *         
+ *         ColorMatrix   new ColorMatrix();
+ *         ColorMatrix   new ColorMatrix(float[][] newColorMatrix)
+ *         
+ *         float colorMatrix[int row, int column]
+ *         float this[int row, int column]
+ *         float colorMatrix.MatrixXX       XX: row-column, 0-4
+ *         例: colorNatrix.Matrix33 = 0.5f; とすると半透明の画像になる
+ */
+/** 
+ *@title WinFormGUI / WinFormSample / ReverseReference / RR08_Graphics
+ *@class MainColorMatrixSepia.cs
+
+        private ImageAttributes BuildSepiaImageAttr()  //self defined 
+        {
+            var cm = new ColorMatrix()        //Change to Sepia Color
+            {
+                Matrix00 = 0.393f,
+                Matrix01 = 0.349f,
+                Matrix02 = 0.272f,
+                Matrix10 = 0.769f,
+                Matrix11 = 0.686f,
+                Matrix12 = 0.534f,
+                Matrix20 = 0.189f,
+                Matrix21 = 0.168f,
+                Matrix22 = 0.131f,
+                Matrix33 = 1f,
+                Matrix44 = 1f,
+            };
+
+            var imageAttr = new ImageAttributes();
+            imageAttr.SetColorMatrix(cm);
+
+            return imageAttr;
+        }//BuildSepiaImageAttr()
+ */
