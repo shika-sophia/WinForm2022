@@ -175,3 +175,23 @@ for(int i = 0; i <= buttonAry.Length; i++)
  *         (ただし、上書きするので、切り替える場合は g.Clear(Color)が必要)
  *         
  */
+ /* 
+ *@title WinFormGUI / WinFormSample / ReverseReference / RR08_Graphics
+ *@class MainMatrixRotateSample.cs
+ *@NOTE【考察】回転の中心点と、描画の原点
+ *      ・PictureBoxSizeMode.CenterImage を設定しているので、
+ *        ここでは PictureBox.ClientSizeの中心点と、画像の中心点は一致する
+ *      ・回転の中心点を 上記に設定
+ *      
+ *        centerPoint = new Point(
+ *             pic.ClientSize.Width / 2, pic.ClientSize.Height / 2);
+ *
+ *      ・画像描画の原点を指定する必要があるので
+ *        PictureBoxの中心点だと、画像が ずれていく。
+ *        PictureBoxの中心点から、画像の横幅 / 2 と高さ /2 の差を 描画の原点とする
+ *        
+ *        g.DrawImage(image, new Point(                     
+ *           (pic.ClientSize.Width - image.Width) / 2,
+ *           (pic.ClientSize.Height - image.Height) / 2));
+ */
+ 
