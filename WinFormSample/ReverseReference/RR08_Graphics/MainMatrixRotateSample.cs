@@ -22,7 +22,10 @@
  *         例 matrix.RotateAt(...);など変更のたびに
  *            greaphics.Transform = matrix; と代入しないと変更を反映しない
  *        
- *         void       graphics.ResetTransform()
+ *         void     graphics.RotateTransform(float angle, [MatrixOrder])           Transformで登録した Matrixを指定角度と順序で回転
+ *         void     graphics.ScaleTransform(float sx, float sy, [MatrixOrder])     Transformで登録した Matrixを指定倍率と順序で拡大縮小
+ *         void     graphics.TranslateTransform(float dx, float dy, [MatrixOrder]) Transformで登録した Matrixを指定幅と順序で平行移動
+ *         void     graphics.ResetTransform()                                      変換行列 Matrixを削除
  *         
  *@subject ◆Matrix : MarshalByRefObject, IDisposable
  *            -- System.Drawing.Drawing2D.
