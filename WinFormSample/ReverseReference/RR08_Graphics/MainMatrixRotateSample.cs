@@ -22,6 +22,8 @@
  *         例 matrix.RotateAt(...);など変更のたびに
  *            greaphics.Transform = matrix; と代入しないと変更を反映しない
  *        
+ *         void       graphics.ResetTransform()
+ *         
  *@subject ◆Matrix : MarshalByRefObject, IDisposable
  *            -- System.Drawing.Drawing2D.
  *         ・図形の回転(360°内で時計回りの角度を指定可), 反転, 拡大縮小を行う変換行列を表すクラス
@@ -76,6 +78,7 @@
  *           (pic.ClientSize.Height - image.Height) / 2));
  *           
  *@see ImageMatrixRotateSample.jpg
+ *@see MainMatrixScaleTranslate.cs
  *@copyTo ~/WinFormSample/WinFormSample_analysis.txt
  *@author shika
  *@date 2022-09-01
