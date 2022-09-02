@@ -70,10 +70,11 @@
  *                            このパラメーターに渡す値は、4 の倍数である必要があります。
  *                IntPtr scan0: ピクセル データを格納するバイトの配列へのポインター。
  *               
- *         Color    bitmap.GetPixel(int x, int y)
- *         void     bitmap.SetPixel(int x, int y, Color)
- *         void     bitmap.MakeTransparent()       既定の透過色を透明にする
- *         void     bitmap.MakeTransparent(Color)  透過色を指定して、その色を透明にする
+ *         Color    graphics.GetNearestColor(Color color)  引数に最も近い Color structを取得
+ *         Color    bitmap.GetPixel(int x, int y)          ピクセル座標を指定して Colorを取得
+ *         void     bitmap.SetPixel(int x, int y, Color)   ピクセル座標を指定して Colorを設定
+ *         void     bitmap.MakeTransparent()               既定の透過色を透明にする
+ *         void     bitmap.MakeTransparent(Color)          透過色を指定して、その色を透明にする
  *         
  *@see ImageGetPixelSample.jpg
  *@see MainBitmapSetPixelSample.cs

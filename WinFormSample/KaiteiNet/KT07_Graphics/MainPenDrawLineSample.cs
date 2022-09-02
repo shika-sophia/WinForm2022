@@ -28,20 +28,53 @@
  *                ||
  *         protected vertural void control.OnPaint(PaintEventArgs e)   virtualを overrideして利用
  *           
- *         PaintEventArgsクラス -- System.Windows.Forms. 再描画イベントに関するデータを提供
+ *         PaintEventArgsクラス e -- System.Windows.Forms. 再描画イベントに関するデータを提供
  *         Graphics   e.Graphics
  *         
  *         Graphics   control.CreateGraphics()   // Paint イベントハンドラ以外の場所で Graphics オブジェクトを取得したい場合に利用
  *                                               // CreateGraphics()で生成した描画は、Form/Controlが再描画される際に消えてしまう
  *                                               // => PaintEventArgsから Graphicsオブジェクトを取得すべき
  *                                               // => Bitmapオブジェクトに描画して保存する方法もある
- *         void       graphics.Dispose()         // CreateGraphics()で生成した Graphicsオブジェクトは 使い終わる度に 破棄する
+ *
+ *         Graphics   Graphics.FromImage(Image)  // Bitmapオブジェクトを生成して、そこに描画
+ *                      └ 引数 Image <- new Bitmap(pictureBox.Width, pictureBox.Height)
  *         
+ *         [×] new Graphics() の定義なく不可
+ *         
+ *         float      graphics.DpiX { get; }            X方向の DPI(解像度)
+ *         float      graphics.DpiY { get; }            Y方向の DPI(解像度)
+ *         Matrix     graphics.Transform { get; set; }  図形変形の行列を登録
+ *                    => 〔RR08_Graphics/MainMatrixRotateSample.cs〕
+ *         
+ *         Region     graphics.Clip { get; set; }       描画の部分取得
+ *                    => 〔KT07_Graphics/MainGraphicsPathSample.cs〕
+ *         
+ *         SmoothingMode  graphics.SmoothingMode { get; set; }
+ *           └ enum SmoothingMode  直線、曲線、塗りつぶし領域の境界線に、スムージング (アンチエイリアス処理) を適用するか
+ *                    -- System.Drawing.Drawing2D.
+ *             {
+ *                 Invalid = -1,    //無効なモード
+ *                 Default = 0,     //アンチエイリアス処理しない
+ *                 HighSpeed = 1,   //アンチエイリアス処理しない
+ *                 HighQuality = 2, //アンチエイリアス処理されたレタリングを指定
+ *                 None = 3,        //アンチエイリアス処理しない
+ *                 AntiAlias = 4    //アンチエイリアス処理されたレタリングを指定
+ *             }
+ *             
+ *         void       graphics.Flush([FlushIntention])   保留中の Graphics操作を強制実行
+ *           └ enum FlushIntention  -- System.Drawing.Drawing2D
+ *             {
+ *                Flush = 0,  //Graphics操作の Stackをすぐに実行し、制御は すぐに戻す
+ *                Sync = 1    //できる限り早く実行し、制御は処理完了まで同期的に待機してから戻す
+ *             }
+ *             
+ *         void       graphics.Dispose()         // CreateGraphics()で生成した Graphicsオブジェクトは 使い終わる度に 破棄する
+ *           
  *         ＊直線の描画
  *         void  graphics.DrawLine(Pen, Point p1, Point p2)             始点 p1 から 終点 p2 の直線を描画
  *         void  graphics.DrawLine(Pen, int x1, int y1, int x2, int y2) 始点 (x1, y1) から 終点 (x2, y2) の直線を描画
  *         
- *         ＊Penクラス  : MarshalByRefObject, ICloneable, IDisposable
+ *@subject ◆Penクラス : MarshalByRefObject, ICloneable, IDisposable
  *             -- System.Drawing.
  *         ・Pen クラスを用いて，特定の色と太さを持つ，仮想のペンを定義
  *         ・自己定義した Pen オブジェクトは，使い終る度に Dispose メソッドで破棄する
@@ -71,10 +104,42 @@
  *         float[]    pen.CompoundArray 平行線の複線。0 ～ 1 の値を昇順に並べた配列
  *         void    pen.Dispose()
  *         
- *         ＊SystemPensクラス -- Syatem.Drawing
- *         Pen     SystemPens.Window       // static ウィンドゥの背景色
- *         Pen     SystemPens.WindowText   // static ウィンドゥの文字色
- *                   :
+ *@subject ◆SystemPens class -- System.Drawing.
+ *         ・Windows System32で使用している色による Penオブジェクトを取得
+ *
+ *         Pen   SystemPens.ActiveBorder  { get; }
+ *         Pen   SystemPens.ActiveCaption  { get; }
+ *         Pen   SystemPens.ActiveCaptionText  { get; }
+ *         Pen   SystemPens.AppWorkspace  { get; }
+ *         Pen   SystemPens.ButtonFace  { get; }
+ *         Pen   SystemPens.ButtonHighlight  { get; }
+ *         Pen   SystemPens.ButtonShadow  { get; }
+ *         Pen   SystemPens.Control  { get; }
+ *         Pen   SystemPens.ControlText  { get; }
+ *         Pen   SystemPens.ControlDark  { get; }
+ *         Pen   SystemPens.ControlDarkDark  { get; }
+ *         Pen   SystemPens.ControlLight  { get; }
+ *         Pen   SystemPens.ControlLightLight  { get; }
+ *         Pen   SystemPens.Desktop  { get; }
+ *         Pen   SystemPens.GradientActiveCaption  { get; }
+ *         Pen   SystemPens.GradientInactiveCaption  { get; }
+ *         Pen   SystemPens.GrayText  { get; }
+ *         Pen   SystemPens.Highlight  { get; }
+ *         Pen   SystemPens.HighlightText  { get; }
+ *         Pen   SystemPens.HotTrack  { get; }
+ *         Pen   SystemPens.InactiveBorder  { get; }
+ *         Pen   SystemPens.InactiveCaption  { get; }
+ *         Pen   SystemPens.InactiveCaptionText  { get; }
+ *         Pen   SystemPens.Info  { get; }
+ *         Pen   SystemPens.InfoText  { get; }
+ *         Pen   SystemPens.Menu  { get; }
+ *         Pen   SystemPens.MenuBar  { get; }
+ *         Pen   SystemPens.MenuHighlight  { get; }
+ *         Pen   SystemPens.MenuText  { get; }
+ *         Pen   SystemPens.ScrollBar  { get; }
+ *         Pen   SystemPens.Window  { get; }
+ *         Pen   SystemPens.WindowFrame  { get; }
+ *         Pen   SystemPens.WindowText  { get; }
  *         
  *@see ImagePenDrawLineSample.jpg
  *@see 

@@ -16,7 +16,11 @@
  *         void        graphics.DrawPath(Pen, GraphicsPath)
  *         Region      graphics.Clip { get; set;}           Graphicsオブジェクトの描画領域を設定
  *           └ Region      new Region(GraphicPath)
- *         RectangleF  graphics.VisibleClipBounds  { get; } Clip描画領域の外接四角形
+ *         bool        graphics.IsClipEmpty { get; }        Clipプロパティが空か
+ *         RectangleF  graphics.ClipBounds { get; }         Clip領域の外接四角形
+ *         RectangleF  graphics.VisibleClipBounds  { get; } 表示されているClip領域の外接四角形
+ *         bool        graphics.IsVisibleClipEmpty { get; } 表示されているClip領域が 空か
+ *         void        graphics.ResetClip()
  *         
  *         ＊配置
  *         void graphics.DrawImage(Image, RectangleF)

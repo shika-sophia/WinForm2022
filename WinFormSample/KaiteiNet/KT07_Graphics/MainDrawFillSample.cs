@@ -39,6 +39,42 @@
  *         void   graphics.DrawPie(Pen, int x, int y, int width, int height, float startAngle, float sweepAngle)
  *         void   graphics.DrawPie(Pen, float x, float y, float width, float height, float startAngle, float sweepAngle)
  *         
+ *         ＊円, 楕円の弧 Arc: 楕円の外接四角形、開始角、回転角を指定して弧を描画
+ *         void   graphics.DrawArc(Pen, Rectangle, float startAngle, float sweepAngle) 
+ *                  └ 引数 startAngle: 開始角。X軸を 0°とした度単位
+ *                         sweepAngle: 回転角。開始角からの角度。度単位
+ *                    ※ RectangleF, int, float 可
+ *                    
+ *         ＊ベジエ曲線 Bezier curve: 
+ *         https://e-words.jp/w/%E3%83%99%E3%82%B8%E3%82%A7%E6%9B%B2%E7%B7%9A.html
+ *         n個の点（制御点という）の座標を指定すると、n-1次の多項式によって示される。
+ *         この曲線は始点と終点を通り、始点とその隣の制御点を結ぶ直線、
+ *         および、終点とその隣の制御点を結ぶ直線の両方に接する。
+ *         始点と終点の位置が同じでも、途中の制御点の位置を変更することで曲線の形を任意に変形することができる。
+ *         作図ソフトなどでは4つの点（始点・終点と中間に2つの制御点）によって描画される3次ベジェ曲線がよく利用される。
+ *         
+ *         void   graphics.DrawBezier(Pen, Point, Point, Point, Point)
+ *         void   graphics.DrawBeziers(Pen, Point[])
+ *                ※PointF, PointF[] 可
+ *
+ *         ＊曲線の図形 ClosedCurve: 指定したPoint, tension(=張り度合?)で曲線の閉じられた図形
+ *         void DrawClosedCurve(Pen, Point[], [float tension, FillMode])
+ *              ※ PointF[] 可
+ *              └ 引数 tension: 0.0f以上 (正のfloat値)
+ *                      fillMode: 塗りつぶしの方法
+ *               └ enum FillMode -- System.Drawing.Drawing2D.
+ *                 {
+ *                     Alternate = 0, //交互塗りつぶしモード
+ *                     Winding = 1    //全域塗りつぶしモード
+ *                 }
+ *         ＊曲線
+ *         void DrawCurve(Pen, Point[], [int offset, int numberOfSegments,][float tension])
+ *              ※ PointF[] 可
+ *              引数  int offsetoffset:     Point[]の最初の要素から、描画開始点までのオフセット値(=非描画部分)
+ *                    int numberOfSegments  曲線に含めるセグメント値(？)
+ *                    float tension         曲線の張り度合 
+ *         
+ *@subject 塗りつぶし
  *         ＊長方形 (rectangle) 塗りつぶし
  *         void   graphics.FillRectangle(Brush, Rectangle)
  *         void   graphics.FillRectangle(Brush, RectangleF)
