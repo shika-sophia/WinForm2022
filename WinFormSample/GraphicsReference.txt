@@ -1,11 +1,11 @@
 ﻿/**
  *@title WinFormGUI/WinFormSample/GraphicsReference.txt
  *@copyFrom KT07_Graphics / MainPenDrawLineSample.cs
- *@copyFrom
- *@copyFrom
- *@copyFrom
- *@copyFrom
- *@copyFrom
+ *@copyFrom KT07_Graphics / MainDrawFillSample.cs
+ *@copyFrom KT07_Graphics / MainHatchBrushViewer.cs
+ *@copyFrom KT07_Graphics / MainBrushAppendix.cs
+ *@copyFrom KT07_Graphics / MainGraphicsPathSample.cs
+ *@copyFrom RR08_Graphics / MainPathGradientBrushSample.cs
  *@copyFrom
  *@copyFrom
  *@copyFrom
@@ -48,6 +48,7 @@
  *         
  *         [×] new Graphics() の定義なく不可
  *         
+ *         ＊プロパティ
  *         float      graphics.DpiX { get; }            X方向の DPI(解像度)
  *         float      graphics.DpiY { get; }            Y方向の DPI(解像度)
  *         Matrix     graphics.Transform { get; set; }  図形変形の行列を登録
@@ -67,15 +68,31 @@
  *                 None = 3,        //アンチエイリアス処理しない
  *                 AntiAlias = 4    //アンチエイリアス処理されたレタリングを指定
  *             }
- *
+ *         
+ *         ＊描画制御
+ *         void       graphics.Clear(Color)              Graphicsオブジェクトに描画を引数 Colorで塗りつぶす
+ *                      └ Color  SystemColors.Windows    => 〔MainDrawFillSample.cs〕
  *         void       graphics.Flush([FlushIntention])   保留中の Graphics操作を強制実行
  *           └ enum FlushIntention  -- System.Drawing.Drawing2D
  *             {
  *                Flush = 0,  //Graphics操作の Stackをすぐに実行し、制御は すぐに戻す
  *                Sync = 1    //できる限り早く実行し、制御は処理完了まで同期的に待機してから戻す
  *             }
- *             
- *         void       graphics.Dispose()         // CreateGraphics()で生成した Graphicsオブジェクトは 使い終わる度に 破棄する
+ *         void       graphics.Dispose()      CreateGraphics()で生成した Graphicsオブジェクトは 使い終わる度に破棄すべき
+ *       ( void       control.Invalidate()    PictureBoxなどを一旦破棄し、再描画 )
+ *       ( void       control.Refresh()       キャッシュを破棄し最新の状態を表示  )
+ *         
+ *         ＊Graphics状態の保存/復元
+ *         GraphicsState  graphics.Save()
+ *           └ class GraphicsState : MarshalByRefObject    中身のないクラス。名前をつけてその時点の Graphics状態を表す
+ *                        -- System.Drawing.Drawing2D
+ *         void           graphics.Restore(GraphicsState)  Save()で保存した状態を復元
+ *         GraphicsContainer  graphics.BeginContainer(Rectangle dstrect, Rectangle srcrect, GraphicsUnit)
+ *                      └ 引数 dstrect:  表示領域
+ *                             srcrect:  部分領域, Save()と同様の機能だが、部分領域を抽出できる
+ *           └ class GraphicsContainer : MarshalByRefObject  中身のないクラス。名前をつけてその時点の Graphics状態を表す
+ *                        -- System.Drawing.Drawing2D
+ *         void           graphics.EndContainer(GraphicsContainer)   //BeginContainer()で保存した状態を復元
  *           
  *         ＊直線の描画
  *         void  graphics.DrawLine(Pen, Point p1, Point p2)             始点 p1 から 終点 p2 の直線を描画
@@ -148,4 +165,346 @@
  *         Pen   SystemPens.WindowFrame  { get; }
  *         Pen   SystemPens.WindowText  { get; }
  */
- 
+/*
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT07_Graphics
+ *@class MainDrawFillSample.cs
+ *@subject ◆Graphics -- System.Drawing.
+ *         ＊長方形 Rectangle: 始点, 横幅, 高さを指定
+ *         void   graphics.DrawRectangle(Pen, Rectangle)
+ *         void   graphics.DrawRectangle(Pen, int x, int y, int width, int height)
+ *         void   graphics.DrawRectangle(Pen, float x, float y, float width, float height)
+ *         void   graphics.DrawRectangles(Pen, Rectangle[]);
+ *         void   graphics.DrawRectangles(Pen, RectangleF[]);
+ *         
+ *         ＊多角形 Polygon: 点となる配列を指定
+ *         void   graphics.DrawLines(Pen, Point[])    始点と終点は結合せず
+ *         void   graphics.DrawLines(Pen, PointF[])
+ *         void   graphics.DrawPolygon(Pen, Point[])  始点と終点を結合し、閉じた多角形を描画
+ *         void   graphics.DrawPolygon(Pen, PointF[])
+ *         
+ *         ＊楕円 Ellipse: 四角形を指定して、それに内接する。正方形なら円、長方形なら楕円になる
+ *                        傾いた楕円を描画することはできない => 図形を回転 〔Matrixクラス | RR[374] p630〕
+ *         void   graphics.DrawEllipse(Pen, Rectangle)
+ *         void   graphics.DrawEllipse(Pen, RectangleF)
+ *         void   graphics.DrawEllipse(Pen, int x, int y, int width, int height)
+ *         void   graphics.DrawEllipse(Pen, float x, float y, float width, float height)
+ *         
+ *         ＊おうぎ型 Pie: 元になる楕円の外接四角形を指定し、X軸からの始まり角、終辺の角を度単位で指定 
+ *         void   graphics.DrawPie(Pen, Rectangle, float startAngle, float sweepAngle)
+ *         void   graphics.DrawPie(Pen, RectangleF, float startAngle, float sweepAngle)
+ *         void   graphics.DrawPie(Pen, int x, int y, int width, int height, float startAngle, float sweepAngle)
+ *         void   graphics.DrawPie(Pen, float x, float y, float width, float height, float startAngle, float sweepAngle)
+ *         
+ *         ＊円, 楕円の弧 Arc: 楕円の外接四角形、開始角、回転角を指定して弧を描画
+ *         void   graphics.DrawArc(Pen, Rectangle, float startAngle, float sweepAngle) 
+ *                  └ 引数 startAngle: 開始角。X軸を 0°とした度単位
+ *                         sweepAngle: 回転角。開始角からの角度。度単位
+ *                    ※ RectangleF, int, float 可
+ *                    
+ *         ＊ベジエ曲線 Bezier curve: 
+ *         https://e-words.jp/w/%E3%83%99%E3%82%B8%E3%82%A7%E6%9B%B2%E7%B7%9A.html
+ *         n個の点（制御点という）の座標を指定すると、n-1次の多項式によって示される。
+ *         この曲線は始点と終点を通り、始点とその隣の制御点を結ぶ直線、
+ *         および、終点とその隣の制御点を結ぶ直線の両方に接する。
+ *         始点と終点の位置が同じでも、途中の制御点の位置を変更することで曲線の形を任意に変形することができる。
+ *         作図ソフトなどでは4つの点（始点・終点と中間に2つの制御点）によって描画される3次ベジェ曲線がよく利用される。
+ *         
+ *         void   graphics.DrawBezier(Pen, Point, Point, Point, Point)
+ *         void   graphics.DrawBeziers(Pen, Point[])
+ *                ※PointF, PointF[] 可
+ *
+ *         ＊曲線の図形 ClosedCurve: 指定したPoint, tension(=張り度合?)で曲線の閉じられた図形
+ *         void DrawClosedCurve(Pen, Point[], [float tension, FillMode])
+ *              ※ PointF[] 可
+ *              └ 引数 tension: 0.0f以上 (正のfloat値)
+ *                      fillMode: 塗りつぶしの方法
+ *               └ enum FillMode -- System.Drawing.Drawing2D.
+ *                 {
+ *                     Alternate = 0, //交互塗りつぶしモード
+ *                     Winding = 1    //全域塗りつぶしモード
+ *                 }
+ *         ＊曲線
+ *         void DrawCurve(Pen, Point[], [int offset, int numberOfSegments,][float tension])
+ *              ※ PointF[] 可
+ *              引数  int offsetoffset:     Point[]の最初の要素から、描画開始点までのオフセット値(=非描画部分)
+ *                    int numberOfSegments  曲線に含めるセグメント値(？)
+ *                    float tension         曲線の張り度合 
+ *         
+ *@subject 塗りつぶし
+ *         ＊長方形 (rectangle) 塗りつぶし
+ *         void   graphics.FillRectangle(Brush, Rectangle)
+ *         void   graphics.FillRectangle(Brush, RectangleF)
+ *         void   graphics.FillRectangle(Brush, int x, int y, int width, int height)
+ *         void   graphics.FillRectangle(Brush, float x, float y, float width, float height)
+ *         void   graphics.FillRectangles(Brush, Rectangle[])
+ *         void   graphics.FillRectangles(Brush, RectangleF[])
+ *         
+ *         ＊楕円 (ellipse) 塗りつぶし
+ *         void   graphics.FillEllipse(Brush, Rectangle)
+ *         void   graphics.FillEllipse(Brush, RectangleF)
+ *         void   graphics.FillEllipse(Brush, int x, int y, int width, int height)
+ *         void   graphics.FillEllipse(Brush, float x, float y, float width, float height)
+ *
+ *         ＊その他 Fill
+ *         void   graphics.FillPolygon(Brush, Point[], [FillMode])  ※ PointF[] 可
+ *         void   graphics.FillPie(Brush, Rectangle, float startAngle, float sweepAngle) ※ int, float可
+ *         void   graphics.FillClosedCurve(Brush, Point[], [FillMode], [float tension])  ※ PointF[] 可 
+ *         
+ *         ＊GraphicsPathを描画
+ *         void   graphics.DrawPath(Pen, GraphicsPath)   =>〔MainGrapicsPathSample.cs〕
+ *         void   graphics.FillPath(Brush, GraphicsPath)
+ *
+ *         ＊Graphics 切替
+ *         void   graphics.Clear(Color) =>〔RR08_Graphics/MainPathGradientBrush.cs〕
+ *                    └ 引数 Color  SystemColors.Window
+ *                  Graphicsオブジェクトに以前に描画したものは残り続けるので、
+ *                  画面を切り替える場合は 別の Graphicsオブジェクトに描画するか、
+ *                  同一Graphicsなら Clear()して使う
+ *                  
+ *@NOTE【考察】DrawXxxx() と FillXxxx()の順
+ *      輪郭をきれいに描画するには、Fill -> Draw の順がいい
+ *      (逆だと、輪郭線が消えて塗りつぶしだけが見える)
+ *      
+ *@subject abstract Brush =>〔~/WinFormSample/ColorRefernce.txt〕
+ *         ＊GDI+(= System.Drawing.Graphics)以外のライブラリ(=System.Drawing.Drawing2D)を利用する Unmangedリソース
+ *         ・SolidBrushクラス : Brush           単色ブラシ
+ *         ・HatchBrushクラス : Brush           enum HatchStyleで規定の柄で塗りつぶし
+ *         ・TextureBrushクラス : Brush         イメージを指定して塗りつぶし
+ *         ・LinierGradientBrushクラス : Brush  線形グラデーション
+ *             これらのBrushオブジェクトは自動破棄が行われず、アプリケーション実行の間、メモリを占有し続ける。
+ *             Brushオブジェクトを大量に利用する場合は、メモリ領域を圧迫する可能性があるので、
+ *             利用が終了するたびに Dispose()しておく
+ *             =>〔MainBrushAppendix.cs〕
+ *         ・PathGradientBrushクラス : Brush    自由図形グラデーション
+ *             =>〔RR08_Graphics/MainPathGradientBrushSample.cs〕
+ */    
+ /* 
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT07_Graphics
+ *@class MainHatchBrushViewer.cs
+ *@subject Graphics -- System.Drawing.
+ *         ・画像外なら Labelでも可
+ *         ・DrawString()は 画像内に 画像としての文字列を描画 (重ねる場合は、要 透過色)
+ *         
+ *         void  graphics.DrawString(string, Font, Brush, PointF)
+ *         void  graphics.DrawString(
+ *                 string, Font, Brush,
+ *                 RectangleF, [StringFormat])
+ *         Region[]  graphics.MeasureCharacterRanges(            指定した文字列内のそれぞれの文字位置の範囲に外接する Region
+ *                       string, Font, RectangleF, StringFormat)
+ *         SizeF  graphics.MeasureString(                        文字列が描画された領域を返す
+ *                       string, Font, [SizeF], [StringFormat])  ※ PointF[], int width 可
+ */
+ /* 
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT07_Graphics
+ *@class MainBrushAppendix.cs
+ *@subject ◆LinearGradientBrush : Brush  -- System.Drawing.Drawing2D.
+ *         ・線形グラデーション: 一定割合で、一方向へ色の濃淡を変化
+ *         ・コンストラクタで、四角形, 開始色, 終了色, Mode, 
+ *           [角度][角度の影響を受けるか]を設定
+ *         LinearGradientBrush    new LinearGradientBrush(
+ *             PointF, PointF, Color, Color, LinearGradientMode
+ *             [, float angle, [bool isAngleScaleable]])
+ *         LinearGradientBrush    new LinearGradientBrush(
+ *             RectangleF, Color, Color, LinearGradientMode
+ *             [, float angle, [bool isAngleScaleable]])
+ *         ※ Point, Rectangleも可
+ *         
+ *         RectangleF  linearGradientBrush.Rectangle { get; }
+ *         Color[]     linearGradientBrush.LinearColors
+ *         LinearGradientMode   (None Property)
+ *           └ enum LinearGradientMode -- System.Drawing.Drawing2D.
+ *             {
+ *                 Horizontal = 0,      //左から右へのグラデーション
+ *                 Vertical = 1,        //上から下へのグラデーション
+ *                 ForwardDiagonal = 2, //左上から右下へのグラデーション
+ *                 BackwardDiagonal = 3 //右上から左下へのグラデーション
+ *             }
+ */
+ /* 
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT07_Graphics
+ *@class MainGraphicsPathSample.cs
+ *@subject Graphics
+ *         void        graphics.DrawPath(Pen, GraphicsPath)
+ *         Region      graphics.Clip { get; set;}           Graphicsオブジェクトの描画領域を設定
+ *           └ Region      new Region(GraphicPath)
+ *         void        graphics.SetClip(Graphics, [CombineMode])
+ *         void        graphics.SetClip(Region, [CombineMode])       ※ Rectangle, RectangleF 可
+ *         void        graphics.SetClip(GraphicsPath, [CombineMode])
+ *           └ enum CombineMode  クリッピング領域の結合方法を指定
+ *                     -- System.Drawing.Drawing2D
+ *             {
+ *                 Replace = 0,    //別のクリッピング領域で置換
+ *                 Intersect = 1,  //2つのクリッピング領域は、積集合
+ *                 Union = 2,      //2つのクリッピング領域は、両方の和集合
+ *                 Xor = 3,        //2つのクリッピング領域は、一方または他方で囲まれた領域だけ
+ *                 Exclude = 4,    //既存の領域から新しい領域の差集合で、既存の領域を置換
+ *                 Complement = 5  //新しい領域から既存の領域の差集合で、既存の領域を置換
+ *             }
+ *             
+ *         bool        graphics.IsClipEmpty { get; }        Clipプロパティが空か
+ *         RectangleF  graphics.ClipBounds { get; }         Clip領域の外接四角形
+ *         RectangleF  graphics.VisibleClipBounds  { get; } 表示されているClip領域の外接四角形
+ *         bool        graphics.IsVisibleClipEmpty { get; } 表示されているClip領域が 空か
+ *         bool        graphics.IsVisible(Rectangle)        引数領域が 表示Clip部分であるか  ※ RectangleF, Point[], PointF[], int, float 可
+ *         void        graphics.TranslateClip(int dx, int dy)  Clip領域を平行移動           ※ float可
+ *         void        graphics.IntersectClip(Region)       graphicsオブジェクトの既存Clip領域と、引数の領域の交差部分  ※Rectangle, RectangleF
+ *         void        graphics.ExcludeClip(Region)         graphicsオブジェクトの既存Clip領域と、引数の領域の差集合    ※Rectangle
+ *         void        graphics.ResetClip()                 Clip領域を削除
+ *         
+ *         ＊配置
+ *         void graphics.DrawImage(Image, RectangleF)
+ *           └ RectangleF  graphics.VisibleClipBounds
+ *               └ Region  　 graphics.Clip
+ *                   └ new Region(GraphicPath)
+ *                   
+ *         例: 
+ *         var gPath = new GraphicsPath( ... );
+ *         var region = new Region(gPath)
+ *         graphics.Clip = region;
+ *         graphics.DrawImage(Image, graphics.VisibleClipBounds);
+ *         
+ *@subject ◆Region : MarshalByRefObject, IDisposable
+ *         ・領域を表すオブジェクト
+ *         ・集合計算に関するメソッドを持つ
+ *         
+ *         Region  new Region(GraphicPath)
+ *         Region  new Region(Rectangle)   ※RectangleF
+ *         void    region.Union(※)        和集合  A or B  ※Rectangle, RectangleF, GraphicPath, Region
+ *         void    region.void Exclude(※) 差集合  A - B
+ *         void    region.Intersect(※)    積集合  A and B
+ *         void    region.Complement(※)   補集合  not A
+ *         void    region.Xor(※)          排他論理和  A xor B (和集合のうち交差部分を除外)
+ *         bool    region.Equals(Region region, Graphics g) 一致するか
+ *         bool    region.IsEmpty(Graphics g)               空集合であるか
+ *         bool    region.IsInfinite(Graphics g)            無限要素であるか
+ *         void    region.MakeEmpty()                       Regionを初期化し、空集合にする
+ *         
+ *@subject ◆GraphicsPath : MarshalByRefObject, ICloneable, IDisposable
+ *         ・System.Drawing.Drawing2D 名前空間
+ *         ・接続した一連の直線と曲線を表すオブジェクト
+ *         ・輪郭に囲まれていれば 必ずRegionになる訳ではない
+ *         ・外から偶数個の輪郭を越えて到達できる箇所は，領域外という扱いになります。
+ *         
+ *         GraphicsPath    new GraphicsPath()
+ *         GraphicsPath    new GraphicsPath(FillMode)
+ *         GraphicsPath    new GraphicsPath(Point[])   ※PointF[]も可
+ *         GraphicsPath    new GraphicsPath(Point[], [byte[] types], [FillMode])
+ *           引数  FileMode 
+ *             └ enum FileMode  -- System.Drawing.Drawing2D.
+ *               {
+ *                   Alternate = 0, //交互塗りつぶしモード
+ *                   Winding = 1    //全域塗りつぶしモード
+ *               }
+ *               
+ *           引数 byte[] types
+ *             └ enum PathPointType -- System.Drawing.Drawing2D.
+ *               {
+ *                   Start = 0,         //GraphicsPathオブジェクトの始点
+ *                   Line = 1,          //線分
+ *                   Bezier = 3,        //既定のベジエ曲線
+ *                   Bezier3 = 3,       //3次ベジエ曲線
+ *                   PathTypeMask = 7,  //マスク ポイント
+ *                   DashMode = 16,     //対応するセグメントはダッシュで描画
+ *                   PathMarker = 32,   //パス マーカー
+ *                   CloseSubpath = 128 //サブパスの終了点
+ *               }
+ *               
+ *               FillMode  graphicsPath.FillMode { get; set; }
+ *               PointF[]  graphicsPath.PathPoints { get; }
+ *               byte[]    graphicsPath.PathTypes  { get; }
+ *               int       graphicsPath.PointCount { get; }   PathTypesの要素数
+ *               
+ *               void      graphicsPath.AddLine(Point, Point)  ※int, PointF, floatも可
+ *               void      graphicsPath.AddLines(Point[])      ※PointF[]も可
+ *               void      graphicsPath.AddArc(Rectangle rect, float startAngle, float sweepAngle)  楕円の弧 ※RectangleFも可
+ *               void      graphicsPath.AddBeziers(params Point[] points)　                         ３次ベジエ曲線 ※PointF[]
+ *               void      graphicsPath.AddCurve(Point[], [int offset, int numberOfSegments], [float tension]) 曲線 ※PointF[]
+ *               void      graphicsPath.AddClosedCurve(Point[], [float tension])                    閉じた曲線  ※PointF[]
+ *               void      graphicsPath.AddEllipse(Rectangle rect)  ※ RectangleF, floatも可
+ *               void      graphicsPath.AddEllipse(int x, int y, int width, int height);
+ *               void      graphicsPath.AddPie(Rectangle, float startAngle, float sweepAngle)       扇形 ※RectangleF, float
+ *               void      graphicsPath.AddPie(int x, int y, int width, int height, float startAngle, float sweepAngle)
+ *               void      graphicsPath.AddPolygon(Point[])              多角形  ※PointF[]
+ *               void      graphicsPath.AddRectangle(Rectangle)          四角形  ※RectangleF
+ *               void      graphicsPath.AddRectangles(Rectangle[] rect)   四角形の配列  ※RectangleF[]
+ *               void AddString(string, FontFamily, int style, float emSize, Point origin, StringFormat)          ※PointF
+ *               void AddString(string, FontFamily, int style, float emSize, Rectangle layoutRect, StringFormat); ※RectangleF
+ *               void      graphicsPath.AddPath(GraphicsPath, bool connect)  
+ *                           引数 connect: 追加パスの最初の図形が、このパスの最後の図形の一部になるか
+ *               void      graphicsPath.SetMarkers();      マーカーを設定
+ *               void      graphicsPath.ClearMarkers()     すべてのマーカーを消去
+ *               void      graphicsPath.CloseAllFigures()  開いている すべての図形を閉じて、新しい図形を開始。開いている図形の開始点と終了点を接続することで閉じた図形になる
+ *               void      graphicsPath.CloseFigures()     開いている 現在の図形を閉じて、新しい図形を開始。開いている図形の開始点と終了点を接続することで閉じた図形になる
+ *               void      graphicsPath.Reset()            PathPoints, PathTypes配列を空にする。FileMode.Alternateに設定。
+ *               void      graphicsPath.Dispose()          このオブジェクトで利用している すべてのリソースを解放
+ */
+/* 
+ *@title WinFormGUI / WinFormSample / ReverseReference / RR08_Graphics
+ *@class MainPathGradientBrushSample.cs
+ *@subject ◆PathGradientBrush : Brush -- System.Drawing.Drawing2D
+ *         ・コンストラクタで 塗りつぶし範囲を指定
+ *         ・色情報は コンストラクタに入っていないので、
+ *           CenterColor, SurroundColorsを追加で指定する必要がある
+ *           (コンストラクタで生成したオブジェクトのままだと何も描画されない)
+ *           
+ *         PathGradientBrush     new PathGradientBrush(GraphicsPath, [WrapMode])
+ *         PathGradientBrush     new PathGradientBrush(Point[], [WrapMode])  ※Point[]も可
+ *           └ enum WrapMode  -- System.Drawing.Drawing2D.  塗りつぶし範囲より Brush範囲が小さい場合の並べ方
+ *             {
+ *                 Tile = 0,        //グラデーションまたはテクスチャを並べて表示
+ *                 TileFlipX = 1,   //水平方向に反転し、並べて表示
+ *                 TileFlipY = 2,   //垂直方向に反転し、並べて表示
+ *                 TileFlipXY = 3,  //水平および垂直方向に反転し、並べて表示
+ *                 Clamp = 4        //並べて表示されません
+ *             }
+ *             
+ *         Color       pathGradientBrush.CenterColor { get; set; }    塗りつぶし範囲の中央の色  
+ *         Color[]     pathGradientBrush.SurroundColors { get; set; } 塗りつぶし範囲の path周辺の色
+ *         RectangleF  pathGradientBrush.Rectangle { get; }           塗りつぶしpathに外接する四角形
+ *         PointF      pathGradientBrush.CenterPoint { get; set; }    グラデーションの中央点
+ *         WrapMode    pathGradientBrush.WrapMode { get; set; }       塗りつぶし範囲より Brush範囲が小さい場合の並べ方
+ *
+ *@NOTE【考察】PictureBox.Size と Dock, SizeMode
+ *      ・BorderStyle, Imageは Dock, SizeModeで拡大されるが 
+ *        Graphicsの描画は Dock, SizeModeで拡大しない
+ *        
+ *      ・DockStyle.Fill, SizeMode = PictureBoxSizeMode.Zoomなどは
+ *        pictureBox.Imageで Imageオブジェクトを登録した場合のみ有効
+ *        
+ *      ・pictrureBox.CreateGraphics()に g.DrawXxxx()/g.FillXxxx()した
+ *        グラフィックスには Dock, SizeModeの値が影響しない
+ *        (サイズが小さいまま表示される)
+ *        
+ *      ・Graphicsを PictureBoxの枠線いっぱいに表示するには
+ *        pictureBox.Size / ClientSizeを 正しく指定する必要がある
+ *        (pic.Size / pic.ClientSizeは DockStyle.Fill, SizeModeで拡大する前の大きさに設定されている)
+ *      
+ *      ・Size / ClientSizeを定数指定することは望ましくないので、
+ *        PictureBoxの親コントロールである Form / Panelのサイズから取得すべき
+ *      
+ *      ・Panelである TableLayoutPanelも同様に Dock, ColumnStyles, RowStylesで
+ *        拡大・縮小する前のサイズが Size, Width, Heightの値になっている
+ *        
+ *       ＊例
+ *      ・form.ClientSize.Width - 5: 親Formの横幅から、PictureBoxの枠線分の 5pxを除いた横幅
+ *      ・(int)(form.ClientSize.Height * 0.83): 親Formの高さの 83%の高さ
+ *        intキャストは pic.Sizeが int指定なので要キャスト
+ *        intキャストなのに、* 0.85 -> * 0.83などの変更も ちゃんとサイズに反映する
+ *        (本来の intキャストだと、どちらの値も 0になるはずだが、
+ *         元の 0.85などの値がカプセル化されて、型のみ intになっている様子)
+ *      ・間に Bitmapオブジェクトを入れて
+ *        pic.Image = new Bitmap(pic.Width, pic.Height); として、
+ *        pic.CreateGraphics().DrawXxxx()で描いても、Dock, SizeModeは適用されない
+ *        
+ *      ・Image.FromFile(string fileName), new Bitmap(string)は
+ *        Imageの元サイズが どうであれ、デフォルトで決まったサイズで登録される
+ *        image.Width, image.Height, image.Sizeは、デフォルトの PictureBoxのサイズになる
+ *        => new Bitmap(Image.FromFile(string fileName), Size)で登録すると、
+ *        元画像のサイズで登録される
+ *        
+ *       ・初期画像を表示するには、pic.Imageプロパティを登録
+ *         Buttonイベントのメソッドを呼出ても反応しない。
+ *         Imageプロパティを登録しても、g.DrawImage()の画像を表示できる。
+ *         (ただし、上書きするので、切り替える場合は g.Clear(Color)が必要)
+ */
+
