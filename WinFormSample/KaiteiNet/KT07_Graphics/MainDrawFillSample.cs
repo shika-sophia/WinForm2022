@@ -89,8 +89,14 @@
  *         void   graphics.FillEllipse(Brush, int x, int y, int width, int height)
  *         void   graphics.FillEllipse(Brush, float x, float y, float width, float height)
  *
+ *         ＊その他 Fill
+ *         void   graphics.FillPolygon(Brush, Point[], [FillMode])  ※ PointF[] 可
+ *         void   graphics.FillPie(Brush, Rectangle, float startAngle, float sweepAngle) ※ int, float可
+ *         void   graphics.FillClosedCurve(Brush, Point[], [FillMode], [float tension])  ※ PointF[] 可 
+ *         
  *         ＊GraphicsPathを描画
  *         void   graphics.DrawPath(Pen, GraphicsPath)   =>〔MainGrapicsPathSample.cs〕
+ *         void   graphics.FillPath(Brush, GraphicsPath)
  *         
  *         ＊Graphics 切替
  *         void   graphics.Clear(Color) =>〔RR08_Graphics/MainPathGradientBrush.cs〕
@@ -105,16 +111,18 @@
  *      
  *@subject abstract Brush =>〔~/WinFormSample/ColorRefernce.txt〕
  *         ＊GDI+(= System.Drawing.Graphics)以外のライブラリ(=System.Drawing.Drawing2D)を利用する Unmangedリソース
- *         SolidBrushクラス : Brush           単色ブラシ
- *         HatchBrushクラス : Brush           enum HatchStyleで規定の柄で塗りつぶし
- *         TextureBrushクラス : Brush         イメージを指定して塗りつぶし
- *         LinierGradientBrushクラス : Brush  グラデーション
- *           これらのBrushオブジェクトは自動破棄が行われず、アプリケーション実行の間、メモリを占有し続ける。
- *           Brushオブジェクトを大量に利用する場合は、メモリ領域を圧迫する可能性があるので、
- *           利用が終了するたびに Dispose()しておく
- *      
+ *         ・SolidBrushクラス : Brush           単色ブラシ
+ *         ・HatchBrushクラス : Brush           enum HatchStyleで規定の柄で塗りつぶし
+ *         ・TextureBrushクラス : Brush         イメージを指定して塗りつぶし
+ *         ・LinierGradientBrushクラス : Brush  線形グラデーション
+ *             これらのBrushオブジェクトは自動破棄が行われず、アプリケーション実行の間、メモリを占有し続ける。
+ *             Brushオブジェクトを大量に利用する場合は、メモリ領域を圧迫する可能性があるので、
+ *             利用が終了するたびに Dispose()しておく
+ *             =>〔MainBrushAppendix.cs〕
+ *         ・PathGradientBrushクラス : Brush    自由図形グラデーション
+ *             =>〔RR08_Graphics/MainPathGradientBrushSample.cs〕
+ *           
  *@see ImageFillSample.jpg
- *@see 
  *@copyTo ~/WinFormSample/GraphicsRefernce.txt
  *@copyTo ~/WinFormSample/ColorRefernce.txt
  *@author shika

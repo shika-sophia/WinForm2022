@@ -29,7 +29,11 @@
  *         void  graphics.DrawString(string, Font, Brush, PointF)
  *         void  graphics.DrawString(
  *                 string, Font, Brush,
- *                 RectangleF, [StringFormat]);
+ *                 RectangleF, [StringFormat])
+ *         Region[]  graphics.MeasureCharacterRanges(            指定した文字列内のそれぞれの文字位置の範囲に外接する Region
+ *                       string, Font, RectangleF, StringFormat)
+ *         SizeF  graphics.MeasureString(                        文字列が描画された領域を返す
+ *                       string, Font, [SizeF], [StringFormat])  ※ PointF[], int width 可
  *         
  *@see ImageHatchBrushViewer.jpg
  *@see ~/CsharpCode/ShowEnumValue.cs

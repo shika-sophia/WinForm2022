@@ -41,6 +41,7 @@
  *         
  *         [×] new Graphics() の定義なく不可
  *         
+ *         ＊プロパティ
  *         float      graphics.DpiX { get; }            X方向の DPI(解像度)
  *         float      graphics.DpiY { get; }            Y方向の DPI(解像度)
  *         Matrix     graphics.Transform { get; set; }  図形変形の行列を登録
@@ -60,15 +61,31 @@
  *                 None = 3,        //アンチエイリアス処理しない
  *                 AntiAlias = 4    //アンチエイリアス処理されたレタリングを指定
  *             }
- *             
+ *         
+ *         ＊描画制御
+ *         void       graphics.Clear(Color)              Graphicsオブジェクトに描画を引数 Colorで塗りつぶす
+ *                      └ Color  SystemColors.Windows    => 〔MainDrawFillSample.cs〕
  *         void       graphics.Flush([FlushIntention])   保留中の Graphics操作を強制実行
  *           └ enum FlushIntention  -- System.Drawing.Drawing2D
  *             {
  *                Flush = 0,  //Graphics操作の Stackをすぐに実行し、制御は すぐに戻す
  *                Sync = 1    //できる限り早く実行し、制御は処理完了まで同期的に待機してから戻す
  *             }
- *             
- *         void       graphics.Dispose()         // CreateGraphics()で生成した Graphicsオブジェクトは 使い終わる度に 破棄する
+ *         void       graphics.Dispose()      CreateGraphics()で生成した Graphicsオブジェクトは 使い終わる度に破棄すべき
+ *       ( void       control.Invalidate()    PictureBoxなどを一旦破棄し、再描画 )
+ *       ( void       control.Refresh()       キャッシュを破棄し最新の状態を表示  )
+ *         
+ *         ＊Graphics状態の保存/復元
+ *         GraphicsState  graphics.Save()
+ *           └ class GraphicsState : MarshalByRefObject    中身のないクラス。名前をつけてその時点の Graphics状態を表す
+ *                        -- System.Drawing.Drawing2D
+ *         void           graphics.Restore(GraphicsState)  Save()で保存した状態を復元
+ *         GraphicsContainer  graphics.BeginContainer(Rectangle dstrect, Rectangle srcrect, GraphicsUnit)
+ *                      └ 引数 dstrect:  表示領域
+ *                             srcrect:  部分領域, Save()と同様の機能だが、部分領域を抽出できる
+ *           └ class GraphicsContainer : MarshalByRefObject  中身のないクラス。名前をつけてその時点の Graphics状態を表す
+ *                        -- System.Drawing.Drawing2D
+ *         void           graphics.EndContainer(GraphicsContainer)   //BeginContainer()で保存した状態を復元
  *           
  *         ＊直線の描画
  *         void  graphics.DrawLine(Pen, Point p1, Point p2)             始点 p1 から 終点 p2 の直線を描画

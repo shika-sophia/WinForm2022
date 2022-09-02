@@ -16,11 +16,29 @@
  *         void        graphics.DrawPath(Pen, GraphicsPath)
  *         Region      graphics.Clip { get; set;}           Graphicsオブジェクトの描画領域を設定
  *           └ Region      new Region(GraphicPath)
+ *         void        graphics.SetClip(Graphics, [CombineMode])
+ *         void        graphics.SetClip(Region, [CombineMode])       ※ Rectangle, RectangleF 可
+ *         void        graphics.SetClip(GraphicsPath, [CombineMode])
+ *           └ enum CombineMode  クリッピング領域の結合方法を指定
+ *                     -- System.Drawing.Drawing2D
+ *             {
+ *                 Replace = 0,    //別のクリッピング領域で置換
+ *                 Intersect = 1,  //2つのクリッピング領域は、積集合
+ *                 Union = 2,      //2つのクリッピング領域は、両方の和集合
+ *                 Xor = 3,        //2つのクリッピング領域は、一方または他方で囲まれた領域だけ
+ *                 Exclude = 4,    //既存の領域から新しい領域の差集合で、既存の領域を置換
+ *                 Complement = 5  //新しい領域から既存の領域の差集合で、既存の領域を置換
+ *             }
+ *             
  *         bool        graphics.IsClipEmpty { get; }        Clipプロパティが空か
  *         RectangleF  graphics.ClipBounds { get; }         Clip領域の外接四角形
  *         RectangleF  graphics.VisibleClipBounds  { get; } 表示されているClip領域の外接四角形
  *         bool        graphics.IsVisibleClipEmpty { get; } 表示されているClip領域が 空か
- *         void        graphics.ResetClip()
+ *         bool        graphics.IsVisible(Rectangle)        引数領域が 表示Clip部分であるか  ※ RectangleF, Point[], PointF[], int, float 可
+ *         void        graphics.TranslateClip(int dx, int dy)  Clip領域を平行移動           ※ float可
+ *         void        graphics.IntersectClip(Region)       graphicsオブジェクトの既存Clip領域と、引数の領域の交差部分  ※Rectangle, RectangleF
+ *         void        graphics.ExcludeClip(Region)         graphicsオブジェクトの既存Clip領域と、引数の領域の差集合    ※Rectangle
+ *         void        graphics.ResetClip()                 Clip領域を削除
  *         
  *         ＊配置
  *         void graphics.DrawImage(Image, RectangleF)
@@ -110,7 +128,7 @@
  *               void      graphicsPath.Dispose()          このオブジェクトで利用している すべてのリソースを解放
  *               
  *@see ImageGraphicsPathSample.jpg
- *@see 
+ *@copyTo ~/WinformSample/GraphicsReference.txt
  *@author shika
  *@date 2022-08-25
  */
