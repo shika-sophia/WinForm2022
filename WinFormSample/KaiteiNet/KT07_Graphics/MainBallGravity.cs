@@ -44,6 +44,7 @@
  *      
  *@see ImageBallGravity.jpg
  *@see MainMouseDragSample.cs
+ *@copyTo ~/WinFormSample/GraphicsReference.txt
  *@author shika
  *@date 2022-08-27
  */

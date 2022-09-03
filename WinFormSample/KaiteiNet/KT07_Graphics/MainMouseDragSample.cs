@@ -28,7 +28,7 @@
  *          }
  *
  *@see ImageBallGravity.jpg
- *@see 
+ *@copyTo ~/WinFormSample/GraphicsReference.txt
  *@author shika
  *@date 2022-08-26
  */

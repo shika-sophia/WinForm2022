@@ -61,7 +61,7 @@
  *         Bitmap   new Bitmap(int width, int height)
  *         Bitmap   new Bitmap(int width, int height, PixelFormat format)
  *         Bitmap   new Bitmap(int width, int height, Graphics g)
- *         Bitmap   new itmap(Image original, int width, int height)
+ *         Bitmap   new Bitmap(Image original, int width, int height)
  *         Bitmap   new Bitmap(int width, int height, int stride, PixelFormat, IntPtr scan0)
  *           引数 bool useIcm: 色補正を利用するか
  *                int stride: スキャンラインの間のバイトオフセット数を指定する整数。 
@@ -79,6 +79,7 @@
  *@see ImageGetPixelSample.jpg
  *@see MainBitmapSetPixelSample.cs
  *@see MainBitmapMakeTransparentSample.cs
+ *@copyTo ~/WinFormSample/GraphicsReference.txt
  *@author shika
  *@date 2022-08-22
  */

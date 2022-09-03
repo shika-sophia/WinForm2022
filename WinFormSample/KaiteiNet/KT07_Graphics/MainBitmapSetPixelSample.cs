@@ -32,6 +32,7 @@
  *        
  *@see ImageBitmapSetPixcelSample.jpg
  *@see MainBitmapGetPixelSample.cs
+ *@copyTo ~/WinFormSample/GraphicsReference.txt
  *@author shika
  *@date 2022-08-24
  */

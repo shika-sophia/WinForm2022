@@ -19,18 +19,21 @@
  *         ※ Point, PointF, Point[], PointF[], Rectangle, RectangleFを用いる オーバーロード(全29個)もある
  *         ※ enum GraphicsUnit 長さの単位を指定する引数もある
  *            {
- *                World = 0,   //ワールド座標系を長さの単位に指定
- *                Display = 1, //表示デバイスの長さの単位を指定します。 通常、ビデオ ディスプレイにはピクセル、プリンターには 1/100 インチを指定します。
- *                Pixel = 2,   //デバイス ピクセルを長さの単位
- *                Point = 3,   //プリンターポイント (1/72 インチ) を長さの単位に指定
- *                Inch = 4,    //インチを長さの単位に指定
- *                Document = 5,//ドキュメント単位 (1/300 インチ) を長さの単位に指定
- *                Millimeter = 6//ミリメートルを長さの単位に指定
+ *                World = 0,      //ワールド座標系を長さの単位に指定
+ *                Display = 1,    //表示デバイスの長さの単位を指定します。 通常、ビデオ ディスプレイにはピクセル、プリンターには 1/100 インチを指定します。
+ *                Pixel = 2,      //デバイス ピクセルを長さの単位
+ *                Point = 3,      //プリンターポイント (1/72 インチ) を長さの単位に指定
+ *                Inch = 4,       //インチを長さの単位に指定
+ *                Document = 5,   //ドキュメント単位 (1/300 インチ) を長さの単位に指定
+ *                Millimeter = 6  //ミリメートルを長さの単位に指定
  *            }
  *            
+ *         ※ DrawImage() 続き =>〔RR08_Graphics / MainColorMatrixSemiTransParent.cs〕
+ *         
  *@subject abstract Image : MarshalByRefObject, ISerializable, ICloneable, IDisposable
  *         ・抽象クラス Image: new Image()は不可
  *         ・インスタンスは Bitmapオブジェクトを生成している〔KT07〕
+ *         ・=>〔MainBitmapGetPixelSample.cs〕
  *         
  *         Image  Image.FromFile(string path)       static / ファイルからImageをロード
  *         void   image.RotateFlip(RotateFlipType)  回転と反転のタイプを適用
@@ -76,7 +79,7 @@
  *          ・ネットには [Windows Form]に同様の不具合報告あり。原因不明
  *          
  *@see ImageDrawImageSample.jpg
- *@see 
+ *@copyTo ~/WinFormSample/GraphicsReference.txt
  *@author shika
  *@date 2022-08-20
  */

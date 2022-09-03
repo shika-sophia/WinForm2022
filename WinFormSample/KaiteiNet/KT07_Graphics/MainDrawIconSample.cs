@@ -91,7 +91,8 @@
  *         }//foreach
  *         
  *@see ImageDrawIconSample.jpg
- *@copyFrom ~\CsharpCode\ShowPropertyAll.cs 
+ *@copyFrom ~\CsharpCode\ShowPropertyAll.cs
+ *@copyTo   ~\WinFormSample\GraphicsReference.txt
  *@author shika
  *@date 2022-08-21
  */
