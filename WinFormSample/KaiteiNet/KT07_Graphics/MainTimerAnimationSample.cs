@@ -38,7 +38,7 @@
  *      おそらくTitleBar, ScrollBar, StatusBarの幅が Formのサイズになっている。
  *      可視範囲の Formの枠で座標処理する場合は ClientSizeで処理すべし
  *@see ImageTimerAnimationSample.jpg
- *@see 
+ *@copyTo ~/WinFormSample/GraphicsReference.txt
  *@author shika
  *@date 2022-08-26
  */
