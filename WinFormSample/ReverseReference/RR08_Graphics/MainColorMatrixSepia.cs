@@ -1,4 +1,4 @@
-﻿/** 
+/** 
  *@title WinFormGUI / WinFormSample / ReverseReference / RR08_Graphics
  *@class MainColorMatrixSepia.cs
  *@class   └ new FormColorMatrixSepia() : Form

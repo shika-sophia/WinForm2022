@@ -49,6 +49,7 @@
         }//BuildTransform()
 
  *@see ImageMatrixScaleTranslate.jpg
+ *@copyTo ~/WinFormSample/GraphicsReference.txt
  *@author shika
  *@date 2022-09-01
  */

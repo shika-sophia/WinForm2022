@@ -83,6 +83,7 @@
  *@see ImageMatrixRotateSample.jpg
  *@see MainMatrixScaleTranslate.cs
  *@copyTo ~/WinFormSample/WinFormSample_analysis.txt
+ *@copyTo ~/WinFormSample/GraphicsReference.txt
  *@author shika
  *@date 2022-09-01
  */
