@@ -6,12 +6,20 @@
  *@copyFrom KT07_Graphics / MainBrushAppendix.cs
  *@copyFrom KT07_Graphics / MainGraphicsPathSample.cs
  *@copyFrom RR08_Graphics / MainPathGradientBrushSample.cs
- *@copyFrom
- *@copyFrom
- *@copyFrom
- *@copyFrom
+ *@copyFrom KT07_Graphics / MainDrawIconSample.cs
+ *@copyFrom KT07_Graphics / MainBitmapGetPixcelSample.cs
+ *@copyFrom KT07_Graphics / MainBitmapMakeTransparentSample.cs
+ *@copyFrom KT07_Graphics / MainBitmapSetPixcelSample.cs
+ *@copyFrom KT07_Graphics / MainDrawImageSample.cs
+ *@copyFrom RR08_Graphics / MainColorMatrixSemiTransParent.cs
+ *@copyFrom RR08_Graphics / MainMatrixRotateSample.cs
+ *@copyFrom RR08_Graphics / MainMatrixScaleTaranslate.cs 
+ *@copyFrom KT07_Graphics / MainMouseDragSample.cs 
+ *@copyFrom KT07_Graphics / MainTimerAnimationSample.cs 
+ *@copyFrom KT07_Graphics / MainBallGravity.cs
+ *@copyFrom  
  *@author shika
- *@date 2022-09-02
+ *@date 2022-09-03
  */
  /* 
  *@title WinFormGUI / WinFormSample / KaiteiNet / KT07_Graphics
@@ -507,4 +515,541 @@
  *         Imageプロパティを登録しても、g.DrawImage()の画像を表示できる。
  *         (ただし、上書きするので、切り替える場合は g.Clear(Color)が必要)
  */
+ /* 
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT07_Graphics
+ *@class MainDrawIconSample.cs
+ *@subject Graphics
+ *         void  graphics.DrawIcon(Icon, int x, int y)  Iconクラスを指定位置に描画、サイズは Icon のサイズ
+ *         void  graphics.DrawIcon(Icon, Rectangle)     Iconクラスを指定位置とサイズで描画
+ *         
+ *         [×] float, Point, PointF, RectangleF は定義なし
+ *
+ *@subject フォームのアイコン設定
+ *         Icon    form.Icon       フォームのアイコン
+ *         bool    form.ShowIcon   フォームのアイコンを表示するか / デフォルト: true
+ *         
+ *@subject〔WF44〕◆Icon : MarshalByRefObject, ISerializable, ICloneable, IDisposable
+ *         Icon   new Icon(string fileName)
+ *         Icon   new Icon(Stream stream)
+ *         Icon   new Icon(string fileName, Size size)
+ *         Icon   new Icon(Icon original, Size size)
+ *         Icon   new Icon(Type type, string resource)
+ *         Icon   new Icon(Stream stream, Size size)
+ *         Icon   new Icon(string fileName, int width, int height)
+ *         Icon   new Icon(Icon original, int width, int height)
+ *         Icon   new Icon(Stream stream, int width, int height)
+ *         
+ *         int    icon.Width    { get; }
+ *         int    icon.Height   { get; }
+ *         Size   icon.Size     { get; }
+ *         
+ *         Icon   static Icon.ExtractAssociatedIcon(string filename) 画像ファイル(.bmp/.jpgなど)から Iconを作成
+ *         void   icon.Save(Stream outputStream)
+ *         Bitmap icon.ToBitmap()
+ *         
+ *         => copyFrom〔RR05_MenuToolStrip/MainNotifyIconSample.cs〕
+ *         
+ *@subject class SystemIcons --System.Drawing.
+ *         ・System32 既定のアイコン
+ *         ・enumではく classなので Reflectionを利用して、全プロパティを取得
+ *         ・「Windowsアイコン」は ちゃんと描画できない
+ *         ・PictureBoxで graphics.DrawIcon()することもできる
+ *           =>〔Reference/SystemIconDiv/MainSystemIconSample.cs〕
+ *         
+ *         public sealed class SystemIcons   
+ *         {
+ *             static Icon Application { get; }  WIN32: IDI_APPLICATION
+ *             static Icon Asterisk { get; }     WIN32: IDI_ASTERISK
+ *             static Icon Error { get; }        WIN32: IDI_ERROR
+ *             static Icon Exclamation { get; }  WIN32: IDI_EXCLAMATION
+ *             static Icon Hand { get; }         WIN32: IDI_HAND
+ *             static Icon Information { get; }  WIN32: IDI_INFORMATION
+ *             static Icon Question { get; }     WIN32: IDI_QUESTION
+ *             static Icon Warning { get; }      WIN32: IDI_WARNING
+ *             static Icon WinLogo { get; }      WIN32: IDI_WINLOGO
+ *             static Icon Shield { get; }       シールド アイコン
+ *         }
+ */
+ /*
+ *@title WinFormGUI / WinFormSample / KaiteiNet.KT07_Graphics
+ *@class MainBitmapGetPixelSample.cs
+ *@subject ◆abstract Image : MarshalByRefObject, ISerializable, ICloneable, IDisposable
+ *         [×]      new Image()
+ *         Image    Image.FromFile(string fileName)
+ *         Image    Image.FromStream(Stream)
+ *         
+ *         int      image.Width   { get; }
+ *         int      image.Height  { get; }
+ *         Size     image.Size    { get; }
+ *         ImageFormat  image.RawFormat   { get; }
+ *         PixelFormat  image.PixelFormat { get; }
+ *           └ enum PixelFormat { ... }   カラーのデータ形式
+ *           
+ *         void     image.RotateFlip(RotateFlipType)        画像の回転、反転
+ *           └ enum RotateFlipType { ... }   =>〔MainDrawImageSample.cs〕
+ *         void     image.Save(string filename, ImageFormat format);
+ *         void     image.Save(Stream stream, ImageFormat format);
+ *           └ class ImageFormat -- System.Drawing.Imaging.ImageFormat
+ *             ImageFormat   new ImageFormat(Guid guid)
+ *             Guid          ImageFormat.Guid { get; }   GUID (Grobal Unique Identifer) グローバル 一意の識別子 ??
+ *               └ struct System.Guid 構造体
+ *             ImageFormat   ImageFormat.MemoryBmp { get; }   メモリ上のビットマップの形式
+ *             ImageFormat   ImageFormat.Bmp  { get; }   ビットマップ (BMP) イメージ形式
+ *             ImageFormat   ImageFormat.Emf  { get; }   拡張メタファイル (EMF) イメージ形式
+ *             ImageFormat   ImageFormat.Wmf  { get; }   Windows メタファイル (WMF) イメージ形式
+ *             ImageFormat   ImageFormat.Gif  { get; }   GIF (Graphics Interchange Format) イメージ形式
+ *             ImageFormat   ImageFormat.Jpeg { get; }   JPEG (Joint Photographic Experts Group) イメージ形式
+ *             ImageFormat   ImageFormat.Png  { get; }   W3C PNG (Portable Network Graphics) イメージ形式
+ *             ImageFormat   ImageFormat.Tiff { get; }   TIFF (Tagged Image File Format) イメージ形式
+ *             ImageFormat   ImageFormat.Exif { get; }   Exif (Exchangeable Image File) 形式
+ *             ImageFormat   ImageFormat.Icon { get; }   Windows アイコン イメージ形式
+ *         
+ *         void     image.Dispose();
+ *         
+ *@subject ◆Bitmap : Image
+ *         ・ピクセルデータで表現されるイメージを扱うクラス
+ *         ・abstract Image クラスを継承
+ *         ・BMP 形式以外に JPG，GIF，PNG，EXIF，TIFF 形式も可。
+ *         ・Bitmap オブジェクトでは，1 ピクセルごとに色の情報を得ることができる。
+ *         ・Bitmap オブジェクトなら，1 ピクセルごとに色を操作することができる。
+ *         
+ *         Bitmap   new Bitmap(string fileName)
+ *         Bitmap   new Bitmap(Stream)
+ *         Bitmap   new Bitmap(Image original)
+ *         Bitmap   new Bitmap(Image original, Size newSize)
+ *         Bitmap   new Bitmap(string fileName, bool useIcm)   
+ *         Bitmap   new Bitmap(Stream stream, bool useIcm)
+ *         Bitmap   new Bitmap(Type type, string resource)
+ *         Bitmap   new Bitmap(int width, int height)
+ *         Bitmap   new Bitmap(int width, int height, PixelFormat format)
+ *         Bitmap   new Bitmap(int width, int height, Graphics g)
+ *         Bitmap   new Bitmap(Image original, int width, int height)
+ *         Bitmap   new Bitmap(int width, int height, int stride, PixelFormat, IntPtr scan0)
+ *           引数 bool useIcm: 色補正を利用するか
+ *                int stride: スキャンラインの間のバイトオフセット数を指定する整数。 
+ *                            これには、通常 (必須ではありません)、ピクセルあたりのバイト数という形式 
+ *                            (16 ビット/ピクセルの場合は 2) にビットマップの幅を乗じた値を指定します。
+ *                            このパラメーターに渡す値は、4 の倍数である必要があります。
+ *                IntPtr scan0: ピクセル データを格納するバイトの配列へのポインター。
+ *               
+ *         Color    graphics.GetNearestColor(Color color)  引数に最も近い Color structを取得
+ *         Color    bitmap.GetPixel(int x, int y)          ピクセル座標を指定して Colorを取得
+ *         void     bitmap.SetPixel(int x, int y, Color)   ピクセル座標を指定して Colorを設定
+ *         void     bitmap.MakeTransparent()               既定の透過色を透明にする
+ *         void     bitmap.MakeTransparent(Color)          透過色を指定して、その色を透明にする
+ */
+ /*
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT07_Graphics
+ *@class MainBitmapMakeTransparentSample.cs
+ *@subject 【部分透過】 画像を透過させて重ねる方法
+ *         ・PNG形式「.png」の画像は 透過度情報をデータ内に保持している
+ *         ・背景が透明の PNGを利用するか
+ *         ・背景が一色に塗られている画像で、MakeTransparent()で透過色を指定する
+ *         ・MakeTransparent()で指定した色を背景以外で利用していた場合、そこも透明になってしまう
+ *         ・背景が透明の画像のほうが、きれいに描画できる
+ *         
+ *@subject Bitmap =>〔MainBitmapGetPixelSample.cs〕
+ *         void    bitmap.MakeTransparent()       既定の透過色を透明にする
+ *         void    bitmap.MakeTransparent(Color)  透過色を指定して、その色を透明にする
+ *         Color   bitmap.GetPixel(int x, int y)  指定座標の Colorを取得
+ */
+ /*
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT07_Graphics
+ *@class MainBitmapSetPixcelSample.cs
+ *@content KT07 Graphics / Bitmap.SetPixcel()
+ *         Bitmap   new Bitmap(int width, int height) によって、
+ *         サイズだけ指定した 空のBitmapオブジェクトを作り、
+ *         bitmap.SetPixel(int x, int y, Color)で、
+ *         Bitmapの絵を描き、
+ *         graphic.DrawImage(Image, int x, int y)で
+ *         Bitmapを Formに描画
+ *         SetPixel()を変更した場合は form.Reflesh()で再描画が必要
+ *         
+ *@subject Bitmap =>〔MainBitmapGetPixelSample.cs〕
+ *         void    bitmap.SetPixcel(int x, int y, Color)
+ *         
+ *@subject Color  =>〔~/WinFormSample/ColorReference.txt〕
+ *         Color   Color.FromArgb(int red, int green, int blue)
+ *
+ *@NOTE【註】
+ *      ・for文 i, j, k での 三重ネストは 処理に 1-2分ぐらい掛かり、
+ *        表示が停滞する
+ *      ・bitmap.SetPixel()だけでは、Formの表示に変化なし
+ *        form.Reflesh()でキャッシュを破棄し、再描画すると Formに反映する
+ */
+  /*
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT07_Graphics
+ *@class MainDrawImageSample.cs
+ *@subject Graphics
+ *         void   graphics.DrawImage(Image, int x, int y)
+ *         void   graphics.DrawImage(Image, float x, float y)
+ *         void   graphics.DrawImage(Image, int x, int y, int width, int height)
+ *         void   graphics.DrawImage(Image, float x, float y, float width, float height)
+ *         
+ *         ※ Point, PointF, Point[], PointF[], Rectangle, RectangleFを用いる オーバーロード(全29個)もある
+ *         ※ enum GraphicsUnit 長さの単位を指定する引数もある
+ *            {
+ *                World = 0,      //ワールド座標系を長さの単位に指定
+ *                Display = 1,    //表示デバイスの長さの単位を指定します。 通常、ビデオ ディスプレイにはピクセル、プリンターには 1/100 インチを指定します。
+ *                Pixel = 2,      //デバイス ピクセルを長さの単位
+ *                Point = 3,      //プリンターポイント (1/72 インチ) を長さの単位に指定
+ *                Inch = 4,       //インチを長さの単位に指定
+ *                Document = 5,   //ドキュメント単位 (1/300 インチ) を長さの単位に指定
+ *                Millimeter = 6  //ミリメートルを長さの単位に指定
+ *            }
+ *            
+ *@subject abstract Image : MarshalByRefObject, ISerializable, ICloneable, IDisposable
+ *         ・抽象クラス Image: new Image()は不可
+ *         ・インスタンスは Bitmapオブジェクトを生成している〔KT07〕
+ *         ・=>〔MainBitmapGetPixelSample.cs〕
+ *         
+ *         Image  Image.FromFile(string path)       static / ファイルからImageをロード
+ *         void   image.RotateFlip(RotateFlipType)  回転と反転のタイプを適用
+ *           └ enum RotateFlipType
+ *             {
+ *                 RotateNoneFlipNone = 0,  //回転も反転も行わない
+ *                 Rotate180FlipXY = 0,     //時計回りに 180 度回転してから、水平と垂直に反転
+ *                 Rotate90FlipNone = 1,    //反転せずに時計回りに 90 度回転
+ *                 Rotate270FlipXY = 1,     //時計回りに 270 度回転してから、水平と垂直に反転
+ *                 Rotate180FlipNone = 2,   //反転せずに時計回りに 180 度回転
+ *                 RotateNoneFlipXY = 2,    //回転せずに水平と垂直に反転
+ *                 Rotate270FlipNone = 3,  //反転せずに時計回りに 270 度回転
+ *                 Rotate90FlipXY = 3,   //時計回りに 90 度回転してから、水平方向と垂直方向に反転
+ *                 RotateNoneFlipX = 4,  //回転せずに水平方向に反転
+ *                 Rotate180FlipY = 4,   //時計回りに 180 度回転してから、垂直方向に反転
+ *                 Rotate90FlipX = 5,    //時計回りに 90 度回転してから、水平方向に反転
+ *                 Rotate270FlipY = 5,   //時計回りに 270 度回転してから、垂直方向に反転
+ *                 Rotate180FlipX = 6,   //時計回りに 180 度回転してから、水平方向に反転
+ *                 RotateNoneFlipY = 6,  //回転せずに垂直方向に反転
+ *                 Rotate270FlipX = 7,   //時計回りに 270 度回転してから、水平方向に反転
+ *                 Rotate90FlipY = 7     //時計回りに 90 度回転してから、垂直方向に反転
+ *             }
+ *             
+ *@NOTE【考察】画像の反転
+ *      ・KTのコード image.RotateFlip(RotateFlipType.RotateNoneFlipX)では反転しない
+ *      ・RRのコード graphics.DrawImage()の 
+ *        * 反転したい Width/Heightを マイナスにして反転する方法
+ *        * -Widthにすると、DrawImageの開始点より左に描画され反転するので
+ *          開始点を image.Width分 右にずらして置く必要がある。
+ *          
+ *        * マイナスにする方法で意図どうりの結果となるが、
+ *          ２箇所(開始点と画像サイズ)を変更する必要があり、
+ *          保守性,可読性に欠くので、できれば避けたいコード
+ *        
+ *        *image.RotateFlip()の解決方法を探すべき
+ *          ・KT サンプルコードの (int) (image.Width * 0.8)は 関係がない。
+ *            intでも floatでも DrawImage()は機能する
+ *          ・imageRotated.RotateFlip(RotateFlipType.RotateNoneFlipX)を
+ *            DrawImage(imageRotated, ...)の後に置いても解決せず。
+ *          ・form.Refresh()を OnPaint()内に記述 
+ *            => 解決せず。画面が何度も Refresh()されチラつく
+ *          ・CommandPromptで実行 => 解決せず。([Visual C#]が原因ではない)
+ *          ・ネットには [Windows Form]に同様の不具合報告あり。原因不明
+ */
+/* 
+ *@title WinFormGUI / WinFormSample / ReverseReference / RR08_Graphics
+ *@class MainColorMatrixSemiTransParent.cs
+ *@content RR[371] p625 ColorMatrix SemiTransParent
+ *         画像を半透明にして描画
+ *         semitransparent [英]: 半透明な
+ *         translucent  [英]: 半透明な, 透明感
+ *         translucency [英]: 透明度, 透明性, 透過性
+ *         matrix [英]: 行列
+ *         
+ *@subject Graphics
+ *         void  graphics.DrawImage(
+ *                 Image, Rectangle destRect, Rectangle srcRect, GraphicsUnit)
+ *                   └ 引数 destRect: 描画する位置とサイズを四角形で指定
+ *                     引数 srcRect:  描画するImageの部分画像の範囲を四角形で指定
+ *                 ※ RectangleFも可、int, float, Point[], PointF[]に置換するオーバーロードあり
+ *                 ※ 元画像　srcRect -> 表示領域 destRectの比率で自動的に拡大縮小
+ *                 (= g.DrawImageに SizeModeは作用しないが、PictrueBoxSizeMode.StretchImage と同様の結果)
+ *                 
+ *         void  graphics.DrawImage(
+ *                 Image, Rectangle, int x, int y, int width, int height,
+ *                 GraphicsUnit, ImageAttributes)
+ *                   └ enum GraphicsUnits =>〔KT07_Graphics/MainDrawImageSample.cs〕
+ *                 ※ RectangleF不可, floatも可
+ *                 
+ *         [×] System.NotImplementedException: 実装されていません。(VSのコンパイルは通る)
+ *         void  graphics.DrawImage(
+ *                 Image, PointF[] destPoints, RectangleF srcRect,
+ *                 GraphicsUnit, ImageAttributes)
+ *                 ※ Point[]不可, Rectangle不可
+ *         ※表示位置の PointF[]が利用できないため、倍率による拡大縮小ができない
+ *         
+ *@subject ImageAttributes : ICloneable, IDisposable
+ *            -- System.Drawing.Imaging.
+ *         ImageAttributes   new ImageAttributes()
+ *         
+ *         void  imageAttr.SetColorMatrix(ColorMatrix)          色調変更のColorMatrixを設定
+ *         void  imageAttr.SetColorMatrix(ColorMatrix, [ColorMatrixFlag, [ColorAdjustType]])
+ *         void  imageAttr.ClearColorMatrix([ColorAdjustType])  指定した型のColorMatrixを削除
+ *           └ enum  ColorMatrixFlag
+ *             {
+ *                 Default = 0,   //すべてのカラー値 (灰色の網かけを含む) が同じカラー調整行列によって調整
+ *                 SkipGrays = 1, //色はすべて調整、灰色の網かけは調整されません。 灰色の網かけは、赤、緑、青の各要素の値が同じである色。
+ *                 AltGrays = 2   //灰色の網かけのみ調整
+ *             }
+ *             
+ *           └ enum ColorAdjustType      色調整する型を選択。部分的な色調整ができる
+ *             {
+ *                 Default = 0, //独自の色の調整情報がないすべての GDI+ オブジェクトにより使用される色の調整情報
+ *                 Bitmap = 1,  //Bitmap オブジェクトの色の調整情報
+ *                 Brush = 2,   //Brush オブジェクトの色の調整情報
+ *                 Pen = 3,     //Pen オブジェクトの色の調整情報
+ *                 Text = 4,    //テキストの色の調整情報
+ *                 Count = 5,   //指定した型の数
+ *                 Any = 6      //指定した型の数
+ *             }
+ *         
+ *         void  bitmap.MakeTransparent(Color)                透過色を指定して、その色を透明にする
+ *         void  imageAttr.SetColorKey(                       透過色の範囲や型を指定して、その色を透明にする
+ *                 Color colorLow, Color colorHigh, [ColorAdjustType])    
+ *         void  imageAttr.ClearColorKey([ColorAdjustType]);  型を指定した ColorKeyを削除
+ *         
+ *         void  imageAttr.SetNoOp([ColorAdjustType type])    指定した型の 色調整を停止。SetOnOp()呼出前に戻す
+ *         void  imageAttr.ClearNoOp([ColorAdjustType type])  SetOnOp()で停止していた 色調整を元に戻す
+ *
+ *         void  imageAttr.SetBrushRemapTable(ColorMap[] map)            Brush型のカラー リマップ テーブルを設定
+ *           └ class ColorMap -- System.Drawing.Imaging.
+ *             ColorMap   new ColorMap()
+ *             Color      colorMap.OldColor { get; set; }
+ *             Color      colorMap.NewColor { get; set; }
+ *         void  imageAttr.ClearBrushRemapTable()                
+ *         void  imageAttr.SetRemapTable(ColorMap[], [ColorAdjustType])  指定した型のカラー リマップ テーブルを設定
+ *         void  imageAttr.ClearRemapTable([ColorAdjustType type])
+ *
+ *         void  imageAttr.SetWrapMode(WrapMode mode, Color color)
+ *           └ enum WrapMode  -- System.Drawing.Drawing2D.  塗りつぶし範囲より Brush範囲が小さい場合の並べ方
+ *             {
+ *                 Tile = 0,        //グラデーションまたはテクスチャを並べて表示
+ *                 TileFlipX = 1,   //水平方向に反転し、並べて表示
+ *                 TileFlipY = 2,   //垂直方向に反転し、並べて表示
+ *                 TileFlipXY = 3,  //水平および垂直方向に反転し、並べて表示
+ *                 Clamp = 4        //並べて表示されません
+ *             }
+ *             
+ *@subject ◆ColorMatrix class -- System.Drawing.Imaging.
+ *         ・RGBAW空間の 5 × 5 行列を表すクラス
+ *         ・R: Red / G: Green / B: Blue / A: Alpha 透明度 / W: ?? を表す
+ *         ・ImageAttributesクラスの コンストラクタの引数やプロパティの値として利用
+ *         
+ *         ＊透明度の変更 Matrix33 = XXf;  
+ *           XX は [0 ～ 1]の float値   0f:透明, 0.xf: 半透明, 1f:元画像の透明度
+ *           
+ *         ＊色調の変更 RR[372] p626
+ *           変更後の R = r * Matrix00 + g * Matrix01 + b * Matrix02
+ *           変更後の G = r * Matrix10 + g * Matrix11 + b * Matrix12
+ *           変更後の B = r * Matrix20 + g * Matrix21 + b * Matrix22
+ *         
+ *         ColorMatrix   new ColorMatrix();
+ *         ColorMatrix   new ColorMatrix(float[][] newColorMatrix)
+ *         
+ *         float colorMatrix[int row, int column]
+ *         float this[int row, int column]
+ *         float colorMatrix.MatrixXX       XX: row-column, 0-4
+ *         例: colorNatrix.Matrix33 = 0.5f; とすると半透明の画像になる
+ */
+/** 
+ *@title WinFormGUI / WinFormSample / ReverseReference / RR08_Graphics
+ *@class MainMatrixRotateSample.cs 
+ *@content RR[374][378] Matrixクラス RotateAt(), Scale() / p630, p635
+ *         matrix    [英]: 行列
+ *         geometric [英]: 幾何学
+ *         geometry transformation [数]: 
+ *             幾何学的変換, ジオメトリック変換
+ *             3Dグラフィックスの処理
+ *             多角形の座標データを、描画(表示)のためのデータに変換すること
+ *             
+ *@subject Graphics
+ *         Matrix   greaphics.Transform { get; set; }   図形の変換をする行列(matrix)を取得/設定
+ *         例 matrix.RotateAt(...);など変更のたびに
+ *            greaphics.Transform = matrix; と代入しないと変更を反映しない
+ *        
+ *         void     graphics.RotateTransform(float angle, [MatrixOrder])           Transformで登録した Matrixを指定角度と順序で回転
+ *         void     graphics.ScaleTransform(float sx, float sy, [MatrixOrder])     Transformで登録した Matrixを指定倍率と順序で拡大縮小
+ *         void     graphics.TranslateTransform(float dx, float dy, [MatrixOrder]) Transformで登録した Matrixを指定幅と順序で平行移動
+ *         void     graphics.ResetTransform()                                      変換行列 Matrixを削除
+ *         
+ *@subject ◆Matrix : MarshalByRefObject, IDisposable
+ *            -- System.Drawing.Drawing2D.
+ *         ・図形の回転(360°内で時計回りの角度を指定可), 反転, 拡大縮小を行う変換行列を表すクラス
+ *         ・void     image.RotateFlip(RotateFlipType)   90°単位の回転, 反転
+ *         ・複数回の変換を行うと、内部的に 行列を乗算している様子
+ *         
+ *         Matrix   new Matrix()
+ *         Matrix   new Matrix(Rectangle, Point[])
+ *            変換する四角形と、ジオメトリック変換〔上記〕の変換先の平行四辺形
+ *            ※ RectangleF, PointF[], float可
+ *         
+ *         void  matrix.Rotate(float angle, [MatrixOrder])             角度を指定して原点(0, 0)を中心とする回転
+ *         void  matrix.RotateAt(float angle, PointF, [MatrixOrder])   角度と中心点を指定して回転
+ *           └ enum MatrixOrder -- System.Drawing.Drawing2D.
+ *             {
+ *                 Prepend = 0,  //新しい操作が、古い操作の前に適用
+ *                 Append = 1    //新しい操作が、古い操作の後に適用
+ *             }
+ *         bool  matrix.IsInvertible { get; }    反転可能か
+ *         void  matrix.Invert()                 反転可能なら反転
+ *         void  matrix.Translate(float offsetX, float offsetY, [MatrixOrder]) x方向, y方向に平行移動
+ *         void  matrix.Shear(float shearX, float shearY, [MatrixOrder])  画像原点(0, 0)を基準に x方向, y方向の傾斜率を指定して傾斜
+ *         void  matrix.Scale(float scaleX, float scaleY, [MatrixOrder])  x方向, y方向の拡大率を指定して拡大縮小
+ *         void  matrix.Multiply(Matrix, [MatrixOrder])                   対象オブジェクトの行列に、引数の行列を乗算
+ *         float[]  matrix.Elements { get; }   Matrixの要素である float[]を取得
+ *         bool     matrix.IsIdentity { get; } 単位行列であるか
+ *         void     matrix.Reset()             単位行列の要素を持つようにリセット
+ *                   ※単位行列 unit matrix: 
+ *                     https://kotobank.jp/word/%E5%8D%98%E4%BD%8D%E8%A1%8C%E5%88%97-94854
+ *                     ・n 次の正方行列 A＝(aij) において，
+ *                       主対角線上の要素がすべて 1で，その他はすべて 0であるもの
+ *                     ・行列は乗算の順によって解が異なるが
+ *                       単位行列を E とすれば AE＝EA＝A なる関係が成り立つ
+ *                       | 1 0 |   | 1 0 0 |
+ *                       | 0 1 | , | 0 1 0 | , ... のような要素になっている。
+ *                                 | 0 0 1 |
+ *         
+ *@NOTE【考察】回転の中心点と、描画の原点
+ *      ・PictureBoxSizeMode.CenterImage を設定しているので、
+ *        ここでは PictureBox.ClientSizeの中心点と、画像の中心点は一致する
+ *      ・回転の中心点を 上記に設定
+ *      
+ *        centerPoint = new Point(
+ *             pic.ClientSize.Width / 2, pic.ClientSize.Height / 2);
+ *
+ *      ・画像描画の原点を指定する必要があるので
+ *        PictureBoxの中心点だと、画像が ずれていく。
+ *        PictureBoxの中心点から、画像の横幅 / 2 と高さ /2 の差を 描画の原点とする
+ *        
+ *        g.DrawImage(image, new Point(                     
+ *           (pic.ClientSize.Width - image.Width) / 2,
+ *           (pic.ClientSize.Height - image.Height) / 2));
+ */
+ /*
+ *@title WinFormGUI / WinFormSample / ReverseReference / RR08_Graphics
+ *@class MainMatrixScaleTaranslate.cs
+ *@content RR[378] p635 Matrixクラス Scale(), Taranslate()
+ *         画像の拡大縮小、平行移動
+ *         => 〔MainMatrixRotateSample.cs〕
+ *           
+ *@NOTE【Problem】Matrixクラス Scale(), Translate()
+ *      ・matrix.Scale()によって、元画像の縦横比を維持したまま、
+ *        PictureBoxのサイズに拡大縮小することには成功
+ *      ・matrix.Translate()でセンタリングを試みたが、intキャスト時の誤差のためか
+ *        元画像のサイズによって、表示位置が変わってしまう問題あり〔未解決〕
+ *        
+ *      ・Matrix利用前は
+ *        rect = new Rectangle(0, 0, pic.Width, pic.Height); で うまくいっていたが
+ *      ・Matrix利用後は
+ *        rect = new Rectangle(0, 0, image.Width, image.Height);でないと
+ *        Scale()の倍率が大幅にずれてしまう問題あり。
+ *        image.Width, image.Heightで Matrix修正後のサイズになっている様子
+ *      
+ *      ・double計算の精度を上げるため、decimalで計算
+ *        decimal  Math.Round(decimal, int)  int値は小数点以下 第何位に丸めるか
+ *        小数点以下 2 -> 4に変更すると、うまくいかない。
+ *        
+ *      private void BuildTransform()
+        { 
+            decimal widthRate = Math.Round(
+                (decimal)pic.ClientSize.Width / (decimal)image.Width, 2);
+            decimal heightRate = Math.Round(
+                (decimal)pic.ClientSize.Height / (decimal)image.Height, 2);
+            decimal adjustRate = (widthRate < heightRate) ? widthRate : heightRate;
 
+            Matrix mx = new Matrix();
+            mx.Scale((float)adjustRate, (float)adjustRate);
+            mx.Translate(
+                (float)((pic.ClientSize.Width - image.Width * adjustRate) / 2),
+                (float)((pic.ClientSize.Height - image.Height * adjustRate) / 2));
+
+            g.Transform = mx;
+        }//BuildTransform()
+*/
+/*
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT07_Graphics
+ *@class MainMouseDragSample.cs
+ *@content KT07 Graphics / MouseDragSample
+ *         マウス ドラッグによる画像の移動
+ *         ・PictureBoxに画像を載せる
+ *         ・pictureBox.MouseDown, MouseUp, MouseMoveイベントだけで
+ *           マウスドラッグを表現できる
+ *
+ *@subject ドラッグ移動
+ *         ・現地点からドラッグ移動分だけ PictureBoxの開始点を移動させる
+ *         ・PictureBoxの幅, 高さは考慮する必要がない
+ *           control.Top, Bottom, Left, Right で 四辺の座標を取得/設定できる
+ *           (form.AutoSize = true; になっているなら、自動でFormが拡大する)
+ *         
+ *          if (dragged)
+ *          {
+ *              pictureBox.Left += e.Location.X - dragPoint.X;
+ *              pictureBox.Top += e.Location.Y - dragPoint.Y;
+ *          }
+ */
+ /*
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT07_Graphics
+ *@class MainTimerAnimationSample.cs
+ *@subject アニメーション
+ *         ＊描画
+ *         ・Timer -> Timer.Tickイベント
+ *         ・Rectangel -> FillXxxx(), DrawXxxx()
+ *         Timerで 一定時間ごとに再描画
+ *         座標処理は Rectangleの始点(左上の座標)で行う
+ *         図形幅も考慮して座標を判定すべし
+ *         
+ *         ＊前図形の削除と新図形の再描画
+ *         void   control.Invalidate();
+ *
+ *         ＊ダブル・バッファー
+ *         bool   control.DoubleBuffered   
+ *           ・画面のチラつきを抑制するためにダブルバッファーを使用するか
+ *           ・頻繁に再描画する場合に利用する
+ *           ・この画面のチラつきは，コンピュータが描画をしている様子が，
+ *             そのまま見えてしまっていることが原因です。
+ *             軽減するためには，一旦メモリ上のキャンバスで描画を完成させ，
+ *             完成した描画を画面に表示するようにします。
+ *             
+ *@NOTE【考察】Formの Size, ClientSize
+ *      Formのサイズは、X座標, Y座標に 見えていない余分の幅が存在し、
+ *      Size = 見えている幅 + 見えていない余分の幅 
+ *      ClientSize = 見えている幅
+ *      
+ *      おそらくTitleBar, ScrollBar, StatusBarの幅が Formのサイズになっている。
+ *      可視範囲の Formの枠で座標処理する場合は ClientSizeで処理すべし
+ */
+/*
+ *@title WinFormGUI / WinFormSample / KaiteiNet / KT07_Graphics
+ *@class MainBallGravity.cs
+ *@content KT07 Graphics / BallGravity
+ *         ボールの画像に重力を働かせ自然落下し、バウンドさせる
+ *         behaivior [英] 動作, 挙動, 振る舞い
+ *         gravity [英]   重力
+ *
+ *@based   MainMouseDragSample.cs
+ *@subject 重力, バウンド  / parent: Form, base: PictureBox
+ *         private double velocity = 0d;  //速度
+ *         private double accel = 0.5d;   //加速度
+ *         
+ *         private void timer_Tick(object sender, EventArgs e)
+ *         {
+ *             //---- Gravity / 重力 ----
+ *             velocity += accel;           //速度を徐々に加速
+ *             base.Top += (int)velocity;   //Top座標を速度分だけ落下「+=」
+ *
+ *             //---- Bound / バウンド ----
+ *             if(base.Bottom >= parent.ClientSize.Height)  //底に着いたら
+ *             {
+ *                 velocity *= -0.8;                        //速度を 80%に減速
+ *                 base.Top = parent.ClientSize.Height - base.Height;  
+ *                                                          //ボールの高さ分だけ底から上げる
+ *             }
+ *         }//timer_Tick()
+ *
+ *@NOTE【調整】Padding
+ *      control.Padding = new Padding(5);
+ *      Padding: コントロール内側の余白
+ *      ドラッグ時や、重力移動時に再描画のチラつきでボールが欠けるので
+ *      内側周囲に 5pxずつの余白を挿入
+ *      底に着いたときも Padding分の余白ができるので注意
+ */
