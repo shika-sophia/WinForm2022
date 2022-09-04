@@ -11,8 +11,10 @@
  *           
  *@content ColorPropertiyViewer
  *         struct Colorの Colorプロパティの色見本を一覧表示
- *         
- *@subject ◆class System.Drawing.Color
+ */
+#region ◆class System.Drawing.Color
+/*
+*@subject ◆class System.Drawing.Color
  *         ＊All Properties -- Property Count: 150
  *         Color   Color.Transparent  { get; }
  *         Color   Color.AliceBlue  { get; }
@@ -164,7 +166,22 @@
  *         Boolean   Color.IsNamedColor  { get; }
  *         Boolean   Color.IsSystemColor  { get; }
  *         String   Color.Name  { get; }
- *
+ */
+#endregion
+/*
+ *@subject Color RGB
+ *         ＊byte表記  0-255
+ *         byte  color.R   Redの値
+ *         byte  color.G   Greenの値
+ *         byte  color.B   Blueの値
+ *         
+ *         ＊16進数表記  00-ff
+ *         ${value : x}  value: 変数名, x: 16進数であることを示す記号
+ *            
+ *         int  Convert.ToInt32(string, int baseformat)
+ *           引数 string value: 数値文字列
+ *               int formBase: 進数 2, 8, 10, 16
+ *               
  *@NOTE【Problem】
  *      table.RowCount = length / COLUMN; とすると、
  *      最終行が 無限に続く大きさになってしまう問題。
@@ -217,7 +234,7 @@ namespace WinFormGUI.Reference.ColorSample
             this.Size = new Size(960, 640);
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.BackColor = SystemColors.Window;
-
+            
             colorOnlyAry = BuildColorOnlyAry();
             int length = colorOnlyAry.Length;
             nameAry = new Label[length];
@@ -232,7 +249,7 @@ namespace WinFormGUI.Reference.ColorSample
                 Dock = DockStyle.Fill,
                 AutoScroll = true,
             };
-
+            
             for (int i = 0; i < table.ColumnCount; i++)
             {
                 table.ColumnStyles.Add(
