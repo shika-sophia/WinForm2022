@@ -59,11 +59,11 @@
  *                 Flat = 16394     //平面表示
  *             }
  *             
- *         ToolStripStatusLabelBorderSides 
+ *         ToolStripStatusLabelBorderSides   ※BorderStyle設定時は BorderSizesも設定
  *           |                    toolStripStatusLabel.BorderSides
  *           └ enum ToolStripStatusLabelBorderSides
  *             {
- *                 None = 0,  //境界線なし
+ *                 None = 0,  //境界線なし (デフォルト)
  *                 Left = 1,  //左側にのみ境界線
  *                 Top = 2,   //上側にのみ境界線
  *                 Right = 4, //右側にのみ境界線
