@@ -83,6 +83,15 @@
  *                SizableToolWindow = 6 // サイズ可変，ツールウィンドウ用
  *             }
  *         
+ *         (コントロール共通 BorderStyle)
+ *         BorderStyle  control.BorderStyle { get; set; }
+ *           └ enum BorderStyle  -- System.Windows.Forms
+ *             {
+ *                None = 0,             // 境界線なし
+ *                FixedSingle = 1,      // サイズ固定，一重線
+ *                Fixed3D = 2,          // サイズ固定，3D スタイル
+ *             }
+ * 
  *         ＊デバイスサイズ
  *         FormWindowState form.WindowState 
  *                              デバイスのモニターサイズを取得し、それに合わせて調整
