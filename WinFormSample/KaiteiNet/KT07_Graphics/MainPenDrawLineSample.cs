@@ -12,7 +12,7 @@
  *@content KT07 Graphics | RR[5] p31, RR[266] p616
  *@subject ◆Graphics : MarshalByRefObject, IDisposable, IDeviceContext
  *             -- System.Drawing
- *         ・GDI+ (Graphics Device Interface): C言語?で記述されたグラフィックス機能を内部的に呼出
+ *         ・GDI+ (Graphics Device Interface): C言語で記述されたグラフィックス機能を内部的に呼出
  *         ・描画キャンバスのような存在
  *         ・グラフィックス処理を行うためには、
  *           描画対象の Form, Controlに関連付けた Graphicsオブジェクトを取得する必要がある
@@ -88,8 +88,9 @@
  *         void           graphics.EndContainer(GraphicsContainer)   //BeginContainer()で保存した状態を復元
  *           
  *         ＊直線の描画
- *         void  graphics.DrawLine(Pen, Point p1, Point p2)             始点 p1 から 終点 p2 の直線を描画
- *         void  graphics.DrawLine(Pen, int x1, int y1, int x2, int y2) 始点 (x1, y1) から 終点 (x2, y2) の直線を描画
+ *         void  graphics.DrawLine(Pen, Point p1, Point p2)             始点 p1 から 終点 p2 の直線を描画  ※PointF 可
+ *         void  graphics.DrawLine(Pen, int x1, int y1, int x2, int y2) 始点 (x1, y1) から 終点 (x2, y2) の直線を描画  ※ float  可
+ *         void  graphics.DrawLines(Pen, Point[])                        複数の直線を描画  ※ PointF[] 可
  *         
  *@subject ◆Penクラス : MarshalByRefObject, ICloneable, IDisposable
  *             -- System.Drawing.
@@ -105,7 +106,23 @@
  *         Color      pen.Color
  *         Brush      pen.Brush
  *         float      pen.Width
- *         
+ *         LineCap    pen.StartCap    線の始点の形状
+ *         LineCap    pen.EndCap      線の終点の形状
+ *           └ enum LineCap  -- System.Drawing.Drawing2D.
+ *             {
+ *                 Flat = 0,           //平坦なラインキャップ
+ *                 Square = 1,         //四角形のラインキャップ
+ *                 Round = 2,          //丸いラインキャップ
+ *                 Triangle = 3,       //三角形のラインキャップ
+ *                 NoAnchor = 16,      //アンカーなし
+ *                 SquareAnchor = 17,  //四角形のアンカー ラインキャップ
+ *                 RoundAnchor = 18,   //丸いアンカーキャップ
+ *                 DiamondAnchor = 19, //菱形のアンカーキャップ
+ *                 ArrowAnchor = 20,   //矢印形のアンカーキャップ
+ *                 AnchorMask = 240,   //ラインキャップがアンカーキャップかどうかをチェックする際に使用するマスクを指定
+ *                 Custom = 255        //CustomLineCapクラスで定義
+ *             }
+ *             
  *         DashStyle  pen.DashStyle  
  *           └ enum DashStyle  -- System.Drawing.Drawing2D.
  *             {
@@ -118,8 +135,36 @@
  *             }
  *         float[]    pen.DashPattern   DashStyle.Customのとき
  *                                      破線内の代替ダッシュと空白の長さを指定する実数の配列。
+ *         DashCap    pen.DashCap       破線の両端の形状
+ *           └ enum DashCap { Flat = 0, Round = 1, Triangle = 2 }   -- System.Drawing.Drawing2D.
+ *         
  *         float[]    pen.CompoundArray 平行線の複線。0 ～ 1 の値を昇順に並べた配列
- *         void    pen.Dispose()
+ *         LineJoin   pen.LineJoin
+ *           └ enum LineJoin
+ *             {
+ *                 Miter = 0,   //鋭角接合。マイタ制限値を超えている場合は、クリッピング
+ *                 Bevel = 1,   //面取り接合。 斜めになった角
+ *                 Round = 2,   //角丸接合
+ *                 MiterClipped = 3  //鋭角接合。マイタ制限値を超えている場合は、斜めになった角
+ *             }
+ *         float      pen.MiterLimit  マイタ隅の接合部の太さの限度。常に 1.0f以上の正数。デフォルト 10.0f
+ *                       
+ *                       ※ Miter表示: 折れ線箇所を面取りしないで尖らせたまま表示すること
+ *                       http://www.htmq.com/canvas/miterLimit.shtml
+ *                       miterLimit属性は、線の接合箇所をmiter表示にする（折れ線箇所を面取りしないで尖らせる）限界を指定する際に使用します。
+ *                       lineJoin属性の値が miter（初期値）の場合、２つの線分が接合する箇所はmiter表示になりますが、 
+ *                       この際、２つの線分の接合角度が鋭角であるほど、尖った部分が鋭く長く飛び出すことになります。
+ *                       miterLimit属性では、接合箇所がどのくらい尖っている場合にmiter表示にするか、
+ *                       あるいは、bevel表示（面取り）にするかの限界値を任意の数値で指定することができます。
+ *                       miterLimit属性の値には、lineWidth属性で指定する線幅の半分の長さに対する比率を指定します。
+ *                       例えば、lineWidth=20の線分に対してmiterLimit=2.0を指定した場合には、10×2.0＝20となります。
+ *                       この例の場合、尖った部分の距離が20を超えない箇所はmiter表示（留め継ぎ）、
+ *                       尖った部分の距離が20を超えて飛び出す箇所はbevel表示（面取り）となります。
+ *                       =>〔~/Reference/miterLimit001.gif, miterLimit002.gif〕
+ *                       
+ *         Matrix     pen.Transform   図形変形のための行列を登録 
+ *                                    =>〔RR08_Graphics/MainMatrixRotateSample.cs〕
+ *         void       pen.Dispose()
  *         
  *@subject ◆SystemPens class -- System.Drawing.
  *         ・Windows System32で使用している色による Penオブジェクトを取得
