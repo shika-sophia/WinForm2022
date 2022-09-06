@@ -23,7 +23,7 @@
  *            └ enum   KnownColors.Xxxx  Windowsで定義されている標準色
  *
  *@subject ◆struct System.Drawing.Color
- *         ＊All Properties
+ *         ＊static プロパティ   Colorオブジェクトの生成
  *         Color   Color.Transparent  { get; }
  *         Color   Color.AliceBlue  { get; }
  *         Color   Color.AntiqueWhite  { get; }
@@ -165,15 +165,17 @@
  *         Color   Color.WhiteSmoke  { get; }
  *         Color   Color.Yellow  { get; }
  *         Color   Color.YellowGreen  { get; }
- *         Byte   Color.R  { get; }
- *         Byte   Color.G  { get; }
- *         Byte   Color.B  { get; }
- *         Byte   Color.A  { get; }
- *         Boolean   Color.IsKnownColor  { get; }
- *         Boolean   Color.IsEmpty  { get; }
- *         Boolean   Color.IsNamedColor  { get; }
- *         Boolean   Color.IsSystemColor  { get; }
- *         String   Color.Name  { get; }
+ *
+ *         ＊インスタンス用 プロパティ (非 static)
+ *         Byte    color.R  { get; }
+ *         Byte    color.G  { get; }
+ *         Byte    color.B  { get; }
+ *         Byte    color.A  { get; }
+ *         Boolean   color.IsKnownColor  { get; }
+ *         Boolean   color.IsEmpty  { get; }
+ *         Boolean   color.IsNamedColor  { get; }
+ *         Boolean   color.IsSystemColor  { get; }
+ *         String    color.Name  { get; }
  *         
  *@subject ◆class System.Drawing.SystemColors
  *         ＊All Properties
