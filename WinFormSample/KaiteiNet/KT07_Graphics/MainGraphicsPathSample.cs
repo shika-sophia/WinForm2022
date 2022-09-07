@@ -57,9 +57,9 @@
  *         ・集合計算に関するメソッドを持つ
  *         
  *         Region  new Region(GraphicPath)
- *         Region  new Region(Rectangle)   ※RectangleF
+ *         Region  new Region(※)          ※Rectangle, RectangleF
  *         void    region.Union(※)        和集合  A or B  ※Rectangle, RectangleF, GraphicPath, Region
- *         void    region.void Exclude(※) 差集合  A - B
+ *         void    region.Exclude(※)      差集合  A - B
  *         void    region.Intersect(※)    積集合  A and B
  *         void    region.Complement(※)   補集合  not A
  *         void    region.Xor(※)          排他論理和  A xor B (和集合のうち交差部分を除外)

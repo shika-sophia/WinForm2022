@@ -9,7 +9,7 @@
  *           http://kaitei.net/csforms/graphics/
  *           =>〔~/Reference/Article_KaiteiNet/WinForm07_Graphics.txt〕
  *           
- *@content KT07 Graphics | RR[5] p31, RR[266] p616
+ *@content KT07 Graphics | RR[5] p31, RR[366] p616
  *@subject ◆Graphics : MarshalByRefObject, IDisposable, IDeviceContext
  *             -- System.Drawing
  *         ・GDI+ (Graphics Device Interface): C言語で記述されたグラフィックス機能を内部的に呼出
