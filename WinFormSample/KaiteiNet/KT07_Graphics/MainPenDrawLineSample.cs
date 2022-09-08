@@ -135,10 +135,16 @@
  *             }
  *         float[]    pen.DashPattern   DashStyle.Customのとき
  *                                      破線内の代替ダッシュと空白の長さを指定する実数の配列。
+ *                                      =>〔Viewer/MainPenDashStyleViewer.cs〕
+ *                                      
  *         DashCap    pen.DashCap       破線の両端の形状
  *           └ enum DashCap { Flat = 0, Round = 1, Triangle = 2 }   -- System.Drawing.Drawing2D.
  *         
  *         float[]    pen.CompoundArray 平行線の複線。0 ～ 1 の値を昇順に並べた配列
+ *                                      配列要素の値は Pen.Widthに対する割合で、実線部分の始点、終点で指定
+ *                                      例 Pen.Width を 100 %として
+ *                                      1本目 0 - 30 %, 2本目　70 - 100 % => 0.0f, 0.3f, 0.7f, 1.0f 
+ *                                      =>〔Viewer/MainPenDashStyleViewer.cs〕
  *         LineJoin   pen.LineJoin
  *           └ enum LineJoin
  *             {
