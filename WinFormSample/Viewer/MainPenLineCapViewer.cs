@@ -46,6 +46,10 @@
  *        g.DrawLine();
  *        pic.Image = bitmap; で解決
  *        
+ *      ・pic.ClientSize = new Size(140, 70) 必須
+ *        指定しないと PictureBox デフォルトの Graphics領域 (100?, 50?)ぐらいになり
+ *        DrawXxxx()の結果が切れてしまう
+ *         
  *@see ImagePenLineCapViewer.jpg
  *@see KT07_Graphics/MainPenDrawLineSample.cs
  *@author shika
@@ -86,6 +90,7 @@ namespace WinFormGUI.WinFormSample.Viewer
             this.Text = "FormPenLineCapViewer";
             this.Font = new Font("consolas", 12, FontStyle.Regular);
             this.Size = new Size(640, 480);
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.BackColor = SystemColors.Window;
 
             //---- TableLayoutPanel ----
@@ -138,7 +143,7 @@ namespace WinFormGUI.WinFormSample.Viewer
 
                 var pic = new PictureBox()
                 {
-                    ClientSize = new Size(200, 70),
+                    ClientSize = new Size(140, 70),
                     Dock = DockStyle.Fill,
                     BorderStyle = BorderStyle.Fixed3D,
                 };
