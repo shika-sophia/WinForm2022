@@ -176,25 +176,36 @@
  *         byte  color.B   Blueの値
  *         
  *         ＊16進数表記  00-ff
- *         ${value : x}  value: 変数名, x: 16進数であることを示す記号
+ *         ${value:x}  value: 変数名, 
+ *                     x: 16進数であることを示す記号。xの前に半角スペース不可
  *            
- *         int  Convert.ToInt32(string, int baseformat)
- *           引数 string value: 数値文字列
- *               int formBase: 進数 2, 8, 10, 16
- *               
+ *         int     Convert.ToInt32(string, int baseformat)
+ *         string  Convert.ToStryng(byte, int baseformat)
+ *                   引数 string value: 数値文字列
+ *                        int formBase: 進数 2, 8, 10, 16
+ *                        
  *@NOTE【Problem】
- *      table.RowCount = length / COLUMN; とすると、
- *      最終行が 無限に続く大きさになってしまう問題。
- *      Color型のプロパティ数 141 / (Column数 6 / Label数 2) = 47 を リテラルとして代入すると解決。
- *      おそらく、割算を intにする際の誤差バグと思われる。
+ *      ・table.RowCount = colorOnlyAry.Length / COLUMN; とすると、
+ *       最終行が 無限に続く大きさになってしまう問題。
+ *       Color型のプロパティ数 141 / (Column数 6 / Label数 2) = 47 を リテラルとして代入すると解決。
+ *       おそらく、割算を intにする際の誤差バグと思われる。
  *      
- *@see ~/Reference/ColorSample/ImageColorPropertiyViewer1.jpg - 6.jpg
+ *      ・Colorプロパティは、Color型の色名プロパティだけでなく、
+ *        byte, bool, stringなども存在するため、色名のみ利用する場合は
+ *        if (info.PropertyType != typeof(Color)) { continue; }で
+ *        処理をスキップするようにしておく。
+ *        (List<PropertyInfo> に Color型プロパティだけを格納する方法もあるが、
+ *         初期起動が重いので、なるべく軽くする)
+ *         
+ *       ・初期起動の重さは、大量の Labelオブジェクト生成と、
+ *         Refrection経由で Color取得/参照していることが原因と思う。
+ *        
+ *@see ImageColorPropertyViewer1.jpg - 6.jpg
  *@see ~/CsharpCode/ShowProrertyAll.cs
  *@author shika
  *@date 2022-09-05
  */
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
@@ -209,7 +220,6 @@ namespace WinFormGUI.Viewer.ColorSample
         {
             Console.WriteLine("new FormColorPropertyViewer()");
             Console.WriteLine("  Calculating now...");
-            Console.WriteLine("  Please wait few minutes.");
 
             Application.EnableVisualStyles();
             Application.Run(new FormColorPropertyViewer());
@@ -220,32 +230,27 @@ namespace WinFormGUI.Viewer.ColorSample
 
     class FormColorPropertyViewer : Form
     {
-        private readonly PropertyInfo[] colorOnlyAry;
-        private const int COLUMN = 6;
         private readonly TableLayoutPanel table;
-        private readonly Label[] nameAry;
-        private readonly Label[] viewAry;
+        private readonly PropertyInfo[] colorAry;
         private readonly Padding padding = new Padding(5);
+        private const int COLUMN = 6;
 
         public FormColorPropertyViewer()
         {
             this.Text = "FormColorPropertyViewer";
-            this.Font = new Font("consolas", 12, FontStyle.Regular);
-            this.Size = new Size(960, 640);
+            this.Font = new Font("consolas", 10, FontStyle.Regular);
+            this.Size = new Size(1048, 640);
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.BackColor = SystemColors.Window;
             
-            colorOnlyAry = BuildColorOnlyAry();
-            int length = colorOnlyAry.Length;
-            nameAry = new Label[length];
-            viewAry = new Label[length];
-            //Console.WriteLine($"length: {length}"); // 141
+            colorAry = typeof(Color).GetProperties();
 
             //---- TableLayoutPanel ----
             table = new TableLayoutPanel()
             {
                 ColumnCount = COLUMN,
-                RowCount = 47,        // = length / (COLUMN / 2)
+                RowCount = 47,        // = colorOnlyAry.Length / (COLUMN / 2)
+                Padding = padding,
                 Dock = DockStyle.Fill,
                 AutoScroll = true,
             };
@@ -258,58 +263,48 @@ namespace WinFormGUI.Viewer.ColorSample
 
             for (int i = 0; i < table.RowCount; i++)
             {
-                table.RowStyles.Add(new RowStyle(SizeType.Absolute, 70));  //px単位
+                table.RowStyles.Add(
+                    new RowStyle(SizeType.Absolute, 70));  //px単位
             }//for
 
             //---- Label ----
-            int index = 0;
-            foreach(PropertyInfo info in colorOnlyAry)
+            foreach(PropertyInfo info in colorAry)
             {
+                if (info.PropertyType != typeof(Color)) { continue; }
+
                 string name = info.Name;
                 Color color = (Color)info.GetValue(name);
                 string colorRGB = $"R{color.R} G{color.G} B{color.B}";        // byte表記:   0-255
-                string colorRGB16 = $"#{color.R :x}{color.G :x}{color.B :x}"; // 16進数表記: $"{value : x}"  00-ff
+                
+                string colorR16 = $"{color.R:x}";
+                string colorG16 = $"{color.G:x}";
+                string colorB16 = $"{color.B:x}";
+                colorR16 = (colorR16.Length == 1) ? ("0" + colorR16) : colorR16;
+                colorG16 = (colorG16.Length == 1) ? ("0" + colorG16) : colorG16;
+                colorB16 = (colorB16.Length == 1) ? ("0" + colorB16) : colorB16;
+                string colorRGB16 = $"#{colorR16}{colorG16}{colorB16}"; // 16進数表記: $"{value:x}"  00-ff
             
-                nameAry[index] = new Label()
+                Label labelName = new Label()
                 {
                     Text = $"{name}\n {colorRGB16}\n {colorRGB}",
-                    Dock = DockStyle.Fill,
                     Margin = padding,
+                    Dock = DockStyle.Fill,
                     AutoSize = true,
                 };
-                table.Controls.Add(nameAry[index]);
+                table.Controls.Add(labelName);
 
-                viewAry[index] = new Label()
+                Label labelView = new Label()
                 {
                     BorderStyle = BorderStyle.FixedSingle,
                     BackColor = color,
-                    Dock = DockStyle.Fill,
                     Margin = padding,
+                    Dock = DockStyle.Fill,
                     AutoSize = true,
                 };
-                table.Controls.Add(viewAry[index]);
-
-                index++;
+                table.Controls.Add(labelView);
             }//foreach
             
             this.Controls.Add(table);
         }//constructor
-
-        private PropertyInfo[] BuildColorOnlyAry()
-        {
-            PropertyInfo[] colorPropertyAry = typeof(Color).GetProperties();
-            List<PropertyInfo> colorOnlyList = 
-                new List<PropertyInfo>(colorPropertyAry.Length);
-            
-            foreach (PropertyInfo info in colorPropertyAry)
-            {
-                if (info.PropertyType == typeof(Color))
-                {
-                    colorOnlyList.Add(info);
-                }
-            }//foreach
-
-            return colorOnlyList.ToArray();
-        }//BuildColorOnlyList()
     }//class
 }
