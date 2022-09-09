@@ -49,6 +49,16 @@
  *         Color   SystemColors.WindowFrame  { get; }
  *         Color   SystemColors.WindowText  { get; }
  *
+ *@NOTE【考察】色 -> 色名
+ *      ・SystemColorsの propertyInfo.Nameと
+ *        propertyInfo.GetValue(name).Nameは 同じ値。SystemColorsのプロパティ名となる
+ *      
+ *      ・Colorクラスのプロパティ名にしたいときは、
+ *        color.ToArgb()で ARGB値が一致するプロパティを探す必要がある。
+ *        
+ *      ・SystemColorsの多くは、Color既定の色名とは一致しない独自のARGB値の様子。
+ *        Black, White, DimGrayのみ一致。
+ *      
  *@see ImageSystemColorsViewer.jpg
  *@see WinFormGUI / CsharpCode / ShowPropertyAll.cs
  *@author shika
