@@ -176,9 +176,25 @@
  *         Boolean   color.IsNamedColor  { get; }
  *         Boolean   color.IsSystemColor  { get; }
  *         String    color.Name  { get; }
+ *         int       color.ToArbg() 
+ *
+ *         ＊Color RGB
+ *         ・byte表記  0-255
+ *         byte  color.R   Redの値
+ *         byte  color.G   Greenの値
+ *         byte  color.B   Blueの値
  *         
+ *         ・16進数表記  00-ff
+ *         ${value:x}  value: 変数名, 
+ *                     x: 16進数であることを示す記号。xの前に半角スペース不可
+ *            
+ *         int     Convert.ToInt32(string, int baseformat)
+ *         string  Convert.ToStryng(byte, int baseformat)
+ *                   引数 string value: 数値文字列
+ *                        int formBase: 進数 2, 8, 10, 16
+ *      
  *@subject ◆class System.Drawing.SystemColors
- *         ＊All Properties
+ *         ＊All Properties  33個
  *         Color   SystemColors.ActiveBorder  { get; }
  *         Color   SystemColors.ActiveCaption  { get; }
  *         Color   SystemColors.ActiveCaptionText  { get; }
