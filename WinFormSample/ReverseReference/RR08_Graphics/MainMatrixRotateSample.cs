@@ -20,8 +20,9 @@
  *@subject Graphics
  *         Matrix   greaphics.Transform { get; set; }   図形の変換をする行列(matrix)を取得/設定
  *         例 matrix.RotateAt(...);など変更のたびに
- *            greaphics.Transform = matrix; と代入しないと変更を反映しない
- *        
+ *            graphics.Transform = matrix; と代入しないと変更を反映しない
+ *            (graphics.Flush(), form.Refresh()では不可)
+ *            
  *         void     graphics.RotateTransform(float angle, [MatrixOrder])           Transformで登録した Matrixを指定角度と順序で回転
  *         void     graphics.ScaleTransform(float sx, float sy, [MatrixOrder])     Transformで登録した Matrixを指定倍率と順序で拡大縮小
  *         void     graphics.TranslateTransform(float dx, float dy, [MatrixOrder]) Transformで登録した Matrixを指定幅と順序で平行移動
@@ -96,9 +97,9 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR08_Graphics
 {
     class MainMatrixRotateSample
     {
-        //[STAThread]
-        //static void Main()
-        public void Main()
+        [STAThread]
+        static void Main()
+        //public void Main()
         {
             Console.WriteLine("new FormMatrixRotateSample()");
 
