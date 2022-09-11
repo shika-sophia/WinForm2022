@@ -887,7 +887,7 @@
  *         ・ImageAttributesクラスの コンストラクタの引数やプロパティの値として利用
  *         
  *         ＊透明度の変更 Matrix33 = XXf;  
- *           XX は [0 ～ 1]の float値   0f:透明, 0.xf: 半透明, 1f:元画像の透明度
+ *           XX は [0 ～ 1]の float値   0f:透明, 0.xf: 半透明, 1f:不透明
  *           
  *         ＊色調の変更 RR[372] p626
  *           変更後の R = r * Matrix00 + g * Matrix01 + b * Matrix02
@@ -900,7 +900,7 @@
  *         float colorMatrix[int row, int column]
  *         float this[int row, int column]
  *         float colorMatrix.MatrixXX       XX: row-column, 0-4
- *         例: colorNatrix.Matrix33 = 0.5f; とすると半透明の画像になる
+ *         例: colorMatrix.Matrix33 = 0.5f; とすると半透明の画像になる
  */
 /** 
  *@title WinFormGUI / WinFormSample / ReverseReference / RR08_Graphics
