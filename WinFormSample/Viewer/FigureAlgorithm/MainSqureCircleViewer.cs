@@ -34,11 +34,11 @@ private void DrawFigure()
  *                     引数 PointF centerPoint:  中心点
  *                          decimal radius:      半径
  *                          
- *         oriX: 円の外接四角形の原点 X座標
- *               中心点より radiusだけ 左方(-)
+ *         rectX: 円の外接四角形の原点(左上隅) X座標
+ *                中心点より radiusだけ 左方(-)
  *               
- *         oriY: 円の外接四角形の原点 Y座標
- *               中心点より radiusだけ 上方(-)
+ *         rectY: 円の外接四角形の原点(左上隅) Y座標
+ *                中心点より radiusだけ 上方(-)
  *              
  *         width: 円の外接四角形は正方形になり、一辺は 円の直径に等しい
  *         
@@ -200,11 +200,11 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
 
         private RectangleF AlgoCircle(PointF centerPoint, decimal radius)
         {
-            float oriX = (float)((decimal)centerPoint.X - radius);  //Rectangleの原点 X座標
-            float oriY = (float)((decimal)centerPoint.Y - radius);  //Rectangleの原点 Y座標
+            float rectX = (float)((decimal)centerPoint.X - radius);  //Rectangleの原点 X座標
+            float rectY = (float)((decimal)centerPoint.Y - radius);  //Rectangleの原点 Y座標
             float width = (float)(radius * 2M);
 
-            return new RectangleF(oriX, oriY, width, width);
+            return new RectangleF(rectX, rectY, width, width);
         }//AlgoCircle()
 
         private RectangleF AlgoSqure(PointF centerPoint, decimal length)

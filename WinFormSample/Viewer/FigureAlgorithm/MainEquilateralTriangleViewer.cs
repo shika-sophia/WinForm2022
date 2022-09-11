@@ -25,6 +25,11 @@
  *         suffix 接尾辞「M, m」:  decimal型のリテラルを表す記号
  *         
  *@subject AlgoTriangle 中心点と一辺から、正三角形の３点を計算
+ *         ・三角形の重心: 各頂点から向かい合う辺の中点に二等分線を引くと 
+ *           その線を 2 : 1 に内分する点で一点となる
+ *         ・正三角形の重心は３本の垂直二等分線の交点になり、
+ *           正三角形の重心 == 外接円の中心(外心) == 内接円の中心(内心) と一致する
+ *         
  *         PointF[]    AlgoTriangle(PointF centerPoint, decimal length)
  *                     引数 PointF centerPoint:  中心点
  *                         decimal length:       正三角形の一辺
@@ -33,17 +38,17 @@
  *                 三平方の定理より、30, 60, 90°の 辺比は 2 : 1 : √3
  *                 height = length / 2 * √3
  *         
- *         pointA: 正三角形の上頂点をAとする
+ *         pointA: 正三角形の上頂点をAとし、時計回りに B, C とする
  *                 X座標は 中心点の X座標と同じ 
  *                 Y座標は 中心点の Y座標より、heightの 2 / 3 だけ上方(-)
  *                 
- *         pointB: 正三角形の底点左
- *                 X座標は 中心点の X座標より、length の 1 / 2 だけ左方(-)
+ *         pointB: 正三角形の底点右
+ *                 X座標は 中心点の X座標より、length の 1 / 2 だけ右方(+)
  *                 Y座標は 中心点の Y座標より、heightの 1 / 3 だけ下方(+)
  *                       = pointAのY座標より、heigthだけ下方(+)
- *                 
- *         pointC: 正三角形の底点右
- *                 X座標は 中心点の X座標より、length の 1 / 2 だけ右方(+)
+ *                       
+ *         pointC: 正三角形の底点左
+ *                 X座標は 中心点の X座標より、length の 1 / 2 だけ左方(-)
  *                 Y座標は 中心点の Y座標より、heightの 1 / 3 だけ下方(+)
  *                       = pointAのY座標より、heigthだけ下方(+)
  *                       
@@ -140,17 +145,18 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
             decimal root3 = (decimal)Math.Sqrt(3d);    // √3
             decimal height = length / 2M * root3;      // Three Square Theorem
 
-            var pointA = new PointF(                   // △の上頂点を Aとする
+            var pointA = new PointF(                   // △の上頂点を Aとし、時計回りに B, C とする
                 centerPoint.X,
                 (float)((decimal)centerPoint.Y - height * 2M / 3M));
 
             var pointB = new PointF(
-                (float)((decimal)pointA.X - length / 2M),
+                (float)((decimal)pointA.X + length / 2M),
                 (float)((decimal)pointA.Y + height));
 
             var pointC = new PointF(
-                (float)((decimal)pointA.X + length / 2M),
+                (float)((decimal)pointA.X - length / 2M),
                 (float)((decimal)pointA.Y + height));
+
 
             rectCircum = AlgoCircle(centerPoint, (height / 3M * 2M));
             rectInscribe = AlgoCircle(centerPoint, (height / 3M));
@@ -163,11 +169,11 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
 
         private RectangleF AlgoCircle(PointF centerPoint, decimal radius)
         {
-            float oriX = (float)((decimal)centerPoint.X - radius);  //Rectangleの原点 X座標
-            float oriY = (float)((decimal)centerPoint.Y - radius);  //Rectangleの原点 Y座標
+            float rectX = (float)((decimal)centerPoint.X - radius);  //Rectangleの原点 X座標
+            float rectY = (float)((decimal)centerPoint.Y - radius);  //Rectangleの原点 Y座標
             float width = (float)(radius * 2M);
             
-            return new RectangleF(oriX, oriY, width, width);
+            return new RectangleF(rectX, rectY, width, width);
         }//AlgoCircle()
 
     }//class
