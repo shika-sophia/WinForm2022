@@ -24,10 +24,10 @@
  *         ・AlgoHexagon()を利用し、まず六角形を作り、
  *           その対角線で正三角形を描画する。
  *           
- *@subject CalcMiddlePoint  ２点の中点座標
+ *@subject AlgoMiddlePoint  ２点の中点座標
  *         両点の X, Y座標を それぞれ + して / 2をする
  *         
- *         PointF  CalcMiddlePoint(PointF pt1, PointF pt2)
+ *         PointF  AlgoMiddlePoint(PointF pt1, PointF pt2)
  *         
  *@subject DrawString()
  *         ・点の名前, 角度, 辺の長さなどのテキスト描画
@@ -221,9 +221,9 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
             brushAngle.Dispose();
 
             //---- "r" ----
-            var middleAF = CalcMiddlePoint(hexgonPointAry[0], hexgonPointAry[5]);
-            var middleAo = CalcMiddlePoint(hexgonPointAry[0], centerHexgon);
-            var middleFo = CalcMiddlePoint(hexgonPointAry[5], centerHexgon);
+            var middleAF = AlgoMiddlePoint(hexgonPointAry[0], hexgonPointAry[5]);
+            var middleAo = AlgoMiddlePoint(hexgonPointAry[0], centerHexgon);
+            var middleFo = AlgoMiddlePoint(hexgonPointAry[5], centerHexgon);
 
             decimal radiusDistance = 10M;
             g.DrawString("ｒ", this.Font, penPink.Brush,
@@ -299,11 +299,11 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
             };
         }//AlgoHexagon()
 
-        private PointF CalcMiddlePoint(PointF pt1, PointF pt2)
+        private PointF AlgoMiddlePoint(PointF pt1, PointF pt2)
         {
             return new PointF(
                 (float)(((decimal)pt1.X + (decimal)pt2.X) / 2M),
                 (float)(((decimal)pt1.Y + (decimal)pt2.Y) / 2M));
-        }//CalcMiddlePoint()
+        }//AlgoMiddlePoint()
     }//class
 }
