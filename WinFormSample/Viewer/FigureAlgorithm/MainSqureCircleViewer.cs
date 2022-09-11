@@ -72,9 +72,9 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
 {
     class MainSqureCircleViewer
     {
-        [STAThread]
-        static void Main()
-        //public void Main()
+        //[STAThread]
+        //static void Main()
+        public void Main()
         {
             Console.WriteLine("new FormSqureCircleViewer()");
 
