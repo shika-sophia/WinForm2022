@@ -72,9 +72,9 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
 {
     class MainSqureCircleViewer
     {
-        //[STAThread]
-        //static void Main()
-        public void Main()
+        [STAThread]
+        static void Main()
+        //public void Main()
         {
             Console.WriteLine("new FormSqureCircleViewer()");
 
@@ -152,6 +152,7 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
             g.DrawString("r", this.Font, penPink.Brush,
                 (float)((decimal)centerPoint.X + 10M),
                 (float)((decimal)centerPoint.Y - LENGTH / 4M - 10M));
+
             g.DrawString("r", this.Font, penPink.Brush,
                 (float)((decimal)centerPoint.X - LENGTH / 4M - 10M),
                 (float)((decimal)centerPoint.Y + 10M));
