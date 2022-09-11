@@ -24,16 +24,36 @@
  *         decimalに変換して行う。(= 内部的に 10進数で計算 | [Java] BigDecimalクラス)
  *         suffix 接尾辞「M, m」:  decimal型のリテラルを表す記号
  *         
- *@subject AlgoTriangle
- *         PointF[]    AlgoTriangle()
- *                     引数 PointF centerPoint
- *                         decimal LENGTN
+ *@subject AlgoTriangle 中心点と一辺から、正三角形の３点を計算
+ *         PointF[]    AlgoTriangle(PointF centerPoint, decimal length)
+ *                     引数 PointF centerPoint:  中心点
+ *                         decimal length:       正三角形の一辺
  *                         
- *@subject AlgoCircle
- *         RectangleF  AlgoCircle(PointF centerPoint, float radius)
+ *         height: 正三角形の上頂点から底辺への垂線
+ *                 三平方の定理より、30, 60, 90°の 辺比は 2 : 1 : √3
+ *                 height = length / 2 * √3
  *         
+ *         pointA: 正三角形の上頂点をAとする
+ *                 X座標は 中心点の X座標と同じ 
+ *                 Y座標は 中心点の Y座標より、heightの 2 / 3 だけ上方(-)
+ *                 
+ *         pointB: 正三角形の底点左
+ *                 X座標は 中心点の X座標より、length の 1 / 2 だけ左方(-)
+ *                 Y座標は 中心点の Y座標より、heightの 1 / 3 だけ下方(+)
+ *                       = pointAのY座標より、heigthだけ下方(+)
+ *                 
+ *         pointC: 正三角形の底点右
+ *                 X座標は 中心点の X座標より、length の 1 / 2 だけ右方(+)
+ *                 Y座標は 中心点の Y座標より、heightの 1 / 3 だけ下方(+)
+ *                       = pointAのY座標より、heigthだけ下方(+)
+ *                       
+ *         外接円:  heigthの 2 / 3を半径とする円
+ *         内接円:  heigthの 1 / 3を半径とする円
+ *
+ *@subject AlgoCircle
+ *         =>〔MainSqureCircleViewer.cs〕
  *@see ImageEquilateralTriangleViewer.jpg
- *@see 
+ *@see MainSqureCircleViewer.cs
  *@author shika
  *@date 2022-09-10
  */
@@ -83,8 +103,9 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
                 Dock = DockStyle.Fill,
             };
             centerPoint = new PointF(
-                (float)(pic.ClientSize.Width / 2M),
-                (float)(pic.ClientSize.Height / 2M));
+                (float)((decimal)pic.ClientSize.Width / 2M),
+                (float)((decimal)pic.ClientSize.Height / 2M));
+
             DrawFigure();
 
             this.Controls.AddRange(new Control[]
@@ -101,37 +122,38 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
             var g = Graphics.FromImage(bitmap);
             g.SmoothingMode = SmoothingMode.HighQuality;
                         
-            PointF[] triPointAry = AlgoTriangle();
+            PointF[] triPointAry = AlgoTriangle(centerPoint, LENGTH);
 
-            g.FillEllipse(pen.Brush, 
-                centerPoint.X - 2f, centerPoint.Y - 2f, 4, 4);  //中心点
+            g.FillEllipse(pen.Brush,               //中心点
+                (float)((decimal)centerPoint.X - 2M), 
+                (float)((decimal)centerPoint.Y - 2M), 4, 4);
             g.DrawPolygon(pen, triPointAry);       //正三角形
             g.DrawEllipse(Pens.Blue, rectCircum);  //外接円
             g.DrawEllipse(Pens.Red, rectInscribe); //内接円
 
             pic.Image = bitmap;
             g.Dispose();
-        }
+        }//DrawFigure()
 
-        private PointF[] AlgoTriangle()
+        private PointF[] AlgoTriangle(PointF centerPoint, decimal length)  //中心点, 一辺の長さ
         {
-            decimal root3 = (decimal)Math.Sqrt(3.0d);  // √3
-            decimal height = LENGTH / 2M * root3;      // Three Square Theorem
+            decimal root3 = (decimal)Math.Sqrt(3d);    // √3
+            decimal height = length / 2M * root3;      // Three Square Theorem
 
-            var pointA = new PointF(                   // △の頂点を Aとする
+            var pointA = new PointF(                   // △の上頂点を Aとする
                 centerPoint.X,
                 (float)((decimal)centerPoint.Y - height * 2M / 3M));
 
             var pointB = new PointF(
-                (float)((decimal)pointA.X - LENGTH / 2M),
+                (float)((decimal)pointA.X - length / 2M),
                 (float)((decimal)pointA.Y + height));
 
             var pointC = new PointF(
-                (float)((decimal)pointA.X + LENGTH / 2M),
+                (float)((decimal)pointA.X + length / 2M),
                 (float)((decimal)pointA.Y + height));
 
-            rectCircum = AlgoCircle(centerPoint, (float)(height / 3M * 2M));
-            rectInscribe = AlgoCircle(centerPoint, (float)(height / 3M));
+            rectCircum = AlgoCircle(centerPoint, (height / 3M * 2M));
+            rectInscribe = AlgoCircle(centerPoint, (height / 3M));
 
             return new PointF[]
             {
@@ -139,14 +161,14 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
             };
         }//ArgoTriangle()
 
-        private RectangleF AlgoCircle(PointF centerPoint, float radius)
+        private RectangleF AlgoCircle(PointF centerPoint, decimal radius)
         {
-            float oriX = centerPoint.X - radius;  //Rectangleの原点 X座標
-            float oriY = centerPoint.Y - radius;  //Rectangleの原点 Y座標
-            float width = radius * 2;
-            float height = radius * 2;
-
-            return new RectangleF(oriX, oriY, width, height);
+            float oriX = (float)((decimal)centerPoint.X - radius);  //Rectangleの原点 X座標
+            float oriY = (float)((decimal)centerPoint.Y - radius);  //Rectangleの原点 Y座標
+            float width = (float)(radius * 2M);
+            
+            return new RectangleF(oriX, oriY, width, width);
         }//AlgoCircle()
+
     }//class
 }
