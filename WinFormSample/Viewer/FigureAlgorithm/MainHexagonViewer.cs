@@ -222,7 +222,7 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
 
             //---- "r" ----
             var middleAF = AlgoMiddlePoint(hexgonPointAry[0], hexgonPointAry[5]);
-            var middleAo = AlgoMiddlePoint(hexgonPointAry[0], centerHexgon);
+            var middleAo = virticalPoint;
             var middleFo = AlgoMiddlePoint(hexgonPointAry[5], centerHexgon);
 
             decimal radiusDistance = 10M;
