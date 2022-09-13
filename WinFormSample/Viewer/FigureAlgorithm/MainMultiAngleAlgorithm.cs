@@ -49,7 +49,7 @@
  *         正n角形の中心角は θ = 360 / n
  *         
  *         decimal centerAngleRadian = 
- *             360M / (decimal)num / 180M * (decimal)Math.PI;
+ *             (360M / (decimal)num) * (decimal)Math.PI / 180M;
  *         
  *@NOTE【考察】
  *      数学の原点(0, 0)に対し (+, +)領域は 右上方向だが、
@@ -58,7 +58,7 @@
  *      そして、中心点の座標から +- する必要がある。
  *      
  *      数学のように、X座標 = r * cosθ, Y座標 = r * sinθとすると、
- *      上頂点からではなく、他のところから始まるが、(初期角を + 90°しても解決しない)
+ *      上頂点からではなく、他のところから始まるが、(初期角を +90° / -90° しても解決しない)
  *      それでも図形は ちゃんと描画できる。
  *      上頂点から始めるには、sin, cosを入れ替えて 反時計回りで座標を算出した
  *      
@@ -108,9 +108,9 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
 {
     class MainMultiAngleAlgorithm
     {
-        //[STAThread]
-        //static void Main()
-        public void Main()
+        [STAThread]
+        static void Main()
+        //public void Main()
         {
             Console.WriteLine("new FormMultiAngleAlgorithm()");
 
@@ -195,7 +195,7 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
 
         private PointF[] AlgoMultiAngle(PointF centerPoint, decimal radius, int num)
         {
-            decimal centerAngleRadian = (360M / (decimal)num) * (decimal)Math.PI / 180M;  //中心角 θ = 360 / n (ラジアン単位: θπ / 180)
+            decimal centerAngleRadian = (360M / (decimal)num) * (decimal)Math.PI / 180M;
 
             PointF[] multiPointAry = new PointF[num];
 
