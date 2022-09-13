@@ -1,20 +1,72 @@
 ﻿/*
 //==== Template DrawFigure() ====
 
-private void DrawFigure()
-{
-    Bitmap bitmap = new Bitmap(
-        pic.ClientSize.Width, pic.ClientSize.Height);
-    var g = Graphics.FromImage(bitmap);
-    g.SmoothingMode = SmoothingMode.HighQuality;
-    g.FillEllipse(pen.Brush,                     //中心点
-        (float)((decimal)centerPoint.X - 2M),
-        (float)((decimal)centerPoint.Y - 2M), 4, 4);
-            
+    [STAThread]
+    static void Main()
+    //public void Main()
+    {
+        Console.WriteLine("new Form1()");
 
-    pic.Image = bitmap;
-    g.Dispose();
-}//DrawFigure()
+        Application.EnableVisualStyles();
+        Application.Run(new Form1());
+
+        Console.WriteLine("Close()");
+    }//Main()
+}//class
+
+class Form1 : Form
+{
+    private readonly PictureBox pic;
+    private readonly PointF centerPoint;
+    private const decimal RADIUS = 150M;
+
+    public Form1()
+    {
+        this.Text = "Form1";
+        this.Font = new Font("consolas", 12, FontStyle.Regular);
+        this.Size = new Size(480, 480);
+        this.FormBorderStyle = FormBorderStyle.FixedSingle;
+        this.BackColor = SystemColors.Window;
+
+        pic = new PictureBox()
+        {
+            ClientSize = this.ClientSize,
+            BorderStyle = BorderStyle.Fixed3D,
+            Dock = DockStyle.Fill,
+        };
+
+        centerPoint = new PointF(
+            (float)((decimal)pic.ClientSize.Width / 2M),
+            (float)((decimal)pic.ClientSize.Height / 2M));
+
+        DrawFigure();
+
+        this.Controls.AddRange(new Control[]
+        {
+            pic,
+        });
+    }//constructor
+
+    private void DrawFigure()
+    {
+        Bitmap bitmap = new Bitmap(
+            pic.ClientSize.Width, pic.ClientSize.Height);
+        var g = Graphics.FromImage(bitmap);
+        g.SmoothingMode = SmoothingMode.HighQuality;
+        Pen penBlue = new Pen(Color.CornflowerBlue, 3);
+        Pen penPink = new Pen(Color.HotPink, 1);
+
+        //---- centerPoint ----
+        g.FillEllipse(penBlue.Brush,
+            (float)((decimal)centerPoint.X - 2M),
+            (float)((decimal)centerPoint.Y - 2M), 4, 4);
+
+        penBlue.Dispose();
+        penPink.Dispose();
+        g.Dispose();
+        pic.Image = bitmap;
+    }//DrawFigure()
+}//class
 
 */
 /** 
