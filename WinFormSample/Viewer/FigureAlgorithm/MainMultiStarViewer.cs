@@ -12,7 +12,7 @@
  *@content MultiStarViewer
  *         正n角形の対角線を用いた星型の描画
  *         
- *@subject AlgoMultiStar()
+ *@subject DrawFigure()
  *         正ｎ角形の ｎが 偶数(even)か 奇数(odd)によってアルゴリズムが異なる
  *         
  *@subject AlgoOddStar()  ｎが奇数のとき
@@ -38,7 +38,6 @@
  *@date 2022-09-13
  */
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -89,23 +88,12 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
                 (float)((decimal)pic.ClientSize.Width / 2M),
                 (float)((decimal)pic.ClientSize.Height / 2M));
 
-            Bitmap bitmap = new Bitmap(
-                pic.ClientSize.Width, pic.ClientSize.Height);
-            g = Graphics.FromImage(bitmap);
-            g.SmoothingMode = SmoothingMode.HighQuality;
-
-            AlgoMultiStar();
-
-            pic.Image = bitmap;
+            DrawStar();
 
             this.Controls.AddRange(new Control[]
             {
                 pic,
             });
-
-            penBlue.Dispose();
-            penPink.Dispose();
-            g.Dispose();
         }//constructor
 
         private PointF[] AlgoMultiAngle(PointF centerPoint, decimal radius, int num)
@@ -126,68 +114,80 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
             return multiPointAry;
         }//AlgoMultiAngle()
 
-        private void AlgoMultiStar()
+        private void DrawStar()
         {
-            //---- OddStar ----
-            if(NUM % 2 == 1)
+            Bitmap bitmap = new Bitmap(
+                pic.ClientSize.Width, pic.ClientSize.Height);
+            var g = Graphics.FromImage(bitmap);
+            g.SmoothingMode = SmoothingMode.HighQuality;
+
+            //---- OddStar ----            
+            if (NUM % 2 == 1)
             {
-                AlgoOddStar(centerPoint, RADIUS, NUM);                
+                GraphicsPath gPath = AlgoOddStar(centerPoint, RADIUS, NUM);
+                g.FillPath(penBlue.Brush, gPath);
+                //g.DrawPath(penBlue, gPath);
             }
 
             //---- EvenStar ----
-            if(NUM % 2 == 0)
+            if (NUM % 2 == 0)
             {
-                AlgoEvenStar(centerPoint, RADIUS, NUM);
-            }
-        }//AlgoMultiStar()
+                GraphicsPath[] gPathAry = AlgoEvenStar(centerPoint, RADIUS, NUM);
 
-        private void AlgoOddStar(PointF centerPoint, decimal radius, int num)
+                //g.FillPath(penPink.Brush, gPathAry[0]);
+                //g.FillPath(penPink.Brush, gPathAry[1]);
+                g.DrawPath(penPink, gPathAry[0]);
+                g.DrawPath(penPink, gPathAry[1]);
+            }
+
+            penBlue.Dispose();
+            penPink.Dispose();
+            g.Dispose();
+
+            pic.Image = bitmap;
+        }//DrawStar()
+
+        private GraphicsPath AlgoOddStar(PointF centerPoint, decimal radius, int num)
         {
             PointF[] multiPointAry = AlgoMultiAngle(centerPoint, radius, num);      
             GraphicsPath gPath = new GraphicsPath(FillMode.Winding);
 
-            PointF[] starPointAry = BuildSkipPointArray(num, multiPointAry);
+            PointF[] starPointAry = AlgoSkipPoint(num, multiPointAry);
             gPath.AddLines(starPointAry);
 
-            g.FillPath(penBlue.Brush, gPath);            
-            //g.DrawPath(penBlue, gPath);
+            return gPath;
         }//AlgoOddStar()
 
-        private void AlgoEvenStar(PointF centerPoint, decimal radius, int num)
+        private GraphicsPath[] AlgoEvenStar(PointF centerPoint, decimal radius, int num)
         {
             PointF[] multiPointAry = AlgoMultiAngle(centerPoint, radius, num);
-            var gPath = new GraphicsPath(FillMode.Winding);
+            var gPath0 = new GraphicsPath(FillMode.Winding);
 
-            int halfAngle = num / 2;
-            PointF[] harfPointAry = BuildSkipPointArray(halfAngle, multiPointAry, start: 0);
-            gPath.AddLines(harfPointAry);
+            PointF[] harfPointAry = AlgoSkipPoint(num, multiPointAry, start: 0);
+            gPath0.AddLines(harfPointAry);
 
-            //g.FillPath(penPink.Brush, gPath);
-            g.DrawPath(penPink, gPath);
+            var gPath1 = new GraphicsPath(FillMode.Winding);
+            harfPointAry = AlgoSkipPoint(num, multiPointAry, start: 1);
+            gPath1.AddLines(harfPointAry);
 
-            gPath.Reset();
-            harfPointAry = BuildSkipPointArray(halfAngle, multiPointAry, start: 1);
-            gPath.AddLines(harfPointAry);
-
-            //gPath.FillMode = FillMode.Winding;
-            //g.FillPath(penPink.Brush, gPath);
-            g.DrawPath(penPink, gPath);
+            return new GraphicsPath[] { gPath0, gPath1 };
         }//AlgoEvenStar()
 
-        private PointF[] BuildSkipPointArray(
-            int num, PointF[] multiPointAry, int start = 0)
+        private PointF[] AlgoSkipPoint(
+            int NUM_ANGLE, PointF[] multiPointAry, int start = 0)
         {
-            PointF[] starPointAry = new PointF[num + 1];
-            int index = start;
+            int numPoint = (NUM_ANGLE % 2 == 0) ? (NUM_ANGLE / 2) : NUM_ANGLE;
             
+            PointF[] starPointAry = new PointF[numPoint + 1];
+            int index = start;
             for (int i = 0; i < starPointAry.Length; i++)
             {
                 starPointAry[i] = multiPointAry[index];
-                index = (index + 2) % NUM;
+                index = (index + 2) % NUM_ANGLE;
             }//for
 
             return starPointAry;
-        }//BuildSkipPointArray()
+        }//AlgoSkipPoint()
     }//class
 }
 
@@ -197,7 +197,7 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
 //Console.WriteLine($"start: {start}");
 //Console.WriteLine($"{i}: {index}");
 
-//---- AlgoOddStar(), BuildSkipPointArray() ----
+//---- AlgoOddStar(), AlgoSkipPoint() ----
 NUM: 5
 start: 0
 0: 0
@@ -207,7 +207,7 @@ start: 0
 4: 3
 5: 0
 
-//---- AlgoEvenStar(), BuildSkipPointArray() ----
+//---- AlgoEvenStar(), AlgoSkipPoint() ----
 NUM: 8
 start: 0
 0: 0
