@@ -23,7 +23,7 @@
  *         ・Formクラスに コピー用
  *         ・ダイアモンド構造の call
  *              DrawStar()
- *                ↓ call         ↓ call 
+ *                ↓ call         ↓ call         call
  *              AlgoOddStar() | AlgoEvenStar()  --> AlgoMultiAngle()
  *                ↓ call         ↓ call
  *              AlgoSkipPoint()
