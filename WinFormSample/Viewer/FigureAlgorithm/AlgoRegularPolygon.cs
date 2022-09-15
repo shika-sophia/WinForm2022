@@ -84,7 +84,7 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
         //    //---- OddStar ----            
         //    if (NUM % 2 == 1)
         //    {
-        //        GraphicsPath gPath = AlgoOddStar(centerPoint, RADIUS, NUM);
+        //        GraphicsPath gPath = algo.AlgoOddStar(centerPoint, RADIUS, NUM);
         //        g.FillPath(penBlue.Brush, gPath);
         //        //g.DrawPath(penBlue, gPath);
         //    }
@@ -92,7 +92,7 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
         //    //---- EvenStar ----
         //    if (NUM % 2 == 0)
         //    {
-        //        GraphicsPath[] gPathAry = AlgoEvenStar(centerPoint, RADIUS, NUM);
+        //        GraphicsPath[] gPathAry = algo.AlgoEvenStar(centerPoint, RADIUS, NUM);
 
         //        //g.FillPath(penPink.Brush, gPathAry[0]);
         //        //g.FillPath(penPink.Brush, gPathAry[1]);
