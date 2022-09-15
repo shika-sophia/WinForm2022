@@ -16,7 +16,7 @@
  *         private readonly AlgoRegularPolygon algo = new AlgoRegularPolygon();
  *         
  *@subject PointF[] AlgoMultiAngle(
- *            PointF centerPoint, decimal radius, int num)
+ *              PointF centerPoint, decimal radius, int num)
  *
  *@subject //void DrawStar()
  *         ・PictureBox, Bitmap, Graphics, Penの各クラスが必要。
@@ -56,7 +56,7 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
     {
         public AlgoRegularPolygon() { } //constructor
 
-        private PointF[] AlgoMultiAngle(PointF centerPoint, decimal radius, int num)
+        public PointF[] AlgoMultiAngle(PointF centerPoint, decimal radius, int num)
         {
             decimal centerAngleRadian = (360M / (decimal)num) * (decimal)Math.PI / 180M;
 
@@ -107,7 +107,7 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
         //    pic.Image = bitmap;
         //}//DrawStar()
 
-        private GraphicsPath AlgoOddStar(PointF centerPoint, decimal radius, int num)
+        public GraphicsPath AlgoOddStar(PointF centerPoint, decimal radius, int num)
         {
             PointF[] multiPointAry = AlgoMultiAngle(centerPoint, radius, num);
             GraphicsPath gPath = new GraphicsPath(FillMode.Winding);
@@ -118,7 +118,7 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
             return gPath;
         }//AlgoOddStar()
 
-        private GraphicsPath[] AlgoEvenStar(PointF centerPoint, decimal radius, int num)
+        public GraphicsPath[] AlgoEvenStar(PointF centerPoint, decimal radius, int num)
         {
             PointF[] multiPointAry = AlgoMultiAngle(centerPoint, radius, num);
             var gPath0 = new GraphicsPath(FillMode.Winding);
@@ -149,7 +149,7 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
             return starPointAry;
         }//AlgoSkipPoint()
 
-        private RectangleF AlgoCircle(PointF centerPoint, decimal radius)
+        public RectangleF AlgoCircle(PointF centerPoint, decimal radius)
         {
             float rectX = (float)((decimal)centerPoint.X - radius);  //Rectangleの原点 X座標
             float rectY = (float)((decimal)centerPoint.Y - radius);  //Rectangleの原点 Y座標
@@ -158,7 +158,7 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
             return new RectangleF(rectX, rectY, width, width);
         }//AlgoCircle()
 
-        private RectangleF AlgoSqure(PointF centerPoint, decimal length)
+        public RectangleF AlgoSqure(PointF centerPoint, decimal length)
         {
             return AlgoCircle(centerPoint, length / 2M);  //円の直径 = 正方形の一辺
         }//AlgoSqure()
