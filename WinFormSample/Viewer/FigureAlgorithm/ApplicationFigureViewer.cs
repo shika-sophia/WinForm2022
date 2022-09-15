@@ -68,10 +68,10 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
         private readonly PictureBox pic;
         private readonly Graphics g;
         private readonly PointF centerPoint;
+        private readonly Pen penBlue = new Pen(Color.CornflowerBlue, 2);
+        private readonly Pen penPink = new Pen(Color.HotPink, 1);
         private int angle;
         private decimal radius;
-        private Pen penBlue = new Pen(Color.CornflowerBlue, 2);
-        private Pen penPink = new Pen(Color.HotPink, 1);
 
         public FormFigureViewer()
         {
@@ -237,7 +237,6 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
             if(list.SelectedItem == null) 
             { 
                 list.SetSelected(0, true); 
-                return;
             }
 
             string selected = list.SelectedItem.ToString();
