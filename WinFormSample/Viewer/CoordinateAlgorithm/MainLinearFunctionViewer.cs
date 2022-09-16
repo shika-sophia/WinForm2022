@@ -97,6 +97,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             linear = new AlgoCoordinateLinear(pic);
             linear.DrawCoordinateAxis();
             linear.DrawLinearFunction();
+            linear.DrawLinearFunction(
+                new PointF(-100, 200), new PointF(100, 50));
 
             this.Controls.AddRange(new Control[]
             {
