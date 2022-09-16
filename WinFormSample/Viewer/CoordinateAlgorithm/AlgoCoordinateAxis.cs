@@ -16,6 +16,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         protected readonly PointF centerPoint;
         protected readonly Pen penBlue = new Pen(Color.CornflowerBlue, 1);
         protected readonly Pen penPink = new Pen(Color.HotPink, 2);
+        protected readonly Font font = new Font("ＭＳ 明朝", 12, FontStyle.Bold);
 
         public AlgoCoordinateAxis(PictureBox pic)
         {
@@ -47,7 +48,6 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         public void DrawCoordinateAxis()
         {
-            Font font = new Font("ＭＳ 明朝", 12, FontStyle.Bold);
             g.DrawLine(penBlue, 0, -centerPoint.Y, 0, centerPoint.Y);  // X軸
             g.DrawLine(penBlue, -centerPoint.X, 0, centerPoint.X, 0);  // Y軸
 
