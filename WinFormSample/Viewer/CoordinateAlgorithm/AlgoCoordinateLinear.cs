@@ -1,9 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿/*
+ *@base    AlgoCoordinateAxis
+ *@inherit AlgoCoordinateLinear : AlgoCoordinateAxis
+ *@used MainLinearFunction.cs
+ *
+ */
+using System;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm

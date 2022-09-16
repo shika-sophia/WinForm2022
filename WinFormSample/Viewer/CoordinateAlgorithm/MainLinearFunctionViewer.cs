@@ -3,6 +3,7 @@
  *@based MainCoordinateAxisViewer.cs
  *@class MainLinearFunctionViewer.cs
  *@class   └ new FormLinearFunctionViewer() : Form
+ *@class       └ AlgoCoordinateLinear(PictureBox) : AlgoCoordinateAxis
  *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
  *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
@@ -12,7 +13,7 @@
  *           
  *@content LinearFunctionViewer
  *         １次関数  y = a x + b の描画
- *
+ *         
  *@subject Matrix 平行移動
  *         =>〔MainCoordinateAxisViewer.cs〕
  *         
@@ -41,11 +42,13 @@
  *         ・Yの値が 座標範囲より大きくなっても OK
  *         ・graphics.DrawLine(Pen, PointF, PointF)で描画
  *           Y座標は、数学座標と Graphics座標で反転しているため、
- *           DrawLine()のときだけ Y座標にのみ「-」をつけて反転させる。(描画だけ反転する)
+ *           DrawLine(), DrawString()のときだけ Y座標にのみ「-」をつけて反転させる。(描画だけ反転する)
  *           計算時に反転させる必要はない。
  *           
  *@see ImageLinearFunctionViewer.jpg
  *@see MainCoordinateAxisViewer.cs
+ *@see AlgoCoordinateAxis.cs
+ *@see AlgoCoordinateLinear.cs
  *@author shika
  *@date 2022-09-16
  */
