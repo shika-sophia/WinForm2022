@@ -58,9 +58,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 {
     class MainLinearFunctionViewer
     {
-        //[STAThread]
-        //static void Main()
-        public void Main()
+        [STAThread]
+        static void Main()
+        //public void Main()
         {
             Console.WriteLine("new FormLinearFunctionViewer()");
 
@@ -74,16 +74,13 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
     class FormLinearFunctionViewer : Form
     {
         private readonly PictureBox pic;
-        private readonly Graphics g;
-        private readonly PointF centerPoint;
-        private readonly Pen penBlue = new Pen(Color.CornflowerBlue, 1);
-        private readonly Pen penPink = new Pen(Color.HotPink, 2);
+        private readonly AlgoCoordinateLinear linear;
 
         public FormLinearFunctionViewer()
         {
             this.Text = "FormLinearFunctionViewer";
             this.Font = new Font("ＭＳ 明朝", 12, FontStyle.Bold);
-            this.ClientSize = new Size(480, 480);
+            this.ClientSize = new Size(600, 600);
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.BackColor = SystemColors.Window;
 
@@ -94,23 +91,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 Dock = DockStyle.Fill,
             };
 
-            centerPoint = new PointF(
-                (float)((decimal)pic.ClientSize.Width / 2M),
-                (float)((decimal)pic.ClientSize.Height / 2M));
-
-            Bitmap bitmap = new Bitmap(
-                pic.ClientSize.Width, pic.ClientSize.Height);
-            g = Graphics.FromImage(bitmap);
-            g.SmoothingMode = SmoothingMode.HighQuality;
-            penBlue.SetLineCap(LineCap.ArrowAnchor, LineCap.ArrowAnchor, DashCap.Flat);
-
-            Matrix mx = new Matrix();
-            mx.Translate(centerPoint.X, centerPoint.Y);
-            g.Transform = mx;
-            pic.Image = bitmap;
-
-            DrawCoordinateAxis();
-            DrawLinearFunction();
+            linear = new AlgoCoordinateLinear(pic);
+            linear.DrawCoordinateAxis();
+            linear.DrawLinearFunction();
 
             this.Controls.AddRange(new Control[]
             {
@@ -118,69 +101,5 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             });
         }//constructor
 
-        private void DrawCoordinateAxis()
-        {
-            g.DrawLine(penBlue, 0, -220, 0, 220);  // X軸
-            g.DrawLine(penBlue, -220, 0, 220, 0);  // Y軸
-
-            Brush brushBlue = penBlue.Brush;
-            g.DrawString("Ｏ", this.Font, brushBlue, -25, 8);
-            g.DrawString("Ｘ", this.Font, brushBlue, 220 - 18, 8);
-            g.DrawString("Ｙ", this.Font, brushBlue, -25, -220);
-        }//DrawCoordinateAxis
-
-        private void DrawLinearFunction()
-        {
-            var pt1 = new PointF(0, 50);
-            var pt2 = new PointF(50, 100);
-            var (a, b) = AlgoLinearParam(pt1, pt2);
-
-            float minX = -220f;
-            float minY = (float)LinearFunctionXtoY((decimal)minX, a, b);
-            float maxX = 220f;
-            float maxY = (float)LinearFunctionXtoY((decimal)maxX, a, b);
-
-            g.DrawLine(penPink, minX, -minY, maxX, -maxY);  //Y座標を反転
-            g.DrawString($"y = {a} x + {b}", this.Font, penPink.Brush, 20, -pt1.Y);
-        }//DrawLinearFunction
-
-        private (decimal a, decimal b) AlgoLinearParam(PointF pt1, PointF pt2)
-        {
-            decimal dx = (decimal)pt1.X - (decimal)pt2.X;
-            decimal dy = (decimal)pt1.Y - (decimal)pt2.Y;
-
-            decimal a;
-            if (dx == 0) { a = 0; }
-            else { a = dy / dx; }
-
-            decimal b = AlgoLinearParam(a, pt1);
-
-            return (a, b);
-        }//AlgoLinerParam(pt1, pt2)
-
-        private decimal AlgoLinearParam(decimal a, PointF pt1)
-        {
-            return (decimal)pt1.Y - a * (decimal)pt1.X;
-        }
-
-        private decimal LinearFunctionXtoY(decimal x, decimal a, decimal b)
-        {
-            return a * x + b;
-        }//AlgoLinearFunction(x) -> y
-
-        private decimal LinearFunctionYtoX(decimal y, decimal a, decimal b)
-        {
-            decimal x;
-            if (a == 0)
-            {
-                x = y;
-            }
-            else
-            {
-                x = (y - b) / a;
-            }
-
-            return x;
-        }//AlgoLinearFunction(y) -> x
     }//class
 }
