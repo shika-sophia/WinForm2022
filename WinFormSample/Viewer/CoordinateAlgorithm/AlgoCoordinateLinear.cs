@@ -98,6 +98,11 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         private double AlgoLinearParam(double a, PointF pt1)
         {
+            if (Double.IsInfinity(a))
+            {
+                throw new ArgumentException("Invalid value 'a = ∞, -∞'");
+            }
+
             // b = y - a x
             return (double)((decimal)pt1.Y - (decimal)a * (decimal)pt1.X);
         }
