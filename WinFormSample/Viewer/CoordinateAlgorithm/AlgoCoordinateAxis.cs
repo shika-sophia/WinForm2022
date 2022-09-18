@@ -99,11 +99,11 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
                 Brush brushBlue = penBlue.Brush;
                 g.DrawString($"{pt.X}", font, brushBlue,
-                    (pt.X > 0) ? -35f : 5f,
-                    -(float)((decimal)pt.Y + 5M));
-                g.DrawString($"{pt.Y}", font, brushBlue,
                     (float)((decimal)pt.X - 15M),
                     (pt.Y > 0) ? 5f : -20f);
+                g.DrawString($"{pt.Y}", font, brushBlue,
+                    (pt.X > 0) ? -35f : 5f,
+                    -(float)((decimal)pt.Y + 5M));
                 
                 brushBlue.Dispose();
             }
