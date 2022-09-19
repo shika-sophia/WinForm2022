@@ -38,9 +38,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 {
     class MainSimultaneousLinearEquation
     {
-        //[STAThread]
-        //static void Main()
-        public void Main()
+        [STAThread]
+        static void Main()
+        //public void Main()
         {
             Console.WriteLine("new FormSimultaneousLinearEquation()");
 
@@ -75,11 +75,11 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             linear.DrawCoordinateAxis();
 
             // y = a x + b
-            float slope1 = 0f;
+            float slope1 = 2f;
             float intercept1 = 50f;
 
             // y = c x + d
-            float slope2 = -0.5f;
+            float slope2 = -0.1f;
             float intercept2 = 200f;
 
             //連立方程式の解

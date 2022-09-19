@@ -78,35 +78,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 {
     class AlgoCoordinateLinear : AlgoCoordinateAxis
     {
-        protected readonly PointF pt1;
-        protected readonly PointF pt2;
-
-        public AlgoCoordinateLinear(PictureBox pic) : base(pic)
-        {
-            // y = 1 x + 50
-            this.pt1 = new PointF(0, 50);
-            this.pt2 = new PointF(100, 150);
-
-            // y = 100
-            //this.pt1 = new PointF(0, 100);
-            //this.pt2 = new PointF(100, 100);
-
-            // x = -100
-            //this.pt1 = new PointF(-100, 50);
-            //this.pt2 = new PointF(-100, 150);
-        }
-
-        public AlgoCoordinateLinear(
-            PictureBox pic, PointF pt1, PointF pt2) : base(pic)
-        {
-            this.pt1 = pt1;
-            this.pt2 = pt2;
-        }
-
-        public void DrawLinearFunction()
-        {
-            DrawLinearFunction(this.pt1, this.pt2);
-        }
+        public AlgoCoordinateLinear(PictureBox pic) : base(pic) { }
 
         public void DrawLinearFunction(PointF pt1, PointF pt2)
         {
@@ -138,25 +110,26 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                     (float)((decimal)-intercept * scaleRate));
                 g.DrawString($"y = {intercept}", font, penPink.Brush, 
                     (float)((decimal)centerPoint.X * scaleRate - 70M),
-                    (float)((decimal)-intercept * scaleRate + 20M));
+                    (float)((decimal)-intercept * scaleRate + 10M));
             }
             else
             {
-                float minX = -centerPoint.X;
-                float minY = LinearFunctionXtoY(minX, slope, intercept);
-                float maxX = centerPoint.X;
-                float maxY = LinearFunctionXtoY(maxX, slope, intercept);
+                float minY = -centerPoint.Y;
+                float minX = LinearFunctionYtoX(minY, slope, intercept);
+                float maxY = centerPoint.Y;
+                float maxX = LinearFunctionYtoX(maxY, slope, intercept);
 
                 g.DrawLine(penPink, 
                     (float)((decimal)minX * scaleRate),
-                    (float)((decimal)-minY * scaleRate),
+                    (float)((decimal)-minY * scaleRate),   //Y座標を反転
                     (float)((decimal)maxX * scaleRate),
                     (float)((decimal)-maxY * scaleRate));  //Y座標を反転
-
-
-                g.DrawString($"y = {slope} x + {intercept}", font, penPink.Brush,
-                    (float)((decimal)minX * scaleRate + 20M), 
-                    (float)((decimal)-LinearFunctionXtoY(minX, slope, intercept) * scaleRate + 20M));
+                
+                string equationStr = $"y = {slope} x + {intercept}";  
+                float labelY = slope > 0 ? minY : maxY;
+                g.DrawString(equationStr, font, penPink.Brush,
+                    (float)((decimal)LinearFunctionYtoX(labelY, slope, intercept) * scaleRate + 20M), 
+                    (float)((decimal)-labelY * scaleRate + (slope > 0 ? -20M : +10M)));
             }           
         }//DrawLinearFunction(double, double)
 
