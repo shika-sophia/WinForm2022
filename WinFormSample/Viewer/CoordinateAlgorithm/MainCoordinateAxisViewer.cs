@@ -36,9 +36,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 {
     class MainCoordinateAxisViewer
     {
-        //[STAThread]
-        //static void Main()
-        public void Main()
+        [STAThread]
+        static void Main()
+        //public void Main()
         {
             Console.WriteLine("new FormCoordinateAxisViewer()");
 
@@ -58,8 +58,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         {
             this.Text = "FormCoordinateAxisViewer";
             this.Font = new Font("ＭＳ 明朝", 12, FontStyle.Bold);
-            this.ClientSize = new Size(600, 600);
-            this.FormBorderStyle = FormBorderStyle.FixedSingle;
+            this.ClientSize = new Size(1080, 640);
+            this.FormBorderStyle = FormBorderStyle.Sizable;
             this.BackColor = SystemColors.Window;
 
             pic = new PictureBox()
@@ -71,6 +71,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             axis = new AlgoCoordinateAxis(pic);
             axis.DrawCoordinateAxis();
+            axis.DrawPointLine(new PointF(5000, 16000), true);
 
             this.Controls.AddRange(new Control[]
             {

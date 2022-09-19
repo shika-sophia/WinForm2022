@@ -119,22 +119,26 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             if(float.IsInfinity(slope))  // x = c (Virtical)
             {
                 g.DrawLine(penPink,
-                    intercept, -centerPoint.Y, 
-                    intercept, centerPoint.Y);
+                    (float)((decimal)intercept * scaleRate),
+                    (float)((decimal)-centerPoint.Y * scaleRate),
+                    (float)((decimal)intercept * scaleRate),
+                    (float)((decimal)-centerPoint.Y * scaleRate));
                 g.DrawString($"x = {intercept}", font, penPink.Brush, 
-                    (float)((decimal)intercept + 10M),
-                    -(float)((decimal)centerPoint.Y + 20M));
+                    (float)((decimal)intercept * scaleRate + 10M),
+                    (float)((decimal)-centerPoint.Y * scaleRate + 20M));
                 return;
             }
 
             if (slope == 0)  // y = b (Horizontal)
             {
                 g.DrawLine(penPink,
-                    -centerPoint.X, -intercept,
-                    centerPoint.X, -intercept);
+                    (float)((decimal)-centerPoint.X * scaleRate),
+                    (float)((decimal)-intercept * scaleRate),
+                    (float)((decimal)centerPoint.X * scaleRate),
+                    (float)((decimal)-intercept * scaleRate));
                 g.DrawString($"y = {intercept}", font, penPink.Brush, 
-                    (float)((decimal)centerPoint.X - 70M),
-                    -(float)((decimal)intercept + 20M));
+                    (float)((decimal)centerPoint.X * scaleRate - 70M),
+                    (float)((decimal)-intercept * scaleRate + 20M));
             }
             else
             {
@@ -143,9 +147,16 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 float maxX = centerPoint.X;
                 float maxY = LinearFunctionXtoY(maxX, slope, intercept);
 
-                g.DrawLine(penPink, minX, -minY, maxX, -maxY);  //Y座標を反転
+                g.DrawLine(penPink, 
+                    (float)((decimal)minX * scaleRate),
+                    (float)((decimal)-minY * scaleRate),
+                    (float)((decimal)maxX * scaleRate),
+                    (float)((decimal)-maxY * scaleRate));  //Y座標を反転
+
+
                 g.DrawString($"y = {slope} x + {intercept}", font, penPink.Brush,
-                    -120f, -(float)((decimal)LinearFunctionXtoY(-120f, slope, intercept) + 20M));
+                    (float)((decimal)minX * scaleRate + 20M), 
+                    (float)((decimal)-LinearFunctionXtoY(minX, slope, intercept) * scaleRate + 20M));
             }           
         }//DrawLinearFunction(double, double)
 

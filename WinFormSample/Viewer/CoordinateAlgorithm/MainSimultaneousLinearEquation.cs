@@ -38,9 +38,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 {
     class MainSimultaneousLinearEquation
     {
-        [STAThread]
-        static void Main()
-        //public void Main()
+        //[STAThread]
+        //static void Main()
+        public void Main()
         {
             Console.WriteLine("new FormSimultaneousLinearEquation()");
 
@@ -60,7 +60,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         {
             this.Text = "FormSimultaneousLinearEquation";
             this.Font = new Font("consolas", 12, FontStyle.Regular);
-            this.ClientSize = new Size(600, 600);
+            this.ClientSize = new Size(1080, 640);
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.BackColor = SystemColors.Window;
 
@@ -75,14 +75,12 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             linear.DrawCoordinateAxis();
 
             // y = a x + b
-            float slope1 = 1f;
-            float intercept1 = -100f;
-            linear.DrawLinearFunction(slope1, intercept1);
+            float slope1 = 0f;
+            float intercept1 = 50f;
 
             // y = c x + d
             float slope2 = -0.5f;
             float intercept2 = 200f;
-            linear.DrawLinearFunction(slope2, intercept2);
 
             //連立方程式の解
             bool existSolution = linear.TrySolution(
@@ -94,8 +92,12 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             }
             else
             {
-                linear.DrawPointGrid(solutionPoint, true);
+                linear.DrawPointLine(solutionPoint, true);
             }
+
+            //DrawPointLine()で PointAutoScale()を行うので、その後に DrawLine()
+            linear.DrawLinearFunction(slope1, intercept1);
+            linear.DrawLinearFunction(slope2, intercept2);
 
             this.Controls.AddRange(new Control[]
             {
