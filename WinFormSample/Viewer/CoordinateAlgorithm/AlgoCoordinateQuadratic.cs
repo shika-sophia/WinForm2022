@@ -1,7 +1,6 @@
 ﻿/** 
- *@title WinFormGUI / WinFormSample / 
- *@class Main.cs
- *@class   └ new Form1() : Form
+ *@title WinFormGUI / WinFormSample / Viewer / CoordinateAlgorithm
+ *@class AlgoCoordinateQuadratic.cs
  *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
  *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
@@ -29,9 +28,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
     {
         public AlgoCoordinateQuadratic(PictureBox pic) : base(pic) { }
 
-        public void DrawParabolaFunction(float quadCoefficiency, float vertexX, float vertexY) 
+        public void DrawParabolaFunction(float quadCoefficient, float vertexX, float vertexY) 
         {
-            if(quadCoefficiency == 0)  // y = q
+            if(quadCoefficient == 0)  // y = q
             {  
                 throw new ArgumentException();
             }
@@ -47,7 +46,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                     new PointF(
                         (float)((decimal)i + (decimal)vertexX),
                         (float)((decimal)-AlgoParabolaFunctionXtoY(
-                            i, quadCoefficiency, vertexX, vertexY) - (decimal)vertexY)
+                            i, quadCoefficient, vertexX, vertexY) - (decimal)vertexY)
                     )
                 );
             }//for
@@ -57,10 +56,11 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             g.DrawPath(penPink, gPath);
         }//DrawParabolaFunction()
 
-        private float AlgoParabolaFunctionXtoY(float x, float quadCoefficiency, float vertexX, float vertexY)
+        private float AlgoParabolaFunctionXtoY(
+            float x, float quadCoefficient, float vertexX, float vertexY)
         {
             // ２次関数 y = a(x - p)^2 + q  
-            return quadCoefficiency * (x - vertexX) * (x - vertexX) + vertexY;
+            return quadCoefficient * (x - vertexX) * (x - vertexX) + vertexY;
         }
     }//class
 }
