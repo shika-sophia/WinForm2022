@@ -80,6 +80,11 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
     {
         public AlgoCoordinateLinear(PictureBox pic) : base(pic) { }
 
+        public void DrawLinearFunction(EquationLinear equLinear)
+        {
+            DrawLinearFunction(equLinear.Slope, equLinear.Intercept);
+        }//DrawLinearFunction(EquationLinear)
+
         public void DrawLinearFunction(PointF pt1, PointF pt2)
         {
             (float slope, float intercept) = AlgoLinearParam(pt1, pt2);
@@ -131,7 +136,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                     (float)((decimal)LinearFunctionYtoX(labelY, slope, intercept) * scaleRate + 20M), 
                     (float)((decimal)-labelY * scaleRate + (slope > 0 ? -20M : +10M)));
             }           
-        }//DrawLinearFunction(double, double)
+        }//DrawLinearFunction(float, float)
 
         private (float slope, float intercept) AlgoLinearParam(PointF pt1, PointF pt2)
         {

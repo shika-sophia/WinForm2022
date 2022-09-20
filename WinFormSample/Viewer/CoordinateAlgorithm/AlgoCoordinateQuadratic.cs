@@ -8,13 +8,13 @@
  *           http://kaitei.net/csforms/
  *           =>〔~/Reference/Article_KaiteiNet/WinForm_.txt〕
  *           
- *@content 
+ *@content AlgoCoordinateQuadratic
  *@subject 
  *
- *@see Image.jpg
- *@see 
+ *@see AlgoCoordinateAxis.cs
+ *@see AlgoCoordinateLinear.cs
  *@author shika
- *@date 
+ *@date 2022-09-20
  */
 using System;
 using System.Collections.Generic;
@@ -28,6 +28,16 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
     {
         public AlgoCoordinateQuadratic(PictureBox pic) : base(pic) { }
 
+        public void DrawParabolaFunction(EquationQuadratic quadEqu)
+        {
+            DrawParabolaFunction(quadEqu.QuadCoefficient, quadEqu.Vertex);
+        }
+
+        public void DrawParabolaFunction(float quadCoefficient, PointF vertex)
+        {
+            DrawParabolaFunction(quadCoefficient, vertex.X, vertex.Y);
+        }//DrawParabolaFunction(float, PointF)
+
         public void DrawParabolaFunction(float quadCoefficient, float vertexX, float vertexY) 
         {
             if(quadCoefficient == 0)  // y = q
@@ -35,32 +45,64 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 throw new ArgumentException();
             }
 
-            DrawPointLine(new PointF(vertexX, vertexY));
+            DrawMultiPointLine(new PointF[]
+            {
+                new PointF(vertexX, vertexY),
+                new PointF(
+                0, AlgoParabolaFunctionXtoY(0, quadCoefficient, vertexX, vertexY))
+            });
+            
+            List<PointF> pointList = new List<PointF>(
+                (int)((decimal)pic.ClientSize.Width / scaleRate));
 
-            List<PointF> pointList = new List<PointF>((int)pic.Width);
-
-            // ２次関数 y = a(x - p)^2 + q  
-            for (int i = (int)-centerPoint.X; i < (int)centerPoint.X; i++)
+            // ２次関数 y = a(x - p)^2 + q  【註】p, qの平行移動は AlgoParabolaFunctionXtoY()内で済み
+            for (decimal i = (decimal)-centerPoint.X / scaleRate;
+                i < (decimal)centerPoint.X / scaleRate; i++)
             {
                 pointList.Add(
                     new PointF(
-                        (float)((decimal)i + (decimal)vertexX),
-                        (float)((decimal)-AlgoParabolaFunctionXtoY(
-                            i, quadCoefficient, vertexX, vertexY) - (decimal)vertexY)
+                        (float)((decimal)i * scaleRate),
+                        (float)(((decimal)-AlgoParabolaFunctionXtoY(
+                            (float)i, quadCoefficient, vertexX, vertexY)
+                        * scaleRate))
                     )
                 );
             }//for
-
+            
             var gPath = new GraphicsPath();
             gPath.AddLines(pointList.ToArray());
             g.DrawPath(penPink, gPath);
-        }//DrawParabolaFunction()
+
+            pointList.Clear();
+        }//DrawParabolaFunction(float, float, float)
+
+        private float AlgoParabolaFunctionXtoY(float x, EquationQuadratic quadEqu)
+        {
+            return AlgoParabolaFunctionXtoY(
+                x, quadEqu.QuadCoefficient, quadEqu.Vertex.X, quadEqu.Vertex.Y);
+        }
 
         private float AlgoParabolaFunctionXtoY(
             float x, float quadCoefficient, float vertexX, float vertexY)
         {
             // ２次関数 y = a(x - p)^2 + q  
-            return quadCoefficient * (x - vertexX) * (x - vertexX) + vertexY;
+            return (float)((decimal)quadCoefficient
+                * ((decimal)x - (decimal)vertexX)
+                * ((decimal)x - (decimal)vertexX)
+                + (decimal)vertexY);
         }
+
+        private float[] AlgoParabolaFunctionYtoX(float y, EquationQuadratic equQuad)
+        {
+            return AlgoParabolaFunctionYtoX(
+                y, equQuad.QuadCoefficient, equQuad.Vertex.X, equQuad.Vertex.Y);
+        }
+
+        private float[] AlgoParabolaFunctionYtoX(
+            float y, float quadCoefficient, float vertexX, float vertexY)
+        {
+            //var x = - p + √　q
+            return new float[] { };
+        }//AlgoParabolaFunctionYtoX()
     }//class
 }

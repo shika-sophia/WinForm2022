@@ -213,7 +213,30 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                     -(float)((decimal)pt.Y * scaleRate + 5M));
             }
             brushPink.Dispose();
-        }//DrawPointGrid()
+        }//DrawPointLine()
+
+        public void DrawMultiPointLine(PointF[] pointAry, bool withLine = false)
+        {
+            //絶対値で最大値を持つ PointFで PointAutoScale()してから DrawPointLine()
+            float max = 0f;
+            PointF maxPoint = new PointF(0, 0);
+            foreach (PointF pt in pointAry)
+            {
+                float larger = Math.Max(Math.Abs(pt.X), Math.Abs(pt.Y));
+
+                if (max < larger)
+                {
+                    maxPoint = pt;
+                }
+            }//foreach
+
+            PointAutoScale(maxPoint);
+
+            foreach (PointF pt in pointAry)
+            {
+                DrawPointLine(pt, withLine);
+            }//forech
+        }//DrawMultiPointLine()
 
         public void SetScaleRate(decimal scaleRate)
         {

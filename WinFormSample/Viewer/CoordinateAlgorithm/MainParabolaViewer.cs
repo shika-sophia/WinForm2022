@@ -20,11 +20,6 @@
  *         
  *@subject DrawParabolaFunction()
  *         =>〔AlgoCoordinateQuadratic.cs〕
- *
- *@NOTE【Ploblem】
- *      ・scaleRateが乗算されていないので、膨らみの幅が数学の２次関数のものと異なる
- *      ・axis.PointAutoScale()を利用して座標軸の縮尺が変更されると、
- *        scaleRateを乗算しても、頂点がずれる。
  *        
  *@see ImageParabolaViewer.jpg
  *@see AlgoCoordinateQuadratic.cs
@@ -62,7 +57,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         {
             this.Text = "FormParabolaViewer";
             this.Font = new Font("consolas", 12, FontStyle.Regular);
-            this.ClientSize = new Size(1080, 640);
+            this.ClientSize = new Size(720, 640);
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.BackColor = SystemColors.Window;
 
@@ -75,10 +70,12 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             quad = new AlgoCoordinateQuadratic(pic);
             quad.DrawCoordinateAxis();
-            quad.DrawParabolaFunction(
-                quadCoefficient: -0.005f, vertexX: -100, vertexY: 100);
-            quad.DrawParabolaFunction(
-                quadCoefficient: 0.005f, vertexX: 0, vertexY: -100);
+
+            var y1 = new EquationQuadratic(-0.005f, new PointF(-100, 200));
+            var y2 = new EquationQuadratic(0.005f, new PointF(100, -500));
+
+            quad.DrawParabolaFunction(y2);
+            quad.DrawParabolaFunction(y1);
 
             this.Controls.AddRange(new Control[]
             {
