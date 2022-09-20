@@ -11,6 +11,13 @@
  *@content AlgoCoordinateQuadratic
  *@subject 
  *
+ *@NOTE【Problem】
+ *      複数の２次関数を描画する際、頂点, ｘ切片, ｙ切片などの点が複数あるので、
+ *      描画する順番によっては、PointAutoScale()が起こり、
+ *      それ以前の描画内容が消えてしまう問題
+ *      => あらかじめ必要な点を全て明かにし、
+ *         絶対値が最大となる点で PointAutoScale()をしておく必要がある
+ *         
  *@see AlgoCoordinateAxis.cs
  *@see AlgoCoordinateLinear.cs
  *@author shika
