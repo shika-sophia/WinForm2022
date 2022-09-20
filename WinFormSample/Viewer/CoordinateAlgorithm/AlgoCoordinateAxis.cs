@@ -58,6 +58,7 @@
  *@author shika
  *@date 2022-09-16
  */
+using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -68,11 +69,12 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
     {
         protected readonly PictureBox pic;
         protected readonly Graphics g;
-        protected readonly PointF centerPoint;
         protected readonly Pen penBlue = new Pen(Color.CornflowerBlue, 1);
         protected readonly Pen penPink = new Pen(Color.HotPink, 2);
         protected readonly Font font = new Font("ＭＳ 明朝", 12, FontStyle.Bold);
         protected readonly Font fontSmall = new Font("ＭＳ 明朝", 8, FontStyle.Regular);
+        protected readonly PointF centerPoint;
+        protected readonly decimal ratioWidthHeight;
         protected GraphicsState defaultAxis;
         protected decimal scaleRate = 2.0M;
 
@@ -82,6 +84,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             centerPoint = new PointF(
                 (float)((decimal)pic.ClientSize.Width / 2M),
                 (float)((decimal)pic.ClientSize.Height / 2M));
+            ratioWidthHeight = 
+                (decimal)pic.ClientSize.Width / 
+                (decimal)pic.ClientSize.Height;
             g = BuildGraphics();
         }//constructor
 
@@ -180,11 +185,11 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             Brush brushPink = penPink.Brush;
             g.FillEllipse(brushPink,
-                (float)((decimal)pt.X * scaleRate - 2M),
-                -(float)((decimal)pt.Y * scaleRate + 2M), 4, 4);
+                (float)((decimal)pt.X * scaleRate - 3M),
+                -(float)((decimal)pt.Y * scaleRate + 3M), 6, 6);
 
             SizeF pointSize = g.MeasureString("(500,500)", fontSmall);
-            g.DrawString($"({pt.X:.##},{pt.Y:.##})", fontSmall, brushPink,
+            g.DrawString($"({pt.X:0.##},{pt.Y:0.##})", fontSmall, brushPink,
                 (float)((decimal)pt.X * scaleRate - (decimal)pointSize.Width / 2M),
                 -(float)((decimal)pt.Y * scaleRate + ((pt.Y > 0) ? (decimal)pointSize.Height + 5M : (decimal)-pointSize.Height)));
 
@@ -200,10 +205,10 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                     (float)((decimal)pt.X * scaleRate), (float)((decimal)-pt.Y * scaleRate),
                     (float)((decimal)pt.X * scaleRate), 0f);
 
-                g.DrawString($"{pt.X:.##}", fontSmall, brushPink,
+                g.DrawString($"{pt.X:0.##}", fontSmall, brushPink,
                     (float)((decimal)pt.X * scaleRate - 15M),
                     (pt.Y > 0) ? 5f : -20f);
-                g.DrawString($"{pt.Y:.##}", fontSmall, brushPink,
+                g.DrawString($"{pt.Y:0.##}", fontSmall, brushPink,
                     (pt.X > 0) ? -35f : 5f,
                     -(float)((decimal)pt.Y * scaleRate + 5M));
             }
@@ -219,8 +224,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         private void PointAutoScale(PointF pt)
         {
-            while (((decimal)centerPoint.X / scaleRate) < (decimal)pt.X
-                || ((decimal)centerPoint.Y / scaleRate) < (decimal)pt.Y)
+            while ((Math.Abs((decimal)centerPoint.X) / scaleRate) < Math.Abs((decimal)pt.X)
+                || (Math.Abs((decimal)centerPoint.Y) / scaleRate) < Math.Abs((decimal)pt.Y))
             {
                 SetScaleRate(scaleRate / 2M);
             }//while
