@@ -92,6 +92,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             }
             else
             {
+                linear.PointAutoScale(solutionPoint);
                 linear.DrawPointLine(solutionPoint, true);
             }
 
