@@ -217,16 +217,20 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         public void DrawMultiPointLine(PointF[] pointAry, bool withLine = false)
         {
-            //絶対値で最大値を持つ PointFで PointAutoScale()してから DrawPointLine()
-            float max = 0f;
+            //絶対値で最大値(X座標とY座標の比を考慮した最大値)を持つ PointFで
+            //PointAutoScale()してから DrawPointLine()
+
+            decimal max = 0M;
             PointF maxPoint = new PointF(0, 0);
             foreach (PointF pt in pointAry)
             {
-                float larger = Math.Max(Math.Abs(pt.X), Math.Abs(pt.Y));
-                
-                if (max < larger)
+                decimal lager = Math.Max(
+                    Math.Abs((decimal)pt.X),  
+                    Math.Abs((decimal)pt.Y * ratioWidthHeight)); 
+
+                if(max < lager)
                 {
-                    max = larger;
+                    max = lager;
                     maxPoint = pt;
                 }
             }//foreach

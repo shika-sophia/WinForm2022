@@ -64,8 +64,10 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             var eqLinear1 = new EquationLinear(1.0f, -100);
             var eqLinear2 = new EquationLinear(-0.5f, 500);
+            var eqLinear3 = new EquationLinear(-2f, -400);
+
             quad.DrawMultiLinearFunciton(
-                new EquationLinear[] { eqLinear1, eqLinear2 });
+                new EquationLinear[] { eqLinear1, eqLinear2, eqLinear3 });
 
             this.Controls.AddRange(new Control[]
             {
