@@ -52,13 +52,6 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 throw new ArgumentException();
             }
 
-            DrawMultiPointLine(new PointF[]
-            {
-                new PointF(vertexX, vertexY),
-                new PointF(
-                0, AlgoParabolaFunctionXtoY(0, quadCoefficient, vertexX, vertexY))
-            });
-            
             List<PointF> pointList = new List<PointF>(
                 (int)((decimal)pic.ClientSize.Width / scaleRate));
 
@@ -108,8 +101,38 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         private float[] AlgoParabolaFunctionYtoX(
             float y, float quadCoefficient, float vertexX, float vertexY)
         {
-            //var x = - p + √　q
-            return new float[] { };
+            // y = a x ^ 2 + b x + c
+            // quadCoefficent = a
+            // vertexX = - b / 2a 
+            // vertexY = - (b ^ 2 - 4ac) / 4 a
+            // x = vertexX ± √ (vertexY - y)
+
+            if (quadCoefficient == 0)
+            {
+                throw new ArgumentException();
+            }
+
+            List<float> solutionList = new List<float>(2);
+
+            if (vertexY - y > 0)  // quad equation formula
+            {
+                solutionList.Add((float)((decimal)vertexX
+                    + (decimal)Math.Sqrt((double)((decimal)vertexY - (decimal)y))));
+                solutionList.Add((float)((decimal)vertexX
+                    - (decimal)Math.Sqrt((double)((decimal)vertexY - (decimal)y))));
+            }
+
+            if (vertexY - y == 0)  // x = - b / 2a
+            {
+                solutionList.Add(vertexX);
+            }
+
+            if (vertexY - y < 0)  // x = (No solution)  虚数解
+            {
+                solutionList.Add(float.NaN);
+            }
+
+            return solutionList.ToArray();
         }//AlgoParabolaFunctionYtoX()
     }//class
 }

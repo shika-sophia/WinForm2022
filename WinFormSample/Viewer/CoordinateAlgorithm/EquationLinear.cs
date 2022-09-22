@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
+﻿namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 {
-    class EquationLinear
+    class EquationLinear : ICoordinateEquation
     {
         public float Slope { get; private set; }
         public float Intercept { get; private set; }

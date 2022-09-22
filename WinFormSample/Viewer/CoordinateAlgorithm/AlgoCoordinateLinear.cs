@@ -71,6 +71,7 @@
  *@date 2022-09-18
  */
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -79,6 +80,38 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
     class AlgoCoordinateLinear : AlgoCoordinateAxis
     {
         public AlgoCoordinateLinear(PictureBox pic) : base(pic) { }
+
+        public void DrawMultiLinearFunciton(EquationLinear[] eqAry)
+        {
+            List<PointF> pointList = new List<PointF>();
+            foreach(EquationLinear eqLinear in eqAry)
+            {
+                if (float.IsNaN(AlgoInterceptX(eqLinear).X)) { continue; }
+                if (float.IsNaN(AlgoInterceptY(eqLinear).Y)) { continue; }
+                pointList.Add(AlgoInterceptX(eqLinear));
+                pointList.Add(AlgoInterceptY(eqLinear));
+            }
+
+            for (int i = 0; i < eqAry.Length; i++)
+            {
+                bool existSolution = TrySolution(
+                    eqAry[i].Slope, eqAry[i].Intercept,
+                    eqAry[(i + 1) % eqAry.Length].Slope,
+                    eqAry[(i + 1) % eqAry.Length].Intercept,
+                    out PointF solutionPoint);
+                if (existSolution) 
+                {
+                    pointList.Add(solutionPoint);
+                }
+            }//for
+            
+            DrawMultiPointLine(pointList.ToArray(), false);
+
+            foreach(EquationLinear eqLinear in eqAry)
+            {
+                DrawLinearFunction(eqLinear);
+            }
+        }//DrawMultiLinearFunciton()
 
         public void DrawLinearFunction(EquationLinear equLinear)
         {
@@ -119,9 +152,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             }
             else
             {
-                float minY = -centerPoint.Y;
+                float minY = (float)((decimal)-centerPoint.Y / scaleRate);
                 float minX = LinearFunctionYtoX(minY, slope, intercept);
-                float maxY = centerPoint.Y;
+                float maxY = (float)((decimal)centerPoint.Y / scaleRate);
                 float maxX = LinearFunctionYtoX(maxY, slope, intercept);
 
                 g.DrawLine(penPink, 
@@ -137,6 +170,36 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                     (float)((decimal)-labelY * scaleRate + (slope > 0 ? -20M : +10M)));
             }           
         }//DrawLinearFunction(float, float)
+
+        private PointF AlgoInterceptY(EquationLinear eqLinear)
+        {
+            if(float.IsInfinity(eqLinear.Slope))
+            { return new PointF(float.NaN, float.NaN); }
+
+            return new PointF(0, eqLinear.Intercept);
+        }//AlgoInterceptY()
+
+        private PointF AlgoInterceptX(EquationLinear eqLinear)
+        {
+            PointF pt = new PointF(float.NaN, float.NaN);
+
+            if (float.IsInfinity(eqLinear.Slope)) 
+            {
+                pt.X = eqLinear.Intercept;
+                pt.Y = 0;
+            }
+            else if (eqLinear.Slope == 0)
+            {
+                return pt;
+            }
+            else
+            {
+                pt.X = LinearFunctionYtoX(0, eqLinear);
+                pt.Y = 0;
+            }
+
+            return pt;
+        }//DrawInterceptY()
 
         private (float slope, float intercept) AlgoLinearParam(PointF pt1, PointF pt2)
         {
@@ -169,11 +232,21 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return (float)((decimal)pt1.Y - (decimal)slope * (decimal)pt1.X);
         }
 
+        private float LinearFunctionXtoY(float x, EquationLinear eqLinear)
+        {
+            return LinearFunctionXtoY(x, eqLinear.Slope, eqLinear.Intercept);
+        }
+
         private float LinearFunctionXtoY(float x, float slope, float intercept)
         {
             // y = a x + b
             return (float)((decimal)slope * (decimal)x + (decimal)intercept);
         }//AlgoLinearFunction(x) -> y
+
+        private float LinearFunctionYtoX(float y, EquationLinear eqLinear)
+        {
+            return LinearFunctionYtoX(y, eqLinear.Slope, eqLinear.Intercept);
+        }
 
         private float LinearFunctionYtoX(float y, float slope, float intercept)
         {
@@ -193,7 +266,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             return x;
         }//AlgoLinearFunction(y) -> x
-
+      
         public bool TrySolution(
             float slope1, float intercept1,
             float slope2, float intercept2, out PointF solution)

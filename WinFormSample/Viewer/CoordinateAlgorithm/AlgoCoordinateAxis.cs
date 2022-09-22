@@ -181,7 +181,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         public void DrawPointLine(PointF pt, bool withLine = false)
         {
-            PointAutoScale(pt);
+            //PointAutoScale(pt);
 
             Brush brushPink = penPink.Brush;
             g.FillEllipse(brushPink,
@@ -223,13 +223,14 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             foreach (PointF pt in pointAry)
             {
                 float larger = Math.Max(Math.Abs(pt.X), Math.Abs(pt.Y));
-
+                
                 if (max < larger)
                 {
+                    max = larger;
                     maxPoint = pt;
                 }
             }//foreach
-
+            
             PointAutoScale(maxPoint);
 
             foreach (PointF pt in pointAry)
@@ -245,7 +246,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             DrawCoordinateAxis();
         }//SetScaleRate()
 
-        private void PointAutoScale(PointF pt)
+        public void PointAutoScale(PointF pt)
         {
             while ((Math.Abs((decimal)centerPoint.X) / scaleRate) < Math.Abs((decimal)pt.X)
                 || (Math.Abs((decimal)centerPoint.Y) / scaleRate) < Math.Abs((decimal)pt.Y))
