@@ -16,7 +16,8 @@
  *         [英] quadratic:          平方の, ２乗の
  *         [英] quadratic equation: ２次方程式
  *         [英] vertex:             頂点
- *         [英] coefficient:       係数
+ *         [英] coefficient:        係数
+ *         [英] completing the squre: 平方完成 
  *         
  *@subject DrawParabolaFunction()
  *         =>〔AlgoCoordinateQuadratic.cs〕
@@ -35,9 +36,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 {
     class MainParabolaViewer
     {
-        [STAThread]
-        static void Main()
-        //public void Main()
+        //[STAThread]
+        //static void Main()
+        public void Main()
         {
             Console.WriteLine("new FormParabolaViewer()");
 
