@@ -1,4 +1,15 @@
-﻿using System;
+﻿/*
+ *@content ２次方程式の係数の値を保持しておくためのクラス
+ *         ・AlgoCoordinateQuadratic の各メソッド引数に代入して利用する
+ *           (同じ式の係数を何度も記述することを防ぐ)
+ *         ・AlgoCoordinateQuadratic の各メソッド引数に代入するので、相互参照にならないよう
+ *           計算や描画のアルゴリズムを記述しない
+ *         ・計算や描画のアルゴリズムは AlgoCoordinateQuadraticに集約
+ *           (ただし、平方完成と式の展開は、このクラス)
+ *         ・ICoordinateEquation で EquationLinear, EquationQuadraticを同一視が可能
+ *         ・１次方程式は ２次方程式の一般式 y = a x ^ 2 + b x + c の a = 0で表現可
+ */
+using System;
 using System.Drawing;
 
 namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm

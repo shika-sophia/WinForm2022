@@ -1,6 +1,6 @@
 ﻿/** 
  *@title WinFormGUI / WinFormSample / Viewer / CoordinateAlgorithm
- *@class AlgoCoordinateQuadratic.cs
+ *@class AlgoCoordinateQuadratic.cs : AlgoCoordinateLinear
  *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
  *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
@@ -9,12 +9,63 @@
  *           =>〔~/Reference/Article_KaiteiNet/WinForm_.txt〕
  *           
  *@content AlgoCoordinateQuadratic
- *@subject 
- *
- *
+ *         ２次関数の計算と描画のアルゴリズムをまとめるクラス
  *         
+ *         [英] parabola            放物線, ２次関数
+ *         [英] quad                本来は「４」の意味。四角形の面積から慣例的に「２次方程式」を表す
+ *         [英] quadratic           平方の, ２乗の
+ *         [英] quadratic equation  ２次方程式
+ *         [英] vertex              頂点
+ *         [英] coefficient         係数
+ *         [英] complete the squre  平方完成
+ *
+ *@subject ２次関数(放物線)の描画
+ *         void  DrawParabolaFunction(EquationQuadratic eqQuad)
+ *         void  DrawParabolaFunction(float quadCoefficient, float vertexX, float vertexY) 
+ *         引数: EquationQuadraticクラス
+ *         引数: float quadCoefficient  y = a ( x - p ) ^ 2 + q の　a
+ *               float vertexX, float vertexY: 頂点の座標
+ *
+ *@subject ２次関数上の点 x座標 -> y座標
+ *         ・２次関数の xに代入し、yの値を取得
+ *         
+ *         float  AlgoParabolaFunctionXtoY(
+ *                  float x, EquationQuadratic eqQuad)
+ *         float  AlgoParabolaFunctionXtoY(
+ *                  float x, float quadCoefficient, float vertexX, float vertexY)
+ *                  
+ *@subject ２次関数上の点 y座標 -> x座標
+ *         ・２次関数の xに代入し、yの値を取得
+ *         ・判別式により、解は 2個, 1個, 0個
+ *         
+ *         float[]  AlgoParabolaFunctionYtoX(
+ *                    float y, EquationQuadratic eqQuad)
+ *         float[]  AlgoParabolaFunctionYtoX(
+ *                    float y, float quadCoefficient, float vertexX, float vertexY)
+ *                    
+ *@subject ２個の２次方程式どうしの連立解
+ *         ・a1 x1 ^ 2 + b1 x1 + c1 = a2 x2 ^ 2 + b2 x2 + c2
+ *              -> subA x ^ 2 + subB x + subC = 0 を満たす x
+ *         ・判別式 AlgoJudge()により、解は 2個, 1個, 0個
+ *         ・解の公式を利用できない場合を条件分岐
+ *         ・連立解を解の公式で求める
+ *        
+ *         bool  TrySolutionQuad(
+ *                 EquationQuadratic eq1, EquationQuadratic eq2, out PointF[] solutionAry)
+ *
+ *@subject 解の公式 a x ^ 2 + b x + c = 0 の解
+ *         ・判別式 AlgoJudge()により、解は 2個, 1個, 0個
+ *         
+ *         PointF[] AlgoQuadSolutionFormula(
+ *                    decimal a, decimal b, decimal c)
+ *                    
+ *@subject 判別式  D = b ^ 2 - 4 a c
+ *         int  AlgoJudge(
+ *                decimal a, decimal b, decimal c, out decimal judge)
+ *
  *@see AlgoCoordinateAxis.cs
  *@see AlgoCoordinateLinear.cs
+ *@see EquationQuadratic.cs
  *@author shika
  *@date 2022-09-20
  */
@@ -30,9 +81,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
     {
         public AlgoCoordinateQuadratic(PictureBox pic) : base(pic) { }
 
-        public void DrawParabolaFunction(EquationQuadratic quadEqu)
+        public void DrawParabolaFunction(EquationQuadratic eqQuad)
         {
-            DrawParabolaFunction(quadEqu.QuadCoefficient, quadEqu.Vertex);
+            DrawParabolaFunction(eqQuad.QuadCoefficient, eqQuad.Vertex);
         }
 
         public void DrawParabolaFunction(float quadCoefficient, PointF vertex)
@@ -69,10 +120,10 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             g.DrawPath(penPink, gPath);
         }//DrawParabolaFunction(float, float, float)
 
-        private float AlgoParabolaFunctionXtoY(float x, EquationQuadratic quadEqu)
+        private float AlgoParabolaFunctionXtoY(float x, EquationQuadratic eqQuad)
         {
             return AlgoParabolaFunctionXtoY(
-                x, quadEqu.QuadCoefficient, quadEqu.Vertex.X, quadEqu.Vertex.Y);
+                x, eqQuad.QuadCoefficient, eqQuad.Vertex.X, eqQuad.Vertex.Y);
         }
 
         private float AlgoParabolaFunctionXtoY(
@@ -85,10 +136,10 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 + (decimal)vertexY);
         }
 
-        private float[] AlgoParabolaFunctionYtoX(float y, EquationQuadratic equQuad)
+        private float[] AlgoParabolaFunctionYtoX(float y, EquationQuadratic eqQuad)
         {
             return AlgoParabolaFunctionYtoX(
-                y, equQuad.QuadCoefficient, equQuad.Vertex.X, equQuad.Vertex.Y);
+                y, eqQuad.QuadCoefficient, eqQuad.Vertex.X, eqQuad.Vertex.Y);
         }
 
         private float[] AlgoParabolaFunctionYtoX(

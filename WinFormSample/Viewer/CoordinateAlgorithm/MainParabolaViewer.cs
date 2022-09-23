@@ -12,12 +12,6 @@
  *           
  *@content ParabolaViewer
  *         ２次関数の放物線を描画
- *         [英] parabola:           放物線, ２次関数
- *         [英] quadratic:          平方の, ２乗の
- *         [英] quadratic equation: ２次方程式
- *         [英] vertex:             頂点
- *         [英] coefficient:        係数
- *         [英] completing the squre: 平方完成 
  *         
  *@subject DrawParabolaFunction()
  *         =>〔AlgoCoordinateQuadratic.cs〕
