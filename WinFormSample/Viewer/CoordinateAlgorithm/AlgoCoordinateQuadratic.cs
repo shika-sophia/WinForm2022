@@ -11,12 +11,7 @@
  *@content AlgoCoordinateQuadratic
  *@subject 
  *
- *@NOTE【Problem】
- *      複数の２次関数を描画する際、頂点, ｘ切片, ｙ切片などの点が複数あるので、
- *      描画する順番によっては、PointAutoScale()が起こり、
- *      それ以前の描画内容が消えてしまう問題
- *      => あらかじめ必要な点を全て明かにし、
- *         絶対値が最大となる点で PointAutoScale()をしておく必要がある
+ *
  *         
  *@see AlgoCoordinateAxis.cs
  *@see AlgoCoordinateLinear.cs
@@ -72,8 +67,6 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             var gPath = new GraphicsPath();
             gPath.AddLines(pointList.ToArray());
             g.DrawPath(penPink, gPath);
-
-            pointList.Clear();
         }//DrawParabolaFunction(float, float, float)
 
         private float AlgoParabolaFunctionXtoY(float x, EquationQuadratic quadEqu)
@@ -134,5 +127,76 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             return solutionList.ToArray();
         }//AlgoParabolaFunctionYtoX()
+
+        public bool TrySolutionQuad(
+            EquationQuadratic eq1, EquationQuadratic eq2, out PointF[] solutionAry)
+        {   
+            decimal subA = eq1.A - eq2.A;
+            decimal subB = eq1.B - eq2.B;
+            decimal subC = eq1.C - eq2.C;
+
+            if(subA == 0 && subB == 0)  // case: parallel
+            {
+                solutionAry = new PointF[0];
+                return false;
+            }
+
+            if (subA == 0)  // case: a = 0, bx + c = 0  解はあっても、0除算のため解の公式を利用できない
+            {
+                float solutionX = (float)(-subC / subB);
+                float solutionY = AlgoParabolaFunctionXtoY(solutionX, eq1);
+                solutionAry = new PointF[] { new PointF(solutionX, solutionY) };
+                return true;
+            }
+
+            solutionAry = AlgoQuadSolutionFormula(subA, subB, subC);
+
+            if(solutionAry.Length == 0) { return false; }
+
+            return true;
+        }//TrySolutionQuad()
+
+        private PointF[] AlgoQuadSolutionFormula(decimal a, decimal b, decimal c)
+        {   // ２次方程式の解の公式
+            int solutionNum = AlgoJudge(a, b, c, out decimal judge);
+            PointF[] solutionAry = new PointF[solutionNum];
+            
+            if(judge > 0)
+            {
+                float solutionX0 = 
+                    (float)((-b + (decimal)Math.Sqrt((double)judge)) / (2M * a));
+                float solutionX1 = 
+                    (float)((-b - (decimal)Math.Sqrt((double)judge)) / (2M * a));
+                float solutionY0 = AlgoParabolaFunctionXtoY(
+                    solutionX0, (float)a, (float)b, (float)c);
+                float solutionY1 = AlgoParabolaFunctionXtoY(
+                    solutionX1, (float)a, (float)b, (float)c);
+
+                solutionAry[0] = new PointF(solutionX0, solutionY0);
+                solutionAry[1] = new PointF(solutionX1, solutionY1);
+            }
+            else if(judge == 0)
+            {
+                float solutionX0 = (float)(-b / (2M * a));
+                float solutionY0 = AlgoParabolaFunctionXtoY(
+                    solutionX0, (float)a, (float)b, (float)c);
+                solutionAry[0] = new PointF(solutionX0, solutionY0);
+            }
+            
+            return solutionAry;
+        }//AlgoQuadSolutionFormula()
+
+        private int AlgoJudge(
+            decimal a, decimal b, decimal c, out decimal judge)
+        {   // 判別式 D = b ^ 2 - 4 a c
+            judge = b * b - 4M * a * c;
+
+            int solutionNum = 0;
+            if (judge > 0) { solutionNum = 2; }
+            if (judge == 0) { solutionNum = 1; }
+            if (judge < 0) { solutionNum = 0; }
+
+            return solutionNum;
+        }//AlgoJudge()
     }//class
 }

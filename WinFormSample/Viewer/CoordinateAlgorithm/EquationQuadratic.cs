@@ -37,6 +37,11 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         private (decimal a, decimal b, decimal c) BuildGeneral(float quadCoefficient, PointF vertex)
         {  // y = a (x - p) ^ 2 + q を展開して y = a x ^ 2 + b x + c 
+            if(float.IsNaN(vertex.X) || float.IsNaN(vertex.Y))
+            {
+                throw new ArgumentException();
+            }
+            
             decimal a = (decimal)quadCoefficient;
             decimal b = -2M * a * (decimal)vertex.X;   // b = -2ap
             decimal c = a * (decimal)vertex.X * (decimal)vertex.X
@@ -47,7 +52,13 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         private PointF BuildQuad(decimal a, decimal b, decimal c)
         {   // y = a x ^ 2 + b x + c から 平方完成 y = a (x - p) ^ 2 + q
-            if (a == 0) { throw new ArgumentException(); }
+            
+            PointF pt = new PointF(float.NaN, float.NaN);
+            
+            if (a == 0)
+            { // y = b x + c, y = c, x = c
+                return pt;
+            }
 
             float vertexX = (float)(-b / (2M * a));                        // p = -b / 2a
             float vertexY = (float)(-(b * b - 4M * a * c) / (4M * a)); // q = -(b ^ 2 - 4ac) / 4a
