@@ -8,6 +8,7 @@
  *           (ただし、平方完成と式の展開は、このクラス)
  *         ・ICoordinateEquation で EquationLinear, EquationQuadraticを同一視が可能
  *         ・１次方程式は ２次方程式の一般式 y = a x ^ 2 + b x + c の a = 0で表現可
+ *           ※ Linearを EquationQuadraticオブジェクトにするのは可読性に問題がある
  */
 using System;
 using System.Drawing;
@@ -113,6 +114,11 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             return Text;
         }//ToString()
+
+        public EquationLinear ToLinear()
+        {
+            return new EquationLinear((float)this.B, (float)this.C);
+        }//ToLinear()
     }//class
 }
 

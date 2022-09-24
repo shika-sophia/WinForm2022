@@ -183,6 +183,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         {
             //PointAutoScale(pt);
 
+            if (float.IsNaN(pt.X)) { return; }
+
             Brush brushPink = penPink.Brush;
             g.FillEllipse(brushPink,
                 (float)((decimal)pt.X * scaleRate - 3M),
@@ -224,6 +226,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             PointF maxPoint = new PointF(0, 0);
             foreach (PointF pt in pointAry)
             {
+                if(float.IsNaN(pt.X)) { continue; }
+
                 decimal lager = Math.Max(
                     Math.Abs((decimal)pt.X),  
                     Math.Abs((decimal)pt.Y * ratioWidthHeight)); 

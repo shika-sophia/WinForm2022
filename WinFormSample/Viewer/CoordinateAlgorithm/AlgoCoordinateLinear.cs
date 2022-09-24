@@ -92,7 +92,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 pointList.Add(AlgoInterceptY(eqLinear));
             }
 
-            for (int i = 0; i < eqAry.Length; i++)
+            for (int i = 0; i < eqAry.Length; i++) //【註】これだと３直線のみ有効
             {
                 bool existSolution = TrySolution(
                     eqAry[i].Slope, eqAry[i].Intercept,
@@ -171,7 +171,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             }           
         }//DrawLinearFunction(float, float)
 
-        private PointF AlgoInterceptY(EquationLinear eqLinear)
+        public PointF AlgoInterceptY(EquationLinear eqLinear)
         {
             if(float.IsInfinity(eqLinear.Slope))
             { return new PointF(float.NaN, float.NaN); }
@@ -179,7 +179,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return new PointF(0, eqLinear.Intercept);
         }//AlgoInterceptY()
 
-        private PointF AlgoInterceptX(EquationLinear eqLinear)
+        public PointF AlgoInterceptX(EquationLinear eqLinear)
         {
             PointF pt = new PointF(float.NaN, float.NaN);
 

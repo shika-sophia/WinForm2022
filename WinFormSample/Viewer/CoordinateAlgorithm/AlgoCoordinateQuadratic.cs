@@ -138,46 +138,27 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         private float[] AlgoParabolaFunctionYtoX(float y, EquationQuadratic eqQuad)
         {
-            return AlgoParabolaFunctionYtoX(
-                y, eqQuad.QuadCoefficient, eqQuad.Vertex.X, eqQuad.Vertex.Y);
+            return AlgoQuadSolutionFormula(eqQuad.A, eqQuad.B, eqQuad.C - (decimal)y);
         }
 
-        private float[] AlgoParabolaFunctionYtoX(
-            float y, float quadCoefficient, float vertexX, float vertexY)
+        public PointF AlgoInterceptY(EquationQuadratic eqQuad)
         {
-            // y = a x ^ 2 + b x + c
-            // quadCoefficent = a
-            // vertexX = - b / 2a 
-            // vertexY = - (b ^ 2 - 4ac) / 4 a
-            // x = vertexX ± √ (vertexY - y)
+            return new PointF(
+                0, AlgoParabolaFunctionXtoY(x: 0f, eqQuad));
+        }//AlgoInterceptY()
 
-            if (quadCoefficient == 0)
+        public PointF[] AlgoInterceptX(EquationQuadratic eqQuad)
+        {
+            List<PointF> pointList = new List<PointF>();
+            
+            float[] interceptXAry = AlgoParabolaFunctionYtoX(y: 0f, eqQuad);            
+            foreach (float x in interceptXAry)
             {
-                throw new ArgumentException();
+                pointList.Add(new PointF(x, 0));
             }
 
-            List<float> solutionList = new List<float>(2);
-
-            if (vertexY - y > 0)  // quad equation formula
-            {
-                solutionList.Add((float)((decimal)vertexX
-                    + (decimal)Math.Sqrt((double)((decimal)vertexY - (decimal)y))));
-                solutionList.Add((float)((decimal)vertexX
-                    - (decimal)Math.Sqrt((double)((decimal)vertexY - (decimal)y))));
-            }
-
-            if (vertexY - y == 0)  // x = - b / 2a
-            {
-                solutionList.Add(vertexX);
-            }
-
-            if (vertexY - y < 0)  // x = (No solution)  虚数解
-            {
-                solutionList.Add(float.NaN);
-            }
-
-            return solutionList.ToArray();
-        }//AlgoParabolaFunctionYtoX()
+            return pointList.ToArray();
+        }//AlgoInterceptX()
 
         public bool TrySolutionQuad(
             EquationQuadratic eq1, EquationQuadratic eq2, out PointF[] solutionAry)
@@ -185,14 +166,13 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             decimal subA = eq1.A - eq2.A;
             decimal subB = eq1.B - eq2.B;
             decimal subC = eq1.C - eq2.C;
-
+            
             if(subA == 0 && subB == 0)  // case: parallel
             {
                 solutionAry = new PointF[0];
                 return false;
             }
-
-            if (subA == 0)  // case: a = 0, bx + c = 0  解はあっても、0除算のため解の公式を利用できない
+            else if (subA == 0)  // case: a = 0, bx + c = 0  解はあっても、0除算のため解の公式を利用できない
             {
                 float solutionX = (float)(-subC / subB);
                 float solutionY = AlgoParabolaFunctionXtoY(solutionX, eq1);
@@ -200,41 +180,42 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 return true;
             }
 
-            solutionAry = AlgoQuadSolutionFormula(subA, subB, subC);
-
-            if(solutionAry.Length == 0) { return false; }
+            float[] xAry = AlgoQuadSolutionFormula(subA, subB, subC);
+            solutionAry = new PointF[2];
+            for(int i = 0; i < xAry.Length; i++)
+            {
+                solutionAry[i] = new PointF(
+                    xAry[i], AlgoParabolaFunctionXtoY(xAry[i], eq1));
+            }//for
+            
+            if (solutionAry.Length == 0) { return false; }
 
             return true;
         }//TrySolutionQuad()
 
-        private PointF[] AlgoQuadSolutionFormula(decimal a, decimal b, decimal c)
+        private float[] AlgoQuadSolutionFormula(decimal a, decimal b, decimal c)
         {   // ２次方程式の解の公式
+            if(a == 0)
+            {
+                throw new ArgumentException();
+            }
+            
             int solutionNum = AlgoJudge(a, b, c, out decimal judge);
-            PointF[] solutionAry = new PointF[solutionNum];
+            float[] solutionXAry = new float[solutionNum];
             
             if(judge > 0)
             {
-                float solutionX0 = 
+                solutionXAry[0] = 
                     (float)((-b + (decimal)Math.Sqrt((double)judge)) / (2M * a));
-                float solutionX1 = 
+                solutionXAry[1] = 
                     (float)((-b - (decimal)Math.Sqrt((double)judge)) / (2M * a));
-                float solutionY0 = AlgoParabolaFunctionXtoY(
-                    solutionX0, (float)a, (float)b, (float)c);
-                float solutionY1 = AlgoParabolaFunctionXtoY(
-                    solutionX1, (float)a, (float)b, (float)c);
-
-                solutionAry[0] = new PointF(solutionX0, solutionY0);
-                solutionAry[1] = new PointF(solutionX1, solutionY1);
             }
             else if(judge == 0)
             {
-                float solutionX0 = (float)(-b / (2M * a));
-                float solutionY0 = AlgoParabolaFunctionXtoY(
-                    solutionX0, (float)a, (float)b, (float)c);
-                solutionAry[0] = new PointF(solutionX0, solutionY0);
+                solutionXAry[0] = (float)(-b / (2M * a));
             }
             
-            return solutionAry;
+            return solutionXAry;
         }//AlgoQuadSolutionFormula()
 
         private int AlgoJudge(

@@ -53,5 +53,11 @@
 
             return this.Text;
         }//ToString()
+
+        public EquationQuadratic ToQuad()
+        {
+            return new EquationQuadratic(
+                0M, (decimal)this.Slope, (decimal)this.Intercept);
+        }//ToQuad()
     }//class
 }

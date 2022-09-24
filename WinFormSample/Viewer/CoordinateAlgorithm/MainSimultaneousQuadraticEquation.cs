@@ -22,6 +22,7 @@
  *@date 2022-09-23
  */
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -68,18 +69,33 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             var eqQuad = new EquationQuadratic(0.05f, new PointF(0, -100));
             var eqLinear = new EquationQuadratic(0M, 0.5M, 50);
-
+            
             bool existSolution = quad.TrySolutionQuad(
                 eqQuad, eqLinear, out PointF[] solutionAry);
 
+            List<PointF> pointList = new List<PointF>();
             if (existSolution)
             {
-                quad.DrawMultiPointLine(solutionAry, true);
+                foreach (PointF pt in solutionAry)
+                {
+                    if (float.IsNaN(pt.X)) { continue; }
+
+                    pointList.Add(pt);
+                }//foreach
             }
             else
             {
-                Console.WriteLine("(No Solution)");
+                Console.WriteLine("(No Solution)");                
             }
+
+            pointList.Add(eqQuad.Vertex);
+            pointList.Add(quad.AlgoInterceptY(eqQuad));
+            pointList.AddRange(quad.AlgoInterceptX(eqQuad));
+
+            EquationLinear eqLinearZ = eqLinear.ToLinear();
+            pointList.Add(quad.AlgoInterceptX(eqLinearZ));
+            pointList.Add(quad.AlgoInterceptY(eqLinearZ));
+            quad.DrawMultiPointLine(pointList.ToArray());
 
             quad.DrawParabolaFunction(eqQuad);
             quad.DrawLinearFunction((float)eqLinear.B, (float)eqLinear.C);
