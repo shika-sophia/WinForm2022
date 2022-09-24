@@ -190,7 +190,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 (float)((decimal)pt.X * scaleRate - 3M),
                 -(float)((decimal)pt.Y * scaleRate + 3M), 6, 6);
 
-            SizeF pointSize = g.MeasureString("(500,500)", fontSmall);
+            SizeF pointSize = g.MeasureString($"({pt.X},{pt.Y})", fontSmall);
             g.DrawString($"({pt.X:0.##},{pt.Y:0.##})", fontSmall, brushPink,
                 (float)((decimal)pt.X * scaleRate - (decimal)pointSize.Width / 2M),
                 -(float)((decimal)pt.Y * scaleRate + ((pt.Y > 0) ? (decimal)pointSize.Height + 5M : (decimal)-pointSize.Height)));
