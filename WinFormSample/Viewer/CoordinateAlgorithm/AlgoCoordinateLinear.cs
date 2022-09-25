@@ -63,6 +63,15 @@
  *           DrawLine(), DrawString()のときだけ Y座標にのみ「-」をつけて反転させる。(描画だけ反転する)
  *           計算時に反転させる必要はない。
  *           
+ *@subject 複数の直線を同時に描画
+ *         void  DrawMultiLinearFunciton(EquationLinear[] eqAry)
+ *         
+ *         for(int j = i; j < eqAry.Length; j++)
+ *         ・TrySolution() の for文は 自分自身を除外して、他の全ての直線との解
+ *         ・j = i から始めることで、重複を除外
+ *         
+ *         => 対角線の描画アルゴリズム〔FigureAlgorithm/ApplicationFigureViewer.DrawDiagonalLine()〕
+ *         
  *@see ImageLinearFunctionViewer.jpg
  *@see MainCoordinateAxisViewer.cs
  *@see AlgoCoordinateAxis.cs
@@ -86,24 +95,29 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             List<PointF> pointList = new List<PointF>();
             foreach(EquationLinear eqLinear in eqAry)
             {
-                if (float.IsNaN(AlgoInterceptX(eqLinear)[0].X)) { continue; }
+                if (float.IsNaN(AlgoInterceptX(eqLinear).X)) { continue; }
                 if (float.IsNaN(AlgoInterceptY(eqLinear).Y)) { continue; }
-                pointList.AddRange(AlgoInterceptX(eqLinear));
+                pointList.Add(AlgoInterceptX(eqLinear));
                 pointList.Add(AlgoInterceptY(eqLinear));
             }
 
-            for (int i = 0; i < eqAry.Length; i++) //【註】これだと３直線のみ有効
+            for (int i = 0; i < eqAry.Length; i++) 
             {
-                bool existSolution = TrySolution(
-                    eqAry[i].Slope, eqAry[i].Intercept,
-                    eqAry[(i + 1) % eqAry.Length].Slope,
-                    eqAry[(i + 1) % eqAry.Length].Intercept,
-                    out PointF solutionPoint);
-                if (existSolution) 
+                for(int j = i; j < eqAry.Length; j++)
                 {
-                    pointList.Add(solutionPoint);
-                }
-            }//for
+                    if(j == i) { continue; }
+
+                    bool existSolution = TrySolution(
+                        eqAry[i].Slope, eqAry[i].Intercept,
+                        eqAry[j].Slope, eqAry[j].Intercept,
+                        out PointF solutionPoint);
+
+                    if (existSolution) 
+                    {
+                        pointList.Add(solutionPoint);
+                    }
+                }//for j
+            }//for i
             
             DrawMultiPointLine(pointList.ToArray(), false);
 
@@ -171,19 +185,16 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             }           
         }//DrawLinearFunction(float, float)
 
-        public virtual PointF AlgoInterceptY(ICoordinateEquation eq)
+        public PointF AlgoInterceptY(EquationLinear eqLinear)
         {
-            var eqLinear = (EquationLinear)eq;
             if(float.IsInfinity(eqLinear.Slope))
             { return new PointF(float.NaN, float.NaN); }
 
             return new PointF(0, eqLinear.Intercept);
         }//AlgoInterceptY()
 
-        public virtual PointF[] AlgoInterceptX(ICoordinateEquation eq)
+        public PointF AlgoInterceptX(EquationLinear eqLinear)
         {
-            var eqLinear = (EquationLinear)eq;
-            PointF[] ptAry = new PointF[1];
             PointF pt = new PointF(float.NaN, float.NaN);
 
             if (float.IsInfinity(eqLinear.Slope)) 
@@ -193,7 +204,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             }
             else if (eqLinear.Slope == 0)
             {
-                return ptAry;
+                return pt;
             }
             else
             {
@@ -201,8 +212,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 pt.Y = 0;
             }
 
-            ptAry[0] = pt;
-            return ptAry;
+            return pt;
         }//DrawInterceptY()
 
         private (float slope, float intercept) AlgoLinearParam(PointF pt1, PointF pt2)
@@ -236,15 +246,13 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return (float)((decimal)pt1.Y - (decimal)slope * (decimal)pt1.X);
         }
 
-        private float AlgoFunctionXtoY(float x, ICoordinateEquation eq)
+        protected float AlgoFunctionXtoY(float x, EquationLinear eqLinear)
         {
-            var eqLinear = (EquationLinear)eq;
             return AlgoLinearFunctionXtoY(x, eqLinear.Slope, eqLinear.Intercept);
         }
 
-        private float AlgoFunctionYtoX(float y, ICoordinateEquation eq)
+        protected float AlgoFunctionYtoX(float y, EquationLinear eqLinear)
         {
-            var eqLinear = (EquationLinear)eq;
             return LinearFunctionYtoX(y, eqLinear.Slope, eqLinear.Intercept);
         }
 

@@ -7,7 +7,7 @@
  *         ・ICoordinateEquationで同一視
  *         ・Algo系クラス継承階層に同名メソッドを用意し、
  *           ポリモーフィズムによって呼出メソッドを切り替えることができるようにする
- *           (クラスの if分岐ではなく、対象オブジェクトの型、引数型によって振り分け)
+ *           (なるべくクラスの if分岐ではなく、対象オブジェクトの型、引数型によって振り分け)
  *           
  *@subject use
  *         AlgoXxxx.AlgoFuncionXtoY(float x, ICoordinate)

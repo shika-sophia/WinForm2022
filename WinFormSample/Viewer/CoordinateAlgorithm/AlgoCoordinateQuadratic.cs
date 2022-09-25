@@ -63,6 +63,15 @@
  *         int  AlgoJudge(
  *                decimal a, decimal b, decimal c, out decimal judge)
  *
+ *@subject 微分
+ *         PointF(x, y)を通る接線
+ *         [ y = a x ^ 2 + b x + c ] ->  [ y' = 2 a x + b ]
+ *         ・接線を表す直線の傾き 2a + b の xに代入
+ *         ・接線 y = c x + d の 傾き cは上記で求まるので、
+ *           PointF(x, y)を代入して dを決定
+ *         
+ *         EquationLinear  DifferentiateQuad(EquationQuadratic, PointF)
+ *         
  *@see AlgoCoordinateAxis.cs
  *@see AlgoCoordinateLinear.cs
  *@see EquationQuadratic.cs
@@ -83,6 +92,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         public void DrawMultiQuadraticFunction(ICoordinateEquation[] eqAry)
         {
+            //---- pointList ----
             List<PointF> pointList = new List<PointF>();
             for (int i = 0; i < eqAry.Length; i++)                
             {
@@ -95,9 +105,24 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                     var eqQuad = (EquationQuadratic)eq;
                     pointList.Add(eqQuad.Vertex);
                 }
+                
+                //---- TrySolutionQuad() ----
+                for(int j = i; j < eqAry.Length; j++)
+                {
+                    if(j == i) { continue; }
 
-                //TrySolutionQuad()
-            }//foreach
+                    bool existSolution = TrySolutionQuad(
+                        eqAry[i], eqAry[j], out PointF[] solutionAry);
+
+                    if (existSolution)
+                    {
+                        pointList.AddRange(solutionAry);
+                    }
+                }//for j
+            }//for i
+
+            //---- Draw ----
+            DrawMultiPointLine(pointList.ToArray());
 
             foreach (ICoordinateEquation eq in eqAry)
             {
@@ -152,15 +177,25 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             DrawPointLine(new PointF(vertexX, vertexY));
         }//DrawParabolaFunction(float, float, float)
 
-        private float AlgoFunctionXtoY(float x, ICoordinateEquation eq)
+        public float AlgoFunctionXtoY(float x, ICoordinateEquation eq)
         {
+            if (eq is EquationLinear)
+            {
+                return base.AlgoFunctionXtoY(x, eq as EquationLinear);
+            }
+
             var eqQuad = (EquationQuadratic)eq;
             return AlgoParabolaFunctionXtoY(
                 x, eqQuad.QuadCoefficient, eqQuad.Vertex.X, eqQuad.Vertex.Y);
         }
 
-        private float[] AlgoFunctionYtoX(float y, ICoordinateEquation eq)
+        public float[] AlgoFunctionYtoX(float y, ICoordinateEquation eq)
         {
+            if (eq is EquationLinear)
+            {
+                return new float[] { base.AlgoFunctionYtoX(y, eq as EquationLinear) };
+            }
+
             var eqQuad = (EquationQuadratic)eq;
             return AlgoQuadSolutionFormula(eqQuad.A, eqQuad.B, eqQuad.C - (decimal)y);
         }
@@ -175,14 +210,26 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 + (decimal)vertexY);
         }
 
-        public override PointF AlgoInterceptY(ICoordinateEquation eqQuad)
+        public PointF AlgoInterceptY(ICoordinateEquation eq)
         {
+            if (eq is EquationLinear)
+            {
+                return base.AlgoInterceptY(eq as EquationLinear);
+            }
+
+            var eqQuad = (EquationQuadratic)eq;
             return new PointF(
                 0, AlgoFunctionXtoY(x: 0f, eqQuad));
         }//AlgoInterceptY()
 
-        public override PointF[] AlgoInterceptX(ICoordinateEquation eqQuad)
+        public PointF[] AlgoInterceptX(ICoordinateEquation eq)
         {
+            if (eq is EquationLinear)
+            {
+                return new PointF[] { base.AlgoInterceptX(eq as EquationLinear) };
+            }
+
+            var eqQuad = (EquationQuadratic)eq;
             List<PointF> pointList = new List<PointF>();
             
             float[] interceptXAry = AlgoFunctionYtoX(y: 0f, eqQuad);            
@@ -267,5 +314,26 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             return solutionNum;
         }//AlgoJudge()
+
+        public EquationLinear DifferentiateQuad(ICoordinateEquation eq, PointF pt)
+        {
+            if(eq is EquationLinear)
+            {
+                return new EquationLinear(0f, (eq as EquationLinear).Slope * 2);
+            }
+
+            var eqQuad = (EquationQuadratic)eq;
+            // [ y = a x ^ 2 + b x + c ] ->  [ y' = 2 a x + b ] に xを代入
+            float slope = (float)(2M * eqQuad.A * (decimal)pt.X + eqQuad.B);
+
+            // y = c x + d に PointF(x, y)を代入  d = y - cx
+            float intercept = 
+                (float)((decimal)pt.Y - (decimal)slope * (decimal)pt.X);
+
+            var tangentLine = new EquationLinear(slope, intercept);
+            
+  
+            return tangentLine;
+        }//DifferentiateQuad()
     }//class
 }
