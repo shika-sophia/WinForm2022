@@ -28,7 +28,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
     {
         //[STAThread]
         //static void Main()
-        //public void Main()
+        public void Main()
         {
             Console.WriteLine("new FormMultiLinearFunctionViewer()");
 
@@ -42,7 +42,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
     class FormMultiLinearFunctionViewer : Form
     {
         private readonly PictureBox pic;
-        private readonly AlgoCoordinateQuadratic quad;
+        private readonly AlgoCoordinateLinear linear;
 
         public FormMultiLinearFunctionViewer()
         {
@@ -59,15 +59,17 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 Dock = DockStyle.Fill,
             };
 
-            quad = new AlgoCoordinateQuadratic(pic);
-            quad.DrawCoordinateAxis();
+            linear = new AlgoCoordinateLinear(pic);
+            linear.DrawCoordinateAxis();
 
             var eqLinear1 = new EquationLinear(1.0f, -100);
             var eqLinear2 = new EquationLinear(-0.5f, 500);
             var eqLinear3 = new EquationLinear(-2f, -400);
+            var eqLinear4 = new EquationLinear(2f, 700);
 
-            quad.DrawMultiLinearFunciton(
-                new EquationLinear[] { eqLinear1, eqLinear2, eqLinear3 });
+            linear.DrawMultiLinearFunciton(
+                new EquationLinear[] { 
+                    eqLinear1, eqLinear2, eqLinear3, eqLinear4, });
 
             this.Controls.AddRange(new Control[]
             {
