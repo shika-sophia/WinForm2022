@@ -86,9 +86,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             List<PointF> pointList = new List<PointF>();
             foreach(EquationLinear eqLinear in eqAry)
             {
-                if (float.IsNaN(AlgoInterceptX(eqLinear).X)) { continue; }
+                if (float.IsNaN(AlgoInterceptX(eqLinear)[0].X)) { continue; }
                 if (float.IsNaN(AlgoInterceptY(eqLinear).Y)) { continue; }
-                pointList.Add(AlgoInterceptX(eqLinear));
+                pointList.AddRange(AlgoInterceptX(eqLinear));
                 pointList.Add(AlgoInterceptY(eqLinear));
             }
 
@@ -171,16 +171,19 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             }           
         }//DrawLinearFunction(float, float)
 
-        public PointF AlgoInterceptY(EquationLinear eqLinear)
+        public virtual PointF AlgoInterceptY(ICoordinateEquation eq)
         {
+            var eqLinear = (EquationLinear)eq;
             if(float.IsInfinity(eqLinear.Slope))
             { return new PointF(float.NaN, float.NaN); }
 
             return new PointF(0, eqLinear.Intercept);
         }//AlgoInterceptY()
 
-        public PointF AlgoInterceptX(EquationLinear eqLinear)
+        public virtual PointF[] AlgoInterceptX(ICoordinateEquation eq)
         {
+            var eqLinear = (EquationLinear)eq;
+            PointF[] ptAry = new PointF[1];
             PointF pt = new PointF(float.NaN, float.NaN);
 
             if (float.IsInfinity(eqLinear.Slope)) 
@@ -190,15 +193,16 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             }
             else if (eqLinear.Slope == 0)
             {
-                return pt;
+                return ptAry;
             }
             else
             {
-                pt.X = LinearFunctionYtoX(0, eqLinear);
+                pt.X = AlgoFunctionYtoX(0, eqLinear);
                 pt.Y = 0;
             }
 
-            return pt;
+            ptAry[0] = pt;
+            return ptAry;
         }//DrawInterceptY()
 
         private (float slope, float intercept) AlgoLinearParam(PointF pt1, PointF pt2)
@@ -232,21 +236,24 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return (float)((decimal)pt1.Y - (decimal)slope * (decimal)pt1.X);
         }
 
-        private float LinearFunctionXtoY(float x, EquationLinear eqLinear)
+        private float AlgoFunctionXtoY(float x, ICoordinateEquation eq)
         {
-            return LinearFunctionXtoY(x, eqLinear.Slope, eqLinear.Intercept);
+            var eqLinear = (EquationLinear)eq;
+            return AlgoLinearFunctionXtoY(x, eqLinear.Slope, eqLinear.Intercept);
         }
 
-        private float LinearFunctionXtoY(float x, float slope, float intercept)
+        private float AlgoFunctionYtoX(float y, ICoordinateEquation eq)
+        {
+            var eqLinear = (EquationLinear)eq;
+            return LinearFunctionYtoX(y, eqLinear.Slope, eqLinear.Intercept);
+        }
+
+        private float AlgoLinearFunctionXtoY(float x, float slope, float intercept)
         {
             // y = a x + b
             return (float)((decimal)slope * (decimal)x + (decimal)intercept);
         }//AlgoLinearFunction(x) -> y
 
-        private float LinearFunctionYtoX(float y, EquationLinear eqLinear)
-        {
-            return LinearFunctionYtoX(y, eqLinear.Slope, eqLinear.Intercept);
-        }
 
         private float LinearFunctionYtoX(float y, float slope, float intercept)
         {
@@ -277,7 +284,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             if (float.IsInfinity(slope1))  // x = □, 
             {
                 solution.X = intercept1;
-                solution.Y = LinearFunctionXtoY(
+                solution.Y = AlgoLinearFunctionXtoY(
                     solution.X, slope2, intercept2);
                 return true;
             }
@@ -285,7 +292,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             if (float.IsInfinity(slope2))  // x = △, 
             {
                 solution.X = intercept2;
-                solution.Y = LinearFunctionXtoY(
+                solution.Y = AlgoLinearFunctionXtoY(
                     solution.X, slope1, intercept1);
                 return true;
             }
@@ -316,7 +323,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             // y = a x + b に xを代入
             solution.X = -(float)(((decimal)intercept1 - (decimal)intercept2) 
                             / ((decimal)slope1 - (decimal)slope2));
-            solution.Y = LinearFunctionXtoY(solution.X, slope1, intercept1);
+            solution.Y = AlgoLinearFunctionXtoY(solution.X, slope1, intercept1);
             return true;
         }//TrySolution()
     }//class

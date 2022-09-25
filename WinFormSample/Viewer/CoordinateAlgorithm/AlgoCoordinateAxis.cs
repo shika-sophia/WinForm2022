@@ -11,6 +11,13 @@
  *@content CoordinateAxisViewer
  *         座標軸のみを描画
  *         
+ *@subject Inherit 継承
+ *         AlgoCoordinateAxis
+ *             ↑
+ *         AlgoCoordinateLinear : AlgoCoordinateAxis
+ *             ↑
+ *         AlgoCoordinateQuadratic : AlgoCoordinateLinear
+ *         
  *@subject Matrix 平行移動, 拡大縮小
  *         void  matrix.Translate(float offsetX, float offsetY) 
  *         void  matrix.Scale(float sx, float sy)  拡大縮小

@@ -1,5 +1,5 @@
 ﻿/** 
- *@title WinFormGUI / WinFormSample / 
+ *@title WinFormGUI / WinFormSample / Viewer / CoordinateAlgorithm
  *@class MainSimultaneousQuadraticEquation.cs
  *@class   └ new FormSimultaneousQuadraticEquation() : Form
  *@class       └ new AlgoCoordinateQuagratic() : AlgoCoordinateLinear
@@ -67,11 +67,13 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             quad = new AlgoCoordinateQuadratic(pic);
             quad.DrawCoordinateAxis();
 
-            var eqQuad = new EquationQuadratic(0.05f, new PointF(0, -100));
-            var eqLinear = new EquationQuadratic(0M, 0.5M, 50);
-            
+            //---- Equation, TrySolution() ----
+            var eq1 = new EquationQuadratic(0.005f, new PointF(0, -100));
+            var eq2 = new EquationQuadratic(-0.005f, new PointF(120, 200));
+            //var eq2 = new EquationLinear(0.5f, 50f);
+
             bool existSolution = quad.TrySolutionQuad(
-                eqQuad, eqLinear, out PointF[] solutionAry);
+                eq1, eq2, out PointF[] solutionAry);
 
             List<PointF> pointList = new List<PointF>();
             if (existSolution)
@@ -88,17 +90,22 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 Console.WriteLine("(No Solution)");                
             }
 
-            pointList.Add(eqQuad.Vertex);
-            pointList.Add(quad.AlgoInterceptY(eqQuad));
-            pointList.AddRange(quad.AlgoInterceptX(eqQuad));
+            //---- eq1 pointList ----
+            pointList.Add(eq1.Vertex);
+            pointList.Add(quad.AlgoInterceptY(eq1));
+            pointList.AddRange(quad.AlgoInterceptX(eq1));
 
-            EquationLinear eqLinearZ = eqLinear.ToLinear();
-            pointList.Add(quad.AlgoInterceptX(eqLinearZ));
-            pointList.Add(quad.AlgoInterceptY(eqLinearZ));
+            //---- eq2 pointList ----
+            pointList.Add(eq2.Vertex);
+            pointList.Add(quad.AlgoInterceptY(eq2));
+            pointList.AddRange(quad.AlgoInterceptX(eq2));
+            //pointList.Add(quad.AlgoInterceptX(eq2));
+
+            //---- Draw ----
             quad.DrawMultiPointLine(pointList.ToArray());
-
-            quad.DrawParabolaFunction(eqQuad);
-            quad.DrawLinearFunction((float)eqLinear.B, (float)eqLinear.C);
+            quad.DrawParabolaFunction(eq1);
+            quad.DrawParabolaFunction(eq2);
+            //quad.DrawLinearFunction(eq2);
 
             this.Controls.AddRange(new Control[]
             {

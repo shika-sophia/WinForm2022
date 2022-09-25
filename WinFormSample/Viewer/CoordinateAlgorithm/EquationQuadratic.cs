@@ -119,6 +119,11 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         {
             return new EquationLinear((float)this.B, (float)this.C);
         }//ToLinear()
+
+        public (decimal a, decimal b, decimal c) GetGeneralParam()
+        {
+            return (A, B, C);
+        }//GetGeneralParam()
     }//class
 }
 

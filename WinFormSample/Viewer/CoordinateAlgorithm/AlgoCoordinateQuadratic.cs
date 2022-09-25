@@ -81,6 +81,37 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
     {
         public AlgoCoordinateQuadratic(PictureBox pic) : base(pic) { }
 
+        public void DrawMultiQuadraticFunction(ICoordinateEquation[] eqAry)
+        {
+            List<PointF> pointList = new List<PointF>();
+            for (int i = 0; i < eqAry.Length; i++)                
+            {
+                ICoordinateEquation eq = eqAry[i];
+                pointList.Add(AlgoInterceptY(eq));
+                pointList.AddRange(AlgoInterceptX(eq));
+
+                if(eq is EquationQuadratic)
+                {
+                    var eqQuad = (EquationQuadratic)eq;
+                    pointList.Add(eqQuad.Vertex);
+                }
+
+                //TrySolutionQuad()
+            }//foreach
+
+            foreach (ICoordinateEquation eq in eqAry)
+            {
+                if(eq is EquationQuadratic)
+                {
+                    DrawParabolaFunction(eq as EquationQuadratic);
+                }
+                else if (eq is EquationLinear)
+                {
+                    DrawLinearFunction(eq as EquationLinear);
+                }
+            }//foreach
+        }//MultiDrawQuadraticFunction()
+
         public void DrawParabolaFunction(EquationQuadratic eqQuad)
         {
             DrawParabolaFunction(eqQuad.QuadCoefficient, eqQuad.Vertex);
@@ -118,12 +149,20 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             var gPath = new GraphicsPath();
             gPath.AddLines(pointList.ToArray());
             g.DrawPath(penPink, gPath);
+            DrawPointLine(new PointF(vertexX, vertexY));
         }//DrawParabolaFunction(float, float, float)
 
-        private float AlgoParabolaFunctionXtoY(float x, EquationQuadratic eqQuad)
+        private float AlgoFunctionXtoY(float x, ICoordinateEquation eq)
         {
+            var eqQuad = (EquationQuadratic)eq;
             return AlgoParabolaFunctionXtoY(
                 x, eqQuad.QuadCoefficient, eqQuad.Vertex.X, eqQuad.Vertex.Y);
+        }
+
+        private float[] AlgoFunctionYtoX(float y, ICoordinateEquation eq)
+        {
+            var eqQuad = (EquationQuadratic)eq;
+            return AlgoQuadSolutionFormula(eqQuad.A, eqQuad.B, eqQuad.C - (decimal)y);
         }
 
         private float AlgoParabolaFunctionXtoY(
@@ -136,22 +175,17 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 + (decimal)vertexY);
         }
 
-        private float[] AlgoParabolaFunctionYtoX(float y, EquationQuadratic eqQuad)
-        {
-            return AlgoQuadSolutionFormula(eqQuad.A, eqQuad.B, eqQuad.C - (decimal)y);
-        }
-
-        public PointF AlgoInterceptY(EquationQuadratic eqQuad)
+        public override PointF AlgoInterceptY(ICoordinateEquation eqQuad)
         {
             return new PointF(
-                0, AlgoParabolaFunctionXtoY(x: 0f, eqQuad));
+                0, AlgoFunctionXtoY(x: 0f, eqQuad));
         }//AlgoInterceptY()
 
-        public PointF[] AlgoInterceptX(EquationQuadratic eqQuad)
+        public override PointF[] AlgoInterceptX(ICoordinateEquation eqQuad)
         {
             List<PointF> pointList = new List<PointF>();
             
-            float[] interceptXAry = AlgoParabolaFunctionYtoX(y: 0f, eqQuad);            
+            float[] interceptXAry = AlgoFunctionYtoX(y: 0f, eqQuad);            
             foreach (float x in interceptXAry)
             {
                 pointList.Add(new PointF(x, 0));
@@ -159,13 +193,16 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             return pointList.ToArray();
         }//AlgoInterceptX()
-
+        
         public bool TrySolutionQuad(
-            EquationQuadratic eq1, EquationQuadratic eq2, out PointF[] solutionAry)
+            ICoordinateEquation eq1, ICoordinateEquation eq2, out PointF[] solutionAry)
         {   
-            decimal subA = eq1.A - eq2.A;
-            decimal subB = eq1.B - eq2.B;
-            decimal subC = eq1.C - eq2.C;
+            (decimal eq1A, decimal eq1B, decimal eq1C) = eq1.GetGeneralParam();
+            (decimal eq2A, decimal eq2B, decimal eq2C) = eq2.GetGeneralParam();
+
+            decimal subA = eq1A - eq2A;
+            decimal subB = eq1B - eq2B;
+            decimal subC = eq1C - eq2C;
             
             if(subA == 0 && subB == 0)  // case: parallel
             {
@@ -175,7 +212,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             else if (subA == 0)  // case: a = 0, bx + c = 0  解はあっても、0除算のため解の公式を利用できない
             {
                 float solutionX = (float)(-subC / subB);
-                float solutionY = AlgoParabolaFunctionXtoY(solutionX, eq1);
+                float solutionY = AlgoFunctionXtoY(solutionX, eq1);
                 solutionAry = new PointF[] { new PointF(solutionX, solutionY) };
                 return true;
             }
@@ -185,7 +222,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             for(int i = 0; i < xAry.Length; i++)
             {
                 solutionAry[i] = new PointF(
-                    xAry[i], AlgoParabolaFunctionXtoY(xAry[i], eq1));
+                    xAry[i], AlgoFunctionXtoY(xAry[i], eq1));
             }//for
             
             if (solutionAry.Length == 0) { return false; }

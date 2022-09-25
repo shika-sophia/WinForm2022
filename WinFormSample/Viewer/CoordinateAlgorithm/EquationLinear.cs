@@ -54,10 +54,16 @@
             return this.Text;
         }//ToString()
 
+        //Deprecated 非推奨: 型変換は可能だが可読性の観点から避けるべき 
         public EquationQuadratic ToQuad()
         {
             return new EquationQuadratic(
                 0M, (decimal)this.Slope, (decimal)this.Intercept);
         }//ToQuad()
+
+        public (decimal a, decimal b, decimal c) GetGeneralParam()
+        {
+            return (0M, (decimal)Slope, (decimal)Intercept);
+        }//GetGeneralParam()
     }//class
 }
