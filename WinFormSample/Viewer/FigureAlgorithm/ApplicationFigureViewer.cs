@@ -28,9 +28,29 @@
  *         FormFigureViewerクラスのプロパティに
  *         new AlgoRegularPolygon()をして、委譲。
  *
- *@subject DrawDiagonalLine(PointF[])
- *         自分自身の点どうし以外、全ての点に線を引いて、
- *         正多角形の輪郭をもう一度、上書き
+ *@subject 中心線の描画
+ *         void   DrawCenterLine(PointF[])
+ *         ・中心点と配列の各点を DrawLine()
+ *         
+ *@subject 対角線の描画
+ *         void  DrawDiagonalLine(PointF[])  
+ *         ・i の最後は全ての対角線が引かれているので除外
+ *         ・自分自身の点, １つ先の点, １つ手前の点を除外
+ *         ・ただし i = 0 のときは 
+ *          (i - 1) % pointAry.Length は 1 となり
+ *          (i + 1) % pointAry.Length と重複し、除外されないままになるので下の条件を追加
+ *          
+ *         for (int i = 0; i < pointAry.Length - 1; i++)
+ *         {
+ *           for (int j = i; j < pointAry.Length; j++)
+ *           {
+ *             if(j == i                               //自分自身の点
+ *                 || j == (i + 1) % pointAry.Length   //１つ先の点
+ *                 || j == (i - 1) % pointAry.Length)  //１つ前の点
+ *             { continue; } 
+ *         
+ *             if(i == 0 && j == pointAry.Length - 1)  
+ *             { continue; }
  *         
  *@NOTE【Problem】TableLayoutPanelと PictureBox
  *      TableLayoutPanelの ColumnStyle, RowStyleを SizeType.Percentで指定すると
@@ -405,16 +425,21 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
 
         public void DrawDiagonalLine(PointF[] pointAry)
         {
-            for (int i = 0; i < pointAry.Length; i++)
+            for (int i = 0; i < pointAry.Length - 1; i++)
             {
-                for (int j = 0; j < pointAry.Length; j++)
+                for (int j = i; j < pointAry.Length; j++)
                 {
-                    if(j == i) { continue; } 
+                    if(j == i
+                        || j == (i + 1) % pointAry.Length 
+                        || j == (i - 1) % pointAry.Length)
+                    { continue; } 
+
+                    if(i == 0 && j == pointAry.Length - 1)  
+                    { continue; } 
+
                     g.DrawLine(penPink, pointAry[i], pointAry[j]);
                 }//for j
             }//for i
-
-            g.DrawPolygon(penBlue, pointAry);
         }//DrawDiagonalLine()
 
         private void DrawStar()
