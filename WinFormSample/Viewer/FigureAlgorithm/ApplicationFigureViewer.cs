@@ -15,9 +15,22 @@
  *         角の数 Angle、半径 Radius、ペンの太さ Width を入力可
  *         ボタンクリック時に入力検証を行い、不適正入力は MessageBoxで通知
  *         
+ *         [英] Triangle        三角形
+ *         [英] Rectangle       四角形
+ *         [英] Pentagon        五角形
+ *         [英] Hexagon         六角形
+ *         [英] Polygon         多角形
+ *         [英] Regular Polygon 正多角形
+ *         [英] center line     中心線
+ *         [英] diagonal line   対角線
+ *         
  *@subject 描画座標のアルゴリズム
  *         FormFigureViewerクラスのプロパティに
  *         new AlgoRegularPolygon()をして、委譲。
+ *
+ *@subject DrawDiagonalLine(PointF[])
+ *         自分自身の点どうし以外、全ての点に線を引いて、
+ *         正多角形の輪郭をもう一度、上書き
  *         
  *@NOTE【Problem】TableLayoutPanelと PictureBox
  *      TableLayoutPanelの ColumnStyle, RowStyleを SizeType.Percentで指定すると
@@ -40,9 +53,9 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
 {
     class ApplicationFigureViewer
     {
-        //[STAThread]
-        //static void Main()
-        public void Main()
+        [STAThread]
+        static void Main()
+        //public void Main()
         {
             Console.WriteLine("new FormFigureViewer()");
 
@@ -64,6 +77,8 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
         private readonly TextBox tbAngle;
         private readonly TextBox tbRadius;
         private readonly TextBox tbWidth;
+        private readonly CheckBox checkCenterLine;
+        private readonly CheckBox checkDiagonalLine;
         private readonly Button button;
         private readonly PictureBox pic;
         private readonly Graphics g;
@@ -85,17 +100,19 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
             table = new TableLayoutPanel()
             {
                 ColumnCount = 3,
-                RowCount = 5,
+                RowCount = 7,
                 Dock = DockStyle.Fill,
             };
             table.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 100));
             table.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 60));
             table.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 480));
-            table.RowStyles.Add(new RowStyle(SizeType.Absolute, 200));
-            table.RowStyles.Add(new RowStyle(SizeType.Absolute, 70));
-            table.RowStyles.Add(new RowStyle(SizeType.Absolute, 70));
-            table.RowStyles.Add(new RowStyle(SizeType.Absolute, 70));
-            table.RowStyles.Add(new RowStyle(SizeType.Absolute, 70));
+            table.RowStyles.Add(new RowStyle(SizeType.Absolute, 180));
+            table.RowStyles.Add(new RowStyle(SizeType.Absolute, 50));
+            table.RowStyles.Add(new RowStyle(SizeType.Absolute, 50));
+            table.RowStyles.Add(new RowStyle(SizeType.Absolute, 50));
+            table.RowStyles.Add(new RowStyle(SizeType.Absolute, 50));
+            table.RowStyles.Add(new RowStyle(SizeType.Absolute, 50));
+            table.RowStyles.Add(new RowStyle(SizeType.Absolute, 50));
 
             //---- ListBox ----
             list = new ListBox()
@@ -169,6 +186,24 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
             };
             table.Controls.Add(tbWidth, 1, 3);
 
+            checkCenterLine = new CheckBox()
+            {
+                Text = "Center Line",
+                Dock = DockStyle.Fill,
+                AutoSize = true,
+            };
+            table.Controls.Add(checkCenterLine, 0, 4);
+            table.SetColumnSpan(checkCenterLine, 2);
+
+            checkDiagonalLine = new CheckBox()
+            {
+                Text = "Diagonal Line",
+                Dock = DockStyle.Fill,
+                AutoSize = true,
+            };
+            table.Controls.Add(checkDiagonalLine, 0, 5);
+            table.SetColumnSpan(checkDiagonalLine, 2);
+
             //---- Button ----
             button = new Button()
             {
@@ -179,7 +214,7 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
                 AutoSize = true,
             };
             button.Click += new EventHandler(button_Click);
-            table.Controls.Add(button, 0, 4);
+            table.Controls.Add(button, 0, 6);
             table.SetColumnSpan(button, 2);
 
             //---- PictureBox ----
@@ -190,7 +225,7 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
                 Dock = DockStyle.Fill,
             };
             table.Controls.Add(pic, 2, 0);
-            table.SetRowSpan(pic, 5);
+            table.SetRowSpan(pic, 7);
 
             Bitmap bitmap = new Bitmap(
                 pic.ClientSize.Width, pic.ClientSize.Height);
@@ -214,20 +249,36 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
             switch (selected)
             {
                 case "Triangle":
+                    tbAngle.Text =
+                        $"{(sender as ListBox).SelectedIndex + 3}";
+                    tbAngle.Enabled = false;
+                    checkCenterLine.Enabled = true;
+                    checkDiagonalLine.Checked = false;
+                    checkDiagonalLine.Enabled = false;
+                    break;
+
                 case "Rectangle":
                 case "Pentagon":
                 case "Hexagon":
                     tbAngle.Text = 
                         $"{(sender as ListBox).SelectedIndex + 3}";
                     tbAngle.Enabled = false;
+                    checkCenterLine.Enabled = true;
+                    checkDiagonalLine.Enabled = true;
                     break;
                 case "Polygon":
                     tbAngle.Text = "7";
                     tbAngle.Enabled = true;
+                    checkCenterLine.Enabled = true;
+                    checkDiagonalLine.Enabled = true;
                     break;
                 case "Star":
                     tbAngle.Text = "5";
                     tbAngle.Enabled = true;
+                    checkCenterLine.Checked = false;
+                    checkCenterLine.Enabled = false;
+                    checkDiagonalLine.Checked = false;
+                    checkDiagonalLine.Enabled = false;
                     break;
             }//switch
         }//list_SelectedIndexChanged()
@@ -331,8 +382,40 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
             RectangleF rect = algo.AlgoCircle(centerPoint, radius);
             g.DrawEllipse(penPink, rect);
 
+            if (checkCenterLine.Checked)
+            {
+                DrawCenterLine(polyPointAry);
+            }
+
+            if (checkDiagonalLine.Checked)
+            {
+                DrawDiagonalLine(polyPointAry);
+            }
+
             pic.Refresh();
         }//DrawFigure()
+
+        private void DrawCenterLine(PointF[] pointAry)
+        {
+            foreach (PointF pt in pointAry)
+            {
+                g.DrawLine(penPink, centerPoint, pt);
+            }
+        }//DrawCenterLine()
+
+        public void DrawDiagonalLine(PointF[] pointAry)
+        {
+            for (int i = 0; i < pointAry.Length; i++)
+            {
+                for (int j = 0; j < pointAry.Length; j++)
+                {
+                    if(j == i) { continue; } 
+                    g.DrawLine(penPink, pointAry[i], pointAry[j]);
+                }//for j
+            }//for i
+
+            g.DrawPolygon(penBlue, pointAry);
+        }//DrawDiagonalLine()
 
         private void DrawStar()
         {
