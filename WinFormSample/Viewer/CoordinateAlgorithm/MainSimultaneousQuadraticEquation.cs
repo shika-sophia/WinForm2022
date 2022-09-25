@@ -70,42 +70,10 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             //---- Equation, TrySolution() ----
             var eq1 = new EquationQuadratic(0.005f, new PointF(0, -100));
             var eq2 = new EquationQuadratic(-0.005f, new PointF(120, 200));
-            //var eq2 = new EquationLinear(0.5f, 50f);
+            var eq3 = new EquationLinear(0.25f, 50f);
 
-            bool existSolution = quad.TrySolutionQuad(
-                eq1, eq2, out PointF[] solutionAry);
-
-            List<PointF> pointList = new List<PointF>();
-            if (existSolution)
-            {
-                foreach (PointF pt in solutionAry)
-                {
-                    if (float.IsNaN(pt.X)) { continue; }
-
-                    pointList.Add(pt);
-                }//foreach
-            }
-            else
-            {
-                Console.WriteLine("(No Solution)");                
-            }
-
-            //---- eq1 pointList ----
-            pointList.Add(eq1.Vertex);
-            pointList.Add(quad.AlgoInterceptY(eq1));
-            pointList.AddRange(quad.AlgoInterceptX(eq1));
-
-            //---- eq2 pointList ----
-            pointList.Add(eq2.Vertex);
-            pointList.Add(quad.AlgoInterceptY(eq2));
-            pointList.AddRange(quad.AlgoInterceptX(eq2));
-            //pointList.Add(quad.AlgoInterceptX(eq2));
-
-            //---- Draw ----
-            quad.DrawMultiPointLine(pointList.ToArray());
-            quad.DrawParabolaFunction(eq1);
-            quad.DrawParabolaFunction(eq2);
-            //quad.DrawLinearFunction(eq2);
+            quad.DrawMultiQuadraticFunction(
+                new ICoordinateEquation[] { eq1, eq2, eq3, });
 
             this.Controls.AddRange(new Control[]
             {
@@ -114,3 +82,43 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         }//constructor
     }//class
 }
+
+/*
+//==== old code of here ====
+//=> quad.DrawMultiQuadraticFunction()
+
+    bool existSolution = quad.TrySolutionQuad(
+        eq1, eq2, out PointF[] solutionAry);
+
+    List<PointF> pointList = new List<PointF>();
+    if (existSolution)
+    {
+        foreach (PointF pt in solutionAry)
+        {
+            if (float.IsNaN(pt.X)) { continue; }
+
+            pointList.Add(pt);
+        }//foreach
+    }
+    else
+    {
+        Console.WriteLine("(No Solution)");                
+    }
+
+    //---- eq1 pointList ----
+    pointList.Add(eq1.Vertex);
+    pointList.Add(quad.AlgoInterceptY(eq1));
+    pointList.AddRange(quad.AlgoInterceptX(eq1));
+
+    //---- eq2 pointList ----
+    //pointList.Add(eq2.Vertex);
+    pointList.Add(quad.AlgoInterceptY(eq2));
+    pointList.AddRange(quad.AlgoInterceptX(eq2));
+    //pointList.Add(quad.AlgoInterceptX(eq2));
+
+    //---- Draw ----
+    quad.DrawMultiPointLine(pointList.ToArray());
+    quad.DrawParabolaFunction(eq1);
+    //quad.DrawParabolaFunction(eq2);
+    quad.DrawLinearFunction(eq2);
+ */
