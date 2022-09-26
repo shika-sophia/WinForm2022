@@ -62,15 +62,6 @@
  *@subject 判別式  D = b ^ 2 - 4 a c
  *         int  AlgoJudge(
  *                decimal a, decimal b, decimal c, out decimal judge)
- *
- *@subject 微分
- *         PointF(x, y)を通る接線
- *         [ y = a x ^ 2 + b x + c ] ->  [ y' = 2 a x + b ]
- *         ・接線を表す直線の傾き 2a + b の xに代入
- *         ・接線 y = c x + d の 傾き cは上記で求まるので、
- *           PointF(x, y)を代入して dを決定
- *         
- *         EquationLinear  DifferentiateQuad(EquationQuadratic, PointF)
  *         
  *@see AlgoCoordinateAxis.cs
  *@see AlgoCoordinateLinear.cs
@@ -99,7 +90,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 ICoordinateEquation eq = eqAry[i];
                 pointList.Add(AlgoInterceptY(eq));
                 pointList.AddRange(AlgoInterceptX(eq));
-
+                
                 if(eq is EquationQuadratic)
                 {
                     var eqQuad = (EquationQuadratic)eq;
@@ -265,7 +256,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             }
 
             float[] xAry = AlgoQuadSolutionFormula(subA, subB, subC);
-            solutionAry = new PointF[2];
+            solutionAry = new PointF[xAry.Length];
             for(int i = 0; i < xAry.Length; i++)
             {
                 solutionAry[i] = new PointF(
@@ -277,7 +268,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return true;
         }//TrySolutionQuad()
 
-        private float[] AlgoQuadSolutionFormula(decimal a, decimal b, decimal c)
+        protected float[] AlgoQuadSolutionFormula(decimal a, decimal b, decimal c)
         {   // ２次方程式の解の公式
             if(a == 0)
             {
@@ -302,7 +293,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return solutionXAry;
         }//AlgoQuadSolutionFormula()
 
-        private int AlgoJudge(
+        protected int AlgoJudge(
             decimal a, decimal b, decimal c, out decimal judge)
         {   // 判別式 D = b ^ 2 - 4 a c
             judge = b * b - 4M * a * c;
@@ -314,26 +305,6 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             return solutionNum;
         }//AlgoJudge()
-
-        public EquationLinear DifferentiateQuad(ICoordinateEquation eq, PointF pt)
-        {
-            if(eq is EquationLinear)
-            {
-                return new EquationLinear(0f, (eq as EquationLinear).Slope * 2);
-            }
-
-            var eqQuad = (EquationQuadratic)eq;
-            // [ y = a x ^ 2 + b x + c ] ->  [ y' = 2 a x + b ] に xを代入
-            float slope = (float)(2M * eqQuad.A * (decimal)pt.X + eqQuad.B);
-
-            // y = c x + d に PointF(x, y)を代入  d = y - cx
-            float intercept = 
-                (float)((decimal)pt.Y - (decimal)slope * (decimal)pt.X);
-
-            var tangentLine = new EquationLinear(slope, intercept);
-            
-  
-            return tangentLine;
-        }//DifferentiateQuad()
+        
     }//class
 }

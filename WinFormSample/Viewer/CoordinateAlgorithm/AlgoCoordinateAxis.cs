@@ -11,13 +11,6 @@
  *@content CoordinateAxisViewer
  *         座標軸のみを描画
  *         
- *@subject Inherit 継承
- *         AlgoCoordinateAxis
- *             ↑
- *         AlgoCoordinateLinear : AlgoCoordinateAxis
- *             ↑
- *         AlgoCoordinateQuadratic : AlgoCoordinateLinear
- *         
  *@subject Matrix 平行移動, 拡大縮小
  *         void  matrix.Translate(float offsetX, float offsetY) 
  *         void  matrix.Scale(float sx, float sy)  拡大縮小
@@ -72,47 +65,9 @@ using System.Windows.Forms;
 
 namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 {
-    class AlgoCoordinateAxis
+    class AlgoCoordinateAxis : AbsAlgoCoordinate
     {
-        protected readonly PictureBox pic;
-        protected readonly Graphics g;
-        protected readonly Pen penBlue = new Pen(Color.CornflowerBlue, 1);
-        protected readonly Pen penPink = new Pen(Color.HotPink, 2);
-        protected readonly Font font = new Font("ＭＳ 明朝", 12, FontStyle.Bold);
-        protected readonly Font fontSmall = new Font("ＭＳ 明朝", 8, FontStyle.Regular);
-        protected readonly PointF centerPoint;
-        protected readonly decimal ratioWidthHeight;
-        protected GraphicsState defaultAxis;
-        protected decimal scaleRate = 2.0M;
-
-        public AlgoCoordinateAxis(PictureBox pic)
-        {
-            this.pic = pic;
-            centerPoint = new PointF(
-                (float)((decimal)pic.ClientSize.Width / 2M),
-                (float)((decimal)pic.ClientSize.Height / 2M));
-            ratioWidthHeight = 
-                (decimal)pic.ClientSize.Width / 
-                (decimal)pic.ClientSize.Height;
-            g = BuildGraphics();
-        }//constructor
-
-        private Graphics BuildGraphics()
-        {
-            Bitmap bitmap = new Bitmap(
-                pic.ClientSize.Width,
-                pic.ClientSize.Height);
-            Graphics g = Graphics.FromImage(bitmap);
-            g.SmoothingMode = SmoothingMode.HighQuality;
-            
-            Matrix mx = new Matrix();
-            mx.Translate(centerPoint.X, centerPoint.Y);
-            mx.Scale(0.96f, 0.96f);
-            g.Transform = mx;
-            pic.Image = bitmap;
-
-            return g;
-        }//BuildGraphics()
+        public AlgoCoordinateAxis(PictureBox pic) : base(pic) { }
 
         public void DrawCoordinateAxis()
         {
@@ -128,11 +83,6 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             DrawAxisScale(brushBlue);
             brushBlue.Dispose();
-
-            if(defaultAxis == null)
-            {
-                defaultAxis = g.Save();
-            }
         }//DrawCoordinateAxis
 
         private void DrawAxisScale(Brush brushBlue)
@@ -200,7 +150,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             SizeF pointSize = g.MeasureString($"({pt.X},{pt.Y})", fontSmall);
             g.DrawString($"({pt.X:0.##},{pt.Y:0.##})", fontSmall, brushPink,
                 (float)((decimal)pt.X * scaleRate - (decimal)pointSize.Width / 2M),
-                -(float)((decimal)pt.Y * scaleRate + ((pt.Y > 0) ? (decimal)pointSize.Height + 5M : (decimal)-pointSize.Height)));
+                -(float)((decimal)pt.Y * scaleRate +
+                    ((pt.Y > 0) ? (decimal)pointSize.Height + 5M: (decimal)-pointSize.Height + 5M)));
 
             if (withLine)
             {
@@ -214,13 +165,23 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                     (float)((decimal)pt.X * scaleRate), (float)((decimal)-pt.Y * scaleRate),
                     (float)((decimal)pt.X * scaleRate), 0f);
 
-                g.DrawString($"{pt.X:0.##}", fontSmall, brushPink,
-                    (float)((decimal)pt.X * scaleRate - 15M),
-                    (pt.Y > 0) ? 5f : -20f);
-                g.DrawString($"{pt.Y:0.##}", fontSmall, brushPink,
-                    (pt.X > 0) ? -35f : 5f,
-                    -(float)((decimal)pt.Y * scaleRate + 5M));
-            }
+                if(pt.X != 0)
+                {
+                    SizeF ptXSize = g.MeasureString($"{pt.X}", fontSmall);
+                    g.DrawString($"{pt.X:0.##}", fontSmall, brushPink,
+                        (float)((decimal)pt.X * scaleRate -(decimal)ptXSize.Width / 2M),
+                        (pt.Y > 0) ? 5f : -ptXSize.Height - 5f);
+                }
+
+                if(pt.Y != 0)
+                {
+                    SizeF ptYSize = g.MeasureString($"{pt.Y}", fontSmall);
+                    g.DrawString($"{pt.Y:0.##}", fontSmall, brushPink,
+                        (pt.X > 0) ? -ptYSize.Width -5f : 5f,
+                    -(float)((decimal)pt.Y * scaleRate + (decimal)ptYSize.Height / 2M));
+                }
+            }//if withLine
+
             brushPink.Dispose();
         }//DrawPointLine()
 
