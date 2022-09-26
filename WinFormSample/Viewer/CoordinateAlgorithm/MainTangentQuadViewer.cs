@@ -16,7 +16,8 @@
  *         [英] tangent        接する
  *         [英] differentiate  微分する
  *         
- *@subject 
+ *@subject 微分, 接線
+ *         =>〔AlgoCoordinateDifferentiate.cs〕
  *
  *@see ImageTangentQuadViewer.jpg
  *@see 
@@ -48,7 +49,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
     class FormTangentQuadViewer : Form
     {
         private readonly PictureBox pic;
-        private readonly AlgoCoordinateQuadratic quad;
+        private readonly AlgoCoordinateDifferentiate diff;
 
         public FormTangentQuadViewer()
         {
@@ -65,14 +66,24 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 Dock = DockStyle.Fill,
             };
 
-            quad = new AlgoCoordinateQuadratic(pic);
-            quad.DrawCoordinateAxis();
+            diff = new AlgoCoordinateDifferentiate(pic);
+            diff.DrawCoordinateAxis();
 
-            EquationQuadratic eqQuad = new EquationQuadratic(0.005f, new PointF(0, -50));
-            float ptY = quad.AlgoFunctionXtoY(100f, eqQuad);
-            EquationLinear eqLinear = quad.DifferentiateQuad(eqQuad, new PointF(100, ptY));
+            EquationQuadratic eqQuad = new EquationQuadratic(0.005f, new PointF(0, 30));
 
-            quad.DrawMultiQuadraticFunction(new ICoordinateEquation[] { eqQuad, eqLinear });
+            //---- 接点 PointF(100, ptY)における接線 ----
+            float ptX = 100f;
+            float ptY = diff.AlgoFunctionXtoY(ptX, eqQuad);
+
+            //---- 任意の点 PointF(x, y)を通る接線 ----
+            //float ptX = 0f;
+            //float ptY = -20f;
+
+            PointF pt = new PointF(ptX, ptY);
+            EquationLinear eqLinear = diff.AlgoTangentLineOnContact(eqQuad, pt);
+            
+            diff.DrawMultiQuadraticFunction(
+                new ICoordinateEquation[] { eqQuad, eqLinear, });
             
             this.Controls.AddRange(new Control[]
             {
