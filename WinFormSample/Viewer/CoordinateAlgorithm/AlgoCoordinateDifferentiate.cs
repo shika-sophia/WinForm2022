@@ -26,6 +26,44 @@
  *            この点を通る y = d の直線になる
  *           (２次関数外の点なので連立すると虚数解になる)
  *
+ *@subject 接線公式 Tangent Formula
+ *         微分可能な y = f(x) 上の点 A(a, f(a)) における接線公式
+ *             y - f(a) = f'(a) ( x - a )
+ *             
+ *         https://math-travel.com/a-tangent-line/
+ *         =>〔~\Reference\Mathematics\Article_TangentLineLineQuad.txt〕
+ *         
+ *@subject 問 y = a x ^ 2 + b x + c 上の接点 (m, f(m))における接線
+ *         ２次関数外の点 (p, q)を通る直線の式
+ *         
+ *         [Question] what is Linear Line? and How much?
+ *         Quadratic Equation: y = a x ^ 2 + b x + c
+ *         tangent line on contact point (m, f(m))
+ *         point (p, q) on tangent Linear Equation, but out of Quadratic Equation
+ *         constant: a, b, c, p, q  定数
+ *         unknown:  m              未知数
+ *         variable: x, y           変数
+ *         
+ *         [Answer]
+ *         Tangent Formula: y - f(a) = f'(a) ( x - a )  〔above〕
+ *         
+ *         f'(a) = 2 a x + b              // differential
+ *         y - f(m) = (2 a x + b)(x - m)  // <- substitute 代入 (x, y) = (p, q)
+ *         q - (a m ^ 2 + b m + c) = (2 a m + b)(p - m)   // only m as unknown
+ *              2 a m ^ 2 - (2 a - b) m - b p 
+ *            - ( a m ^ 2 + b m + c - q )       = 0
+ *                a m ^ 2 - 2 a m - c + q - b p = 0       // to Quadratic Formula
+ *              
+ *        judge expression  判別式
+ *        D > 0:  solution m are two.
+ *        D = 0:  solution m is one.
+ *        D < 0:  solution m is none.
+ *        
+ *        m is contact point x-coordinate.                       m は接点の x座標
+ *        ->　y-coordinate is calculated by Quadratic Equation.  ２次関数から y座標が求まる
+ *        ->  m, f(m) lead to Linear Equation as tangent line.   接線公式に接点を代入し直線の式が求まる
+ *          ([or] slope m, one point lead to Linear Equation.)   (別解: 傾き m, 一点から 直線の式が導ける)
+ *           
  *@see MainTangentQuadViewer.cs
  *@author shika
  *@date 2022-09-26
