@@ -17,7 +17,7 @@
  *         [ y = a x ^ 2 + b x + c ] ->  [ y' = 2 a x + b ]
  *         float  AlgoDifferentiateQuad(float x, EquationQuadratic)
  *
- *@subject 接線 PointF(x, y)を通る接線
+ *@subject 接線:  接点 PointF(x, y)を通る接線
  *         EquationLinear  AlgoTangentLine(EquationQuadratic, PointF)
  *         ・接線を表す直線の傾き 2ax + b の xに代入
  *         ・接線 y = c x + d の 傾き cは上記で求まるので、
@@ -36,7 +36,7 @@
  *@subject 問 y = a x ^ 2 + b x + c 上の接点 (m, f(m))における接線
  *         ２次関数外の点 (p, q)を通る直線の式
  *         
- *         [Question] what is Linear Line? and How much?
+ *         [Question] Culculate the Tangent Lines expression. and How much?
  *         Quadratic Equation: y = a x ^ 2 + b x + c
  *         tangent line on contact point (m, f(m))
  *         point (p, q) on tangent Linear Equation, but out of Quadratic Equation
@@ -50,9 +50,9 @@
  *         f'(a) = 2 a x + b              // differential
  *         y - f(m) = (2 a x + b)(x - m)  // <- substitute 代入 (x, y) = (p, q)
  *         q - (a m ^ 2 + b m + c) = (2 a m + b)(p - m)   // only m as unknown
- *              2 a m ^ 2 - (2 a - b) m - b p 
- *            - ( a m ^ 2 + b m + c - q )       = 0
- *                a m ^ 2 - 2 a m - c + q - b p = 0       // to Quadratic Formula
+ *              2 a m ^ 2 - (2 a p - b) m - b p 
+ *            - ( a m ^ 2 + b m + c - q )         = 0
+ *                a m ^ 2 - 2 a p m - c - b p + q = 0       // to Quadratic Formula
  *              
  *        judge expression  判別式
  *        D > 0:  solution m are two.
@@ -62,8 +62,10 @@
  *        m is contact point x-coordinate.                       m は接点の x座標
  *        ->　y-coordinate is calculated by Quadratic Equation.  ２次関数から y座標が求まる
  *        ->  m, f(m) lead to Linear Equation as tangent line.   接線公式に接点を代入し直線の式が求まる
- *          ([or] slope m, one point lead to Linear Equation.)   (別解: 傾き m, 一点から 直線の式が導ける)
+ *          ([or] slope 2 a m + b, one point lead to Linear Equation.)   (別解: 傾き m, 一点から 直線の式が導ける)
  *           
+ *        【NOTE】接線を y = d x + e と置くと未知数が多く解けなくなる
+ *        
  *@see MainTangentQuadViewer.cs
  *@author shika
  *@date 2022-09-26
@@ -86,7 +88,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         }//CheckOnLine()
 
         public EquationLinear[] AlgoTangentLineFree(
-            ICoordinateEquation eq, PointF pt)
+            ICoordinateEquation eq, PointF pt, out PointF[] contactPointAry)
         {
             if(eq is EquationLinear)
             {
@@ -94,24 +96,43 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             }
 
             var eqQuad = (EquationQuadratic)eq;
+            
             if(CheckOnLine(eqQuad, pt))
             {
-                return new EquationLinear[]{
-                    AlgoTangentLineOnContact(eqQuad, pt)};
+                EquationLinear eqLinear = AlgoTangentLineOnContact(eqQuad, pt, out PointF contactPoint);
+                contactPointAry = new PointF[] { contactPoint };
+                return new EquationLinear[] { eqLinear };
             }
 
-            // c = 2 a x + b  | y = c x + d
-            // y = (2 a x + b) x + d
-            // y = 2 a x ^ 2 + b x + d
-            // d = y - 2 a x ^ 2 - b x | PointF (pt.X, pt.Y)
-            float intercept = (float)((decimal)pt.Y 
-                - 2M * eqQuad.A * (decimal)pt.X * (decimal)pt.X 
-                - eqQuad.B * (decimal)pt.X);
+            //a m ^ 2 - 2 a p m - c - b p + q = 0  〔see above〕
+            var eqContactX = new EquationQuadratic(
+                eqQuad.A,
+                -2M * eqQuad.A * (decimal)pt.X,
+                - eqQuad.C - eqQuad.B * (decimal)pt.X + (decimal)pt.Y);
 
-            return new EquationLinear[] { };
+            //---- Quadratic Formula ----
+            float[] contactXAry = AlgoQuadSolutionFormula(eqContactX);
+            
+            //---- EquationLinear as tangent line ----
+            contactPointAry = new PointF[contactXAry.Length];
+            EquationLinear[] tangentLineAry = new EquationLinear[contactXAry.Length];
+
+            for(int i = 0; i < contactXAry.Length; i++)
+            {
+                float contactX = contactXAry[i];
+                float contactY = AlgoFunctionXtoY(contactX, eqQuad);
+                float slope = AlgoDifferentiateQuad(contactX, eqQuad);
+                PointF contactPoint = new PointF(contactX, contactY);
+
+                contactPointAry[i] = contactPoint;
+                tangentLineAry[i] = new EquationLinear(slope, contactPoint);
+            }//for
+            
+            return tangentLineAry;
         }//AlgoTangentLineFree()
 
-        public EquationLinear AlgoTangentLineOnContact(ICoordinateEquation eq, PointF pt)
+        public EquationLinear AlgoTangentLineOnContact(
+            ICoordinateEquation eq, PointF pt, out PointF contactPoint)
         {
             if (eq is EquationLinear)
             {   
@@ -130,7 +151,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             float intercept =
                 (float)((decimal)pt.Y - (decimal)slope * (decimal)pt.X);
 
-            DrawPointLine(pt, true);
+            contactPoint = pt;
             return new EquationLinear(slope, intercept);
         }//AlgoTangentLine()
 

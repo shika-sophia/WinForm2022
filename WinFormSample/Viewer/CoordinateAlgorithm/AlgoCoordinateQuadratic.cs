@@ -73,6 +73,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
@@ -81,10 +82,11 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
     {
         public AlgoCoordinateQuadratic(PictureBox pic) : base(pic) { }
 
-        public void DrawMultiQuadraticFunction(ICoordinateEquation[] eqAry)
+        public void DrawMultiQuadraticFunction(
+            ICoordinateEquation[] eqAry, params PointF[] pointAryArgs)
         {
             //---- pointList ----
-            List<PointF> pointList = new List<PointF>();
+            List<PointF> pointList = new List<PointF>(pointAryArgs);
             for (int i = 0; i < eqAry.Length; i++)                
             {
                 ICoordinateEquation eq = eqAry[i];
@@ -112,8 +114,13 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 }//for j
             }//for i
 
+            PointF[] pointAry = 
+                pointList.Select(b => b)
+                  .Distinct()
+                  .ToArray();
+
             //---- Draw ----
-            DrawMultiPointLine(pointList.ToArray());
+            DrawMultiPointLine(pointAry);
 
             foreach (ICoordinateEquation eq in eqAry)
             {
@@ -268,6 +275,11 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return true;
         }//TrySolutionQuad()
 
+        protected float[] AlgoQuadSolutionFormula(EquationQuadratic eqQuad)
+        {
+            return AlgoQuadSolutionFormula(eqQuad.A, eqQuad.B, eqQuad.C);
+        }
+
         protected float[] AlgoQuadSolutionFormula(decimal a, decimal b, decimal c)
         {   // ２次方程式の解の公式
             if(a == 0)
@@ -292,6 +304,11 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             
             return solutionXAry;
         }//AlgoQuadSolutionFormula()
+
+        protected int AlgoJudge(EquationQuadratic eqQuad, out decimal judge)
+        {
+            return AlgoJudge(eqQuad.A, eqQuad.B, eqQuad.C, out  judge);
+        }
 
         protected int AlgoJudge(
             decimal a, decimal b, decimal c, out decimal judge)

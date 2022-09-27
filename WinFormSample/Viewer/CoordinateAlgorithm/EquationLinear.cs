@@ -1,4 +1,7 @@
-﻿namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
+﻿using System;
+using System.Drawing;
+
+namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 {
     class EquationLinear : ICoordinateEquation
     {
@@ -6,7 +9,12 @@
         public float Intercept { get; private set; }
         public string Text { get; set; }
 
-        public EquationLinear() { }
+        public EquationLinear(float slope, PointF pt) 
+        {
+            this.Slope = slope;
+            this.Intercept = CalcIntercept(slope, pt);
+            this.Text = BuildText(slope, Intercept);
+        }
 
         public EquationLinear(float slope, float intercept) 
         {
@@ -14,6 +22,13 @@
             this.Intercept = intercept;
             this.Text = BuildText(slope, intercept);
         }//constructor
+
+        private float CalcIntercept(float slope, PointF pt)
+        {
+            // y = a x + b
+            // b = y - a x
+            return (float)((decimal)pt.Y - (decimal)slope * (decimal)pt.X);
+        }
 
         private string BuildText(float slope, float intercept)
         {
