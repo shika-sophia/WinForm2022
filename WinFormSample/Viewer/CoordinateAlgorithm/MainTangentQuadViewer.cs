@@ -25,6 +25,7 @@
  *@date 2022-09-26
  */
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -71,19 +72,24 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             EquationQuadratic eqQuad = new EquationQuadratic(0.005f, new PointF(0, 30));
 
+            List<ICoordinateEquation> eqList = new List<ICoordinateEquation>();
+            eqList.Add(eqQuad);
+
             //---- 接点 PointF(100, ptY)における接線 ----
-            float ptX = 100f;
-            float ptY = diff.AlgoFunctionXtoY(ptX, eqQuad);
+            //float ptX = 100f;
+            //float ptY = diff.AlgoFunctionXtoY(ptX, eqQuad);
+            //EquationLinear eqLinear = diff.AlgoTangentLineOnContact(eqQuad, new PointF(ptX, ptY));
+            //eqList.Add(eqLinear);
 
             //---- 任意の点 PointF(x, y)を通る接線 ----
-            //float ptX = 0f;
-            //float ptY = -20f;
-
-            PointF pt = new PointF(ptX, ptY);
-            EquationLinear eqLinear = diff.AlgoTangentLineOnContact(eqQuad, pt);
+            float ptX = 0f;
+            float ptY = -50f;
+            EquationLinear[] tangentLineAry = 
+                diff.AlgoTangentLineFree(
+                    eqQuad, new PointF(ptX, ptY), out PointF[] contactAry);
+            eqList.AddRange(tangentLineAry);
             
-            diff.DrawMultiQuadraticFunction(
-                new ICoordinateEquation[] { eqQuad, eqLinear, });
+            diff.DrawMultiQuadraticFunction(eqList.ToArray(), contactAry);
             
             this.Controls.AddRange(new Control[]
             {
