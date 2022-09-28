@@ -34,9 +34,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 {
     class MainTangentQuadViewer
     {
-        [STAThread]
-        static void Main()
-        //public void Main()
+        //[STAThread]
+        //static void Main()
+        public void Main()
         {
             Console.WriteLine("new FormTangentQuadViewer()");
 
@@ -74,6 +74,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             List<ICoordinateEquation> eqList = new List<ICoordinateEquation>();
             eqList.Add(eqQuad);
+            List<PointF> pointList = new List<PointF>();
 
             //---- 接点 PointF(100, ptY)における接線 ----
             //float ptX = 100f;
@@ -82,14 +83,22 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             //eqList.Add(eqLinear);
 
             //---- 任意の点 PointF(x, y)を通る接線 ----
-            float ptX = 0f;
+            float ptX = 20f;
             float ptY = -50f;
+            PointF givenPoint = new PointF(ptX, ptY);
+            pointList.Add(givenPoint);
+
             EquationLinear[] tangentLineAry = 
                 diff.AlgoTangentLineFree(
-                    eqQuad, new PointF(ptX, ptY), out PointF[] contactAry);
+                    eqQuad, givenPoint, out PointF[] contactAry);
             eqList.AddRange(tangentLineAry);
+            pointList.AddRange(contactAry);
+
+            //eqList.ForEach(eq => { Console.WriteLine(eq); } );
+            //Console.WriteLine("Main pointList:");
+            //pointList.ForEach(pt => { Console.Write($"({pt.X},{pt.Y}), "); });
             
-            diff.DrawMultiQuadraticFunction(eqList.ToArray(), contactAry);
+            diff.DrawMultiQuadraticFunction(eqList.ToArray(), pointList.ToArray());
             
             this.Controls.AddRange(new Control[]
             {
