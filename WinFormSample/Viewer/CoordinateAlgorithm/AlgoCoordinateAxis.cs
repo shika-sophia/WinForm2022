@@ -228,6 +228,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 || (Math.Abs((decimal)centerPoint.Y) / scaleRate) < Math.Abs((decimal)pt.Y))
             {
                 SetScaleRate(scaleRate / 2M);
+
+                if(scaleRate < 0.02M) { break; }  
             }//while
         }//PointAutoScale()
     }//class

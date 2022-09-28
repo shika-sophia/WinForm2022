@@ -125,7 +125,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 PointF contactPoint = new PointF(contactX, contactY);
 
                 contactPointAry[i] = contactPoint;
-                tangentLineAry[i] = new EquationLinear(slope, contactPoint);
+                //tangentLineAry[i] = new EquationLinear(slope, contactPoint); //非推奨 y切片に誤差発生
+                tangentLineAry[i] = new EquationLinear(slope, pt);
             }//for
             
             return tangentLineAry;
@@ -149,7 +150,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             // 接線 y = c x + d に PointF(x, y)を代入  d = y - cx
             float intercept =
-                (float)((decimal)pt.Y - (decimal)slope * (decimal)pt.X);
+                (float)Math.Round((decimal)pt.Y - (decimal)slope * (decimal)pt.X, 4);
 
             contactPoint = pt;
             return new EquationLinear(slope, intercept);
