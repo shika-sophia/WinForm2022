@@ -45,13 +45,15 @@
  *         variable: x, y           変数
  *         
  *         [Answer]
- *         Tangent Formula: y - f(a) = f'(a) ( x - a )  〔above〕
+ *         Tangent Formula: y - f(m) = f'(m) ( x - m )  〔see above〕
  *         
- *         f'(a) = 2 a x + b              // differential
- *         y - f(m) = (2 a x + b)(x - m)  // <- substitute 代入 (x, y) = (p, q)
- *         q - (a m ^ 2 + b m + c) = (2 a m + b)(p - m)   // only m as unknown
- *              2 a m ^ 2 - (2 a p - b) m - b p 
- *            - ( a m ^ 2 + b m + c - q )         = 0
+ *         f'(m) = 2 a m + b              // differential
+ *         y - f(m) = (2 a m + b)(x - m)  // <- substitute 代入 (x, y) = (p, q)
+ *         q - (a m ^ 2 + b m + c) = (2 a m + b)(p - m)     // only m as unknown
+ *            - 2 a m ^ 2 + 2 a p m - b m + b p 
+ *            +   a m ^ 2           + b m + c - q = 0
+ *            -----------------------------------------
+ *              - a m ^ 2 + 2 a p m + c + b p - q = 0       // both side * (-1)
  *                a m ^ 2 - 2 a p m - c - b p + q = 0       // to Quadratic Formula
  *              
  *        judge expression  判別式
@@ -66,6 +68,18 @@
  *           
  *        【NOTE】接線を y = d x + e と置くと未知数が多く解けなくなる
  *        
+ *@NOTE 【考察】Test Print の計算誤差は なぜ起こるのか 〔下記〕
+ *
+ *@subject 垂線 virtical line
+ *         ・垂直条件 virtical condition: a c = -1  when y = a x + b | y = c x + d 
+ *
+ *           EquationLinear  AlgoVirticalLine(EquationLinear, PointF)
+ *           
+ *@subject 距離 distance
+ *         ・三平方の定理 Three Squre Theorem:  z ^ 2 = x ^ 2 + y ^ 2 
+ *         
+ *         decimal  AlgoDistance(PointF pt1, PointF pt2)
+ *
  *@see MainTangentQuadViewer.cs
  *@author shika
  *@date 2022-09-26
@@ -104,10 +118,10 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 return new EquationLinear[] { eqLinear };
             }
 
-            //a m ^ 2 - 2 a p m - c - b p + q = 0  〔see above〕
+            //a m ^ 2 - 2 a p m - c - b p + q = 0   〔see above〕
             var eqContactX = new EquationQuadratic(
                 eqQuad.A,
-                -2M * eqQuad.A * (decimal)pt.X,
+                - 2M * eqQuad.A * (decimal)pt.X,
                 - eqQuad.C - eqQuad.B * (decimal)pt.X + (decimal)pt.Y);
 
             //---- Quadratic Formula ----
@@ -125,7 +139,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 PointF contactPoint = new PointF(contactX, contactY);
 
                 contactPointAry[i] = contactPoint;
-                //tangentLineAry[i] = new EquationLinear(slope, contactPoint); //非推奨 y切片に誤差発生
+                
+                //tangentLineAry[i] = new EquationLinear(slope, contactPoint); //【非推奨】y切片に誤差発生〔see below〕
                 tangentLineAry[i] = new EquationLinear(slope, pt);
             }//for
             
@@ -150,7 +165,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             // 接線 y = c x + d に PointF(x, y)を代入  d = y - cx
             float intercept =
-                (float)Math.Round((decimal)pt.Y - (decimal)slope * (decimal)pt.X, 4);
+                (float)((decimal)pt.Y - (decimal)slope * (decimal)pt.X);
 
             contactPoint = pt;
             return new EquationLinear(slope, intercept);
@@ -160,5 +175,152 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         {   // [ y = a x ^ 2 + b x + c ] ->  [ y' = 2 a x + b ] に xを代入
             return (float)(2M * eqQuad.A * (decimal)x + eqQuad.B);
         }//AlgoDifferentiateQuad()
+
+        public EquationLinear AlgoVirticalLine(EquationLinear eqLinear, PointF pt)
+        {
+            if (float.IsInfinity(eqLinear.Slope))  //x = c  ->  y = b
+            {
+                return new EquationLinear(0, pt.Y);
+            }
+
+            if (eqLinear.Slope == 0f)  // y = b  -> x = c
+            {
+                return new EquationLinear(float.PositiveInfinity, pt.X);
+            }
+
+            // 垂直条件 virtical condition: a c = -1  when y = a x + b | y = c x + d  
+            float slope = (float)(-1M / (decimal)eqLinear.Slope);
+             
+            return new EquationLinear(slope, pt);
+        }//AlgoVirticalLine()
+
+        public decimal AlgoDistance(PointF pt1, PointF pt2)
+        {
+            // 三平方の定理 Three Squre Theorem:  z ^ 2 = x ^ 2 + y ^ 2 
+            decimal dx = (decimal)pt1.X - (decimal)pt2.X;
+            decimal dy = (decimal)pt1.Y - (decimal)pt2.Y;
+
+            return (decimal)Math.Sqrt((double)(dx * dx + dy * dy));
+        }//AlgoDistance()
     }//class
 }
+
+/*
+//【考察】下記 Test Print の計算誤差は なぜ起こるのか
+３種類の２次方程式の解法による計算誤差だろうか
+y = a x ^ 2 + b x + c  ..①
+y = a (x - p) ^ 2 + q  ..②
+y = f'(a) (x - a) + f'(a)  ..③
+① = ② は AlgoParabolaFunctionXtoY()で確認
+
+数学的には どれも同じ結果になるはずだが、
+接線の y切片 -50 と -49.99998 が 他の値に影響を及ぼしている。
+判別式 で 重解 (D = 0)となるはずが、-50 -> 虚数解 (D < 0) | -49.99998 -> ２解 (D > 0)となる。
+
+decimalで計算しているので、float, doubleの２進数計算の誤差とは考えにくい。
+decimal -> float 型変換時の Math.Round() 丸め(=四捨五入)の誤差と思われる。
+
+=> tangentLineAry[i] = new EquationLinear(slope, pt); にして、
+   判別式 judgeのみ Math.Round(judge, 4)を行い、微細な差異を同一視すると解決
+   (decimal -> float 全てに Math.Round()すると、更に不正確な値になるので、変更せず)
+
+=> AlgoCoordinateLinear.CalcIntercept() を Math.Round(value, 4)すると、
+   tangentLineAry[i] = new EquationLinear(slope, contactPoint); でも、y切片 -50になるが、
+   この計算にだけ Math.Round()するのは、仕様統一性に問題があるし、チートぽくもある。
+   その上、直線の交点で、２重交点になることがある。
+   (例: EquationQuadratic(0.005f, new PointF(20, 30)) | PointF(20, -50)で二重交点)   
+
+【結論】２次方程式の解の公式で出たルート計算の小数値の微小誤差が、
+        数学的に同一の点を 異なる点として認識してしまう可能性がある。
+
+//#### Test Print ####
+//==== FormTangentQuadViewer ====
+eqList.ForEach(eq => { Console.WriteLine(eq); } );
+
+Console.WriteLine("Main pointList:");
+pointList.ForEach(pt => { Console.Write($"({pt.X},{pt.Y}), "); });
+
+Console.WriteLine("\n\ncontactAry:");
+foreach (PointF pt in contactAry) { Console.Write($"({pt.X},{pt.Y}), "); }
+
+//==== DrawMultiQuadraticFunction() ====
+//---- Remove at overlapped point as object ----
+Console.WriteLine("pointList:");
+pointList.ForEach(pt => { Console.Write($"({pt.X},{pt.Y}), "); });
+
+PointF[] pointAry = pointList.Select(pt => pt)
+    .Distinct()
+    .ToArray();
+
+Console.WriteLine("\n\npointAry:");
+foreach (PointF pt in pointAry) { Console.Write($"({pt.X},{pt.Y}), "); }
+
+//#### Resault Print ####
+y = 0.005 x ^ 2 + 30         // xの１次係数 eqQuad.B == 0 になっているのは b = -2ap なのでＯＫ
+y = 1.264911 x - 49.99998    // b == 0 だと slopeが 接点の x座標になる
+y = -1.264911 x - 49.99998   // 
+
+Main pointList:
+(0,-50), (126.4911,110), (-126.4911,110),
+
+pointList:
+(0,-50), (126.4911,110), (-126.4911,110), (0,30), (0,30),   // (0, 30)の重複は y切片と ２次関数の頂点なのでＯＫ
+(126.5399,110.0617), (126.4423,109.9383),          // ２次関数と接線の交点が重解ではなく、２点になっている
+(-126.4423,109.9383), (-126.5399,110.0617), 
+(0,-49.99998), (39.52846,0),                       // y切片, x切片
+(0,-49.99998),                                     // ２直線の交点 = 所与の値(0, -50)に計算誤差
+(0,-49.99998),(-39.52846,0),                       // y切片, x切片
+
+pointAry:
+(0,-50), (126.4911,110), (-126.4911,110), (0,30),  // (0, 30)の重複は 別オブジェクトでも (x, y)の値が同じだと、Distinct()で重複解消される
+(126.5399,110.0617), (126.4423,109.9383),          
+(-126.4423,109.9383), (-126.5399,110.0617),
+(0,-49.99998), (39.52846,0), 
+(0,-49.99998),                                     // ここの(0,-49.99998)は重複解消しているが、上の点とは重複
+(-39.52846,0),
+
+//==== AlgoCoordinateDifferenciate.AlgoTangentLineFree() ====
+tangentLineAry[i] = 
+    new EquationLinear(slope, contactPoint) ->  new EquationLinear(slope, pt);
+
+y = 0.005 x ^ 2 + 30
+y = 1.264911 x - 50
+y = -1.264911 x - 50
+
+Main pointList:
+(0,-50), (126.4911,110), (-126.4911,110),
+
+pointList:
+(0,-50), (126.4911,110), (-126.4911,110), 
+(0,30), (0,30), 
+                         // ２次関数と接線の交点が 虚数解となり算出されていない
+(0,-50), (39.52847,0), 
+(0,-50),
+(0,-50), (-39.52847,0),
+
+pointAry:
+(0,-50), (126.4911,110), (-126.4911,110),
+(0,30), (39.52847,0), (-39.52847,0), 
+
+//
+y = 0.005 x ^ 2 + 30
+y = 1.264911 x - 50
+y = -1.264911 x - 50
+Main pointList:
+(0,-50), (126.4911,110), (-126.4911,110),
+
+pointList:
+(0,-50), (126.4911,110), (-126.4911,110), 
+(0,30), (0,30),
+(126.4911,110), (-126.4911,110),          // ２次関数と接線の交点も算出
+(0,-50), (39.52847,0), 
+(0,-50), 
+(0,-50), (-39.52847,0),
+
+pointAry:
+(0,-50), (126.4911,110), (-126.4911,110),
+(0,30), 
+(126.4911,110), (-126.4911,110), 
+(39.52847,0), (-39.52847,0), 
+ 
+ */

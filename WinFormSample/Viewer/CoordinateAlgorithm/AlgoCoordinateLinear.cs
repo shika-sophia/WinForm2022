@@ -105,6 +105,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             {
                 for(int j = i; j < eqAry.Length; j++)
                 {
+                    
                     if(j == i) { continue; }
 
                     bool existSolution = TrySolution(

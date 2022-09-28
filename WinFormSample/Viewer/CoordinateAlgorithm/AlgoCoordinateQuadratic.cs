@@ -114,16 +114,16 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 }//for j
             }//for i
 
-            //Console.WriteLine("\n\npointList:");
-            //pointList.ForEach(pt => { Console.Write($"({pt.X},{pt.Y}), "); });
+            Console.WriteLine("\n\npointList:");
+            pointList.ForEach(pt => { Console.Write($"({pt.X},{pt.Y}), "); });
 
             //---- Remove at overlapped point as object ----
             PointF[] pointAry = pointList.Select(pt => pt)
                 .Distinct()
                 .ToArray();
 
-            //Console.WriteLine("\n\npointAry:");
-            //foreach (PointF pt in pointAry) { Console.Write($"({pt.X},{pt.Y}), "); }
+            Console.WriteLine("\n\npointAry:");
+            foreach (PointF pt in pointAry) { Console.Write($"({pt.X},{pt.Y}), "); }
 
             //---- Draw ----
             DrawMultiPointLine(pointAry);
@@ -322,7 +322,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         protected int AlgoJudge(
             decimal a, decimal b, decimal c, out decimal judge)
-        {   // 判別式 D = b ^ 2 - 4 a c
+        {   // 判別式 D = b ^ 2 - 4 a c  ※Math.Roundの理由 =>〔AlgoCoordinateDifferentiate.cs〕
             judge = Math.Round(b * b - 4M * a * c, 4);
 
             int solutionNum = 0;
@@ -336,112 +336,3 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
     }//class
 }
 
-/*
-//【考察】下記 Teat Print の計算誤差は なぜ起こるのか
-３種類の２次方程式の解法による計算誤差だろうか
-y = a x ^ 2 + b x + c  ..①
-y = a (x - p) ^ 2 + q  ..②
-y = f'(a) (x - a) + f'(a)  ..③
-① = ② は AlgoParabolaFunctionXtoY()で確認
-
-数学的には どれも同じ結果になるはずだが、
-接線の y切片 -50 と -49.99998 が 他の値に影響を及ぼしている。
-判別式 で 重解 (D = 0)となるはずが、-50 -> 虚数解 (D < 0) | -49.99998 -> ２解 (D > 0)となる。
-
-decimalで計算しているので、float, doubleの２進数計算の誤差とは考えにくい。
-decimal -> float 型変換時の Math.Round() 丸め(=四捨五入)の誤差と思われる。
-
-=> 判別式 judgeのみ Math.Round(judge, 4)を行い、微細な差異を同一視すると解決
-   (decimal -> float 全てに Math.Round()すると、更に不正確な値になるので、変更せず)
-
-//#### Test Print ####
-//==== FormTangentQuadViewer ====
-eqList.ForEach(eq => { Console.WriteLine(eq); } );
-
-Console.WriteLine("Main pointList:");
-pointList.ForEach(pt => { Console.Write($"({pt.X},{pt.Y}), "); });
-
-Console.WriteLine("\n\ncontactAry:");
-foreach (PointF pt in contactAry) { Console.Write($"({pt.X},{pt.Y}), "); }
-
-//==== DrawMultiQuadraticFunction() ====
-//---- Remove at overlapped point as object ----
-Console.WriteLine("pointList:");
-pointList.ForEach(pt => { Console.Write($"({pt.X},{pt.Y}), "); });
-
-PointF[] pointAry = pointList.Select(pt => pt)
-    .Distinct()
-    .ToArray();
-
-Console.WriteLine("\n\npointAry:");
-foreach (PointF pt in pointAry) { Console.Write($"({pt.X},{pt.Y}), "); }
-
-//#### Resault Print ####
-y = 0.005 x ^ 2 + 30         // xの１次係数 eqQuad.B == 0 になっているのは b = -2ap なのでＯＫ
-y = 1.264911 x - 49.99998    // b == 0 だと slopeが 接点の x座標になる
-y = -1.264911 x - 49.99998   // 
-
-Main pointList:
-(0,-50), (126.4911,110), (-126.4911,110),
-
-pointList:
-(0,-50), (126.4911,110), (-126.4911,110), (0,30), (0,30),   // (0, 30)の重複は y切片と ２次関数の頂点なのでＯＫ
-(126.5399,110.0617), (126.4423,109.9383),          // ２次関数と接線の交点が重解ではなく、２点になっている
-(-126.4423,109.9383), (-126.5399,110.0617), 
-(0,-49.99998), (39.52846,0),                       // y切片, x切片
-(0,-49.99998),                                     // ２直線の交点 = 所与の値(0, -50)に計算誤差
-(0,-49.99998),(-39.52846,0),                       // y切片, x切片
-
-pointAry:
-(0,-50), (126.4911,110), (-126.4911,110), (0,30),  // (0, 30)の重複は 別オブジェクトでも (x, y)の値が同じだと、Distinct()で重複解消される
-(126.5399,110.0617), (126.4423,109.9383),          
-(-126.4423,109.9383), (-126.5399,110.0617),
-(0,-49.99998), (39.52846,0), 
-(0,-49.99998),                                     // ここの(0,-49.99998)は重複解消しているが、上の点とは重複
-(-39.52846,0),
-
-//==== AlgoCoordinateDifferenciate.AlgoTangentLineFree() ====
-tangentLineAry[i] = 
-    new EquationLinear(slope, contactPoint) ->  new EquationLinear(slope, pt);
-
-y = 0.005 x ^ 2 + 30
-y = 1.264911 x - 50
-y = -1.264911 x - 50
-
-Main pointList:
-(0,-50), (126.4911,110), (-126.4911,110),
-
-pointList:
-(0,-50), (126.4911,110), (-126.4911,110), 
-(0,30), (0,30), 
-                         // ２次関数と接線の交点が 虚数解となり算出されていない
-(0,-50), (39.52847,0), 
-(0,-50),
-(0,-50), (-39.52847,0),
-
-pointAry:
-(0,-50), (126.4911,110), (-126.4911,110),
-(0,30), (39.52847,0), (-39.52847,0), 
-
-//
-y = 0.005 x ^ 2 + 30
-y = 1.264911 x - 50
-y = -1.264911 x - 50
-Main pointList:
-(0,-50), (126.4911,110), (-126.4911,110),
-
-pointList:
-(0,-50), (126.4911,110), (-126.4911,110), 
-(0,30), (0,30),
-(126.4911,110), (-126.4911,110),          // ２次関数と接線の交点も算出
-(0,-50), (39.52847,0), 
-(0,-50), 
-(0,-50), (-39.52847,0),
-
-pointAry:
-(0,-50), (126.4911,110), (-126.4911,110),
-(0,30), 
-(126.4911,110), (-126.4911,110), 
-(39.52847,0), (-39.52847,0), 
- 
- */

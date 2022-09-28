@@ -24,13 +24,13 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
     abstract class AbsAlgoCoordinate
     {
         protected readonly PictureBox pic;
-        protected readonly Graphics g;
         protected readonly Pen penBlue = new Pen(Color.CornflowerBlue, 1);
         protected readonly Pen penPink = new Pen(Color.HotPink, 2);
         protected readonly Font font = new Font("ＭＳ 明朝", 12, FontStyle.Bold);
         protected readonly Font fontSmall = new Font("ＭＳ 明朝", 8, FontStyle.Regular);
         protected readonly PointF centerPoint;
         protected readonly decimal ratioWidthHeight;
+        protected Graphics g;
         protected GraphicsState defaultGrapics;
         protected decimal scaleRate = 2.0M;
 
@@ -43,25 +43,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             ratioWidthHeight =
                 (decimal)pic.ClientSize.Width /
                 (decimal)pic.ClientSize.Height;
-            g = BuildGraphics();
         }//constructor
 
-        private Graphics BuildGraphics()
-        {
-            Bitmap bitmap = new Bitmap(
-                pic.ClientSize.Width,
-                pic.ClientSize.Height);
-            Graphics g = Graphics.FromImage(bitmap);
-            g.SmoothingMode = SmoothingMode.HighQuality;
-
-            Matrix mx = new Matrix();
-            mx.Translate(centerPoint.X, centerPoint.Y);
-            mx.Scale(0.96f, 0.96f);  //fixed
-            g.Transform = mx;
-            pic.Image = bitmap;
-
-            defaultGrapics = g.Save();
-            return g;
-        }//BuildGraphics()
     }//class
 }

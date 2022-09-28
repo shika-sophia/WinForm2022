@@ -67,7 +67,28 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 {
     class AlgoCoordinateAxis : AbsAlgoCoordinate
     {
-        public AlgoCoordinateAxis(PictureBox pic) : base(pic) { }
+        public AlgoCoordinateAxis(PictureBox pic) : base(pic)
+        {
+            g = BuildGraphics();
+        }
+
+        private Graphics BuildGraphics()
+        {
+            Bitmap bitmap = new Bitmap(
+                pic.ClientSize.Width,
+                pic.ClientSize.Height);
+            Graphics g = Graphics.FromImage(bitmap);
+            g.SmoothingMode = SmoothingMode.HighQuality;
+
+            Matrix mx = new Matrix();
+            mx.Translate(centerPoint.X, centerPoint.Y);
+            mx.Scale(0.96f, 0.96f);  //fixed
+            g.Transform = mx;
+            pic.Image = bitmap;
+
+            defaultGrapics = g.Save();
+            return g;
+        }//BuildGraphics()
 
         public void DrawCoordinateAxis()
         {

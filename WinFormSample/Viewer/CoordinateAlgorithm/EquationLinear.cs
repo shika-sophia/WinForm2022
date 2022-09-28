@@ -26,7 +26,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         private float CalcIntercept(float slope, PointF pt)
         {
             // y = a x + b
-            // b = y - a x
+            // b = y - a x 
             return (float)((decimal)pt.Y - (decimal)slope * (decimal)pt.X);
         }
 
