@@ -83,7 +83,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             //eqList.Add(eqLinear);
 
             //---- 任意の点 PointF(x, y)を通る接線 ----
-            float ptX = 20f;
+            float ptX = 0f;
             float ptY = -50f;
             PointF givenPoint = new PointF(ptX, ptY);
             pointList.Add(givenPoint);
@@ -94,10 +94,10 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             eqList.AddRange(tangentLineAry);
             pointList.AddRange(contactAry);
 
-            //eqList.ForEach(eq => { Console.WriteLine(eq); } );
-            //Console.WriteLine("Main pointList:");
-            //pointList.ForEach(pt => { Console.Write($"({pt.X},{pt.Y}), "); });
-            
+            eqList.ForEach(eq => { Console.WriteLine(eq); });
+            Console.WriteLine("\nMain pointList:");
+            pointList.ForEach(pt => { Console.Write($"({pt.X},{pt.Y}), "); });
+
             diff.DrawMultiQuadraticFunction(eqList.ToArray(), pointList.ToArray());
             
             this.Controls.AddRange(new Control[]
