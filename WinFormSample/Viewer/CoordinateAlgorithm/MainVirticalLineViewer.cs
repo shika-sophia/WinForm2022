@@ -65,8 +65,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             diff = new AlgoCoordinateDifferentiate(pic);
             diff.DrawCoordinateAxis();
 
-            var originLine = new EquationLinear(float.PositiveInfinity, 20f);
-            var virticalLine = diff.AlgoVirticalLine(originLine, new PointF(20f, 40f));
+            var originLine = new EquationLinear(2f, -150f);
+            var virticalLine = diff.AlgoVirticalLine(originLine, new PointF(100f, 100f));
 
             diff.DrawMultiQuadraticFunction(
                 new ICoordinateEquation[] { originLine, virticalLine });
