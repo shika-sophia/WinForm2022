@@ -94,10 +94,6 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             eqList.AddRange(tangentLineAry);
             pointList.AddRange(contactAry);
 
-            eqList.ForEach(eq => { Console.WriteLine(eq); });
-            Console.WriteLine("\nMain pointList:");
-            pointList.ForEach(pt => { Console.Write($"({pt.X},{pt.Y}), "); });
-
             diff.DrawMultiQuadraticFunction(eqList.ToArray(), pointList.ToArray());
             
             this.Controls.AddRange(new Control[]
