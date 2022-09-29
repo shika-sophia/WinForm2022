@@ -218,8 +218,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 if(float.IsNaN(pt.X)) { continue; }
 
                 decimal lager = Math.Max(
-                    Math.Abs((decimal)pt.X),  
-                    Math.Abs((decimal)pt.Y * ratioWidthHeight)); 
+                    Math.Abs((decimal)pt.X * ratioWidthHeight),  
+                    Math.Abs((decimal)pt.Y)); 
 
                 if(max < lager)
                 {

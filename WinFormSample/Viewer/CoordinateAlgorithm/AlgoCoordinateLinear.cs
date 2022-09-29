@@ -128,29 +128,22 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             }
         }//DrawMultiLinearFunciton()
 
-        public void DrawLinearFunction(EquationLinear equLinear)
+        public void DrawLinearFunction(EquationLinear eqLinear)
         {
-            DrawLinearFunction(equLinear.Slope, equLinear.Intercept);
-        }//DrawLinearFunction(EquationLinear)
+            float slope = eqLinear.Slope;
+            float intercept = eqLinear.Intercept;
+            //Console.WriteLine($"slope = {slope}, intercept = {intercept}");
 
-        public void DrawLinearFunction(PointF pt1, PointF pt2)
-        {
-            (float slope, float intercept) = AlgoLinearParam(pt1, pt2);
-            DrawLinearFunction(slope, intercept);
-        }//DrawLinearFunction(PointF, PointF)
-
-        public void DrawLinearFunction(float slope, float intercept)
-        {
-            if(float.IsInfinity(slope))  // x = c (Virtical)
+            if (float.IsInfinity(slope))  // x = c (Virtical)
             {
                 g.DrawLine(penPink,
                     (float)((decimal)intercept * scaleRate),
                     (float)((decimal)-centerPoint.Y * scaleRate),
                     (float)((decimal)intercept * scaleRate),
-                    (float)((decimal)-centerPoint.Y * scaleRate));
-                g.DrawString($"x = {intercept}", font, penPink.Brush, 
-                    (float)((decimal)intercept * scaleRate + 10M),
-                    (float)((decimal)-centerPoint.Y * scaleRate + 20M));
+                    (float)((decimal)centerPoint.Y * scaleRate));
+         
+                g.DrawString($"x = {intercept}", font, penPink.Brush,
+                    (float)((decimal)intercept * scaleRate + 5M), 20f);
                 return;
             }
 
@@ -161,29 +154,61 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                     (float)((decimal)-intercept * scaleRate),
                     (float)((decimal)centerPoint.X * scaleRate),
                     (float)((decimal)-intercept * scaleRate));
-                g.DrawString($"y = {intercept}", font, penPink.Brush, 
-                    (float)((decimal)centerPoint.X * scaleRate - 70M),
+
+                SizeF textSizeHorizontal = g.MeasureString(eqLinear.Text, font);
+                g.DrawString($"y = {intercept}", font, penPink.Brush,
+                    -textSizeHorizontal.Width - 5f,
                     (float)((decimal)-intercept * scaleRate + 10M));
+                return;
+            }
+
+            //---- y = a x + b ----
+            float minX, minY, maxX, maxY;
+            PointF textLocation = new PointF(0, 0);
+            SizeF textSize = g.MeasureString(eqLinear.Text, font);
+
+            if (Math.Abs(ratioWidthHeight) < Math.Abs((decimal)slope))
+            {   // 傾きが急で、y切片 0 のとき、y座標の境界が直線の端になる
+                minY = (float)((decimal)-centerPoint.Y / scaleRate);
+                minX = AlgoLinearFunctionYtoX(minY, slope, intercept);
+                maxY = (float)((decimal)centerPoint.Y / scaleRate);
+                maxX = AlgoLinearFunctionYtoX(maxY, slope, intercept);
+
+                textLocation.X = (float)((decimal)((slope > 0) ?
+                    minX + 10f : minX - textSize.Width - 5f) * scaleRate);
+                textLocation.Y = (float)((decimal)-(minY + 20f) * scaleRate);
             }
             else
-            {
-                float minY = (float)((decimal)-centerPoint.Y / scaleRate);
-                float minX = LinearFunctionYtoX(minY, slope, intercept);
-                float maxY = (float)((decimal)centerPoint.Y / scaleRate);
-                float maxX = LinearFunctionYtoX(maxY, slope, intercept);
+            {   // 傾きが緩やかで、y切片 0 のとき、x座標の境界が直線の端になる
+                minX = (float)((decimal)-centerPoint.X / scaleRate);
+                minY = AlgoLinearFunctionXtoY(minX, slope, intercept);
+                maxX = (float)((decimal)centerPoint.X / scaleRate);
+                maxY = AlgoLinearFunctionXtoY(maxX, slope, intercept);
 
-                g.DrawLine(penPink, 
-                    (float)((decimal)minX * scaleRate),
-                    (float)((decimal)-minY * scaleRate),   //Y座標を反転
-                    (float)((decimal)maxX * scaleRate),
-                    (float)((decimal)-maxY * scaleRate));  //Y座標を反転
-                
-                string equationStr = $"y = {slope} x + {intercept}";  
-                float labelY = slope > 0 ? minY : maxY;
-                g.DrawString(equationStr, font, penPink.Brush,
-                    (float)((decimal)LinearFunctionYtoX(labelY, slope, intercept) * scaleRate + 20M), 
-                    (float)((decimal)-labelY * scaleRate + (slope > 0 ? -20M : +10M)));
-            }           
+                textLocation.X = (float)((decimal)(maxX - textSize.Width - 20f) * scaleRate);
+                textLocation.Y = (float)((decimal)((slope > 0) ?
+                    -(maxY + textSize.Height) : -maxY) * scaleRate);
+            }
+            
+            //---- Draw ----
+            g.DrawLine(penPink,
+                (float)((decimal)minX * scaleRate),
+                (float)((decimal)-minY * scaleRate),   //Y座標を反転
+                (float)((decimal)maxX * scaleRate),
+                (float)((decimal)-maxY * scaleRate));  //Y座標を反転
+
+            g.DrawString(eqLinear.Text, font, penPink.Brush, textLocation);
+        }//DrawLinearFunction(EquationLinear)
+
+        public void DrawLinearFunction(PointF pt1, PointF pt2)
+        {
+            (float slope, float intercept) = AlgoLinearParam(pt1, pt2);
+            DrawLinearFunction(new EquationLinear(slope, intercept));
+        }//DrawLinearFunction(PointF, PointF)
+
+        public void DrawLinearFunction(float slope, float intercept)
+        {
+            DrawLinearFunction(new EquationLinear(slope, intercept));
         }//DrawLinearFunction(float, float)
 
         public PointF AlgoInterceptY(EquationLinear eqLinear)
@@ -254,7 +279,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         protected float AlgoFunctionYtoX(float y, EquationLinear eqLinear)
         {
-            return LinearFunctionYtoX(y, eqLinear.Slope, eqLinear.Intercept);
+            return AlgoLinearFunctionYtoX(y, eqLinear.Slope, eqLinear.Intercept);
         }
 
         private float AlgoLinearFunctionXtoY(float x, float slope, float intercept)
@@ -264,7 +289,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         }//AlgoLinearFunction(x) -> y
 
 
-        private float LinearFunctionYtoX(float y, float slope, float intercept)
+        private float AlgoLinearFunctionYtoX(float y, float slope, float intercept)
         {
             float x;
             if (float.IsInfinity(slope))  // x = c
@@ -282,7 +307,18 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             return x;
         }//AlgoLinearFunction(y) -> x
-      
+
+        public bool TrySolution(
+            EquationLinear eqLinear1, EquationLinear eqLinear2, out PointF solutionPoint)
+        {
+            bool existSolution = TrySolution(
+                eqLinear1.Slope, eqLinear1.Intercept,
+                eqLinear2.Slope, eqLinear2.Intercept,
+                out PointF solution);
+            solutionPoint = solution;
+            return existSolution;
+        }//TrySolution()
+
         public bool TrySolution(
             float slope1, float intercept1,
             float slope2, float intercept2, out PointF solution)
@@ -314,7 +350,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             if (slope1 == 0)  // y = b | y = c x + d
             {
                 solution.Y = intercept1;
-                solution.X = LinearFunctionYtoX(
+                solution.X = AlgoLinearFunctionYtoX(
                     solution.Y, slope2, intercept2);
                 return true;
             }
@@ -322,7 +358,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             if (slope2 == 0)  // y = a x + b | y = d
             {
                 solution.Y = intercept2;
-                solution.X = LinearFunctionYtoX(
+                solution.X = AlgoLinearFunctionYtoX(
                     solution.Y, slope1, intercept1);
                 return true;
             }

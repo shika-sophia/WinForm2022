@@ -85,6 +85,12 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         public void DrawMultiQuadraticFunction(
             ICoordinateEquation[] eqAry, params PointF[] pointAryArgs)
         {
+            //---- Test Print ----
+            Console.WriteLine("Equation Array:");
+            foreach (var eq in eqAry) { Console.WriteLine(eq); };
+            Console.WriteLine("\nArgument pointAry:");
+            foreach(var pt in pointAryArgs) { Console.Write($"({pt.X},{pt.Y}), "); }
+
             //---- pointList ----
             List<PointF> pointList = new List<PointF>(pointAryArgs);
             for (int i = 0; i < eqAry.Length; i++)                
@@ -114,16 +120,20 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 }//for j
             }//for i
 
-            Console.WriteLine("\n\npointList:");
+            //---- Test Print before Distinct() ----
+            Console.WriteLine("\n\npointList before Distinct():");
             pointList.ForEach(pt => { Console.Write($"({pt.X},{pt.Y}), "); });
 
-            //---- Remove at overlapped point as object ----
+            //---- Remove overlapped point and NaN ----
             PointF[] pointAry = pointList.Select(pt => pt)
+                .Where(pt => !float.IsNaN(pt.X) || !float.IsNaN(pt.Y))
                 .Distinct()
                 .ToArray();
 
-            Console.WriteLine("\n\npointAry:");
+            //---- Test Print after Distinct() ----
+            Console.WriteLine("\n\npointAry after Distinct():");
             foreach (PointF pt in pointAry) { Console.Write($"({pt.X},{pt.Y}), "); }
+            Console.WriteLine("\n");
 
             //---- Draw ----
             DrawMultiPointLine(pointAry);
@@ -132,10 +142,12 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             {
                 if(eq is EquationQuadratic)
                 {
+                    Console.WriteLine($"DrawParabolaFunction({eq})");
                     DrawParabolaFunction(eq as EquationQuadratic);
                 }
                 else if (eq is EquationLinear)
                 {
+                    Console.WriteLine($"DrawLinearFunction({eq})");
                     DrawLinearFunction(eq as EquationLinear);
                 }
             }//foreach
@@ -252,9 +264,32 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         public bool TrySolutionQuad(
             ICoordinateEquation eq1, ICoordinateEquation eq2, out PointF[] solutionAry)
         {   
+            //---- GetGeneralParam() ---- by Polymorphism
             (decimal eq1A, decimal eq1B, decimal eq1C) = eq1.GetGeneralParam();
             (decimal eq2A, decimal eq2B, decimal eq2C) = eq2.GetGeneralParam();
 
+            //---- solution with x = c  ----
+            if(eq1B == Decimal.MaxValue && eq2B == Decimal.MaxValue)  // x = c && x = d
+            {
+                solutionAry = new PointF[0];
+                return false;
+            }
+            else if (eq1B == Decimal.MaxValue)
+            {
+                float solutionX = (float)eq1C;
+                float solutionY = AlgoFunctionXtoY(solutionX, eq2);
+                solutionAry = new PointF[] { new PointF(solutionX, solutionY) };
+                return true;
+            }
+            else if (eq2B == Decimal.MaxValue)
+            {
+                float solutionX = (float)eq2C;
+                float solutionY = AlgoFunctionXtoY(solutionX, eq1);
+                solutionAry = new PointF[] { new PointF(solutionX, solutionY) };
+                return true;
+            }
+
+            //---- Quaratic Simultaneous Equations / Solution Formula ---- ２次連立方程式, 解の公式
             decimal subA = eq1A - eq2A;
             decimal subB = eq1B - eq2B;
             decimal subC = eq1C - eq2C;

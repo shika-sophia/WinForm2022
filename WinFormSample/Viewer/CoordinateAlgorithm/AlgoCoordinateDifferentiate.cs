@@ -178,21 +178,33 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         public EquationLinear AlgoVirticalLine(EquationLinear eqLinear, PointF pt)
         {
+            EquationLinear virticalLine;
             if (float.IsInfinity(eqLinear.Slope))  //x = c  ->  y = b
             {
-                return new EquationLinear(0, pt.Y);
+                virticalLine = new EquationLinear(slope: 0f, intercept: pt.Y);
             }
-
-            if (eqLinear.Slope == 0f)  // y = b  -> x = c
+            else if (eqLinear.Slope == 0f)  // y = b  -> x = c
             {
-                return new EquationLinear(float.PositiveInfinity, pt.X);
+                virticalLine = new EquationLinear(
+                    slope: float.PositiveInfinity, intercept: pt.X);
+            }
+            else
+            {
+                // 垂直条件 virtical condition: a c = -1  when y = a x + b | y = c x + d  
+                float slope = (float)(-1M / (decimal)eqLinear.Slope);
+             
+                virticalLine = new EquationLinear(slope, pt);
             }
 
-            // 垂直条件 virtical condition: a c = -1  when y = a x + b | y = c x + d  
-            float slope = (float)(-1M / (decimal)eqLinear.Slope);
-             
-            return new EquationLinear(slope, pt);
+            DrawVirticalMark(eqLinear, virticalLine);
+            return virticalLine;
         }//AlgoVirticalLine()
+
+        protected void DrawVirticalMark(EquationLinear eqLinear, EquationLinear virticalLine)
+        {
+            TrySolution(eqLinear, virticalLine, out PointF solutionPoint);
+            // (editing...)
+        }//DrawVirticalMark()
 
         public decimal AlgoDistance(PointF pt1, PointF pt2)
         {
@@ -202,6 +214,14 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             return (decimal)Math.Sqrt((double)(dx * dx + dy * dy));
         }//AlgoDistance()
+
+        public PointF AlgoDistanceOnLinePoint(
+            decimal distance, bool pulsX, PointF startPoint, EquationLinear eqLinear)
+        {
+            // EquationCircle:  (x - p) ^ 2 + (y - q) ^ 2 = r ^ 2
+            // EquationLinear:  y = a x + b
+            return new PointF(0, 0);
+        }//AlgoDistanceOnLinePoint()
     }//class
 }
 

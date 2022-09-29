@@ -41,8 +41,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 (float)((decimal)pic.ClientSize.Width / 2M),
                 (float)((decimal)pic.ClientSize.Height / 2M));
             ratioWidthHeight =
-                (decimal)pic.ClientSize.Width /
-                (decimal)pic.ClientSize.Height;
+                (decimal)pic.ClientSize.Height /
+                (decimal)pic.ClientSize.Width;
         }//constructor
 
     }//class

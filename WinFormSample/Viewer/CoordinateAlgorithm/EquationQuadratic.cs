@@ -25,7 +25,13 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         public string Text { get; set; }
 
         public EquationQuadratic(float quadCoefficient, PointF vertex)
-        {   // y = a (x - p) ^ 2 + q
+        {   
+            if(quadCoefficient == 0) 
+            {
+                throw new ArgumentException("Quadratic should not be 'quadCoefficient == 0' ");
+            }
+
+            // y = a (x - p) ^ 2 + q
             this.QuadCoefficient = quadCoefficient;
             this.Vertex = vertex;
 
@@ -38,7 +44,13 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         }
 
         public EquationQuadratic(decimal a, decimal b, decimal c)
-        {   // y = a x ^ 2 + b x + c
+        {
+            if (a == 0M)
+            {
+                throw new ArgumentException("Quadratic should not be 'a == 0' ");
+            }
+
+            // y = a x ^ 2 + b x + c
             this.QuadCoefficient = (float)a;
             this.Vertex = BuildQuad(a, b, c);
             this.A = a;
@@ -49,9 +61,10 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         private (decimal a, decimal b, decimal c) BuildGeneral(float quadCoefficient, PointF vertex)
         {  // y = a (x - p) ^ 2 + q を展開して y = a x ^ 2 + b x + c 
-            if(float.IsNaN(vertex.X) || float.IsNaN(vertex.Y))
+            if( float.IsInfinity(Vertex.X) || float.IsInfinity(vertex.Y) ||
+                float.IsNaN(vertex.X) || float.IsNaN(vertex.Y))
             {
-                throw new ArgumentException();
+                throw new ArgumentException("Vertex should not be Infinity or NaN");
             }
             
             decimal a = (decimal)quadCoefficient;
@@ -64,15 +77,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         private PointF BuildQuad(decimal a, decimal b, decimal c)
         {   // y = a x ^ 2 + b x + c から 平方完成 y = a (x - p) ^ 2 + q
-            
-            PointF pt = new PointF(float.NaN, float.NaN);
-            
-            if (a == 0)
-            { // y = b x + c, y = c, x = c
-                return pt;
-            }
-
-            float vertexX = (float)(-b / (2M * a));                        // p = -b / 2a
+            float vertexX = (float)(-b / (2M * a));                    // p = -b / 2a
             float vertexY = (float)(-(b * b - 4M * a * c) / (4M * a)); // q = -(b ^ 2 - 4ac) / 4a
 
             return new PointF(vertexX, vertexY);
@@ -115,6 +120,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return Text;
         }//ToString()
 
+        //【Deprecated】非推奨 Quadratic should not contain Linear, because of readablility. 
+        // 非推奨: 型変換は可能だが可読性の観点から避けるべき 
         public EquationLinear ToLinear()
         {
             return new EquationLinear((float)this.B, (float)this.C);
