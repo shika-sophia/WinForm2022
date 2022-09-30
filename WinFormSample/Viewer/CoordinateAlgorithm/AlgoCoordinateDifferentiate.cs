@@ -80,6 +80,28 @@
  *         
  *         decimal  AlgoDistance(PointF pt1, PointF pt2)
  *
+ *@subject 直線上の点の距離
+ *         AlgoDistanceOnLinePoint(
+ *              decimal distance, bool pulsX, PointF startPoint, EquationLinear eqLinear)
+ *         
+ *        【三角比の公式】Triangular ratio Formula: 
+ *         三角比の定義より、tanθ = sinθ / cosθ
+ *         三平方の定理より、cos^2 θ + sin^2 θ = 1
+ *         両式の連立により、tan^2 θ + 1 = 1 / cos^2 θ
+ *         
+ *         これらの公式により、cosθ, sinθ, tanθ のいずれかの値がわかると、
+ *         他のすべての値を求めることができる。
+ *          =>〔三角比 | FigureAlgorithm\MainMultiAngleViewer.cs〕
+ *         
+ *@subject tanθ = dy / dx = 傾き slope (直線の式から値がわかる)。
+ *         斜辺の長さ distanceは所与 (引数で与えられる)
+ *         求める点の座標 (x, y) = (distance * cosθ, distance * sinθ)
+ *         点 (p, q)からの点は (p + distance * cosθ, Q + distance * sinθ)
+ *         上記の公式より、cosθ = √ (1 / tan^2 θ)
+ *         
+ *         【NOTE】公式のままだと角度が x反転？ 180°回転？する問題。(y反転は仕様上必要なのでＯＫ)
+ *          => slope < 0 のときは　tanθ = slopeになるのか？
+ *          
  *@see MainTangentQuadViewer.cs
  *@author shika
  *@date 2022-09-26
@@ -202,8 +224,30 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         protected void DrawVirticalMark(EquationLinear eqLinear, EquationLinear virticalLine)
         {
+            if(eqLinear.Slope * virticalLine.Slope != -1)
+            {
+                throw new ArgumentException("2 lines are not virtical.");
+            }
+
             TrySolution(eqLinear, virticalLine, out PointF solutionPoint);
-            // (editing...)
+
+            PointF pt1 = AlgoDistanceOnLinePoint(10M, solutionPoint, eqLinear);
+            PointF pt3 = AlgoDistanceOnLinePoint(10M, solutionPoint, virticalLine);
+
+            EquationLinear eq1Parallel = new EquationLinear(eqLinear.Slope, pt1);
+            EquationLinear eq2Parallel = new EquationLinear(virticalLine.Slope, pt3);
+            TrySolution(eq1Parallel, eq2Parallel, out PointF pt2);
+
+            g.DrawLine(penPink,
+                (float)((decimal)pt1.X * scaleRate),
+                (float)((decimal)pt1.Y * scaleRate),
+                (float)((decimal)pt2.X * scaleRate),
+                (float)((decimal)pt2.Y * scaleRate));
+            g.DrawLine(penPink,
+                (float)((decimal)pt2.X * scaleRate),
+                (float)((decimal)pt2.Y * scaleRate),
+                (float)((decimal)pt3.X * scaleRate),
+                (float)((decimal)pt3.Y * scaleRate));
         }//DrawVirticalMark()
 
         public decimal AlgoDistance(PointF pt1, PointF pt2)
@@ -216,11 +260,33 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         }//AlgoDistance()
 
         public PointF AlgoDistanceOnLinePoint(
-            decimal distance, bool pulsX, PointF startPoint, EquationLinear eqLinear)
+            decimal distance, PointF startPoint, EquationLinear eqLinear)
         {
-            // EquationCircle:  (x - p) ^ 2 + (y - q) ^ 2 = r ^ 2
-            // EquationLinear:  y = a x + b
-            return new PointF(0, 0);
+            PointF pt = new PointF(0, 0);
+            float slope = eqLinear.Slope;
+
+            if (float.IsInfinity(slope))  // x = c
+            {
+                pt.X = startPoint.X;
+                pt.Y = (float)((decimal)startPoint.Y + distance);
+            }
+            else if (slope == 0)  // y = b
+            {
+                pt.X = (float)((decimal)startPoint.X + distance);
+                pt.Y = startPoint.Y;
+            }
+            else
+            {
+                //点(p, q)からの点は(p + distance * cosθ, q + distance * sinθ)
+                //上記の公式より、cosθ = √ (1 / tan ^ 2 θ + 1) | tanθ = slope 
+                // tan ^ 2 θ > 0なので、 tan ^ 2 θ + 1 != 0
+                decimal cos = (decimal)Math.Sqrt(
+                    (double)(1M / ((decimal)slope * (decimal)slope + 1M)));
+                pt.X = (float)((decimal)startPoint.X + distance * cos);
+                pt.Y = AlgoFunctionXtoY(pt.X, eqLinear);
+            }
+
+            return pt;
         }//AlgoDistanceOnLinePoint()
     }//class
 }

@@ -137,6 +137,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             //---- Draw ----
             DrawMultiPointLine(pointAry);
+            Console.WriteLine($"scaleRate = {scaleRate}");
 
             foreach (ICoordinateEquation eq in eqAry)
             {

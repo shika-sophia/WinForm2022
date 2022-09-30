@@ -185,7 +185,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 maxX = (float)((decimal)centerPoint.X / scaleRate);
                 maxY = AlgoLinearFunctionXtoY(maxX, slope, intercept);
 
-                textLocation.X = (float)((decimal)(maxX - textSize.Width - 20f) * scaleRate);
+                textLocation.X = (float)((decimal)maxX * scaleRate - (decimal)textSize.Width- 5M);
                 textLocation.Y = (float)((decimal)((slope > 0) ?
                     -(maxY + textSize.Height) : -maxY) * scaleRate);
             }
