@@ -94,11 +94,13 @@
  *        : 
  *        :
  *        
- *@subject【公式】Formula: これらの公式により、cosθ, sinθ, tanθ のいずれかの値がわかると、
- *         他のすべての値を求めることができる。
+ *@subject【公式】Formula: 
  *         三角比の定義より、tanθ = sinθ / cosθ
  *         三平方の定理より、cos^2 θ + sin^2 θ = 1
  *         両式の連立により、tan^2 θ = 1 / cos^2 θ
+ *         
+ *         これらの公式により、cosθ, sinθ, tanθ のいずれかの値がわかると、
+ *         他のすべての値を求めることができる。
  *         =>〔CoordinateAlgorithm/AlgoCoordinateDifferenciate.AlgoDiatanceOnLine()〕
  *         
  *@see ImageMultiAngleViewer.jpg
