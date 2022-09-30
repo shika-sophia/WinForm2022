@@ -93,9 +93,16 @@
  *              point2 は 中心点より X座標　左方(-), Y座標 radiusの半分だけ 下方(+)
  *        : 
  *        :
- *
+ *        
+ *@subject【公式】Formula: これらの公式により、cosθ, sinθ, tanθ のいずれかの値がわかると、
+ *         他のすべての値を求めることができる。
+ *         三角比の定義より、tanθ = sinθ / cosθ
+ *         三平方の定理より、cos^2 θ + sin^2 θ = 1
+ *         両式の連立により、tan^2 θ = 1 / cos^2 θ
+ *         =>〔CoordinateAlgorithm/AlgoCoordinateDifferenciate.AlgoDiatanceOnLine()〕
+ *         
  *@see ImageMultiAngleViewer.jpg
- *@see 
+ *@see CoordinateAlgorithm/AlgoCoordinateDifferenciate.AlgoDiatanceOnLine()
  *@author shika
  *@date 2022-09-12
  */
