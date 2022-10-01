@@ -8,7 +8,7 @@
  *           http://kaitei.net/csforms/
  *           =>〔~/Reference/Article_KaiteiNet/WinForm_.txt〕
  *           
- *@content 微分, 接線, 垂直, 距離, 漸近線に関するアルゴリズム
+ *@content 微分, 接線 に関するアルゴリズム
  *         [英] differentiate  微分する
  *         [英] tangent        接する
  *         [英] virtical       垂直な
@@ -70,38 +70,6 @@
  *        
  *@NOTE 【考察】Test Print の計算誤差は なぜ起こるのか 〔下記〕
  *
- *@subject 垂線 virtical line
- *         ・垂直条件 virtical condition: a c = -1  when y = a x + b | y = c x + d 
- *
- *           EquationLinear  AlgoVirticalLine(EquationLinear, PointF)
- *           
- *@subject 距離 distance
- *         ・三平方の定理 Three Squre Theorem:  z ^ 2 = x ^ 2 + y ^ 2 
- *         
- *         decimal  AlgoDistance(PointF pt1, PointF pt2)
- *
- *@subject 直線上の点の距離
- *         AlgoDistanceOnLinePoint(
- *              decimal distance, bool pulsX, PointF startPoint, EquationLinear eqLinear)
- *         
- *        【三角比の公式】Triangular ratio Formula: 
- *         三角比の定義より、tanθ = sinθ / cosθ
- *         三平方の定理より、cos^2 θ + sin^2 θ = 1
- *         両式の連立により、tan^2 θ + 1 = 1 / cos^2 θ
- *         
- *         これらの公式により、cosθ, sinθ, tanθ のいずれかの値がわかると、
- *         他のすべての値を求めることができる。
- *          =>〔三角比 | FigureAlgorithm\MainMultiAngleViewer.cs〕
- *         
- *@subject tanθ = dy / dx = 傾き slope (直線の式から値がわかる)。
- *         斜辺の長さ distanceは所与 (引数で与えられる)
- *         求める点の座標 (x, y) = (distance * cosθ, distance * sinθ)
- *         点 (p, q)からの点は (p + distance * cosθ, Q + distance * sinθ)
- *         上記の公式より、cosθ = √ (1 / tan^2 θ)
- *         
- *         【NOTE】公式のままだと角度が x反転？ 180°回転？する問題。(y反転は仕様上必要なのでＯＫ)
- *          => slope < 0 のときは　tanθ = slopeになるのか？
- *          
  *@see MainTangentQuadViewer.cs
  *@author shika
  *@date 2022-09-26
@@ -198,96 +166,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return (float)(2M * eqQuad.A * (decimal)x + eqQuad.B);
         }//AlgoDifferentiateQuad()
 
-        public EquationLinear AlgoVirticalLine(EquationLinear eqLinear, PointF pt)
-        {
-            EquationLinear virticalLine;
-            if (float.IsInfinity(eqLinear.Slope))  //x = c  ->  y = b
-            {
-                virticalLine = new EquationLinear(slope: 0f, intercept: pt.Y);
-            }
-            else if (eqLinear.Slope == 0f)  // y = b  -> x = c
-            {
-                virticalLine = new EquationLinear(
-                    slope: float.PositiveInfinity, intercept: pt.X);
-            }
-            else
-            {
-                // 垂直条件 virtical condition: a c = -1  when y = a x + b | y = c x + d  
-                float slope = (float)(-1M / (decimal)eqLinear.Slope);
-             
-                virticalLine = new EquationLinear(slope, pt);
-            }
-
-            DrawVirticalMark(eqLinear, virticalLine);
-            return virticalLine;
-        }//AlgoVirticalLine()
-
-        protected void DrawVirticalMark(EquationLinear eqLinear, EquationLinear virticalLine)
-        {
-            if(eqLinear.Slope * virticalLine.Slope != -1)
-            {
-                throw new ArgumentException("2 lines are not virtical.");
-            }
-
-            TrySolution(eqLinear, virticalLine, out PointF solutionPoint);
-
-            PointF pt1 = AlgoDistanceOnLinePoint(10M, solutionPoint, eqLinear);
-            PointF pt3 = AlgoDistanceOnLinePoint(10M, solutionPoint, virticalLine);
-
-            EquationLinear eq1Parallel = new EquationLinear(eqLinear.Slope, pt1);
-            EquationLinear eq2Parallel = new EquationLinear(virticalLine.Slope, pt3);
-            TrySolution(eq1Parallel, eq2Parallel, out PointF pt2);
-
-            g.DrawLine(penPink,
-                (float)((decimal)pt1.X * scaleRate),
-                (float)((decimal)pt1.Y * scaleRate),
-                (float)((decimal)pt2.X * scaleRate),
-                (float)((decimal)pt2.Y * scaleRate));
-            g.DrawLine(penPink,
-                (float)((decimal)pt2.X * scaleRate),
-                (float)((decimal)pt2.Y * scaleRate),
-                (float)((decimal)pt3.X * scaleRate),
-                (float)((decimal)pt3.Y * scaleRate));
-        }//DrawVirticalMark()
-
-        public decimal AlgoDistance(PointF pt1, PointF pt2)
-        {
-            // 三平方の定理 Three Squre Theorem:  z ^ 2 = x ^ 2 + y ^ 2 
-            decimal dx = (decimal)pt1.X - (decimal)pt2.X;
-            decimal dy = (decimal)pt1.Y - (decimal)pt2.Y;
-
-            return (decimal)Math.Sqrt((double)(dx * dx + dy * dy));
-        }//AlgoDistance()
-
-        public PointF AlgoDistanceOnLinePoint(
-            decimal distance, PointF startPoint, EquationLinear eqLinear)
-        {
-            PointF pt = new PointF(0, 0);
-            float slope = eqLinear.Slope;
-
-            if (float.IsInfinity(slope))  // x = c
-            {
-                pt.X = startPoint.X;
-                pt.Y = (float)((decimal)startPoint.Y + distance);
-            }
-            else if (slope == 0)  // y = b
-            {
-                pt.X = (float)((decimal)startPoint.X + distance);
-                pt.Y = startPoint.Y;
-            }
-            else
-            {
-                //点(p, q)からの点は(p + distance * cosθ, q + distance * sinθ)
-                //上記の公式より、cosθ = √ (1 / tan ^ 2 θ + 1) | tanθ = slope 
-                // tan ^ 2 θ > 0なので、 tan ^ 2 θ + 1 != 0
-                decimal cos = (decimal)Math.Sqrt(
-                    (double)(1M / ((decimal)slope * (decimal)slope + 1M)));
-                pt.X = (float)((decimal)startPoint.X + distance * cos);
-                pt.Y = AlgoFunctionXtoY(pt.X, eqLinear);
-            }
-
-            return pt;
-        }//AlgoDistanceOnLinePoint()
+        
     }//class
 }
 

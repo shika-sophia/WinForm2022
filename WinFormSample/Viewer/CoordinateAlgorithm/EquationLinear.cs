@@ -50,6 +50,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         private float CalcIntercept(float slope, PointF pt)
         {
+            if (float.IsInfinity(slope)) { return pt.X; } // x = c
+
             // y = a x + b
             // b = y - a x 
             return (float)((decimal)pt.Y - (decimal)slope * (decimal)pt.X);

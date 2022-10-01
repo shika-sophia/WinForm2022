@@ -71,7 +71,40 @@
  *         ・j = i から始めることで、重複を除外
  *         
  *         => 対角線の描画アルゴリズム〔FigureAlgorithm/ApplicationFigureViewer.DrawDiagonalLine()〕
+ *
+ *@subject 垂線 virtical line
+ *         ・垂直条件 virtical condition: a c = -1  when y = a x + b | y = c x + d 
+ *
+ *           EquationLinear  AlgoVirticalLine(EquationLinear, PointF)
+ *           
+ *@subject 距離 distance
+ *         ・三平方の定理 Three Squre Theorem:  z ^ 2 = x ^ 2 + y ^ 2 
  *         
+ *         decimal  AlgoDistance(PointF pt1, PointF pt2)
+ *
+ *@subject 直線上の点の距離
+ *         AlgoDistanceOnLinePoint(
+ *              decimal distance, bool pulsX, PointF startPoint, EquationLinear eqLinear)
+ *         
+ *        【三角比の公式】Triangular ratio Formula: 
+ *         三角比の定義より、tanθ = sinθ / cosθ
+ *         三平方の定理より、cos^2 θ + sin^2 θ = 1
+ *         両式の連立により、tan^2 θ + 1 = 1 / cos^2 θ
+ *         
+ *         これらの公式により、cosθ, sinθ, tanθ のいずれかの値がわかると、
+ *         他のすべての値を求めることができる。
+ *          =>〔三角比 | FigureAlgorithm\MainMultiAngleViewer.cs〕
+ *         
+ *@subject AlgoVirticleMark()
+ *         tanθ = dy / dx = 傾き slope (直線の式から値がわかる)。
+ *         斜辺の長さ distanceは所与 (引数で与えられる)
+ *         求める点の座標 (x, y) = (distance * cosθ, distance * sinθ)
+ *         点 (p, q)からの点は (p + distance * cosθ, q + distance * sinθ)
+ *         上記の公式より、cosθ = √ (1 / tan^2 θ)
+ *         
+ *        【註】平行線は、その線上の点を指定すると、同一の直線になる
+ *         傾きが同じで、直線外の点を指定して EquationLinearを作成する。
+ *          
  *@see ImageLinearFunctionViewer.jpg
  *@see MainCoordinateAxisViewer.cs
  *@see AlgoCoordinateAxis.cs
@@ -82,6 +115,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
@@ -90,9 +124,20 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
     {
         public AlgoCoordinateLinear(PictureBox pic) : base(pic) { }
 
-        public void DrawMultiLinearFunciton(EquationLinear[] eqAry)
+        public void DrawMultiLinearFunciton(
+            EquationLinear[] eqAry, params PointF[] pointAryArgs)
         {
-            List<PointF> pointList = new List<PointF>();
+            //---- Test Print ----
+            Console.WriteLine("Equation Array:");
+            foreach (var eq in eqAry) { Console.WriteLine(eq); };
+            Console.WriteLine("\nArgument pointAry:");
+            foreach (var pt in pointAryArgs) { Console.Write($"({pt.X},{pt.Y}), "); }
+            Console.WriteLine("\n");
+
+            //---- pointList ----
+            List<PointF> pointList = new List<PointF>(pointAryArgs);
+            List<EquationLinear> virticalLineList = new List<EquationLinear>();
+            
             foreach(EquationLinear eqLinear in eqAry)
             {
                 if (float.IsNaN(AlgoInterceptX(eqLinear).X)) { continue; }
@@ -101,30 +146,59 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 pointList.Add(AlgoInterceptY(eqLinear));
             }
 
+            //---- Simultaneous Equations 連立方程式 ----
             for (int i = 0; i < eqAry.Length; i++) 
             {
                 for(int j = i; j < eqAry.Length; j++)
                 {
-                    
                     if(j == i) { continue; }
 
                     bool existSolution = TrySolution(
-                        eqAry[i].Slope, eqAry[i].Intercept,
-                        eqAry[j].Slope, eqAry[j].Intercept,
-                        out PointF solutionPoint);
+                        eqAry[i], eqAry[j], out PointF solutionPoint);
 
-                    if (existSolution) 
+                    if (existSolution)
                     {
                         pointList.Add(solutionPoint);
                     }
+
+                    if (IsVirtical(eqAry[i], eqAry[j]))
+                    {
+                        virticalLineList.Add(eqAry[i]);
+                        virticalLineList.Add(eqAry[j]);
+                    }
+
+                    Console.WriteLine($"existSolution = {existSolution}");
+                    Console.WriteLine($"solution: ({solutionPoint.X},{solutionPoint.Y})");
+                    Console.WriteLine($"IsVirticle = {IsVirtical(eqAry[i],eqAry[j])}");
                 }//for j
             }//for i
-            
+
+            //---- Test Print before Distinct() ----
+            Console.WriteLine("\n\npointList before Distinct():");
+            pointList.ForEach(pt => { Console.Write($"({pt.X},{pt.Y}), "); });
+
+            //---- Remove overlapped point and NaN ----
+            PointF[] pointAry = pointList.Select(pt => pt)
+                .Where(pt => !float.IsNaN(pt.X) || !float.IsNaN(pt.Y))
+                .Distinct()
+                .ToArray();
+
+            //---- Test Print after Distinct() ----
+            Console.WriteLine("\n\npointAry after Distinct():");
+            foreach (PointF pt in pointAry) { Console.Write($"({pt.X},{pt.Y}), "); }
+            Console.WriteLine("\n");
+
+            //---- Draw ----
             DrawMultiPointLine(pointList.ToArray(), false);
 
             foreach(EquationLinear eqLinear in eqAry)
             {
                 DrawLinearFunction(eqLinear);
+            }
+
+            if(virticalLineList.Count > 0)
+            {
+                DrawVirticalMark(virticalLineList.ToArray());
             }
         }//DrawMultiLinearFunciton()
 
@@ -132,7 +206,6 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         {
             float slope = eqLinear.Slope;
             float intercept = eqLinear.Intercept;
-            //Console.WriteLine($"slope = {slope}, intercept = {intercept}");
 
             if (float.IsInfinity(slope))  // x = c (Virtical)
             {
@@ -284,7 +357,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         private float AlgoLinearFunctionXtoY(float x, float slope, float intercept)
         {
-            // y = a x + b
+            if (float.IsInfinity(slope)) { return float.NaN; }  // x = c
+
+            // y = a x + b | y = b
             return (float)((decimal)slope * (decimal)x + (decimal)intercept);
         }//AlgoLinearFunction(x) -> y
 
@@ -371,5 +446,147 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             solution.Y = AlgoLinearFunctionXtoY(solution.X, slope1, intercept1);
             return true;
         }//TrySolution()
+
+        public bool IsVirtical(EquationLinear eqLinear1, EquationLinear eqLinear2)
+        {
+            if (float.IsInfinity(eqLinear1.Slope)) { return eqLinear2.Slope == 0; }
+            if (float.IsInfinity(eqLinear2.Slope)) { return eqLinear1.Slope == 0; }
+            if (eqLinear1.Slope == 0) { return float.IsInfinity(eqLinear2.Slope); }
+            if (eqLinear2.Slope == 0) { return float.IsInfinity(eqLinear1.Slope); }
+
+            return eqLinear1.Slope * eqLinear2.Slope == -1;
+        }//IsVirtical()
+
+        public EquationLinear AlgoVirticalLine(EquationLinear eqLinear, PointF pt)
+        {
+            EquationLinear virticalLine;
+            if (float.IsInfinity(eqLinear.Slope))  //x = c  ->  y = b
+            {
+                virticalLine = new EquationLinear(slope: 0f, intercept: pt.Y);
+            }
+            else if (eqLinear.Slope == 0f)  // y = b  -> x = c
+            {
+                virticalLine = new EquationLinear(
+                    slope: float.PositiveInfinity, intercept: pt.X);
+            }
+            else
+            {
+                // 垂直条件 virtical condition: a c = -1  when y = a x + b | y = c x + d  
+                float slope = (float)(-1M / (decimal)eqLinear.Slope);
+
+                virticalLine = new EquationLinear(slope, pt);
+            }
+
+            return virticalLine;
+        }//AlgoVirticalLine()
+
+        protected void DrawVirticalMark(EquationLinear[] eqLinearAry)
+        {
+            for(int i = 0; i < eqLinearAry.Length; i += 2)
+            {
+                 DrawVirticalMark(eqLinearAry[i], eqLinearAry[i + 1]);
+            }//for
+        }
+
+        protected void DrawVirticalMark(EquationLinear eqLinear, EquationLinear virticalLine)
+        {
+            if (!IsVirtical(eqLinear, virticalLine))
+            {
+                throw new ArgumentException("2 lines are not virtical.");
+            }
+
+            TrySolution(eqLinear, virticalLine, out PointF solutionPoint);
+
+            PointF pt1 = AlgoDistanceOnLinePoint(8M / scaleRate, solutionPoint, eqLinear);
+            PointF pt3 = AlgoDistanceOnLinePoint(8M / scaleRate, solutionPoint, virticalLine);
+
+            EquationLinear eq1Parallel = new EquationLinear(eqLinear.Slope, pt3);
+            EquationLinear eq2Parallel = new EquationLinear(virticalLine.Slope, pt1);
+            TrySolution(eq1Parallel, eq2Parallel, out PointF pt2);
+
+            penPink.Width = 0.5f;
+            g.DrawLine(penPink,
+                (float)((decimal)pt1.X * scaleRate),
+                (float)((decimal)-pt1.Y * scaleRate),
+                (float)((decimal)pt2.X * scaleRate),
+                (float)((decimal)-pt2.Y * scaleRate));
+            g.DrawLine(penPink,
+                (float)((decimal)pt2.X * scaleRate),
+                (float)((decimal)-pt2.Y * scaleRate),
+                (float)((decimal)pt3.X * scaleRate),
+                (float)((decimal)-pt3.Y * scaleRate));
+            penPink.Width = 2f;
+        }//DrawVirticalMark()
+
+        public decimal AlgoDistance(PointF pt1, PointF pt2)
+        {
+            // 三平方の定理 Three Squre Theorem:  z ^ 2 = x ^ 2 + y ^ 2 
+            decimal dx = (decimal)pt1.X - (decimal)pt2.X;
+            decimal dy = (decimal)pt1.Y - (decimal)pt2.Y;
+
+            return (decimal)Math.Sqrt((double)(dx * dx + dy * dy));
+        }//AlgoDistance()
+
+        public PointF AlgoDistanceOnLinePoint(
+            decimal distance, PointF startPoint, EquationLinear eqLinear)
+        {
+            PointF pt = new PointF(0, 0);
+            float slope = eqLinear.Slope;
+
+            if (float.IsInfinity(slope))  // x = c
+            {
+                pt.X = startPoint.X;
+                pt.Y = (float)((decimal)startPoint.Y + distance);
+            }
+            else if (slope == 0)  // y = b
+            {
+                pt.X = (float)((decimal)startPoint.X + distance);
+                pt.Y = startPoint.Y;
+            }
+            else
+            {
+                //点(p, q)からの点は(p + distance * cosθ, q + distance * sinθ)
+                //上記の公式より、cosθ = √ (1 / tan ^ 2 θ + 1) | tanθ = slope 
+                // tan ^ 2 θ > 0なので、 tan ^ 2 θ + 1 != 0
+                decimal tan = (decimal)slope;
+                decimal cos = (decimal)Math.Sqrt((double)( 1M /(tan * tan + 1M)));
+                
+                pt.X = (float)((decimal)startPoint.X + distance * cos);
+                pt.Y = AlgoFunctionXtoY(pt.X, eqLinear);
+
+                Console.WriteLine($"tan = {tan}, cos = {cos}, PointF({pt.X},{pt.Y})");
+            }
+
+            return pt;
+        }//AlgoDistanceOnLinePoint()
     }//class
 }
+
+/*
+//==== Test Print ====
+new FormVirticalLineViewer()
+//---- AlgoVirticleLine(), AlgoDistanceOnLine(), AlgoVirticleMark() ----
+
+Equation Array:
+y = 2 x - 50
+y = -0.5 x + 100
+
+Argument pointAry:
+(100,50),
+
+existSolution = True
+solution: (60,70)
+IsVirticle = True
+
+
+pointList before Distinct():
+(100,50), (25,0), (0,-50), (200,0), (0,100), (60,70),
+
+pointAry after Distinct():
+(100,50), (25,0), (0,-50), (200,0), (0,100), (60,70),
+
+tan = 2, cos = 0.447213595499958, PointF(63.57771,77.15542)
+tan = -0.5, cos = 0.894427190999916, PointF(67.15542,66.42229)
+
+Close()
+ */

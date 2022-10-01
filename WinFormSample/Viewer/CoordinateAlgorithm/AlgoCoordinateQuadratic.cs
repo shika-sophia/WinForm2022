@@ -90,9 +90,12 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             foreach (var eq in eqAry) { Console.WriteLine(eq); };
             Console.WriteLine("\nArgument pointAry:");
             foreach(var pt in pointAryArgs) { Console.Write($"({pt.X},{pt.Y}), "); }
+            Console.WriteLine("\n");
 
             //---- pointList ----
             List<PointF> pointList = new List<PointF>(pointAryArgs);
+            List<EquationLinear> virticalLineList = new List<EquationLinear>();
+
             for (int i = 0; i < eqAry.Length; i++)                
             {
                 ICoordinateEquation eq = eqAry[i];
@@ -108,6 +111,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 //---- TrySolutionQuad() ----
                 for(int j = i; j < eqAry.Length; j++)
                 {
+                    //case same
                     if(j == i) { continue; }
 
                     bool existSolution = TrySolutionQuad(
@@ -117,6 +121,20 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                     {
                         pointList.AddRange(solutionAry);
                     }
+
+                    //case virtical
+                    if (eqAry[i] is EquationLinear && eqAry[j] is EquationLinear
+                        && IsVirtical(eqAry[i] as EquationLinear, eqAry[j] as EquationLinear))
+                    {
+                        virticalLineList.Add(eqAry[i] as EquationLinear);
+                        virticalLineList.Add(eqAry[j] as EquationLinear);
+                    }
+                    
+                    //---- Test Print TrySolution() ----
+                    Console.WriteLine($"existSolution = {existSolution}");
+                    foreach(var solution in solutionAry) { Console.Write($"({solution.X},{solution.Y}), "); }
+                    Console.WriteLine(
+                        $"\nIsVirticle = {IsVirtical(eqAry[i] as EquationLinear, eqAry[j] as EquationLinear)}");
                 }//for j
             }//for i
 
@@ -150,6 +168,11 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 {
                     Console.WriteLine($"DrawLinearFunction({eq})");
                     DrawLinearFunction(eq as EquationLinear);
+                }
+
+                if(virticalLineList.Count > 0)
+                {
+                    DrawVirticalMark(virticalLineList.ToArray());
                 }
             }//foreach
         }//MultiDrawQuadraticFunction()
