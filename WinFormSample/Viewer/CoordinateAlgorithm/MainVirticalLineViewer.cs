@@ -45,7 +45,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
     class FormVirticalLineViewer : Form
     {
         private readonly PictureBox pic;
-        private readonly AlgoCoordinateDifferentiate diff;
+        private readonly AlgoCoordinateLinear linear;
 
         public FormVirticalLineViewer()
         {
@@ -62,14 +62,15 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 Dock = DockStyle.Fill,
             };
 
-            diff = new AlgoCoordinateDifferentiate(pic);
-            diff.DrawCoordinateAxis();
+            linear = new AlgoCoordinateLinear(pic);
+            linear.DrawCoordinateAxis();
 
-            var originLine = new EquationLinear(2f, -100f);
-            var virticalLine = diff.AlgoVirticalLine(originLine, new PointF(20f, 20f));
-
-            diff.DrawMultiQuadraticFunction(
-                new ICoordinateEquation[] { originLine, virticalLine });
+            var originLine = new EquationLinear(2f, -50f);
+            var pt = new PointF(100f, 50f);
+            var virticalLine = linear.AlgoVirticalLine(originLine, pt);
+            
+            linear.DrawMultiLinearFunciton(
+                new EquationLinear[] { originLine, virticalLine }, pt);
 
             this.Controls.AddRange(new Control[]
             {
