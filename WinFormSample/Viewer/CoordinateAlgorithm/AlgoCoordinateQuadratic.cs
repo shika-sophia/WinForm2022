@@ -96,23 +96,23 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             List<PointF> pointList = new List<PointF>(pointAryArgs);
             List<EquationLinear> virticalLineList = new List<EquationLinear>();
 
-            for (int i = 0; i < eqAry.Length; i++)                
+            for (int i = 0; i < eqAry.Length; i++)
             {
                 ICoordinateEquation eq = eqAry[i];
                 pointList.Add(AlgoInterceptY(eq));
                 pointList.AddRange(AlgoInterceptX(eq));
-                
-                if(eq is EquationQuadratic)
+
+                if (eq is EquationQuadratic)
                 {
                     var eqQuad = (EquationQuadratic)eq;
                     pointList.Add(eqQuad.Vertex);
                 }
-                
+
                 //---- TrySolutionQuad() ----
-                for(int j = i; j < eqAry.Length; j++)
+                for (int j = i; j < eqAry.Length; j++)
                 {
                     //case same
-                    if(j == i) { continue; }
+                    if (j == i) { continue; }
 
                     bool existSolution = TrySolutionQuad(
                         eqAry[i], eqAry[j], out PointF[] solutionAry);
@@ -128,13 +128,12 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                     {
                         virticalLineList.Add(eqAry[i] as EquationLinear);
                         virticalLineList.Add(eqAry[j] as EquationLinear);
+                        Console.WriteLine($"\nIsVirticle = True");
                     }
-                    
+                
                     //---- Test Print TrySolution() ----
-                    Console.WriteLine($"existSolution = {existSolution}");
-                    foreach(var solution in solutionAry) { Console.Write($"({solution.X},{solution.Y}), "); }
-                    Console.WriteLine(
-                        $"\nIsVirticle = {IsVirtical(eqAry[i] as EquationLinear, eqAry[j] as EquationLinear)}");
+                    Console.WriteLine($"\nexistSolution = {existSolution}");
+                    foreach (var solution in solutionAry) { Console.Write($"({solution.X},{solution.Y}), "); }
                 }//for j
             }//for i
 
@@ -156,6 +155,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             //---- Draw ----
             DrawMultiPointLine(pointAry);
             Console.WriteLine($"scaleRate = {scaleRate}");
+            Console.WriteLine($"height / width = {ratioWidthHeight:0.##}");
 
             foreach (ICoordinateEquation eq in eqAry)
             {
@@ -177,45 +177,64 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             }//foreach
         }//MultiDrawQuadraticFunction()
 
-        public void DrawParabolaFunction(EquationQuadratic eqQuad)
-        {
-            DrawParabolaFunction(eqQuad.QuadCoefficient, eqQuad.Vertex);
-        }
-
         public void DrawParabolaFunction(float quadCoefficient, PointF vertex)
         {
-            DrawParabolaFunction(quadCoefficient, vertex.X, vertex.Y);
+            DrawParabolaFunction(new EquationQuadratic(quadCoefficient, vertex));
         }//DrawParabolaFunction(float, PointF)
 
-        public void DrawParabolaFunction(float quadCoefficient, float vertexX, float vertexY) 
+        public void DrawParabolaFunction(float quadCoefficient, float vertexX, float vertexY)
         {
-            if(quadCoefficient == 0)  // y = q
-            {  
+            DrawParabolaFunction(new EquationQuadratic(quadCoefficient, new PointF(vertexX, vertexY)));
+        }//DrawParabolaFunction(float, float, float)
+        public void DrawParabolaFunction(EquationQuadratic eqQuad)
+        {
+            float quadCoefficient = eqQuad.QuadCoefficient;
+            float vertexX = eqQuad.Vertex.X;
+            float vertexY = eqQuad.Vertex.Y;
+
+            if (quadCoefficient == 0)  // y = q
+            {
                 throw new ArgumentException();
             }
 
-            List<PointF> pointList = new List<PointF>(
+            List<PointF> drawPointList = new List<PointF>(
                 (int)((decimal)pic.ClientSize.Width / scaleRate));
 
             // ２次関数 y = a(x - p)^2 + q  【註】p, qの平行移動は AlgoParabolaFunctionXtoY()内で済み
             for (decimal i = (decimal)-centerPoint.X / scaleRate;
                 i < (decimal)centerPoint.X / scaleRate; i++)
             {
-                pointList.Add(
-                    new PointF(
-                        (float)((decimal)i * scaleRate),
-                        (float)((decimal)-AlgoParabolaFunctionXtoY(
-                            (float)i, quadCoefficient, vertexX, vertexY)
-                        * scaleRate)
-                    )
-                );
+                float ptY = (float)((decimal)-AlgoFunctionXtoY((float)i, eqQuad) * scaleRate);
+
+                if (Math.Abs((decimal)ptY) > Math.Abs((decimal)centerPoint.Y))
+                { continue; }
+
+                drawPointList.Add(
+                    new PointF((float)((decimal)i * scaleRate), ptY));
             }//for
-            
-            var gPath = new GraphicsPath();
-            gPath.AddLines(pointList.ToArray());
-            g.DrawPath(penPink, gPath);
+
             DrawPointLine(new PointF(vertexX, vertexY));
-        }//DrawParabolaFunction(float, float, float)
+
+            var gPath = new GraphicsPath();
+            gPath.AddLines(drawPointList.ToArray());
+            g.DrawPath(penPink, gPath);
+
+            SizeF textSize = g.MeasureString(eqQuad.Text, font);
+            PointF textLoction = new PointF(0, 0);
+            textLoction.X = (float)(quadCoefficient > 0.05f ?
+                (decimal)drawPointList[0].X - (decimal)textSize.Width - 10M :
+                (decimal)drawPointList[0].X + 10M);
+            textLoction.Y = quadCoefficient > 0 ?
+                drawPointList[0].Y : drawPointList[0].Y - textSize.Height;
+
+            g.DrawString(eqQuad.Text, font, penPink.Brush, textLoction);
+        }//DrawParabolaFunction(EquationQuadratic)
+        
+        public override bool CheckOnLine(ICoordinateEquation eq, PointF pt)
+        {
+            float onY = AlgoFunctionXtoY(pt.X, eq as EquationQuadratic);
+            return pt.Y == onY;
+        }//CheckOnLine()
 
         public float AlgoFunctionXtoY(float x, ICoordinateEquation eq)
         {

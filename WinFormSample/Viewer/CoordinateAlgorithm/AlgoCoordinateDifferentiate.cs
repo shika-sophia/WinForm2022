@@ -85,12 +85,6 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
     {
         public AlgoCoordinateDifferentiate(PictureBox pic) : base(pic) { }
 
-        public bool CheckOnLine(ICoordinateEquation eq, PointF pt)
-        {
-            float onY = AlgoFunctionXtoY(pt.X, eq);
-            return pt.Y == onY; 
-        }//CheckOnLine()
-
         public EquationLinear[] AlgoTangentLineFree(
             ICoordinateEquation eq, PointF pt, out PointF[] contactPointAry)
         {

@@ -56,7 +56,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         {
             this.Text = "FormTangentQuadViewer";
             this.Font = new Font("consolas", 12, FontStyle.Regular);
-            this.ClientSize = new Size(640, 640);
+            this.ClientSize = new Size(960, 640);
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.BackColor = SystemColors.Window;
 

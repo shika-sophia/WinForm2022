@@ -190,8 +190,10 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             //---- Draw ----
             DrawMultiPointLine(pointList.ToArray(), false);
+            Console.WriteLine($"scaleRate = {scaleRate}");
+            Console.WriteLine($"height / width = {ratioWidthHeight:0.##}");
 
-            foreach(EquationLinear eqLinear in eqAry)
+            foreach (EquationLinear eqLinear in eqAry)
             {
                 DrawLinearFunction(eqLinear);
             }
@@ -248,8 +250,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 maxX = AlgoLinearFunctionYtoX(maxY, slope, intercept);
 
                 textLocation.X = (float)((decimal)((slope > 0) ?
-                    minX + 10f : minX - textSize.Width - 5f) * scaleRate);
-                textLocation.Y = (float)((decimal)-(minY + 20f) * scaleRate);
+                    ((decimal)minX * scaleRate - (decimal)textSize.Width - 5M) : (decimal)minX * scaleRate + 10M));
+                textLocation.Y = (float)(-(decimal)minY * scaleRate - (decimal)textSize.Height);
             }
             else
             {   // 傾きが緩やかで、y切片 0 のとき、x座標の境界が直線の端になる
@@ -259,9 +261,10 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 maxY = AlgoLinearFunctionXtoY(maxX, slope, intercept);
 
                 textLocation.X = (float)((decimal)maxX * scaleRate - (decimal)textSize.Width- 5M);
-                textLocation.Y = (float)((decimal)((slope > 0) ?
-                    -(maxY + textSize.Height) : -maxY) * scaleRate);
-            }
+                textLocation.Y = (float)((slope > 0 ?
+                    -((decimal)maxY * scaleRate + (decimal)textSize.Height) :
+                    -((decimal)maxY * scaleRate - (decimal)textSize.Height)));
+             }
             
             //---- Draw ----
             g.DrawLine(penPink,
@@ -283,6 +286,12 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         {
             DrawLinearFunction(new EquationLinear(slope, intercept));
         }//DrawLinearFunction(float, float)
+
+        public virtual bool CheckOnLine(ICoordinateEquation eq, PointF pt)
+        {
+            float onY = AlgoFunctionXtoY(pt.X, eq as EquationLinear);
+            return pt.Y == onY;
+        }//CheckOnLine()
 
         public PointF AlgoInterceptY(EquationLinear eqLinear)
         {
