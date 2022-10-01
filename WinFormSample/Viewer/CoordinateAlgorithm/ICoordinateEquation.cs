@@ -3,6 +3,8 @@
  *@class interface ICoordinateEquation
  *@class   └ EquationLinear : ICoordinateEquation
  *@class   └ EquationQuadratic : ICoordinateEquation
+ *@class   └ EquationCircle : ICoordinateEquation
+ *
  *@content 式の係数値を保持するクラス
  *         ・ICoordinateEquationで同一視
  *         ・Algo系クラス継承階層に同名メソッドを用意し、
@@ -22,7 +24,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
     interface ICoordinateEquation
     {
         (decimal a, decimal b, decimal c) GetGeneralParam();
-        
+
         string ToString();
     }
 }
