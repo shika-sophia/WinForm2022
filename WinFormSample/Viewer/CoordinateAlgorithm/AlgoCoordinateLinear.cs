@@ -287,9 +287,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             DrawLinearFunction(new EquationLinear(slope, intercept));
         }//DrawLinearFunction(float, float)
 
-        public virtual bool CheckOnLine(ICoordinateEquation eq, PointF pt)
+        public bool CheckOnLine(PointF pt, EquationLinear eqLinear)
         {
-            float onY = AlgoFunctionXtoY(pt.X, eq as EquationLinear);
+            float onY = AlgoFunctionXtoY(pt.X, eqLinear);
             return pt.Y == onY;
         }//CheckOnLine()
 
@@ -323,7 +323,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return pt;
         }//DrawInterceptY()
 
-        private (float slope, float intercept) AlgoLinearParam(PointF pt1, PointF pt2)
+        protected (float slope, float intercept) AlgoLinearParam(PointF pt1, PointF pt2)
         {
             decimal dx = (decimal)pt1.X - (decimal)pt2.X;
             decimal dy = (decimal)pt1.Y - (decimal)pt2.Y;
@@ -343,7 +343,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return (slope, intercept);
         }//AlgoLinerParam(pt1, pt2)
 
-        private float AlgoLinearParam(float slope, PointF pt1)
+        protected float AlgoLinearParam(float slope, PointF pt1)
         {
             if (float.IsInfinity(slope))
             {
@@ -497,7 +497,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             }//for
         }
 
-        protected void DrawVirticalMark(EquationLinear eqLinear, EquationLinear virticalLine)
+        protected void DrawVirticalMark(
+            EquationLinear eqLinear, EquationLinear virticalLine, 
+            bool plusX = true, bool plusY = true)
         {
             if (!IsVirtical(eqLinear, virticalLine))
             {
@@ -506,8 +508,10 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             TrySolution(eqLinear, virticalLine, out PointF solutionPoint);
 
-            PointF pt1 = AlgoDistanceOnLinePoint(8M / scaleRate, solutionPoint, eqLinear);
-            PointF pt3 = AlgoDistanceOnLinePoint(8M / scaleRate, solutionPoint, virticalLine);
+            PointF pt1 = AlgoDistanceOnLinePoint(
+                8M / scaleRate, solutionPoint, eqLinear, plusX, plusY);
+            PointF pt3 = AlgoDistanceOnLinePoint(
+                8M / scaleRate, solutionPoint, virticalLine, plusX, plusY);
 
             EquationLinear eq1Parallel = new EquationLinear(eqLinear.Slope, pt3);
             EquationLinear eq2Parallel = new EquationLinear(virticalLine.Slope, pt1);
@@ -537,19 +541,22 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         }//AlgoDistance()
 
         public PointF AlgoDistanceOnLinePoint(
-            decimal distance, PointF startPoint, EquationLinear eqLinear)
+            decimal distance, PointF startPoint, EquationLinear eqLinear,
+            bool plusX = true, bool plusY = true)
         {
             PointF pt = new PointF(0, 0);
             float slope = eqLinear.Slope;
+            decimal signX = plusX ? 1 : -1;
+            decimal signY = plusY ? 1 : -1;
 
             if (float.IsInfinity(slope))  // x = c
             {
                 pt.X = startPoint.X;
-                pt.Y = (float)((decimal)startPoint.Y + distance);
+                pt.Y = (float)((decimal)startPoint.Y + signY * distance);
             }
             else if (slope == 0)  // y = b
             {
-                pt.X = (float)((decimal)startPoint.X + distance);
+                pt.X = (float)((decimal)startPoint.X + signX * distance);
                 pt.Y = startPoint.Y;
             }
             else
@@ -560,10 +567,10 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 decimal tan = (decimal)slope;
                 decimal cos = (decimal)Math.Sqrt((double)( 1M /(tan * tan + 1M)));
                 
-                pt.X = (float)((decimal)startPoint.X + distance * cos);
+                pt.X = (float)((decimal)startPoint.X + signX * distance * cos);
                 pt.Y = AlgoFunctionXtoY(pt.X, eqLinear);
 
-                Console.WriteLine($"tan = {tan}, cos = {cos}, PointF({pt.X},{pt.Y})");
+                //Console.WriteLine($"tan = {tan}, cos = {cos}, PointF({pt.X},{pt.Y})");
             }
 
             return pt;

@@ -230,9 +230,15 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             g.DrawString(eqQuad.Text, font, penPink.Brush, textLoction);
         }//DrawParabolaFunction(EquationQuadratic)
         
-        public override bool CheckOnLine(ICoordinateEquation eq, PointF pt)
+        public bool CheckOnLine(PointF pt, ICoordinateEquation eq)
         {
-            float onY = AlgoFunctionXtoY(pt.X, eq as EquationQuadratic);
+            if(eq is EquationLinear)
+            {
+                return base.CheckOnLine(pt, eq as EquationLinear);
+            }
+
+            var eqQuad = (EquationQuadratic)eq;
+            float onY = AlgoFunctionXtoY(pt.X, eqQuad);
             return pt.Y == onY;
         }//CheckOnLine()
 
@@ -258,12 +264,12 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return AlgoQuadSolutionFormula(eqQuad.A, eqQuad.B, eqQuad.C - (decimal)y);
         }
 
-        private float AlgoParabolaFunctionXtoY(float x, decimal a, decimal b, decimal c)
+        protected float AlgoParabolaFunctionXtoY(float x, decimal a, decimal b, decimal c)
         {   // y = a x ^ 2 + b x + c
             return (float)(a * (decimal)x * (decimal)x + b * (decimal)x + c);
         }
 
-        private float AlgoParabolaFunctionXtoY(
+        protected float AlgoParabolaFunctionXtoY(
             float x, float quadCoefficient, float vertexX, float vertexY)
         {
             // ２次関数 y = a(x - p)^2 + q  

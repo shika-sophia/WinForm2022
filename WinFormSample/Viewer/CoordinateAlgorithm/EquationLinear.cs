@@ -34,10 +34,10 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         public float Intercept { get; private set; }
         public string Text { get; set; }
 
-        public EquationLinear(float slope, PointF pt) 
+        public EquationLinear(float slope, PointF pathPoint) 
         {
             this.Slope = slope;
-            this.Intercept = CalcIntercept(slope, pt);
+            this.Intercept = CalcIntercept(slope, pathPoint);
             this.Text = BuildText(slope, Intercept);
         }
 

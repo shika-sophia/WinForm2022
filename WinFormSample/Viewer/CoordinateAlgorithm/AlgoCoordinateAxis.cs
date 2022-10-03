@@ -53,6 +53,9 @@
  *              SetScaleRate(scaleRate / 2M);
  *          }//while
  *
+ *@subject Graphics BuildGraphics()
+ *         AlgoCoordinateAxis 十字座標系に特化したメソッド
+ *         
  *@see ImageCoordinateAxisViewer.jpg
  *@see 
  *@author shika
