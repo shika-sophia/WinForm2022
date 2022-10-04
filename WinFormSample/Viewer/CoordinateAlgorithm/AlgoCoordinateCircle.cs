@@ -26,14 +26,28 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
     {
         public AlgoCoordinateCircle(PictureBox pic) : base(pic) { }
 
+        //====== Draw ======
+        public void DrawTriangleTheta(decimal angle, EquationCircle eqCircle)
+        {
+            if (Math.Abs(angle) > 360)
+            {
+                angle %= 360M;
+            }
+
+            PointF origin = eqCircle.CircleCenterPoint;
+            PointF radiusPoint = AlgoRadiusPoint(angle, eqCircle);
+            DrawRadiusLine(radiusPoint, eqCircle);
+            DrawPointLine(radiusPoint);
+            DrawRariusPointVirticalLineX(radiusPoint);
+            DrawAngleArc(angle, eqCircle);
+            DrawAngleNarrow(angle, eqCircle);
+        }//DrawTriangleTheta()
+
         public void DrawCircleFunction(EquationCircle eqCircle)
         {
             decimal radius = eqCircle.Radius;
             PointF circleCenterPoint = eqCircle.CircleCenterPoint;
-            var rect = new RectangleF(
-                (float)(((decimal)circleCenterPoint.X - radius) * scaleRate),
-                (float)(((decimal)-circleCenterPoint.Y - radius) * scaleRate),
-                (float)(2M * radius * scaleRate), (float)(2M * radius * scaleRate));
+            var rect = BuildCircleRectangle(radius, circleCenterPoint);
             
             g.DrawEllipse(penPink, rect);
             Brush brushPink = penPink.Brush;
@@ -50,14 +64,158 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             brushPink.Dispose();
         }//DrawCircleFunction()
 
-        public PointF AlgoRadiusPoint(decimal angle, EquationCircle eqCircle)
+        public void DrawRadiusLine(PointF radiusPoint, EquationCircle eqCircle)
+        {
+            PointF origin = eqCircle.CircleCenterPoint;
+
+            penViolet.DashStyle = DashStyle.Solid;
+            penViolet.Width = 1.0f;
+            penViolet.CompoundArray = new float[] { 0.0f, 1.0f };
+            g.DrawLine(penViolet,
+                origin.X, origin.Y,
+                (float)((decimal)radiusPoint.X * scaleRate),
+                (float)((decimal)-radiusPoint.Y * scaleRate));
+        }//DrawRadiusLine()
+
+        protected void DrawRariusPointVirticalLineX(PointF radiusPoint)
+        {
+            penViolet.DashStyle = DashStyle.Dash;
+            penViolet.Width = 1.0f;
+            penViolet.CompoundArray = new float[] { 0.0f, 1.0f };
+
+            g.DrawLine(penViolet,
+                (float)((decimal)radiusPoint.X * scaleRate),
+                0f,
+                (float)((decimal)radiusPoint.X * scaleRate),
+                (float)((decimal)-radiusPoint.Y * scaleRate));
+
+            if (radiusPoint.Y == 0) { return; }
+
+            DrawVirticalMark(
+                new EquationLinear(0, 0),             // y = 0  (X-Axis)
+                new EquationLinear(
+                    float.PositiveInfinity,           // x = c  (virtical line)
+                    (float)((decimal)radiusPoint.X)),
+                plusX: radiusPoint.X <= 0,            // if + => then -, if - or 0 then +
+                plusY: radiusPoint.Y > 0);            // if + => then +, (0 not defined)
+        }//DrawRariusPointVirticalLineX()
+
+        protected RectangleF BuildCircleRectangle(
+            decimal radius, PointF circleCenterPoint)
+        {
+            return new RectangleF(
+                (float)(((decimal)circleCenterPoint.X - radius) * scaleRate),
+                (float)(((decimal)-circleCenterPoint.Y - radius) * scaleRate),
+                (float)(2M * radius * scaleRate), (float)(2M * radius * scaleRate));
+        }//BuildCircleRectangle()
+
+        protected void DrawAngleArc(
+            decimal angle, EquationCircle eqCircle)
+        {
+            // draw absolute angle arc from X-Axis plus
+            // X軸+から常に正の絶対角を描画
+
+            if (Math.Abs(angle) > 360)
+            {
+                angle %= 360M;
+            }
+
+            if (angle == 90) { return; }
+
+            decimal arcRadius = 10M;
+            RectangleF rect = BuildCircleRectangle(arcRadius, eqCircle.CircleCenterPoint);
+
+            penViolet.DashStyle = DashStyle.Solid;
+            penViolet.Width = 1.0f;
+            penViolet.CompoundArray = new float[] { 0.0f, 1.0f };
+            g.DrawArc(penViolet, rect, 0,
+                (float)(angle >= 0 ? -angle : -(360 + angle)));  // 時計回り角を指定
+
+            DrawAngleText(angle, eqCircle.CircleCenterPoint);
+        }//DrawAngleArc()        
+
+        protected void DrawAngleNarrow(decimal angle, EquationCircle eqCircle)
+        {
+            // draw narrow angle from X-Axis both side
+            // X軸+- との鋭角を描画
+            
+            if (Math.Abs(angle) > 360)
+            {
+                angle %= 360M;
+            }
+            angle = (angle > 0) ? angle : 360 + angle; // to absolute angle
+            //Console.WriteLine($"angle = {angle}");
+            
+            if (0 <= angle && angle <= 90 || angle == 270)
+            {
+                return;
+            }
+
+            decimal narrowAngle = angle;
+            decimal startAngle = 0M;
+
+            if (90 < angle && angle <= 180)
+            {
+                narrowAngle = 180 - angle;
+                startAngle = 360 - angle - narrowAngle;  //時計回り角
+            }
+            else if (180 < angle && angle < 270)
+            {
+                narrowAngle = angle - 180;
+                startAngle = 180M - narrowAngle;
+            }
+            else if (270 < angle)
+            {
+                narrowAngle = 360 - angle;
+            }
+            //Console.WriteLine($"narrowAngle = {narrowAngle}");
+            //Console.WriteLine($"startAngle = {startAngle}");
+
+            decimal narrowRadius = 12M;
+            RectangleF rect = BuildCircleRectangle(narrowRadius, eqCircle.CircleCenterPoint);
+            penViolet.DashStyle = DashStyle.Solid;
+            penViolet.Width = 3.0f;
+            penViolet.CompoundArray =
+                new float[] { 0.0f, 0.3f, 0.7f, 1.0f };
+            g.DrawArc(penViolet, rect, (float)startAngle, (float)narrowAngle);
+
+            DrawAngleText(narrowAngle, eqCircle.CircleCenterPoint, angle);
+        }//DrawAngleNarrow()
+
+        protected void DrawAngleText(decimal angle, PointF cicleCenterPoint, decimal startAngle = 0M)
+        {
+            if (Math.Abs(angle) > 360)
+            {
+                angle %= 360M;
+            }
+            angle = (angle >= 0) ? angle : -(360 + angle);
+
+            if(180 < startAngle && startAngle < 270)
+            {
+                startAngle = 180;
+            }
+
+            decimal angleHalf = angle / 2M;
+            decimal textRadius = 15M;
+            EquationCircle eqCircleText = new EquationCircle(textRadius, cicleCenterPoint);
+            PointF textLocation = AlgoRadiusPoint(angleHalf + startAngle, eqCircleText);
+            SizeF textSize = g.MeasureString($"{angle}", fontSmall);
+            
+            g.DrawString($"{angle}", fontSmall, penViolet.Brush,
+                (float)((decimal)textLocation.X * scaleRate - (decimal)textSize.Width / 2M),
+                (float)((decimal)-textLocation.Y * scaleRate - (decimal)textSize.Height / 2M));
+        }//DrawAngleText()
+
+        //====== Algo ======
+        public PointF AlgoRadiusPoint(
+            decimal angle, EquationCircle eqCircle)
         {
             decimal radius = eqCircle.Radius;
             PointF origin = eqCircle.CircleCenterPoint;
-
-            if(Math.Abs(angle) > 360)
+            
+            if (Math.Abs(angle) > 360)
             {
-                angle = Math.Sign(angle) * angle % 360M;
+                angle %= 360M;
             }
 
             if(Math.Abs(angle) == 90 || Math.Abs(angle) == 270)
@@ -79,6 +237,15 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             
             return new PointF((float)(radius * cos), (float)(radius * sin));
         }//AlgoRadiusPoint()
+
+        public EquationLinear AlgoRadiusLine(PointF radiusPoint, EquationCircle eqCircle)
+        {
+            PointF origin = eqCircle.CircleCenterPoint;
+
+            (float slope, float intercept) = AlgoLinearParam(origin, radiusPoint);
+
+            return new EquationLinear(slope, intercept);
+        }//AlgoRadiusLine()
 
         public bool CheckOnLine(PointF pt, EquationCircle eqCircle)
         { 
@@ -107,85 +274,5 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return AlgoQuadSolutionFormula(eqQuad);
         }//AlgoCircleFunctionXtoY()
 
-        public EquationLinear AlgoRadiusLine(PointF radiusPoint, EquationCircle eqCircle)
-        {
-            PointF origin = eqCircle.CircleCenterPoint;
-
-            (float slope, float intercept) = AlgoLinearParam(origin, radiusPoint);
-
-            return new EquationLinear(slope, intercept);
-        }//AlgoRadiusLine()
-
-        protected void DrawRariusPointVirticalLineX(PointF radiusPoint)
-        {
-            penViolet.DashStyle = DashStyle.Dash;
-            g.DrawLine(penViolet, 
-                (float)((decimal)radiusPoint.X * scaleRate),
-                0f,
-                (float)((decimal)radiusPoint.X * scaleRate),
-                (float)((decimal)-radiusPoint.Y * scaleRate));
-
-            Console.WriteLine(radiusPoint);
-            if(radiusPoint.Y == 0) { return; }
-
-            DrawVirticalMark(
-                new EquationLinear(0, 0),             // y = 0  (X-Axis)
-                new EquationLinear(
-                    float.PositiveInfinity,           // x = c  (virtical line)
-                    (float)((decimal)radiusPoint.X)),  
-                plusX: radiusPoint.X <= 0,            // if + => then -, if - or 0 then +
-                plusY: radiusPoint.Y > 0);            // if + => then +, (0 not defined)
-        }//DrawRariusPointVirticalLineX()
-
-        public void DrawRadiusLine(PointF radiusPoint, EquationCircle eqCircle)
-        {
-            PointF origin = eqCircle.CircleCenterPoint;
-
-            penViolet.DashStyle = DashStyle.Solid;
-            g.DrawLine(penViolet, 
-                origin.X, origin.Y, 
-                (float)((decimal)radiusPoint.X * scaleRate),
-                (float)((decimal)-radiusPoint.Y * scaleRate));
-        }//DrawRadiusLine()
-
-        protected void DrawAngleText(
-            decimal angle, PointF radiusPoint, EquationCircle eqCircle)
-        {
-            PointF origin = eqCircle.CircleCenterPoint;
-     
-            decimal arcRadius = 10M;
-            RectangleF rect = new RectangleF(
-                (float)(((decimal)origin.X - arcRadius) * scaleRate),
-                (float)(((decimal)-origin.Y - arcRadius) * scaleRate),
-                (float)(2M * arcRadius * scaleRate), (float)(2M * arcRadius * scaleRate));
-            
-            penViolet.DashStyle = DashStyle.Solid;
-            g.DrawArc(penViolet, rect, 0, 
-                (float)(angle >= 0 ? -angle : -(360 + angle)));
-
-            decimal angleHalf = angle / 2M;
-            decimal textAngle = 15M;
-            EquationCircle eqCircleText = new EquationCircle(textAngle, origin);
-            PointF textLocation = AlgoRadiusPoint(textAngle, eqCircleText);
-            SizeF textSize = g.MeasureString(angle.ToString(), fontSmall);
-            g.DrawString(angle.ToString(), fontSmall, penViolet.Brush,
-                (float)((decimal)textLocation.X * scaleRate - (decimal)textSize.Width / 2M),
-                (float)((decimal)-textLocation.Y * scaleRate - (decimal)textSize.Height * scaleRate));
-        }//DrawAngleText()
-
-        public void DrawTriangleTheta(decimal angle, EquationCircle eqCircle)
-        {
-            if (Math.Abs(angle) > 360)
-            {
-                angle = Math.Sign(angle) * angle % 360M;
-            }
-
-            PointF origin = eqCircle.CircleCenterPoint;
-            PointF radiusPoint = AlgoRadiusPoint(angle, eqCircle);
-            DrawRadiusLine(radiusPoint, eqCircle);
-            DrawPointLine(radiusPoint);
-            DrawRariusPointVirticalLineX(radiusPoint);
-            DrawAngleText(angle, radiusPoint, eqCircle);
-        }//DrawTriangleTheta()
     }//class
 }

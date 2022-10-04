@@ -26,7 +26,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         protected readonly PictureBox pic;
         protected readonly Pen penBlue = new Pen(Color.CornflowerBlue, 1);
         protected readonly Pen penPink = new Pen(Color.HotPink, 2);
-        protected readonly Pen penViolet = new Pen(Color.Violet, 1);
+        protected readonly Pen penViolet = new Pen(Color.Orchid, 1);
         protected readonly Font font = new Font("ＭＳ 明朝", 12, FontStyle.Bold);
         protected readonly Font fontSmall = new Font("ＭＳ 明朝", 8, FontStyle.Regular);
         protected readonly PointF centerPoint;
