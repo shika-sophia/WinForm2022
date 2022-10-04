@@ -27,9 +27,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 {
     class MainCircleRadiusViewer
     {
-        [STAThread]
-        static void Main()
-        //public void Main()
+        //[STAThread]
+        //static void Main()
+        public void Main()
         {
             Console.WriteLine("new FormCircleRadiusViewer()");
 
@@ -63,8 +63,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             circle = new AlgoCoordinateCircle(pic);
             circle.DrawCoordinateAxis();
 
+            decimal angle = 30;
             var eqCircle = new EquationCircle(100, 0, 0);
-            decimal angle = -30;
             PointF radiusPoint = circle.AlgoRadiusPoint(angle, eqCircle);
             //circle.SetScaleRate(1.0M);
             circle.DrawTriangleTheta(angle, eqCircle);
