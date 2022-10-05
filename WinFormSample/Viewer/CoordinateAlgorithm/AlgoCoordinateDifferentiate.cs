@@ -109,7 +109,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 - eqQuad.C - eqQuad.B * (decimal)pt.X + (decimal)pt.Y);
 
             //---- Quadratic Formula ----
-            float[] contactXAry = AlgoQuadSolutionFormula(eqContactX);
+            float[] contactXAry = eqContactX.AlgoQuadSolutionFormula();
             
             //---- EquationLinear as tangent line ----
             contactPointAry = new PointF[contactXAry.Length];

@@ -40,23 +40,52 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
     {
         public float Slope { get; private set; }
         public float Intercept { get; private set; }
+        public PointF InterceptPointX { get; private set; }
+        public PointF InterceptPointY { get; private set; }
+        public PointF[] EqPointAry { get; private set; }
         public string Text { get; set; }
 
-        public EquationLinear(float slope, PointF pathPoint) 
-        {
-            this.Slope = slope;
-            this.Intercept = CalcIntercept(slope, pathPoint);
-            this.Text = BuildText(slope, Intercept);
-        }
-
         public EquationLinear(float slope, float intercept) 
-        {
+        {   
             this.Slope = slope;
             this.Intercept = intercept;
+            this.InterceptPointX = AlgoInterceptX();
+            this.InterceptPointY = AlgoInterceptY();
+            this.EqPointAry = new PointF[] { InterceptPointX, InterceptPointY };
             this.Text = BuildText(slope, intercept);
         }//constructor
 
-        private float CalcIntercept(float slope, PointF pt)
+        private EquationLinear((float slope, float intercept) taple)
+            : this(taple.slope, taple.intercept) { }
+
+        public EquationLinear(float slope, PointF pathPoint) 
+            : this(slope, CalcIntercept(slope, pathPoint)) { }
+
+        public EquationLinear(PointF pt1, PointF pt2)
+            : this(AlgoLinearParam(pt1, pt2)) { }
+        
+        //====== static Method =====
+        private static (float slope, float intercept) AlgoLinearParam(PointF pt1, PointF pt2)
+        {
+            decimal dx = (decimal)pt1.X - (decimal)pt2.X;
+            decimal dy = (decimal)pt1.Y - (decimal)pt2.Y;
+
+            float slope, intercept;
+            if (dx == 0M)
+            {
+                slope = dy > 0M ? float.PositiveInfinity : float.NegativeInfinity;     // a = ∞ or -∞
+                intercept = pt1.X;     // x = c
+                return (slope, intercept);
+            }
+            else if (dy == 0M) { slope = 0f; }  // y = b 
+            else { slope = (float)(dy / dx); }
+
+            intercept = CalcIntercept(slope, pt1);
+
+            return (slope, intercept);
+        }//AlgoLinearParam(pt1, pt2)
+
+        private static float CalcIntercept(float slope, PointF pt)
         {
             if (float.IsInfinity(slope)) { return pt.X; } // x = c
 
@@ -65,6 +94,38 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return (float)((decimal)pt.Y - (decimal)slope * (decimal)pt.X);
         }
 
+        //====== Intercept ======
+        public PointF AlgoInterceptX()
+        {
+            PointF pt = new PointF(float.NaN, float.NaN);
+
+            if (float.IsInfinity(Slope))
+            {
+                pt.X = Intercept;
+                pt.Y = 0;
+            }
+            else if (Slope == 0)
+            {
+                return pt;
+            }
+            else
+            {
+                pt.X = AlgoFunctionYtoX(y: 0)[0];
+                pt.Y = 0;
+            }
+
+            return pt;
+        }//DrawInterceptX()
+
+        public PointF AlgoInterceptY()
+        {
+            if (float.IsInfinity(Slope))
+            { return new PointF(float.NaN, float.NaN); }
+
+            return new PointF(0, Intercept);
+        }//AlgoInterceptY()
+       
+        //====== Text ======
         private string BuildText(float slope, float intercept)
         {
             string text = null;
@@ -112,6 +173,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 0M, (decimal)this.Slope, (decimal)this.Intercept);
         }//ToQuad()
 
+        //====== Getter for ICoordinateEquation ======
         public (decimal a, decimal b, decimal c) GetGeneralParam()
         {
             if (float.IsInfinity(Slope))
@@ -122,6 +184,12 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return (0M, (decimal)Slope, (decimal)Intercept);
         }//GetGeneralParam()
 
+        public PointF[] GetEqPointAry()
+        {
+            return EqPointAry;
+        }//GetEqPointAry()
+
+        //====== Algo ======
         public bool CheckOnLine(PointF pt)
         {
             float onY = AlgoFunctionXtoY(pt.X)[0];

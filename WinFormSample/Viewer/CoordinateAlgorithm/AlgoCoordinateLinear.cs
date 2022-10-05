@@ -132,10 +132,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             
             foreach(EquationLinear eqLinear in eqAry)
             {
-                if (float.IsNaN(AlgoInterceptX(eqLinear).X)) { continue; }
-                if (float.IsNaN(AlgoInterceptY(eqLinear).Y)) { continue; }
-                pointList.Add(AlgoInterceptX(eqLinear));
-                pointList.Add(AlgoInterceptY(eqLinear));
+                pointList.AddRange(eqLinear.EqPointAry); 
             }
 
             //---- Simultaneous Equations 連立方程式 ----
@@ -270,75 +267,13 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         public void DrawLinearFunction(PointF pt1, PointF pt2)
         {
-            (float slope, float intercept) = AlgoLinearParam(pt1, pt2);
-            DrawLinearFunction(new EquationLinear(slope, intercept));
+            DrawLinearFunction(new EquationLinear(pt1, pt2));
         }//DrawLinearFunction(PointF, PointF)
 
         public void DrawLinearFunction(float slope, float intercept)
         {
             DrawLinearFunction(new EquationLinear(slope, intercept));
         }//DrawLinearFunction(float, float)
-
-        public PointF AlgoInterceptY(EquationLinear eqLinear)
-        {
-            if(float.IsInfinity(eqLinear.Slope))
-            { return new PointF(float.NaN, float.NaN); }
-
-            return new PointF(0, eqLinear.Intercept);
-        }//AlgoInterceptY()
-
-        public PointF AlgoInterceptX(EquationLinear eqLinear)
-        {
-            PointF pt = new PointF(float.NaN, float.NaN);
-
-            if (float.IsInfinity(eqLinear.Slope)) 
-            {
-                pt.X = eqLinear.Intercept;
-                pt.Y = 0;
-            }
-            else if (eqLinear.Slope == 0)
-            {
-                return pt;
-            }
-            else
-            {
-                pt.X = eqLinear.AlgoFunctionYtoX(y: 0)[0];
-                pt.Y = 0;
-            }
-
-            return pt;
-        }//DrawInterceptY()
-
-        protected (float slope, float intercept) AlgoLinearParam(PointF pt1, PointF pt2)
-        {
-            decimal dx = (decimal)pt1.X - (decimal)pt2.X;
-            decimal dy = (decimal)pt1.Y - (decimal)pt2.Y;
-
-            float slope, intercept;
-            if (dx == 0M)
-            {
-                slope = dy > 0M ? float.PositiveInfinity : float.NegativeInfinity;     // a = ∞ or -∞
-                intercept = pt1.X;     // x = c
-                return (slope, intercept);
-            }
-            else if (dy == 0M) { slope = 0f; }  // y = b 
-            else { slope = (float)(dy / dx); }
-
-            intercept = AlgoLinearParam(slope, pt1);
-
-            return (slope, intercept);
-        }//AlgoLinerParam(pt1, pt2)
-
-        protected float AlgoLinearParam(float slope, PointF pt1)
-        {
-            if (float.IsInfinity(slope))
-            {
-                throw new ArgumentException("Invalid value 'a = ∞, -∞'");
-            }
-
-            // b = y - a x
-            return (float)((decimal)pt1.Y - (decimal)slope * (decimal)pt1.X);
-        }
 
         //====== Simultaneous 連立方程式 ======
         public bool TrySolution(

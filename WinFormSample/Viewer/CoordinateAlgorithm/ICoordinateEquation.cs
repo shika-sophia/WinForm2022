@@ -26,6 +26,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
     interface ICoordinateEquation
     {
         (decimal a, decimal b, decimal c) GetGeneralParam();
+        PointF[] GetEqPointAry();
 
         bool CheckOnLine(PointF pt);
         float[] AlgoFunctionXtoY(float x);

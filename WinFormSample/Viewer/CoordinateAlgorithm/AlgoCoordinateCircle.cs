@@ -35,8 +35,13 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             for(int i = 0; i < eqAry.Length; i++)
             {
                 ICoordinateEquation eq = eqAry[i];
-
-                //(Editing..)
+                pointList.AddRange(eq.GetEqPointAry());
+                
+                for(int j = i; j < eqAry.Length; j++)
+                {
+                    if(j == i) { continue; }
+                    //(Editing...)
+                }
             }//for i
         }//DrawMultiFunctionCircle()
 
@@ -251,11 +256,25 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         public EquationLinear AlgoRadiusLine(PointF radiusPoint, EquationCircle eqCircle)
         {
-            PointF origin = eqCircle.CircleCenterPoint;
-
-            (float slope, float intercept) = AlgoLinearParam(origin, radiusPoint);
-
-            return new EquationLinear(slope, intercept);
+            return new EquationLinear(pt1: radiusPoint, pt2: eqCircle.CircleCenterPoint);
         }//AlgoRadiusLine()
+
+        public bool TrySolutionCircle(
+            ICoordinateEquation eq1, ICoordinateEquation eq2, out PointF[] solutionAry)
+        {
+            //---- GetGeneralParam() ---- by Polymorphism
+            (decimal eq1A, decimal eq1B, decimal eq1C) = eq1.GetGeneralParam();
+            (decimal eq2A, decimal eq2B, decimal eq2C) = eq2.GetGeneralParam();
+
+            if(eq1 is EquationCircle && eq2 is EquationCircle)
+            {
+                var eqCircle1 = (EquationCircle)eq1;
+                var eqCircle2 = (EquationCircle)eq2;
+                
+                //(Editing...)
+            }
+            solutionAry = new PointF[0];
+            return false;
+        }//TrySolutionCircle()
     }//class
 }

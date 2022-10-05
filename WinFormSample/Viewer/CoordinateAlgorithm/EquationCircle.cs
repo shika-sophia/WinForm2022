@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
@@ -7,18 +8,56 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
     {
         public decimal Radius { get; private set; }
         public PointF CircleCenterPoint { get; private set; }
+        public PointF[] InterceptPointX { get; private set; }
+        public PointF[] InterceptPointY { get; private set; }
+        public PointF[] EqPointAry { get; private set; }
         public string Text { get; set; }
+
+        public EquationCircle(decimal radius, PointF cirleCenterPoint)
+        {
+            if (radius <= 0)
+            {
+                throw new ArgumentException("Circle radius should be plus value.");
+            }
+
+            this.Radius = radius;
+            this.CircleCenterPoint = cirleCenterPoint;
+            this.InterceptPointX = AlgoInterceptX();
+            this.InterceptPointY = AlgoInterceptY();
+            this.EqPointAry = BuildEqPointAry();
+            this.Text = BuildText(radius, cirleCenterPoint);
+        }//constructor
 
         public EquationCircle(decimal radius, float p, float q)
             : this(radius, new PointF(p, q)) { }
 
-        public EquationCircle(decimal radius, PointF cirleCenterPoint)
+        private PointF[] BuildEqPointAry()
         {
-            this.Radius = radius;
-            this.CircleCenterPoint = cirleCenterPoint;
-            this.Text = BuildText(radius, cirleCenterPoint);
-        }//constructor
+            List<PointF> pointList = new List<PointF>();
+            pointList.Add(CircleCenterPoint);
+            pointList.AddRange(InterceptPointX);
+            pointList.AddRange(InterceptPointY);
 
+            return pointList.ToArray();
+        }//BuildEqPointAry()
+
+        private PointF[] AlgoInterceptX()
+        {
+            return new PointF[] {
+                new PointF((float)((decimal)CircleCenterPoint.X + Radius), 0),
+                new PointF((float)((decimal)CircleCenterPoint.X - Radius), 0)
+            };
+        }//AlgoInterceptX()
+
+        private PointF[] AlgoInterceptY()
+        {
+            return new PointF[] {
+                new PointF(0, (float)((decimal)CircleCenterPoint.Y + Radius)),
+                new PointF(0, (float)((decimal)CircleCenterPoint.Y - Radius))
+            };
+        }//AlgoInterceptY()
+
+        //====== Text ======
         private string BuildText(decimal radius, PointF circleCenterPoint)
         {
             // Circle Equation  (x - p) ^ 2 + (y - q) ^ 2 = r ^ 2 
@@ -48,16 +87,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return $"(x {pStr}) ^ 2 + (y {qStr}) ^ 2 = {radius:0.##} ^ 2";
         }//BuildText()
 
-        (decimal a, decimal b, decimal c) ICoordinateEquation.GetGeneralParam()
-        {
-            decimal r = Radius;
-            decimal p = (decimal)CircleCenterPoint.X;
-            decimal q = (decimal)CircleCenterPoint.Y;
-
-            return (r, p, q);
-        }//GetGeneralParam()
-
-        string ICoordinateEquation.ToString()
+        public override string ToString()
         {
             if (Text == null)
             {
@@ -67,6 +97,22 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return Text;
         }//ToString()
 
+        //====== Getter for ICoordinateEquation ======
+        public (decimal a, decimal b, decimal c) GetGeneralParam()
+        {
+            decimal p = (decimal)CircleCenterPoint.X;
+            decimal q = (decimal)CircleCenterPoint.Y;
+            decimal r = Radius;
+
+            return (p, q, r);
+        }//GetGeneralParam()
+
+        public PointF[] GetEqPointAry()
+        {
+            return EqPointAry;
+        }
+
+        //====== Algo ======
         public bool CheckOnLine(PointF pt)
         {
             // (x - p) ^ 2 + (y - q) ^ 2 = r ^ 2
@@ -127,5 +173,19 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             return eqQuadX.AlgoQuadSolutionFormula();
         }//AlgoCircleFunctionYtoX()
+
+        public int AlgoJudgeCircle(PointF pt)
+        {
+            decimal dx = (decimal)CircleCenterPoint.X - (decimal)pt.X;
+            decimal dy = (decimal)CircleCenterPoint.Y - (decimal)pt.Y;
+            decimal distanceSqure = dx * dx + dy * dy;
+
+            int solutionNum = -1;
+            if (distanceSqure > Radius * Radius) { solutionNum = 0; }
+            if (distanceSqure == Radius * Radius) { solutionNum = 1; }
+            if (distanceSqure < Radius * Radius) { solutionNum = 2; }
+
+            return solutionNum;
+        }//AlgoJudgeCircle()
     }//class
 }
