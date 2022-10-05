@@ -200,8 +200,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             ICoordinateEquation eq1, ICoordinateEquation eq2, out PointF[] solutionAry)
         {   
             //---- GetGeneralParam() ---- by Polymorphism
-            (decimal eq1A, decimal eq1B, decimal eq1C) = eq1.GetGeneralParam();
-            (decimal eq2A, decimal eq2B, decimal eq2C) = eq2.GetGeneralParam();
+            (decimal eq1A, decimal eq1B, decimal eq1C) = eq1.GetGeneralParameter();
+            (decimal eq2A, decimal eq2B, decimal eq2C) = eq2.GetGeneralParameter();
 
             //---- solution with x = c  ----
             if(eq1B == Decimal.MaxValue && eq2B == Decimal.MaxValue)  // x = c && x = d

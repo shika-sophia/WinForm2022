@@ -340,7 +340,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return eqLinear1.Slope * eqLinear2.Slope == -1;
         }//IsVirtical()
 
-        public EquationLinear AlgoVirticalLine(EquationLinear eqLinear, PointF pt)
+        public EquationLinear AlgoVirticalLine(PointF pt, EquationLinear eqLinear)
         {
             EquationLinear virticalLine;
             if (float.IsInfinity(eqLinear.Slope))  //x = c  ->  y = b
@@ -405,14 +405,23 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             penPink.Width = 2f;
         }//DrawVirticalMark()
 
-        public decimal AlgoDistance(PointF pt1, PointF pt2)
+        //====== Distance 距離 ======
+        public decimal AlgoDistanceSq(PointF pt1, PointF pt2)
         {
-            // 三平方の定理 Three Squre Theorem:  z ^ 2 = x ^ 2 + y ^ 2 
+            // 三平方の定理 Three Squre Theorem:  d ^ 2 = x ^ 2 + y ^ 2 
             decimal dx = (decimal)pt1.X - (decimal)pt2.X;
             decimal dy = (decimal)pt1.Y - (decimal)pt2.Y;
 
-            return (decimal)Math.Sqrt((double)(dx * dx + dy * dy));
-        }//AlgoDistance()
+            return dx * dx + dy * dy; // d ^ 2 as still Squre value
+        }//AlgoDistance(pt1, pt2)
+
+        public decimal AlgoDistanceSq(PointF pt, EquationLinear eqLinear) 
+        {
+            var eqVirtical = AlgoVirticalLine(pt, eqLinear);
+            TrySolution(eqLinear, eqVirtical, out PointF solution);
+
+            return AlgoDistanceSq(pt, solution);
+        }//AlgoDistance(pt, eqLinear)
 
         public PointF AlgoDistanceOnLinePoint(
             decimal distance, PointF startPoint, EquationLinear eqLinear,
@@ -449,6 +458,24 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             return pt;
         }//AlgoDistanceOnLinePoint()
+
+        public PointF AlgoMidpoint(PointF pt1, PointF pt2)
+        {   // midpoint 中点 = (sumX / 2, sumY / 2)
+            float midX = (float)(((decimal)pt1.X + (decimal)pt2.X) / 2M);
+            float midY = (float)(((decimal)pt1.Y + (decimal)pt2.Y) / 2M);
+
+            return new PointF(midX, midY);
+        }//AlgoMidpoint()
+
+        public PointF AlgoInternalPoint(decimal distance1, decimal distance2, PointF pt1, PointF pt2)
+        {
+            // internal devide formula: (x1, x2) | m : n => (n * x1 + m * x2) / (m + n)
+            return new PointF(
+                (float)((distance2 * (decimal)pt1.X + distance1 * (decimal)pt2.X)
+                    / (distance1 + distance2)),
+                (float)((distance2 * (decimal)pt1.Y + distance1 * (decimal)pt2.Y)
+                    / (distance1 + distance2)));
+        }//AlgoInternalPoint()
     }//class
 }
 

@@ -43,18 +43,38 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         private PointF[] AlgoInterceptX()
         {
-            return new PointF[] {
-                new PointF((float)((decimal)CircleCenterPoint.X + Radius), 0),
-                new PointF((float)((decimal)CircleCenterPoint.X - Radius), 0)
-            };
+            List<PointF> pointList = new List<PointF>();
+
+            if ((decimal)CircleCenterPoint.Y < Radius)       // d < r
+            {
+                float[] xAry = AlgoFunctionYtoX(y: 0f);      // y = 0 | (x - p) ^ 2 + (y - q) ^ 2 = r ^ 2
+                pointList.Add(new PointF(xAry[0], 0));
+                pointList.Add(new PointF(xAry[1], 0));
+            }
+            else if ((decimal)CircleCenterPoint.Y == Radius) // d == r
+            {
+                pointList.Add(new PointF(CircleCenterPoint.X, 0)); 
+            }
+
+            return pointList.ToArray();
         }//AlgoInterceptX()
 
         private PointF[] AlgoInterceptY()
         {
-            return new PointF[] {
-                new PointF(0, (float)((decimal)CircleCenterPoint.Y + Radius)),
-                new PointF(0, (float)((decimal)CircleCenterPoint.Y - Radius))
-            };
+            List<PointF> pointList = new List<PointF>();
+
+            if ((decimal)CircleCenterPoint.X < Radius)  // d < r
+            {
+                float[] yAry = AlgoFunctionXtoY(x: 0f); // x = 0 | (x - p) ^ 2 + (y - q) ^ 2 = r ^ 2
+                pointList.Add(new PointF(0, yAry[0]));
+                pointList.Add(new PointF(0, yAry[1]));
+            }
+            else if ((decimal)CircleCenterPoint.X == Radius) // d == r
+            {
+                pointList.Add(new PointF(0, CircleCenterPoint.Y));
+            }
+
+            return pointList.ToArray();
         }//AlgoInterceptY()
 
         //====== Text ======
@@ -98,7 +118,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         }//ToString()
 
         //====== Getter for ICoordinateEquation ======
-        public (decimal a, decimal b, decimal c) GetGeneralParam()
+        public (decimal a, decimal b, decimal c) GetGeneralParameter()
         {
             decimal p = (decimal)CircleCenterPoint.X;
             decimal q = (decimal)CircleCenterPoint.Y;
@@ -116,12 +136,10 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         public bool CheckOnLine(PointF pt)
         {
             // (x - p) ^ 2 + (y - q) ^ 2 = r ^ 2
-            decimal radius = Radius;
-            PointF circleCenterPoint = CircleCenterPoint;
-            decimal dx = (decimal)pt.X - (decimal)circleCenterPoint.X;
-            decimal dy = (decimal)pt.Y - (decimal)circleCenterPoint.Y;
+            decimal dx = (decimal)pt.X - (decimal)CircleCenterPoint.X;
+            decimal dy = (decimal)pt.Y - (decimal)CircleCenterPoint.Y;
 
-            return dx * dx + dy * dy == radius * radius;
+            return dx * dx + dy * dy == Radius * Radius;
         }//CheckOnLine()
 
         public float[] AlgoFunctionXtoY(float x)

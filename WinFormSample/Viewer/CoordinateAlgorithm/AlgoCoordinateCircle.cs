@@ -259,22 +259,40 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return new EquationLinear(pt1: radiusPoint, pt2: eqCircle.CircleCenterPoint);
         }//AlgoRadiusLine()
 
+        //====== TrySolutionCircle() ======
         public bool TrySolutionCircle(
             ICoordinateEquation eq1, ICoordinateEquation eq2, out PointF[] solutionAry)
         {
-            //---- GetGeneralParam() ---- by Polymorphism
-            (decimal eq1A, decimal eq1B, decimal eq1C) = eq1.GetGeneralParam();
-            (decimal eq2A, decimal eq2B, decimal eq2C) = eq2.GetGeneralParam();
-
             if(eq1 is EquationCircle && eq2 is EquationCircle)
-            {
-                var eqCircle1 = (EquationCircle)eq1;
-                var eqCircle2 = (EquationCircle)eq2;
-                
+            {                
                 //(Editing...)
             }
             solutionAry = new PointF[0];
             return false;
         }//TrySolutionCircle()
+
+        private PointF[] AlgoSimultaneousCircleBoth
+            (EquationCircle eqCircle1, EquationCircle eqCircle2)
+        {
+            decimal r1 = eqCircle1.Radius;
+            decimal r2 = eqCircle2.Radius;
+            PointF origin1 = eqCircle1.CircleCenterPoint;
+            PointF origin2 = eqCircle2.CircleCenterPoint;
+
+            decimal distanceSq = AlgoDistanceSq(origin1, origin2); // d ^ 2 : distance between both circle center points as squre.
+            decimal radiusSumSq = (r1 + r2) * (r1 + r2);           // (r1 + r2) ^ 2 : sum of both radius as squre.
+
+            List<PointF> pointList = new List<PointF>();
+            if(distanceSq > radiusSumSq)       // solutionNum = 2;
+            {
+                //(Editing...)
+            }
+            else if(distanceSq == radiusSumSq) // solutionNum = 1;
+            {
+                pointList.Add(AlgoInternalPoint(r1, r2, origin1, origin2));
+            }
+
+            return pointList.ToArray();
+        }//AlgoSimultaneousCircleBoth()
     }//class
 }

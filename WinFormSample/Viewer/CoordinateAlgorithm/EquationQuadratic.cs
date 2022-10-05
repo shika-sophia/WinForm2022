@@ -193,7 +193,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         }//ToLinear()
 
         //====== Getter for ICoordinateEquation ======
-        public (decimal a, decimal b, decimal c) GetGeneralParam()
+        public (decimal a, decimal b, decimal c) GetGeneralParameter()
         {
             return (A, B, C);
         }//GetGeneralParam()
@@ -240,7 +240,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return AlgoQuadSolutionFormula(A, B, C);
         }
 
-        public static float[] AlgoQuadSolutionFormula(decimal a, decimal b, decimal c)
+        public float[] AlgoQuadSolutionFormula(decimal a, decimal b, decimal c)
         {   // ２次方程式の解の公式
             if (a == 0)
             {
@@ -270,7 +270,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return AlgoJudge(eqQuad.A, eqQuad.B, eqQuad.C, out judge);
         }
 
-        public static int AlgoJudge(
+        public int AlgoJudge(
             decimal a, decimal b, decimal c, out decimal judge)
         {   // 判別式 D = b ^ 2 - 4 a c  
             //※Math.Roundの理由 =>〔AlgoCoordinateDifferentiate.cs〕

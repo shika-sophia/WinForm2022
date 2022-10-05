@@ -67,7 +67,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             var originLine = new EquationLinear(2f, -50f);
             var pt = new PointF(100f, 50f);
-            var virticalLine = linear.AlgoVirticalLine(originLine, pt);
+            var virticalLine = linear.AlgoVirticalLine(pt, originLine);
             
             linear.DrawMultiLinearFunciton(
                 new EquationLinear[] { originLine, virticalLine }, pt);

@@ -55,16 +55,16 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             this.Text = BuildText(slope, intercept);
         }//constructor
 
-        private EquationLinear((float slope, float intercept) taple)
-            : this(taple.slope, taple.intercept) { }
-
-        public EquationLinear(float slope, PointF pathPoint) 
+        public EquationLinear(float slope, PointF pathPoint)
             : this(slope, CalcIntercept(slope, pathPoint)) { }
 
         public EquationLinear(PointF pt1, PointF pt2)
             : this(AlgoLinearParam(pt1, pt2)) { }
-        
-        //====== static Method =====
+
+        public EquationLinear((float slope, float intercept)taple)
+            : this(taple.slope, taple.intercept) { }
+
+        //====== static Method for constructor =====
         private static (float slope, float intercept) AlgoLinearParam(PointF pt1, PointF pt2)
         {
             decimal dx = (decimal)pt1.X - (decimal)pt2.X;
@@ -174,7 +174,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         }//ToQuad()
 
         //====== Getter for ICoordinateEquation ======
-        public (decimal a, decimal b, decimal c) GetGeneralParam()
+        public (decimal a, decimal b, decimal c) GetGeneralParameter()
         {
             if (float.IsInfinity(Slope))
             {
