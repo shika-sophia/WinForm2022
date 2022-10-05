@@ -469,13 +469,33 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         public PointF AlgoInternalPoint(decimal distance1, decimal distance2, PointF pt1, PointF pt2)
         {
-            // internal devide formula: (x1, x2) | m : n => (n * x1 + m * x2) / (m + n)
+            if (distance1 + distance2 == 0)
+            {
+                throw new ArgumentException("Distance should be defined as plus value.");
+            }
+
+            // internal devide formula 内分点: A(a), B(b) | m : n => (n a + m b) / (m + n)   | m + n != 0
             return new PointF(
                 (float)((distance2 * (decimal)pt1.X + distance1 * (decimal)pt2.X)
                     / (distance1 + distance2)),
                 (float)((distance2 * (decimal)pt1.Y + distance1 * (decimal)pt2.Y)
                     / (distance1 + distance2)));
         }//AlgoInternalPoint()
+
+        public PointF AlgoExternalPoint(decimal distance1, decimal distance2, PointF pt1, PointF pt2)
+        {   
+            if(distance1 == distance2)
+            {
+                throw new ArgumentException("External point is not defined with same ratio.");
+            }
+
+            // external devide formula 外分点: A(a), B(b) | m : n => (-n a  + m b) / (m - n)   | m - n != 0
+            return new PointF(
+                (float)((distance1 * (decimal)pt2.X - distance2 * (decimal)pt1.X)
+                    / (distance1 - distance2)),
+                (float)((distance1 * (decimal)pt2.Y - distance2 * (decimal)pt1.Y)
+                    / (distance1 - distance2)));
+        }//AlgoExternalPoint()
     }//class
 }
 
