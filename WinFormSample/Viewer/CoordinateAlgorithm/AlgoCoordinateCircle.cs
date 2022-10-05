@@ -16,6 +16,7 @@
  *      return new PointF((float)(radius * cos), (float)(radius * sin));
  */
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -27,6 +28,18 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         public AlgoCoordinateCircle(PictureBox pic) : base(pic) { }
 
         //====== Draw ======
+        public void DrawMultiCircleFunction(ICoordinateEquation[] eqAry, params PointF[] pointAryArgs)
+        {
+            List<PointF> pointList = new List<PointF>(pointAryArgs);
+
+            for(int i = 0; i < eqAry.Length; i++)
+            {
+                ICoordinateEquation eq = eqAry[i];
+
+                //(Editing..)
+            }//for i
+        }//DrawMultiFunctionCircle()
+
         public void DrawTriangleTheta(decimal angle, EquationCircle eqCircle)
         {
             if (Math.Abs(angle) > 360)
@@ -34,7 +47,6 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 angle %= 360M;
             }
 
-            PointF origin = eqCircle.CircleCenterPoint;
             PointF radiusPoint = AlgoRadiusPoint(angle, eqCircle);
             DrawRadiusLine(radiusPoint, eqCircle);
             DrawPointLine(radiusPoint);
@@ -211,7 +223,6 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             decimal angle, EquationCircle eqCircle)
         {
             decimal radius = eqCircle.Radius;
-            PointF origin = eqCircle.CircleCenterPoint;
             
             if (Math.Abs(angle) > 360)
             {
@@ -246,33 +257,5 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             return new EquationLinear(slope, intercept);
         }//AlgoRadiusLine()
-
-        public bool CheckOnLine(PointF pt, EquationCircle eqCircle)
-        { 
-            float[] x = AlgoCircleFunctionXtoY(pt.X, eqCircle);
-            //(Editing...)
-            return false;
-        }
-
-        public float[] AlgoCircleFunctionXtoY(float x, EquationCircle eqCircle)
-        {
-            decimal radius = eqCircle.Radius;
-            decimal p = (decimal)eqCircle.CircleCenterPoint.X;
-            decimal q = (decimal)eqCircle.CircleCenterPoint.Y;
-
-            // (x - p) ^ 2 + (y - q) ^ 2 = r ^ 2
-            // (x - p) ^ 2 + y ^ 2 - 2 q y + q ^ 2 = r ^ 2
-            float onlyX = AlgoParabolaFunctionXtoY(
-                x, 1f, (float)p, 0f);   // y = (x - p) ^ 2 
-
-            // y ^ 2 - 2 q y + q ^ 2 - (x - p) ^ 2 - r ^ 2 = 0
-            var eqQuad = new EquationQuadratic(
-                a: 1M,
-                b: -2M * q,
-                c: q * q -(decimal)onlyX - radius * radius);
-
-            return AlgoQuadSolutionFormula(eqQuad);
-        }//AlgoCircleFunctionXtoY()
-
     }//class
 }

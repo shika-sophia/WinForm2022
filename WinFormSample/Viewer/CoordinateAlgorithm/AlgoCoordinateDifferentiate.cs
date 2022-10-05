@@ -95,7 +95,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             var eqQuad = (EquationQuadratic)eq;
             
-            if(CheckOnLine(pt, eqQuad))
+            if(eqQuad.CheckOnLine(pt))
             {
                 EquationLinear eqLinear = AlgoTangentLineOnContact(eqQuad, pt, out PointF contactPoint);
                 contactPointAry = new PointF[] { contactPoint };
@@ -118,7 +118,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             for(int i = 0; i < contactXAry.Length; i++)
             {
                 float contactX = contactXAry[i];
-                float contactY = AlgoFunctionXtoY(contactX, eqQuad);
+                float contactY = eqQuad.AlgoFunctionXtoY(contactX)[0];
                 float slope = AlgoDifferentiateQuad(contactX, eqQuad);
                 PointF contactPoint = new PointF(contactX, contactY);
 
@@ -139,7 +139,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 throw new ArgumentException("y = a x + b の接線は定義しない");
             }
 
-            if (!CheckOnLine(pt, eq))
+            if (!eq.CheckOnLine(pt))
             {   
                 throw new ArgumentException("このメソッドの引数は接点のみ");
             }

@@ -66,5 +66,66 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             return Text;
         }//ToString()
+
+        public bool CheckOnLine(PointF pt)
+        {
+            // (x - p) ^ 2 + (y - q) ^ 2 = r ^ 2
+            decimal radius = Radius;
+            PointF circleCenterPoint = CircleCenterPoint;
+            decimal dx = (decimal)pt.X - (decimal)circleCenterPoint.X;
+            decimal dy = (decimal)pt.Y - (decimal)circleCenterPoint.Y;
+
+            return dx * dx + dy * dy == radius * radius;
+        }//CheckOnLine()
+
+        public float[] AlgoFunctionXtoY(float x)
+        {
+            return AlgoCircleFunctionXtoY(x, this);
+        }
+
+        public float[] AlgoFunctionYtoX(float y)
+        {
+            return AlgoCircleFunctionYtoX(y, this);
+        }
+
+        public float[] AlgoCircleFunctionXtoY(float x, EquationCircle eqCircle)
+        {
+            decimal radius = eqCircle.Radius;
+            decimal p = (decimal)eqCircle.CircleCenterPoint.X;
+            decimal q = (decimal)eqCircle.CircleCenterPoint.Y;
+
+            // (x - p) ^ 2 + (y - q) ^ 2 = r ^ 2
+            // (x - p) ^ 2 + y ^ 2 - 2 q y + q ^ 2 = r ^ 2
+            var eqQuadX = new EquationQuadratic(1f, new PointF((float)p, 0f));
+            float solutionX = eqQuadX.AlgoFunctionXtoY(x)[0];   // z = (x - p) ^ 2 
+
+            // y ^ 2 - 2 q y + q ^ 2 - (x - p) ^ 2 - r ^ 2 = 0
+            var eqQuadY = new EquationQuadratic(
+                a: 1M,
+                b: -2M * q,
+                c: q * q - (decimal)solutionX - radius * radius);
+
+            return eqQuadY.AlgoQuadSolutionFormula();
+        }//AlgoCircleFunctionXtoY()
+
+        public float[] AlgoCircleFunctionYtoX(float y, EquationCircle eqCircle)
+        {
+            decimal radius = eqCircle.Radius;
+            decimal p = (decimal)eqCircle.CircleCenterPoint.X;
+            decimal q = (decimal)eqCircle.CircleCenterPoint.Y;
+
+            // (x - p) ^ 2 + (y - q) ^ 2 = r ^ 2
+            // x ^ 2 - 2 p x + p ^ 2 + (y - q) ^ 2 = r ^ 2
+            var eqQuadY = new EquationQuadratic(1f, new PointF((float)q, 0f));
+            float solutionY = eqQuadY.AlgoFunctionXtoY(y)[0];   // z = (y - p) ^ 2 
+
+            // x ^ 2 - 2 p x + p ^ 2 - (y - q) ^ 2 - r ^ 2 = 0
+            var eqQuadX = new EquationQuadratic(
+                a: 1M,
+                b: -2M * p,
+                c: p * p - (decimal)solutionY - radius * radius);
+
+            return eqQuadX.AlgoQuadSolutionFormula();
+        }//AlgoCircleFunctionYtoX()
     }//class
 }

@@ -3,12 +3,30 @@
  *         ・AlgoCoordinateQuadratic の各メソッド引数に代入して利用する
  *           (同じ式の係数を何度も記述することを防ぐ)
  *         ・AlgoCoordinateQuadratic の各メソッド引数に代入するので、相互参照にならないよう
- *           計算や描画のアルゴリズムを記述しない
- *         ・計算や描画のアルゴリズムは AlgoCoordinateQuadraticに集約
- *           (ただし、平方完成と式の展開は、このクラス)
+ *           描画のアルゴリズムを記述しない (AlgoCoordinateQuadraticに集約)
+ *         ・計算アルゴリズムは、このクラス
+ *           (ただし 解の公式は AlgoCoordinateQuadraticにも重複)
  *         ・ICoordinateEquation で EquationLinear, EquationQuadraticを同一視が可能
  *         ・１次方程式は ２次方程式の一般式 y = a x ^ 2 + b x + c の a = 0で表現可
  *           ※ Linearを EquationQuadraticオブジェクトにするのは可読性に問題がある
+ *
+ * *@subject ２次関数上の点 x座標 -> y座標
+ *         ・２次関数の xに代入し、yの値を取得
+ *         
+ *         float  AlgoParabolaFunctionXtoY(
+ *                  float x, EquationQuadratic eqQuad)
+ *         float  AlgoParabolaFunctionXtoY(
+ *                  float x, float quadCoefficient, float vertexX, float vertexY)
+ *                  
+ *@subject ２次関数上の点 y座標 -> x座標
+ *         ・２次関数の xに代入し、yの値を取得
+ *         ・判別式により、解は 2個, 1個, 0個
+ *         
+ *         float[]  AlgoParabolaFunctionYtoX(
+ *                    float y, EquationQuadratic eqQuad)
+ *         float[]  AlgoParabolaFunctionYtoX(
+ *                    float y, float quadCoefficient, float vertexX, float vertexY)
+ *                    
  */
 using System;
 using System.Drawing;
@@ -36,7 +54,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             this.Vertex = vertex;
 
             var (a, b, c) = BuildGeneral(quadCoefficient, vertex);
-            this.A = (decimal)quadCoefficient;
+            this.A = a;
             this.B = b;
             this.C = c;
 
@@ -85,7 +103,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         private string BuildText()
         {
-            string text = null;
+            string text;
             string quadCoefficientStr = (QuadCoefficient == 1) ? "" : $"{QuadCoefficient}";
             string vertexXStr = (Vertex.X > 0) ? $"- {Vertex.X}" : $"+ {-Vertex.X}";
             string vertexYStr = (Vertex.Y > 0) ? $"+ {Vertex.Y}" : $"- {-Vertex.Y}";
@@ -131,6 +149,87 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         {
             return (A, B, C);
         }//GetGeneralParam()
+
+        public bool CheckOnLine(PointF pt)
+        {
+            float onY = AlgoFunctionXtoY(pt.X)[0];
+            return pt.Y == onY;
+        }//CheckOnLine()
+
+        public float[] AlgoFunctionXtoY(float x)
+        {
+            return new float[] { AlgoParabolaFunctionXtoY(x, A, B, C) };
+        }
+
+        public float[] AlgoFunctionYtoX(float y)
+        {
+            return AlgoQuadSolutionFormula(A, B, C - (decimal)y);
+        }
+
+        protected float AlgoParabolaFunctionXtoY(float x, decimal a, decimal b, decimal c)
+        {   // y = a x ^ 2 + b x + c
+            return (float)(a * (decimal)x * (decimal)x + b * (decimal)x + c);
+        }
+
+        protected float AlgoParabolaFunctionXtoY(
+            float x, float quadCoefficient, float vertexX, float vertexY)
+        {
+            // ２次関数 y = a(x - p)^2 + q  
+            return (float)((decimal)quadCoefficient
+                * ((decimal)x - (decimal)vertexX)
+                * ((decimal)x - (decimal)vertexX)
+                + (decimal)vertexY);
+        }//AlgoParabolaFunctionXtoY()
+
+        public float[] AlgoQuadSolutionFormula()
+        {
+            return AlgoQuadSolutionFormula(A, B, C);
+        }
+
+        public float[] AlgoQuadSolutionFormula(decimal a, decimal b, decimal c)
+        {   // ２次方程式の解の公式 //CopyTo〔AlgoCoordinateQuadratic〕
+            if (a == 0)
+            {
+                throw new ArgumentException();
+            }
+
+            int solutionNum = AlgoJudge(a, b, c, out decimal judge);
+            float[] solutionXAry = new float[solutionNum];
+
+            if (judge > 0)
+            {
+                solutionXAry[0] =
+                    (float)((-b + (decimal)Math.Sqrt((double)judge)) / (2M * a));
+                solutionXAry[1] =
+                    (float)((-b - (decimal)Math.Sqrt((double)judge)) / (2M * a));
+            }
+            else if (judge == 0)
+            {
+                solutionXAry[0] = (float)(-b / (2M * a));
+            }
+
+            return solutionXAry;
+        }//AlgoQuadSolutionFormula()
+
+        protected int AlgoJudge(EquationQuadratic eqQuad, out decimal judge)
+        {   //CopyTo〔AlgoCoordinateQuadratic〕
+            return AlgoJudge(eqQuad.A, eqQuad.B, eqQuad.C, out judge);
+        }
+
+        protected int AlgoJudge(
+            decimal a, decimal b, decimal c, out decimal judge)
+        {   //CopyTo〔AlgoCoordinateQuadratic〕
+            //※Math.Roundの理由 =>〔AlgoCoordinateDifferentiate.cs〕
+            // 判別式 D = b ^ 2 - 4 a c  
+            judge = Math.Round(b * b - 4M * a * c, 4);
+
+            int solutionNum = 0;
+            if (judge > 0) { solutionNum = 2; }
+            if (judge == 0) { solutionNum = 1; }
+            if (judge < 0) { solutionNum = 0; }
+
+            return solutionNum;
+        }//AlgoJudge()
     }//class
 }
 

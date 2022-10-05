@@ -17,6 +17,14 @@
  *         ・傾き slope, y切片 intercept
  *         ・２点 =>〔AlgoCoordinateLinear.AlgoLinearParam〕
  *
+ *@subject LinearFunction  X, Y の関係を示す式
+ *         ・引数 slope, interceptを渡して、Methodで関係性を再現する。
+ *         ・X -> Y,  Y -> X で計算式が異なる
+ *         ・「slope = 0」のときの 0除算にならないよう if文で条件分岐することに注意
+ *         
+ *         float  LinearFunctionXtoY(float x, float slope, float intercept)
+ *         float  LinearFunctionYtoX(float y, float slope, float intercept)
+ *
  *@see AlgoCoordinateLinear.cs
  *@see 
  *@author shika
@@ -113,5 +121,48 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             return (0M, (decimal)Slope, (decimal)Intercept);
         }//GetGeneralParam()
+
+        public bool CheckOnLine(PointF pt)
+        {
+            float onY = AlgoFunctionXtoY(pt.X)[0];
+            return pt.Y == onY;
+        }//CheckOnLine()
+
+        public float[] AlgoFunctionXtoY(float x)
+        {
+            return new float[] { AlgoLinearFunctionXtoY(x, Slope, Intercept) };
+        }
+
+        public float[] AlgoFunctionYtoX(float y)
+        {
+            return new float[] { AlgoLinearFunctionYtoX(y, Slope, Intercept) };
+        }
+
+        private float AlgoLinearFunctionXtoY(float x, float slope, float intercept)
+        {
+            if (float.IsInfinity(slope)) { return float.NaN; }  // x = c
+
+            // y = a x + b | y = b
+            return (float)((decimal)slope * (decimal)x + (decimal)intercept);
+        }//AlgoLinearFunction(x) -> y
+
+        private float AlgoLinearFunctionYtoX(float y, float slope, float intercept)
+        {
+            float x;
+            if (float.IsInfinity(slope))  // x = c
+            {
+                x = intercept;
+            }
+            else if (slope == 0)            // y = b
+            {
+                x = float.NaN;
+            }
+            else                          // x = (y - b) / a
+            {
+                x = (float)(((decimal)y - (decimal)intercept) / (decimal)slope);
+            }
+
+            return x;
+        }//AlgoLinearFunction(y) -> x
     }//class
 }

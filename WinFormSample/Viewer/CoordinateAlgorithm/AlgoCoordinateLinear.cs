@@ -46,14 +46,6 @@
  *         (float slope , float intercept)  AlgoLinearParam(PointF pt1, PointF pt2)
  *         float                            AlgoLinearParam(float slope, PointF pt1)
  *         
- *@subject LinearFunction  X, Y の関係を示す式
- *         ・引数 slope, interceptを渡して、Methodで関係性を再現する。
- *         ・X -> Y,  Y -> X で計算式が異なる
- *         ・「slope = 0」のときの 0除算にならないよう if文で条件分岐することに注意
- *         
- *         float  LinearFunctionXtoY(float x, float slope, float intercept)
- *         float  LinearFunctionYtoX(float y, float slope, float intercept)
- *
  *@subject DrawLinearFunction
  *         ・１次関数  y = a x + b の a, bを確定させ、
  *         ・X軸の右端と左端の X座標を代入し、それぞれの Y座標を求める
@@ -245,9 +237,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             if (Math.Abs(ratioWidthHeight) < Math.Abs((decimal)slope))
             {   // 傾きが急で、y切片 0 のとき、y座標の境界が直線の端になる
                 minY = (float)((decimal)-centerPoint.Y / scaleRate);
-                minX = AlgoLinearFunctionYtoX(minY, slope, intercept);
+                minX = eqLinear.AlgoFunctionYtoX(minY)[0];
                 maxY = (float)((decimal)centerPoint.Y / scaleRate);
-                maxX = AlgoLinearFunctionYtoX(maxY, slope, intercept);
+                maxX = eqLinear.AlgoFunctionYtoX(maxY)[0];
 
                 textLocation.X = (float)((decimal)((slope > 0) ?
                     ((decimal)minX * scaleRate - (decimal)textSize.Width - 5M) : (decimal)minX * scaleRate + 10M));
@@ -256,9 +248,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             else
             {   // 傾きが緩やかで、y切片 0 のとき、x座標の境界が直線の端になる
                 minX = (float)((decimal)-centerPoint.X / scaleRate);
-                minY = AlgoLinearFunctionXtoY(minX, slope, intercept);
+                minY = eqLinear.AlgoFunctionXtoY(minX)[0];
                 maxX = (float)((decimal)centerPoint.X / scaleRate);
-                maxY = AlgoLinearFunctionXtoY(maxX, slope, intercept);
+                maxY = eqLinear.AlgoFunctionXtoY(maxX)[0];
 
                 textLocation.X = (float)((decimal)maxX * scaleRate - (decimal)textSize.Width- 5M);
                 textLocation.Y = (float)((slope > 0 ?
@@ -287,12 +279,6 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             DrawLinearFunction(new EquationLinear(slope, intercept));
         }//DrawLinearFunction(float, float)
 
-        public bool CheckOnLine(PointF pt, EquationLinear eqLinear)
-        {
-            float onY = AlgoFunctionXtoY(pt.X, eqLinear);
-            return pt.Y == onY;
-        }//CheckOnLine()
-
         public PointF AlgoInterceptY(EquationLinear eqLinear)
         {
             if(float.IsInfinity(eqLinear.Slope))
@@ -316,7 +302,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             }
             else
             {
-                pt.X = AlgoFunctionYtoX(0, eqLinear);
+                pt.X = eqLinear.AlgoFunctionYtoX(y: 0)[0];
                 pt.Y = 0;
             }
 
@@ -354,75 +340,29 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return (float)((decimal)pt1.Y - (decimal)slope * (decimal)pt1.X);
         }
 
-        protected float AlgoFunctionXtoY(float x, EquationLinear eqLinear)
-        {
-            return AlgoLinearFunctionXtoY(x, eqLinear.Slope, eqLinear.Intercept);
-        }
-
-        protected float AlgoFunctionYtoX(float y, EquationLinear eqLinear)
-        {
-            return AlgoLinearFunctionYtoX(y, eqLinear.Slope, eqLinear.Intercept);
-        }
-
-        private float AlgoLinearFunctionXtoY(float x, float slope, float intercept)
-        {
-            if (float.IsInfinity(slope)) { return float.NaN; }  // x = c
-
-            // y = a x + b | y = b
-            return (float)((decimal)slope * (decimal)x + (decimal)intercept);
-        }//AlgoLinearFunction(x) -> y
-
-
-        private float AlgoLinearFunctionYtoX(float y, float slope, float intercept)
-        {
-            float x;
-            if (float.IsInfinity(slope))  // x = c
-            {
-                x = intercept;
-            }
-            else if(slope == 0)            // y = b
-            {
-                x = float.NaN;
-            }
-            else                          // x = (y - b) / a
-            {   
-                x = (float)(((decimal)y - (decimal)intercept) / (decimal)slope);
-            }
-
-            return x;
-        }//AlgoLinearFunction(y) -> x
-
+        //====== Simultaneous 連立方程式 ======
         public bool TrySolution(
-            EquationLinear eqLinear1, EquationLinear eqLinear2, out PointF solutionPoint)
+            EquationLinear eqLinear1, EquationLinear eqLinear2, out PointF solution)
         {
-            bool existSolution = TrySolution(
-                eqLinear1.Slope, eqLinear1.Intercept,
-                eqLinear2.Slope, eqLinear2.Intercept,
-                out PointF solution);
-            solutionPoint = solution;
-            return existSolution;
-        }//TrySolution()
-
-        public bool TrySolution(
-            float slope1, float intercept1,
-            float slope2, float intercept2, out PointF solution)
-        {
+            float slope1 = eqLinear1.Slope;
+            float intercept1 = eqLinear1.Intercept;
+            float slope2 = eqLinear2.Slope;
+            float intercept2 = eqLinear2.Intercept;
+            
             // y = a x + b | y = cx + d の連立方程式の解
             solution = new PointF(float.NaN, float.NaN);
 
             if (float.IsInfinity(slope1))  // x = □, 
             {
                 solution.X = intercept1;
-                solution.Y = AlgoLinearFunctionXtoY(
-                    solution.X, slope2, intercept2);
+                solution.Y = eqLinear2.AlgoFunctionXtoY(solution.X)[0];
                 return true;
             }
 
             if (float.IsInfinity(slope2))  // x = △, 
             {
                 solution.X = intercept2;
-                solution.Y = AlgoLinearFunctionXtoY(
-                    solution.X, slope1, intercept1);
+                solution.Y = eqLinear1.AlgoFunctionXtoY(solution.X)[0];
                 return true;
             }
 
@@ -434,28 +374,27 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             if (slope1 == 0)  // y = b | y = c x + d
             {
                 solution.Y = intercept1;
-                solution.X = AlgoLinearFunctionYtoX(
-                    solution.Y, slope2, intercept2);
+                solution.X = eqLinear2.AlgoFunctionYtoX(solution.Y)[0];
                 return true;
             }
 
             if (slope2 == 0)  // y = a x + b | y = d
             {
                 solution.Y = intercept2;
-                solution.X = AlgoLinearFunctionYtoX(
-                    solution.Y, slope1, intercept1);
+                solution.X = eqLinear1.AlgoFunctionYtoX(solution.Y)[0];
                 return true;
             }
 
             // y = a x + b | y = cx + d の連立方程式の解
             // x = -(b - d) / (a - c)
             // y = a x + b に xを代入
-            solution.X = -(float)(((decimal)intercept1 - (decimal)intercept2) 
+            solution.X = -(float)(((decimal)intercept1 - (decimal)intercept2)
                             / ((decimal)slope1 - (decimal)slope2));
-            solution.Y = AlgoLinearFunctionXtoY(solution.X, slope1, intercept1);
+            solution.Y = eqLinear1.AlgoFunctionXtoY(solution.X)[0];
             return true;
         }//TrySolution()
 
+        //====== Virtical 垂直線 ======
         public bool IsVirtical(EquationLinear eqLinear1, EquationLinear eqLinear2)
         {
             if (float.IsInfinity(eqLinear1.Slope)) { return eqLinear2.Slope == 0; }
@@ -568,7 +507,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 decimal cos = (decimal)Math.Sqrt((double)( 1M /(tan * tan + 1M)));
                 
                 pt.X = (float)((decimal)startPoint.X + signX * distance * cos);
-                pt.Y = AlgoFunctionXtoY(pt.X, eqLinear);
+                pt.Y = eqLinear.AlgoFunctionXtoY(pt.X)[0];
 
                 //Console.WriteLine($"tan = {tan}, cos = {cos}, PointF({pt.X},{pt.Y})");
             }

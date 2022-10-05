@@ -26,23 +26,6 @@
  *         引数: float quadCoefficient  y = a ( x - p ) ^ 2 + q の　a
  *               float vertexX, float vertexY: 頂点の座標
  *
- *@subject ２次関数上の点 x座標 -> y座標
- *         ・２次関数の xに代入し、yの値を取得
- *         
- *         float  AlgoParabolaFunctionXtoY(
- *                  float x, EquationQuadratic eqQuad)
- *         float  AlgoParabolaFunctionXtoY(
- *                  float x, float quadCoefficient, float vertexX, float vertexY)
- *                  
- *@subject ２次関数上の点 y座標 -> x座標
- *         ・２次関数の xに代入し、yの値を取得
- *         ・判別式により、解は 2個, 1個, 0個
- *         
- *         float[]  AlgoParabolaFunctionYtoX(
- *                    float y, EquationQuadratic eqQuad)
- *         float[]  AlgoParabolaFunctionYtoX(
- *                    float y, float quadCoefficient, float vertexX, float vertexY)
- *                    
  *@subject ２個の２次方程式どうしの連立解
  *         ・a1 x1 ^ 2 + b1 x1 + c1 = a2 x2 ^ 2 + b2 x2 + c2
  *              -> subA x ^ 2 + subB x + subC = 0 を満たす x
@@ -204,7 +187,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             for (decimal i = (decimal)-centerPoint.X / scaleRate;
                 i < (decimal)centerPoint.X / scaleRate; i++)
             {
-                float ptY = (float)((decimal)-AlgoFunctionXtoY((float)i, eqQuad) * scaleRate);
+                float ptY = (float)((decimal)-eqQuad.AlgoFunctionXtoY((float)i)[0] * scaleRate);
 
                 if (Math.Abs((decimal)ptY) > Math.Abs((decimal)centerPoint.Y))
                 { continue; }
@@ -229,46 +212,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             g.DrawString(eqQuad.Text, font, penPink.Brush, textLoction);
         }//DrawParabolaFunction(EquationQuadratic)
-        
-        public bool CheckOnLine(PointF pt, ICoordinateEquation eq)
-        {
-            if(eq is EquationLinear)
-            {
-                return base.CheckOnLine(pt, eq as EquationLinear);
-            }
 
-            var eqQuad = (EquationQuadratic)eq;
-            float onY = AlgoFunctionXtoY(pt.X, eqQuad);
-            return pt.Y == onY;
-        }//CheckOnLine()
-
-        public float AlgoFunctionXtoY(float x, ICoordinateEquation eq)
-        {
-            if (eq is EquationLinear)
-            {
-                return base.AlgoFunctionXtoY(x, eq as EquationLinear);
-            }
-
-            var eqQuad = (EquationQuadratic)eq;
-            return AlgoParabolaFunctionXtoY(x, eqQuad.A, eqQuad.B, eqQuad.C);
-        }
-
-        public float[] AlgoFunctionYtoX(float y, ICoordinateEquation eq)
-        {
-            if (eq is EquationLinear)
-            {
-                return new float[] { base.AlgoFunctionYtoX(y, eq as EquationLinear) };
-            }
-
-            var eqQuad = (EquationQuadratic)eq;
-            return AlgoQuadSolutionFormula(eqQuad.A, eqQuad.B, eqQuad.C - (decimal)y);
-        }
-
-        protected float AlgoParabolaFunctionXtoY(float x, decimal a, decimal b, decimal c)
-        {   // y = a x ^ 2 + b x + c
-            return (float)(a * (decimal)x * (decimal)x + b * (decimal)x + c);
-        }
-
+        //using AlgoCoordinateCircle
         protected float AlgoParabolaFunctionXtoY(
             float x, float quadCoefficient, float vertexX, float vertexY)
         {
@@ -281,14 +226,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         public PointF AlgoInterceptY(ICoordinateEquation eq)
         {
-            if (eq is EquationLinear)
-            {
-                return base.AlgoInterceptY(eq as EquationLinear);
-            }
-
-            var eqQuad = (EquationQuadratic)eq;
-            return new PointF(
-                0, AlgoFunctionXtoY(x: 0f, eqQuad));
+            return new PointF(0, eq.AlgoFunctionXtoY(x: 0f)[0]);
         }//AlgoInterceptY()
 
         public PointF[] AlgoInterceptX(ICoordinateEquation eq)
@@ -301,7 +239,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             var eqQuad = (EquationQuadratic)eq;
             List<PointF> pointList = new List<PointF>();
             
-            float[] interceptXAry = AlgoFunctionYtoX(y: 0f, eqQuad);            
+            float[] interceptXAry = eqQuad.AlgoFunctionYtoX(y: 0f);
             foreach (float x in interceptXAry)
             {
                 pointList.Add(new PointF(x, 0));
@@ -326,14 +264,14 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             else if (eq1B == Decimal.MaxValue)
             {
                 float solutionX = (float)eq1C;
-                float solutionY = AlgoFunctionXtoY(solutionX, eq2);
+                float solutionY = eq2.AlgoFunctionXtoY(solutionX)[0];
                 solutionAry = new PointF[] { new PointF(solutionX, solutionY) };
                 return true;
             }
             else if (eq2B == Decimal.MaxValue)
             {
                 float solutionX = (float)eq2C;
-                float solutionY = AlgoFunctionXtoY(solutionX, eq1);
+                float solutionY = eq1.AlgoFunctionXtoY(solutionX)[0];
                 solutionAry = new PointF[] { new PointF(solutionX, solutionY) };
                 return true;
             }
@@ -351,7 +289,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             else if (subA == 0)  // case: a = 0, bx + c = 0  解はあっても、0除算のため解の公式を利用できない
             {
                 float solutionX = (float)(-subC / subB);
-                float solutionY = AlgoFunctionXtoY(solutionX, eq1);
+                float solutionY = eq1.AlgoFunctionXtoY(solutionX)[0];
                 solutionAry = new PointF[] { new PointF(solutionX, solutionY) };
                 return true;
             }
@@ -361,7 +299,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             for(int i = 0; i < xAry.Length; i++)
             {
                 solutionAry[i] = new PointF(
-                    xAry[i], AlgoFunctionXtoY(xAry[i], eq1));
+                    xAry[i], eq1.AlgoFunctionXtoY(xAry[i])[0]);
             }//for
             
             if (solutionAry.Length == 0) { return false; }
@@ -370,13 +308,13 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         }//TrySolutionQuad()
 
         protected float[] AlgoQuadSolutionFormula(EquationQuadratic eqQuad)
-        {
+        {   //CopyTo〔EquationQuadratic〕
             return AlgoQuadSolutionFormula(eqQuad.A, eqQuad.B, eqQuad.C);
         }
 
         protected float[] AlgoQuadSolutionFormula(decimal a, decimal b, decimal c)
-        {   // ２次方程式の解の公式
-            if(a == 0)
+        {   // ２次方程式の解の公式  //CopyTo〔EquationQuadratic〕
+            if (a == 0)
             {
                 throw new ArgumentException();
             }
@@ -400,13 +338,15 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         }//AlgoQuadSolutionFormula()
 
         protected int AlgoJudge(EquationQuadratic eqQuad, out decimal judge)
-        {
+        {   //CopyTo〔EquationQuadratic〕
             return AlgoJudge(eqQuad.A, eqQuad.B, eqQuad.C, out  judge);
         }
 
         protected int AlgoJudge(
             decimal a, decimal b, decimal c, out decimal judge)
-        {   // 判別式 D = b ^ 2 - 4 a c  ※Math.Roundの理由 =>〔AlgoCoordinateDifferentiate.cs〕
+        {   //CopyTo〔EquationQuadratic〕
+            //※Math.Roundの理由 =>〔AlgoCoordinateDifferentiate.cs〕
+            // 判別式 D = b ^ 2 - 4 a c  
             judge = Math.Round(b * b - 4M * a * c, 4);
 
             int solutionNum = 0;

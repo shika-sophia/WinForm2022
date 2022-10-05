@@ -19,11 +19,17 @@
  *         AlgoXxxx.DrawMultiQuadraticFunction(ICoordinate[])
  */
 
+using System.Drawing;
+
 namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 {
     interface ICoordinateEquation
     {
         (decimal a, decimal b, decimal c) GetGeneralParam();
+
+        bool CheckOnLine(PointF pt);
+        float[] AlgoFunctionXtoY(float x);
+        float[] AlgoFunctionYtoX(float y);
 
         string ToString();
     }
