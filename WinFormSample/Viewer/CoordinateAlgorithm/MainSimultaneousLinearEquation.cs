@@ -75,16 +75,14 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             linear.DrawCoordinateAxis();
 
             // y = a x + b
-            float slope1 = 2f;
-            float intercept1 = 50f;
+            var eqLinear1 = new EquationLinear(2f, 50f);
 
             // y = c x + d
-            float slope2 = -0.1f;
-            float intercept2 = 200f;
+            var eqLinear2 = new EquationLinear(-0.1f, 200f);
 
             //連立方程式の解
             bool existSolution = linear.TrySolution(
-                slope1, intercept1, slope2, intercept2, out PointF solutionPoint);
+                eqLinear1, eqLinear2, out PointF solutionPoint);
             
             if(!existSolution)
             {
@@ -97,8 +95,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             }
 
             //DrawPointLine()で PointAutoScale()を行うので、その後に DrawLine()
-            linear.DrawLinearFunction(slope1, intercept1);
-            linear.DrawLinearFunction(slope2, intercept2);
+            linear.DrawLinearFunction(eqLinear1);
+            linear.DrawLinearFunction(eqLinear2);
 
             this.Controls.AddRange(new Control[]
             {
