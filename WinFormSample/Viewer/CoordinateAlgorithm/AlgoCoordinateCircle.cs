@@ -263,12 +263,43 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         public bool TrySolutionCircle(
             ICoordinateEquation eq1, ICoordinateEquation eq2, out PointF[] solutionAry)
         {
+            List<PointF> solutionList = new List<PointF>();
             if(eq1 is EquationCircle && eq2 is EquationCircle)
-            {                
-                //(Editing...)
+            {
+                solutionList.AddRange(AlgoSimultaneousCircleBoth(
+                    eq1 as EquationCircle, eq2 as EquationCircle));
             }
-            solutionAry = new PointF[0];
-            return false;
+             
+            if (eq1 is EquationCircle && eq2 is EquationQuadratic)
+            {
+                // (Editing...)
+            }
+
+            if (eq2 is EquationCircle && eq1 is EquationQuadratic)
+            {
+                // (Editing...)
+            }
+
+            if (eq1 is EquationCircle && eq2 is EquationLinear)
+            {
+                solutionList.AddRange(AlgoSimultaneousCircleLinear(
+                    eq1 as EquationCircle, eq2 as EquationLinear));
+            }
+
+            if (eq2 is EquationCircle && eq1 is EquationLinear)
+            {
+                solutionList.AddRange(AlgoSimultaneousCircleLinear(
+                    eq2 as EquationCircle, eq1 as EquationLinear));
+            }
+
+            if (!(eq1 is EquationCircle) && !(eq2 is EquationCircle))
+            {
+                TrySolutionQuad(eq1, eq2, out PointF[] solutionAryQuad);
+                solutionList.AddRange(solutionAryQuad);
+            }
+
+            solutionAry = solutionList.ToArray();
+            return solutionAry.Length > 0;
         }//TrySolutionCircle()
 
         private PointF[] AlgoSimultaneousCircleBoth
@@ -281,18 +312,89 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             decimal distanceSq = AlgoDistanceSq(origin1, origin2); // d ^ 2 : distance between both circle center points as squre.
             decimal radiusSumSq = (r1 + r2) * (r1 + r2);           // (r1 + r2) ^ 2 : sum of both radius as squre.
+            decimal radiusSubtractSq = (r1 - r2) * (r1 - r2);
 
             List<PointF> pointList = new List<PointF>();
-            if(distanceSq > radiusSumSq)       // solutionNum = 2;
-            {
-                //(Editing...)
+            if(distanceSq < radiusSumSq && distanceSq > radiusSubtractSq)
+            {   // solutionNum = 2;  d < r1 + r2, d > r1 - r2
+                // (x - p) ^ 2 + (y - q) ^ 2 = r ^ 2 | (x - m) ^ 2 + (y - n) ^ 2 = R ^ 2
+                //    x ^ 2 - 2 p x + p ^ 2 + y ^ 2 - 2 q y + q ^ 2 = r ^ 2
+                // -) x ^ 2 - 2 m x + m ^ 2 + y ^ 2 - 2 n y + n ^ 2 = R ^ 2
+                //          - 2 p x + 2 m x         - 2 q y + 2 n y = r^2 - R^2 - p^2 + m^2 - q^2 + n^2
+                // y = (r^2 - R^2 - p^2 - q^2 + m^2 + n^2 + 2 (p - m) x) / 2(q - n)
+
+                decimal p = (decimal)origin1.X;
+                decimal q = (decimal)origin1.Y;
+                decimal m = (decimal)origin2.X;
+                decimal n = (decimal)origin2.Y;
+
+                if(q - n == 0) 
+                {
+                    //eqLinear = new EquationLinear(
+                    //    slope: float.PositiveInfinity,
+                    //    intercept: );
+
+                    throw new ArgumentException("q - n == 0  in AlgoSimultaneousCircleBoth()");
+                }
+                
+                var eqLinear = new EquationLinear(
+                    slope: (float)((p - m) / (q - n)),
+                    intercept: (float)((r1 * r1 - r2 * r2 - p * p - q * q + m * m + n * n) 
+                        / (2M * (q - n)))
+                );
+            
+                pointList.AddRange(AlgoSimultaneousCircleLinear(eqCircle1, eqLinear));
             }
-            else if(distanceSq == radiusSumSq) // solutionNum = 1;
-            {
+            else if(distanceSq == radiusSumSq)
+            {   // solutionNum = 1;  d == r1 + r2  ２円外接、内分点
                 pointList.Add(AlgoInternalPoint(r1, r2, origin1, origin2));
+            }
+            else if (distanceSq == radiusSubtractSq && r1 != r2)
+            {   // solutionNum = 1;  d == r1 - r2  ２円内接、外分点
+                pointList.Add(AlgoExternalPoint(r1, r2, origin1, origin2));
             }
 
             return pointList.ToArray();
         }//AlgoSimultaneousCircleBoth()
+
+        private PointF[] AlgoSimultaneousCircleLinear(EquationCircle eqCircle, EquationLinear eqLinear)
+        {
+            List<PointF> pointList = new List<PointF>();
+            if (float.IsInfinity(eqLinear.Slope))  // x = c  (virtical)
+            {
+                float[] yAry = eqCircle.AlgoFunctionXtoY(x: eqLinear.Intercept);
+                foreach (float solutionY in yAry)
+                {
+                    pointList.Add(new PointF(eqLinear.Intercept, solutionY));
+                }//foreach
+
+                return pointList.ToArray();
+            }
+
+            // y = a x + b | (x - p) ^ 2 + (y - q) ^ 2 = r ^ 2
+            // x ^ 2 - 2 p x + p ^ 2 + (a x + b) ^ 2 - 2 q (a x + b) + q ^ 2 = r ^ 2
+            // x ^ 2 - 2 p x + p ^ 2 + a^2 x^2 + 2abx + b^2 -2aqx -2bq + q ^ 2 = r ^ 2
+            // (1 + a^2) x ^ 2 + (2ab -2p -2aq) x + p^2 + q^2 - 2bq - r^2 = 0
+            decimal a = (decimal)eqLinear.Slope;
+            decimal b = (decimal)eqLinear.Intercept;
+            decimal p = (decimal)eqCircle.CircleCenterPoint.X;
+            decimal q = (decimal)eqCircle.CircleCenterPoint.Y;
+            decimal r = eqCircle.Radius;
+
+            var eqQuad = new EquationQuadratic(
+                a: 1 + a * a,               // 必ず 1 + a ^ 2 > 0
+                b: 2M * (a * b - p - a * q),
+                c: p * p + q * q - 2M * b * q - r * r);
+
+            float[] xAry = eqQuad.AlgoQuadSolutionFormula();
+
+            foreach(float solutionX in xAry)
+            {
+                float solutionY = eqLinear.AlgoFunctionXtoY(solutionX)[0];
+                pointList.Add(new PointF(solutionX, solutionY));
+            }//foreach
+
+            return pointList.ToArray();
+        }//AlgoSimultaneousCircleLinear()
     }//class
 }
