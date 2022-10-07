@@ -60,17 +60,23 @@
  *           
  *          pointList.AddRange(AlgoSimultaneousCircleLinear(eqCircle1, eqLinear));
  *          
- *         ＊【幾何的解法】 Geometrical Solver
+ *@subject ＊【幾何的解法】 Geometrical Solver
  *         ・２円の交点を通る直線は、２円の中心を結ぶ線と垂直に交わる (r による二等辺三角形の角２等分線)
  *           -> 直線の傾き slopeが求まる
- *         ・３辺の長さ d, r1, r2 が分っているので、余弦定理より(double計算ではない) cosθの値を得て、
+ *         ・３辺の長さ d, r1, r2 が分っているので、余弦定理より cosθの値を得て、
  *           -> 上記２直線の交点座標が求まる
  *         ・複雑な代数計算をせずに済み、0除算の場合分けも不要
+ *         
+ *         余弦定理: c ^ 2 = a ^ 2 + b ^ 2 - 2 a b cosC
+ *         cosC = (c ^ 2 - a ^ 2 - b ^ 2) / (- 2 a b)
+ *         ∠C: 中心線と eqCircle1の半径のなす角
+ *              ->  a = r2, b = d, c = r1
  */
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
@@ -82,19 +88,92 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         //====== Draw ======
         public void DrawMultiCircleFunction(ICoordinateEquation[] eqAry, params PointF[] pointAryArgs)
         {
-            List<PointF> pointList = new List<PointF>(pointAryArgs);
+            //---- Test Print ----
+            Console.WriteLine("Equation Array:");
+            foreach (var eq in eqAry) { Console.WriteLine(eq); };
+            Console.WriteLine("\nArgument pointAry:");
+            foreach (var pt in pointAryArgs) { Console.Write($"({pt.X},{pt.Y}), "); }
+            Console.WriteLine("\n");
 
-            for(int i = 0; i < eqAry.Length; i++)
+            //---- pointList ----
+            List<PointF> pointList = new List<PointF>(pointAryArgs);
+            List<EquationLinear> virticalLineList = new List<EquationLinear>();
+
+            for (int i = 0; i < eqAry.Length; i++)
             {
                 ICoordinateEquation eq = eqAry[i];
-                pointList.AddRange(eq.GetEqPointAry());
                 
                 for(int j = i; j < eqAry.Length; j++)
                 {
+                    //case same
                     if(j == i) { continue; }
-                    //(Editing...)
-                }
+
+                    //---- TrySolution ----
+                    bool existSolution = TrySolutionCircle(eqAry[i], eqAry[j], out PointF[] solutionAry);
+
+                    if (existSolution)
+                    {
+                        pointList.AddRange(solutionAry);
+                    }
+
+                    //case virtical
+                    if (eqAry[i] is EquationLinear && eqAry[j] is EquationLinear
+                        && IsVirtical(eqAry[i] as EquationLinear, eqAry[j] as EquationLinear))
+                    {
+                        virticalLineList.Add(eqAry[i] as EquationLinear);
+                        virticalLineList.Add(eqAry[j] as EquationLinear);
+                        Console.WriteLine($"\nIsVirticle = True");
+                    }
+
+                    //---- Test Print TrySolution() ----
+                    Console.WriteLine($"\nexistSolution = {existSolution}");
+                    foreach (var solution in solutionAry) { Console.Write($"({solution.X},{solution.Y}), "); }
+                }//for j
+
+                pointList.AddRange(eq.GetEqPointAry());
             }//for i
+
+            //---- Test Print before Distinct() ----
+            Console.WriteLine("\n\npointList before Distinct():");
+            pointList.ForEach(pt => { Console.Write($"({pt.X},{pt.Y}), "); });
+
+            //---- Remove overlapped point and NaN ----
+            PointF[] pointAry = pointList.Select(pt => pt)
+                .Where(pt => !float.IsNaN(pt.X) || !float.IsNaN(pt.Y))
+                .Distinct()
+                .ToArray();
+
+            //---- Test Print after Distinct() ----
+            Console.WriteLine("\n\npointAry after Distinct():");
+            foreach (PointF pt in pointAry) { Console.Write($"({pt.X},{pt.Y}), "); }
+            Console.WriteLine("\n");
+
+            //---- Draw ----
+            DrawMultiPointLine(pointList.ToArray());
+
+            foreach (ICoordinateEquation eq in eqAry)
+            {
+                if (eq is EquationCircle)
+                {
+                    Console.WriteLine($"DrawCircleFunction({eq})");
+                    DrawCircleFunction(eq as EquationCircle);
+                }
+                else if (eq is EquationQuadratic)
+                {
+                    Console.WriteLine($"DrawParabolaFunction({eq})");
+                    DrawParabolaFunction(eq as EquationQuadratic);
+                }
+                else if (eq is EquationLinear)
+                {
+                    Console.WriteLine($"DrawLinearFunction({eq})");
+                    DrawLinearFunction(eq as EquationLinear);
+                }
+
+                if (virticalLineList.Count > 0)
+                {
+                    DrawVirticalMark(virticalLineList.ToArray());
+                }
+            }//foreach
         }//DrawMultiFunctionCircle()
 
         public void DrawTriangleTheta(decimal angle, EquationCircle eqCircle)
@@ -370,7 +449,21 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             List<PointF> pointList = new List<PointF>();
             if(distanceSq < radiusSumSq && distanceSq > radiusSubtractSq)
             {   
-                //
+                
+                // 中心線
+                var eqCenterLine = new EquationLinear(origin1, origin2);
+                
+                // 余弦定理: c ^ 2 = a ^ 2 + b ^ 2 - 2 a b cosC
+                // cosC = (c ^ 2 - a ^ 2 - b ^ 2) / (- 2 a b)
+                // ∠C: 中心線と eqCircle1の半径のなす角 ->  a = r2, b = d, c = r1
+                decimal cos = (r1 * r1 - r2 * r2 - distanceSq)
+                    / (-2M * r2 * (decimal)Math.Sqrt((double)distanceSq));
+                float solutionX = (float)(r1 * cos);
+                float solutionY = eqCenterLine.AlgoFunctionXtoY(solutionX)[0];
+                var eqSolutionLine =
+                    AlgoVirticalLine(new PointF(solutionX, solutionY), eqCenterLine);
+
+                pointList.AddRange(AlgoSimultaneousCircleLinear(eqCircle1, eqSolutionLine));
             }
             else if(distanceSq == radiusSumSq)
             {   // solutionNum = 1;  d == r1 + r2  ２円外接、内分点
