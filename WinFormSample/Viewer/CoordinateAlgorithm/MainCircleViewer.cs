@@ -63,8 +63,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             circle.DrawCoordinateAxis();
             //circle.DrawMultiPointLine(new PointF[] { new PointF(0, 0) });
             
-            var eqCircle = new EquationCircle(100, 0, 0);
-            var eqCircle2 = new EquationCircle(100, 50, 50);
+            var eqCircle = new EquationCircle(100, new PointF(0, 0));
+            var eqCircle2 = new EquationCircle(100, new PointF(50, 50));
 
             Console.WriteLine(eqCircle);
             Console.WriteLine(eqCircle.Text);
