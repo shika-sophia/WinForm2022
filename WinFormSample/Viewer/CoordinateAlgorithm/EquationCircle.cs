@@ -8,6 +8,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
     {
         public decimal Radius { get; private set; }
         public PointF CircleCenterPoint { get; private set; }
+        public decimal A { get; private set; }
+        public decimal B { get; private set; }
+        public decimal C { get; private set; }
         public PointF[] InterceptPointX { get; private set; }
         public PointF[] InterceptPointY { get; private set; }
         public PointF[] EqPointAry { get; private set; }
@@ -15,6 +18,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         public EquationCircle(decimal radius, PointF cirleCenterPoint)
         {
+            // (x - p) ^ 2 + (y - q) ^ 2 = r ^ 2
             if (radius <= 0)
             {
                 throw new ArgumentException("Circle radius should be plus value.");
@@ -22,6 +26,11 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             this.Radius = radius;
             this.CircleCenterPoint = cirleCenterPoint;
+            (decimal a, decimal b, decimal c) = 
+                BuildGeneralParameterCircle(radius, cirleCenterPoint);
+            this.A = a;
+            this.B = b;
+            this.C = c;
             this.InterceptPointX = AlgoInterceptX();
             this.InterceptPointY = AlgoInterceptY();
             this.EqPointAry = BuildEqPointAry();
@@ -30,6 +39,43 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         public EquationCircle(decimal radius, float p, float q)
             : this(radius, new PointF(p, q)) { }
+
+        //【Deprecated】非推奨: because of including Math.Sqrt(double) | double計算を含み誤差の可能性
+        public EquationCircle(decimal a, decimal b, decimal c)
+        {
+            // x ^ 2 + y ^ 2 + a x + b y + c = 0
+            (float p, float q, decimal radius) = BuildSqureCircle(a, b, c);
+
+            new EquationCircle(radius, new PointF(p, q));
+        }
+
+        private (decimal a, decimal b, decimal c) 
+            BuildGeneralParameterCircle(decimal radius, PointF circleCenterPoint)
+        {
+            // [(x - p) ^ 2 + (y - q) ^ 2 = r ^ 2]  ->  [x ^ 2 + y ^ 2 + a x + b y + c = 0]
+            // x ^ 2 - 2 p x + p ^ 2 + y ^ 2 - 2 q y + q ^ 2 = r ^ 2
+            // x ^ 2 + y ^ 2 - 2 p - 2 q y + p ^ 2 + q ^ 2 - r ^ 2 = 0
+            decimal p = (decimal)circleCenterPoint.X;
+            decimal q = (decimal)circleCenterPoint.Y;
+            
+            decimal a = -2M * p;
+            decimal b = -2M * q;
+            decimal c = p * p + q * q - radius * radius;
+
+            return (a, b, c);
+        }//BuildGeneralParam()
+
+        private (float p, float q, decimal radius) BuildSqureCircle(
+            decimal a, decimal b, decimal c)
+        {
+            // [x ^ 2 + y ^ 2 + a x + b y + c = 0]  -> Completed Squre [(x - p) ^ 2 + (y - q) ^ 2 = r ^ 2]
+            // (x - (- a / 2)) ^ 2 + (y - (- b / 2)) ^ 2 = √[(a ^ 2 + b ^ 2 - 4 c) / 4)] ^ 2
+            float p = (float)(-a / 2M);
+            float q = (float)(-b / 2M);
+            decimal radius = (decimal)Math.Sqrt((double)((a * a + b * b - 4M * c) / 4M));
+
+            return (p, q, radius);
+        }//BuildSqureCircle()
 
         private PointF[] BuildEqPointAry()
         {
@@ -120,11 +166,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         //====== Getter for ICoordinateEquation ======
         public (decimal a, decimal b, decimal c) GetGeneralParameter()
         {
-            decimal p = (decimal)CircleCenterPoint.X;
-            decimal q = (decimal)CircleCenterPoint.Y;
-            decimal r = Radius;
-
-            return (p, q, r);
+            return (this.A, this.B, this.B);
         }//GetGeneralParam()
 
         public PointF[] GetEqPointAry()

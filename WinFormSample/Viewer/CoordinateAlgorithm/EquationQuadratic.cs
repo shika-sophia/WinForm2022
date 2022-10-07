@@ -1,9 +1,13 @@
 ﻿/*
  *@content ２次方程式を表現するクラス
+ *         平方式 y = a (x - p) ^ 2 + q
+ *         一般式 y = a x ^ 2 + b x + c
+ *         
  *         ・AlgoCoordinateQuadratic の各メソッド引数に代入して利用する
  *           (同じ式の係数を何度も記述することを防ぐ)
  *         ・AlgoCoordinateQuadratic の各メソッド引数に代入するので、相互参照にならないよう
  *           描画のアルゴリズムを記述しない (AlgoCoordinateQuadraticに集約)
+ *           
  *         ・計算アルゴリズムは、このクラス
  *           (ただし 解の公式は AlgoCoordinateQuadraticにも重複)
  *         ・ICoordinateEquation で EquationLinear, EquationQuadraticを同一視が可能
@@ -66,8 +70,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             // y = a (x - p) ^ 2 + q
             this.QuadCoefficient = quadCoefficient;
             this.Vertex = vertex;
-
-            var (a, b, c) = BuildGeneral(quadCoefficient, vertex);
+            var (a, b, c) = 
+                BuildGeneralParameterQuad(quadCoefficient, vertex);
             this.A = a;
             this.B = b;
             this.C = c;
@@ -84,7 +88,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             // y = a x ^ 2 + b x + c
             this.QuadCoefficient = (float)a;
-            this.Vertex = BuildQuad(a, b, c);
+            this.Vertex = BuildSqureQuad(a, b, c);
             this.A = a;
             this.B = b;
             this.C = c;
@@ -92,7 +96,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             this.Text = BuildText();
         }//constructor
 
-        private (decimal a, decimal b, decimal c) BuildGeneral(float quadCoefficient, PointF vertex)
+        private (decimal a, decimal b, decimal c) BuildGeneralParameterQuad(float quadCoefficient, PointF vertex)
         {  // y = a (x - p) ^ 2 + q を展開して y = a x ^ 2 + b x + c 
             if( float.IsInfinity(Vertex.X) || float.IsInfinity(vertex.Y) ||
                 float.IsNaN(vertex.X) || float.IsNaN(vertex.Y))
@@ -108,7 +112,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return (a, b, c);
         }//BuildGeneral()
 
-        private PointF BuildQuad(decimal a, decimal b, decimal c)
+        private PointF BuildSqureQuad(decimal a, decimal b, decimal c)
         {   // y = a x ^ 2 + b x + c から 平方完成 y = a (x - p) ^ 2 + q
             float vertexX = (float)(-b / (2M * a));                    // p = -b / 2a
             float vertexY = (float)(-(b * b - 4M * a * c) / (4M * a)); // q = -(b ^ 2 - 4ac) / 4a

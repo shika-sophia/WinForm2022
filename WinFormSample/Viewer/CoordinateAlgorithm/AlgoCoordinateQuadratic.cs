@@ -228,7 +228,6 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             decimal subA = eq1A - eq2A;
             decimal subB = eq1B - eq2B;
             decimal subC = eq1C - eq2C;
-            var eqSimulaneousQuad = new EquationQuadratic(subA, subB, subC);
 
             if(subA == 0 && subB == 0)  // case: parallel
             {
@@ -243,6 +242,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 return true;
             }
 
+            var eqSimulaneousQuad = new EquationQuadratic(subA, subB, subC);
             float[] xAry = eqSimulaneousQuad.AlgoQuadSolutionFormula();
             solutionAry = new PointF[xAry.Length];
             for(int i = 0; i < xAry.Length; i++)

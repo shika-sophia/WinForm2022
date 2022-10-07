@@ -32,6 +32,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
@@ -188,6 +189,71 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         {
             return EqPointAry;
         }//GetEqPointAry()
+
+        //====== Simultaneous 連立方程式 ======
+        public PointF[] AlgoSimultaneous(EquationLinear eqLinear)
+        {
+            float slope1 = this.Slope;
+            float intercept1 = this.Intercept;
+            float slope2 = eqLinear.Slope;
+            float intercept2 = eqLinear.Intercept;
+
+            // y = a x + b | y = cx + d の連立方程式の解
+            List<PointF> pointList = new List<PointF>();
+
+            float solutionX = float.NaN;
+            float solutionY = float.NaN;
+            if (float.IsInfinity(slope1) && float.IsInfinity(slope2))
+            {   // parallel 
+                ;
+            }
+            else if (float.IsInfinity(slope1))  // x = □, 
+            {
+                solutionX = intercept1;
+                solutionY = eqLinear.AlgoFunctionXtoY(solutionX)[0];
+            }
+            else if (float.IsInfinity(slope2))  // x = △, 
+            {
+                solutionX = intercept2;
+                solutionY = this.AlgoFunctionXtoY(solutionX)[0];
+            }
+            else if (slope1 == slope2) // (a - c) == 0, parallel 平行
+            {
+                ;
+            }
+            else if (slope1 == 0)  // y = b | y = c x + d
+            {
+                solutionY = intercept1;
+                solutionX = eqLinear.AlgoFunctionYtoX(solutionY)[0];
+            }
+            else if (slope2 == 0)  // y = a x + b | y = d
+            {
+                solutionY = intercept2;
+                solutionX = this.AlgoFunctionYtoX(solutionY)[0];
+            }
+            else
+            {
+                // y = a x + b | y = cx + d の連立方程式の解
+                // x = -(b - d) / (a - c)
+                // y = a x + b に xを代入
+                solutionX = -(float)(((decimal)intercept1 - (decimal)intercept2)
+                                / ((decimal)slope1 - (decimal)slope2));
+                solutionY = this.AlgoFunctionXtoY(solutionX)[0];
+            }
+
+            pointList.Add(new PointF(solutionX, solutionY));
+            EqPointAryAddRange(pointList);
+            return pointList.ToArray();
+        }//AlgoSimultaneous()
+
+        private void EqPointAryAddRange(ICollection<PointF> pointListArgs)
+        {
+            List<PointF> pointListNew = new List<PointF>();
+            pointListNew.AddRange(EqPointAry);
+            pointListNew.AddRange(pointListArgs);
+
+            this.EqPointAry = pointListNew.ToArray();
+        }//EqPointAryAddRange()
 
         //====== Algo ======
         public bool CheckOnLine(PointF pt)

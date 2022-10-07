@@ -96,7 +96,21 @@
  *         
  *        【註】平行線は、その線上の点を指定すると、同一の直線になる
  *         傾きが同じで、直線外の点を指定して EquationLinearを作成する。
- *          
+ *
+ *@subject 内分点の公式 internal divide formula:
+ *         辺比 m : n のとき 
+ *         A(a), B(b)の内分点 = (n a + m b) / (m + n)   [ m + n != 0 ]
+ *         
+ *         PointF AlgoInternalPoint(
+ *             decimal distance1, decimal distance2, PointF pt1, PointF pt2)
+ *
+ *@subject 外分点の公式 external divide formula:
+ *         辺比 m : n のとき
+ *         A(a), B(b) の外分点 = (-n a  + m b) / (m - n)    [m - n != 0]
+ *         
+ *         PointF AlgoExternalPoint(
+ *             decimal distance1, decimal distance2, PointF pt1, PointF pt2)
+ *             
  *@see ImageLinearFunctionViewer.jpg
  *@see MainCoordinateAxisViewer.cs
  *@see AlgoCoordinateAxis.cs
@@ -130,11 +144,6 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             List<PointF> pointList = new List<PointF>(pointAryArgs);
             List<EquationLinear> virticalLineList = new List<EquationLinear>();
             
-            foreach(EquationLinear eqLinear in eqAry)
-            {
-                pointList.AddRange(eqLinear.EqPointAry); 
-            }
-
             //---- Simultaneous Equations 連立方程式 ----
             for (int i = 0; i < eqAry.Length; i++) 
             {
@@ -142,13 +151,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 {
                     if(j == i) { continue; }
 
-                    bool existSolution = TrySolution(
-                        eqAry[i], eqAry[j], out PointF solutionPoint);
-
-                    if (existSolution)
-                    {
-                        pointList.Add(solutionPoint);
-                    }
+                    PointF solutionPoint = eqAry[i].AlgoSimultaneous(eqAry[j])[0];
 
                     if (IsVirtical(eqAry[i], eqAry[j]))
                     {
@@ -156,11 +159,15 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                         virticalLineList.Add(eqAry[j]);
                     }
 
-                    Console.WriteLine($"existSolution = {existSolution}");
                     Console.WriteLine($"solution: ({solutionPoint.X},{solutionPoint.Y})");
                     Console.WriteLine($"IsVirticle = {IsVirtical(eqAry[i],eqAry[j])}");
                 }//for j
             }//for i
+
+            foreach (EquationLinear eqLinear in eqAry)
+            {
+                pointList.AddRange(eqLinear.EqPointAry);
+            }
 
             //---- Test Print before Distinct() ----
             Console.WriteLine("\n\npointList before Distinct():");
@@ -279,54 +286,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         public bool TrySolution(
             EquationLinear eqLinear1, EquationLinear eqLinear2, out PointF solution)
         {
-            float slope1 = eqLinear1.Slope;
-            float intercept1 = eqLinear1.Intercept;
-            float slope2 = eqLinear2.Slope;
-            float intercept2 = eqLinear2.Intercept;
-            
-            // y = a x + b | y = cx + d の連立方程式の解
-            solution = new PointF(float.NaN, float.NaN);
-
-            if (float.IsInfinity(slope1))  // x = □, 
-            {
-                solution.X = intercept1;
-                solution.Y = eqLinear2.AlgoFunctionXtoY(solution.X)[0];
-                return true;
-            }
-
-            if (float.IsInfinity(slope2))  // x = △, 
-            {
-                solution.X = intercept2;
-                solution.Y = eqLinear1.AlgoFunctionXtoY(solution.X)[0];
-                return true;
-            }
-
-            if (slope1 == slope2)  // (a - c) == 0, parallel 平行
-            {
-                return false;
-            }
-
-            if (slope1 == 0)  // y = b | y = c x + d
-            {
-                solution.Y = intercept1;
-                solution.X = eqLinear2.AlgoFunctionYtoX(solution.Y)[0];
-                return true;
-            }
-
-            if (slope2 == 0)  // y = a x + b | y = d
-            {
-                solution.Y = intercept2;
-                solution.X = eqLinear1.AlgoFunctionYtoX(solution.Y)[0];
-                return true;
-            }
-
-            // y = a x + b | y = cx + d の連立方程式の解
-            // x = -(b - d) / (a - c)
-            // y = a x + b に xを代入
-            solution.X = -(float)(((decimal)intercept1 - (decimal)intercept2)
-                            / ((decimal)slope1 - (decimal)slope2));
-            solution.Y = eqLinear1.AlgoFunctionXtoY(solution.X)[0];
-            return true;
+            solution = eqLinear1.AlgoSimultaneous(eqLinear2)[0];
+            return !float.IsNaN(solution.X) || !float.IsNaN(solution.Y);
         }//TrySolution()
 
         //====== Virtical 垂直線 ======
@@ -380,7 +341,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 throw new ArgumentException("2 lines are not virtical.");
             }
 
-            TrySolution(eqLinear, virticalLine, out PointF solutionPoint);
+            PointF solutionPoint = eqLinear.AlgoSimultaneous(virticalLine)[0];
 
             PointF pt1 = AlgoDistanceOnLinePoint(
                 8M / scaleRate, solutionPoint, eqLinear, plusX, plusY);
@@ -389,7 +350,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             EquationLinear eq1Parallel = new EquationLinear(eqLinear.Slope, pt3);
             EquationLinear eq2Parallel = new EquationLinear(virticalLine.Slope, pt1);
-            TrySolution(eq1Parallel, eq2Parallel, out PointF pt2);
+            PointF pt2 = eq1Parallel.AlgoSimultaneous(eq2Parallel)[0];
 
             penPink.Width = 0.5f;
             g.DrawLine(penPink,
@@ -418,7 +379,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         public decimal AlgoDistanceSq(PointF pt, EquationLinear eqLinear) 
         {
             var eqVirtical = AlgoVirticalLine(pt, eqLinear);
-            TrySolution(eqLinear, eqVirtical, out PointF solution);
+            PointF solution = eqLinear.AlgoSimultaneous(eqVirtical)[0];
 
             return AlgoDistanceSq(pt, solution);
         }//AlgoDistance(pt, eqLinear)
@@ -452,7 +413,6 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 
                 pt.X = (float)((decimal)startPoint.X + signX * distance * cos);
                 pt.Y = eqLinear.AlgoFunctionXtoY(pt.X)[0];
-
                 //Console.WriteLine($"tan = {tan}, cos = {cos}, PointF({pt.X},{pt.Y})");
             }
 
@@ -474,7 +434,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 throw new ArgumentException("Distance should be defined as plus value.");
             }
 
-            // internal devide formula 内分点: A(a), B(b) | m : n => (n a + m b) / (m + n)   | m + n != 0
+            // internal divide formula 内分点: A(a), B(b) | m : n => (n a + m b) / (m + n)   | m + n != 0
             return new PointF(
                 (float)((distance2 * (decimal)pt1.X + distance1 * (decimal)pt2.X)
                     / (distance1 + distance2)),
@@ -489,7 +449,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 throw new ArgumentException("External point is not defined with same ratio.");
             }
 
-            // external devide formula 外分点: A(a), B(b) | m : n => (-n a  + m b) / (m - n)   | m - n != 0
+            // external divide formula 外分点: A(a), B(b) | m : n => (-n a  + m b) / (m - n)   | m - n != 0
             return new PointF(
                 (float)((distance1 * (decimal)pt2.X - distance2 * (decimal)pt1.X)
                     / (distance1 - distance2)),

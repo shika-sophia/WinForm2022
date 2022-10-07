@@ -14,6 +14,58 @@
  *      decimal sin = (decimal)Math.Sin((double)angleRadian);
  *      
  *      return new PointF((float)(radius * cos), (float)(radius * sin));
+ *
+ *@subjct ２円の交点  Two circles solution
+ *        PointF[] AlgoSimultaneousCircleBoth(EquationCircle, EquationCircle)
+ *        
+ *        ＊２円の位置関係と解の個数:  5 cases of two circles location relationship 
+ *            d:      distance between two circle center points
+ *            r1, r2: each radius
+ *        ・Separated 乖離:     d > r1 + r2              -> solution 0
+ *        ・Circumscribed 外接: d == r1 + r2             -> solution 1
+ *        ・Overlappd 重複:     |r1 - r2| < d < r1 + r2  -> solution 2
+ *        ・Inscribed 内接:     d == |r1 - r2|           -> solution 1
+ *        ・Included  内包:     d < |r1 - r2|            -> solution 0
+ *        
+ *@subject ２円の交点を通る直線  The linear equation on two circles solution points
+ *         ＊【代数的解法】 Algebraic Solver
+ *         ・２円の方程式を連立 -> 二乗項を消去すると、求める直線の式になっている
+ *         ・複雑な代数計算をする、0除算の場合分けが必要
+ *          // solutionNum = 2;  d < r1 + r2, d > r1 - r2
+ *          // (x - p) ^ 2 + (y - q) ^ 2 = r ^ 2 | (x - m) ^ 2 + (y - n) ^ 2 = R ^ 2
+ *          //    x ^ 2 - 2 p x + p ^ 2 + y ^ 2 - 2 q y + q ^ 2 = r ^ 2
+ *          // -) x ^ 2 - 2 m x + m ^ 2 + y ^ 2 - 2 n y + n ^ 2 = R ^ 2
+ *          //          - 2 p x + 2 m x         - 2 q y + 2 n y = r^2 - R^2 - p^2 + m^2 - q^2 + n^2
+ *          // y = (r^2 - R^2 - p^2 - q^2 + m^2 + n^2 + 2 (p - m) x) / 2(q - n)
+ *
+ *          decimal p = (decimal)origin1.X;
+ *          decimal q = (decimal)origin1.Y;
+ *          decimal m = (decimal)origin2.X;
+ *          decimal n = (decimal)origin2.Y;
+ *
+ *          if(q - n == 0) 
+ *          {
+ *              //eqLinear = new EquationLinear(
+ *              //    slope: float.PositiveInfinity,
+ *              //    intercept: );
+ *              
+ *               throw new ArgumentException("q - n == 0  in AlgoSimultaneousCircleBoth()");
+ *          }
+ *               
+ *          var eqLinear = new EquationLinear(
+ *              slope: (float)((p - m) / (q - n)),
+ *               intercept: (float)((r1 * r1 - r2 * r2 - p * p - q * q + m * m + n * n) 
+ *                   / (2M * (q - n)))
+ *          );
+ *           
+ *          pointList.AddRange(AlgoSimultaneousCircleLinear(eqCircle1, eqLinear));
+ *          
+ *         ＊【幾何的解法】 Geometrical Solver
+ *         ・２円の交点を通る直線は、２円の中心を結ぶ線と垂直に交わる (r による二等辺三角形の角２等分線)
+ *           -> 直線の傾き slopeが求まる
+ *         ・３辺の長さ d, r1, r2 が分っているので、余弦定理より(double計算ではない) cosθの値を得て、
+ *           -> 上記２直線の交点座標が求まる
+ *         ・複雑な代数計算をせずに済み、0除算の場合分けも不要
  */
 using System;
 using System.Collections.Generic;
@@ -224,6 +276,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         }//DrawAngleText()
 
         //====== Algo ======
+        //【Deprecated】非推奨: because of including Math.Cos(double) | double計算を含み誤差の可能性
         public PointF AlgoRadiusPoint(
             decimal angle, EquationCircle eqCircle)
         {
@@ -316,34 +369,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             List<PointF> pointList = new List<PointF>();
             if(distanceSq < radiusSumSq && distanceSq > radiusSubtractSq)
-            {   // solutionNum = 2;  d < r1 + r2, d > r1 - r2
-                // (x - p) ^ 2 + (y - q) ^ 2 = r ^ 2 | (x - m) ^ 2 + (y - n) ^ 2 = R ^ 2
-                //    x ^ 2 - 2 p x + p ^ 2 + y ^ 2 - 2 q y + q ^ 2 = r ^ 2
-                // -) x ^ 2 - 2 m x + m ^ 2 + y ^ 2 - 2 n y + n ^ 2 = R ^ 2
-                //          - 2 p x + 2 m x         - 2 q y + 2 n y = r^2 - R^2 - p^2 + m^2 - q^2 + n^2
-                // y = (r^2 - R^2 - p^2 - q^2 + m^2 + n^2 + 2 (p - m) x) / 2(q - n)
-
-                decimal p = (decimal)origin1.X;
-                decimal q = (decimal)origin1.Y;
-                decimal m = (decimal)origin2.X;
-                decimal n = (decimal)origin2.Y;
-
-                if(q - n == 0) 
-                {
-                    //eqLinear = new EquationLinear(
-                    //    slope: float.PositiveInfinity,
-                    //    intercept: );
-
-                    throw new ArgumentException("q - n == 0  in AlgoSimultaneousCircleBoth()");
-                }
-                
-                var eqLinear = new EquationLinear(
-                    slope: (float)((p - m) / (q - n)),
-                    intercept: (float)((r1 * r1 - r2 * r2 - p * p - q * q + m * m + n * n) 
-                        / (2M * (q - n)))
-                );
-            
-                pointList.AddRange(AlgoSimultaneousCircleLinear(eqCircle1, eqLinear));
+            {   
+                //
             }
             else if(distanceSq == radiusSumSq)
             {   // solutionNum = 1;  d == r1 + r2  ２円外接、内分点
