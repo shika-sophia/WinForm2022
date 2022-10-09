@@ -61,11 +61,11 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             circle = new AlgoCoordinateCircle(pic);
             circle.DrawCoordinateAxis();
 
-            var eqCircle1 = new EquationCircle(radius: 100M, new PointF(0, 0));
-            var eqCircle2 = new EquationCircle(radius: 80M, new PointF(100, 50));
-            //var eqLinear = new EquationLinear(slope: 1f, intercept: -50f);
+            var eqCircle1 = new EquationCircle(radiusSq: 100M * 100M, new PointF(0, 0));
+            //var eqCircle2 = new EquationCircle(radiusSq: 80M * 80M, new PointF(100, 50));
+            var eqLinear = new EquationLinear(slope: 1f, intercept: -50f);
             circle.DrawMultiCircleFunction(
-                new ICoordinateEquation[] { eqCircle1, eqCircle2 });
+                new ICoordinateEquation[] { eqCircle1, /*eqCircle2,*/ eqLinear });
             
             this.Controls.AddRange(new Control[]
             {
