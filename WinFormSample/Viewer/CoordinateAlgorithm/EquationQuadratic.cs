@@ -22,11 +22,11 @@
  *             BuildGeneralParameterQuad(float quadCoefficient, PointF vertex)
  *
  *@subject 一般式 -> 平方式  y = a x ^ 2 + b x + c から 平方完成 y = a (x - p) ^ 2 + q
- *         a x ^ 2 + b x + c = 0
- *         x ^ 2 + (b / a) x + c / a = 0
- *         [x ^ 2 + (b / a) x + b ^ 2 / 4 a ^ 2] - b ^ 2 / 4 a ^ 2 + c / a = 0
- *         (x + b / 2 a) ^ 2 - b ^ 2 / 4 a ^ 2 + c / a = 0
- *         (x - (- b / 2 a)) ^ 2 + (b ^ 2 - 4 a c) / 4 a ^ 2 = 0
+ *         y = a x ^ 2 + b x + c
+ *         y = a (x ^ 2 + (b / a) x + c / a)
+ *         y = a { [x ^ 2 + 2 (b / 2a) x + b ^ 2 / 4 a ^ 2] - b ^ 2 / 4 a ^ 2 + c / a }
+ *         y = a (x + b / 2 a) ^ 2 - b ^ 2 / 4 a ^ 2 + c / a )
+ *         y = a (x - (- b / 2 a)) ^ 2 + (b ^ 2 - 4 a c) / 4 a 
  *         
  *         PointF BuildSqureQuad(decimal a, decimal b, decimal c)
  *@subject ２次関数上の点 x座標 -> y座標
@@ -129,9 +129,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         private PointF BuildSqureQuad(decimal a, decimal b, decimal c)
         {   // y = a x ^ 2 + b x + c から 平方完成 y = a (x - p) ^ 2 + q
-            // y = (x - (- b / 2 a)) ^ 2 + (b ^ 2 - 4 a c) / 4 a ^ 2 
-            float vertexX = (float)(-b / (2M * a));                       // p = -b / 2a
-            float vertexY = (float)((b * b - 4M * a * c) / (4M * a * a)); // q = (b ^ 2 - 4ac) / 4a ^ 2
+            // y = a (x - (- b / 2 a)) ^ 2 + (b ^ 2 - 4 a c) / 4 a 
+            float vertexX = (float)(-b / (2M * a));                     // p = -b / 2a
+            float vertexY = (float)((b * b - 4M * a * c) / (4M * a));   // q = (b ^ 2 - 4ac) / 4a
 
             return new PointF(vertexX, vertexY);
         }//BuildQuad()

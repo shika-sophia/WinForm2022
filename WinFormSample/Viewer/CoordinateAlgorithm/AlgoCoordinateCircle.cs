@@ -496,8 +496,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             }
 
             // y = a x + b | (x - p) ^ 2 + (y - q) ^ 2 = r ^ 2
+            // x ^ 2 - 2 p x + p ^ 2 + y ^ 2 - 2 q y + q ^ 2 = r ^ 2
             // x ^ 2 - 2 p x + p ^ 2 + (a x + b) ^ 2 - 2 q (a x + b) + q ^ 2 = r ^ 2
-            // x ^ 2 - 2 p x + p ^ 2 + a^2 x^2 + 2abx + b^2 -2aqx -2bq + q ^ 2 = r ^ 2
+            // x^2 - 2px + p^2 + a^2 x^2 + 2abx + b^2 -2aqx -2bq + q ^ 2 = r ^ 2
             // (1 + a^2) x ^ 2 + (2ab -2p -2aq) x + p^2 + q^2 - 2bq - r^2 = 0
             decimal a = (decimal)eqLinear.Slope;
             decimal b = (decimal)eqLinear.Intercept;
