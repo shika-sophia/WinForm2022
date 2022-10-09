@@ -107,7 +107,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             decimal a = (decimal)quadCoefficient;
             decimal b = -2M * a * (decimal)vertex.X;   // b = -2ap
             decimal c = a * (decimal)vertex.X * (decimal)vertex.X
-                + (decimal)vertex.Y;               // c = a * p ^ 2 + q  
+                + (decimal)vertex.Y;                   // c = a * p ^ 2 + q  
 
             return (a, b, c);
         }//BuildGeneral()
@@ -265,6 +265,14 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             {
                 solutionXAry[0] = (float)(-b / (2M * a));
             }
+
+            //---- Test Print ----
+            //Console.WriteLine("AlgoQuadSolutionFormula.solutionXAry:");
+            //foreach (float solutionX in solutionXAry)
+            //{
+            //    Console.Write($"{solutionX}, ");
+            //}
+            //Console.WriteLine("\n");
 
             return solutionXAry;
         }//AlgoQuadSolutionFormula()

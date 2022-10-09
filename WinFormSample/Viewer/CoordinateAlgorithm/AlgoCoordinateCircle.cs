@@ -383,7 +383,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             decimal cos = (decimal)Math.Cos((double)angleRadian);
             decimal sin = (decimal)Math.Sin((double)angleRadian);
             
-            return new PointF((float)(radius * cos), (float)(radius * sin));
+            return new PointF(
+                (float)((decimal)eqCircle.CircleCenterPoint.X + radius * cos),
+                (float)((decimal)eqCircle.CircleCenterPoint.Y + radius * sin));
         }//AlgoRadiusPoint()
 
         public EquationLinear AlgoRadiusLine(PointF radiusPoint, EquationCircle eqCircle)
@@ -444,12 +446,11 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             decimal distanceSq = AlgoDistanceSq(origin1, origin2); // d ^ 2 : distance between both circle center points as squre.
             decimal radiusSumSq = (r1 + r2) * (r1 + r2);           // (r1 + r2) ^ 2 : sum of both radius as squre.
-            decimal radiusSubtractSq = (r1 - r2) * (r1 - r2);
+            decimal radiusSubtractSq = (r1 - r2) * (r1 - r2);      // (r1 - r2) ^ 2 : subtract of both radius as squre.
 
             List<PointF> pointList = new List<PointF>();
             if(distanceSq < radiusSumSq && distanceSq > radiusSubtractSq)
             {   
-                
                 // 中心線
                 var eqCenterLine = new EquationLinear(origin1, origin2);
                 
@@ -458,18 +459,21 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 // ∠C: 中心線と eqCircle1の半径のなす角 ->  a = r2, b = d, c = r1
                 decimal cos = (r1 * r1 - r2 * r2 - distanceSq)
                     / (-2M * r2 * (decimal)Math.Sqrt((double)distanceSq));
-                float solutionX = (float)(r1 * cos);
+                float solutionX = (float)(r1 * cos) + origin1.X;
                 float solutionY = eqCenterLine.AlgoFunctionXtoY(solutionX)[0];
                 var eqSolutionLine =
                     AlgoVirticalLine(new PointF(solutionX, solutionY), eqCenterLine);
 
+                //SetScaleRate(1.0M);
+                //DrawLinearFunction(eqCenterLine);
+                //DrawLinearFunction(eqSolutionLine);
                 pointList.AddRange(AlgoSimultaneousCircleLinear(eqCircle1, eqSolutionLine));
             }
             else if(distanceSq == radiusSumSq)
             {   // solutionNum = 1;  d == r1 + r2  ２円外接、内分点
                 pointList.Add(AlgoInternalPoint(r1, r2, origin1, origin2));
             }
-            else if (distanceSq == radiusSubtractSq && r1 != r2)
+            else if (distanceSq == radiusSubtractSq && r1 - r2 != 0)
             {   // solutionNum = 1;  d == r1 - r2  ２円内接、外分点
                 pointList.Add(AlgoExternalPoint(r1, r2, origin1, origin2));
             }
@@ -499,14 +503,14 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             decimal b = (decimal)eqLinear.Intercept;
             decimal p = (decimal)eqCircle.CircleCenterPoint.X;
             decimal q = (decimal)eqCircle.CircleCenterPoint.Y;
-            decimal r = eqCircle.Radius;
 
-            var eqQuad = new EquationQuadratic(
+            var eqSolutionQuad = new EquationQuadratic(
                 a: 1 + a * a,               // 必ず 1 + a ^ 2 > 0
                 b: 2M * (a * b - p - a * q),
-                c: p * p + q * q - 2M * b * q - r * r);
+                c: p * p + q * q - 2M * b * q - eqCircle.RadiusSq
+            );
 
-            float[] xAry = eqQuad.AlgoQuadSolutionFormula();
+            float[] xAry = eqSolutionQuad.AlgoQuadSolutionFormula();
 
             foreach(float solutionX in xAry)
             {

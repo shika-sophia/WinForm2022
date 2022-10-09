@@ -6,7 +6,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 {
     class EquationCircle : ICoordinateEquation
     {
-        public decimal Radius { get; private set; }
+        public decimal Radius { get; private set; }  //【Deprecated】非推奨: including Math.Sqrt(double)
+        public decimal RadiusSq { get; private set; }
         public PointF CircleCenterPoint { get; private set; }
         public decimal A { get; private set; }
         public decimal B { get; private set; }
@@ -16,65 +17,70 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         public PointF[] EqPointAry { get; private set; }
         public string Text { get; set; }
 
-        public EquationCircle(decimal radius, PointF cirleCenterPoint)
+        public EquationCircle(decimal radiusSq, PointF cirleCenterPoint)
         {
             // (x - p) ^ 2 + (y - q) ^ 2 = r ^ 2
-            if (radius <= 0)
+            if (radiusSq <= 0)
             {
                 throw new ArgumentException("Circle radius should be plus value.");
             }
 
-            this.Radius = radius;
+            this.Radius = (decimal)Math.Sqrt((double)radiusSq);
+            this.RadiusSq = radiusSq;
             this.CircleCenterPoint = cirleCenterPoint;
             (decimal a, decimal b, decimal c) = 
-                BuildGeneralParameterCircle(radius, cirleCenterPoint);
+                BuildGeneralParameterCircle(radiusSq, cirleCenterPoint);
             this.A = a;
             this.B = b;
             this.C = c;
             this.InterceptPointX = AlgoInterceptX();
             this.InterceptPointY = AlgoInterceptY();
             this.EqPointAry = BuildEqPointAry();
-            this.Text = BuildText(radius, cirleCenterPoint);
+            this.Text = BuildText(Radius, cirleCenterPoint);
         }//constructor
 
-        public EquationCircle(decimal radius, float p, float q)
-            : this(radius, new PointF(p, q)) { }
-
-        //【Deprecated】非推奨: because of including Math.Sqrt(double) | double計算を含み誤差の可能性
+        public EquationCircle(decimal radiusSq, float p, float q)
+            : this(radiusSq, new PointF(p, q)) { }
+        
         public EquationCircle(decimal a, decimal b, decimal c)
         {
             // x ^ 2 + y ^ 2 + a x + b y + c = 0
-            (float p, float q, decimal radius) = BuildSqureCircle(a, b, c);
+            (float p, float q, decimal radiusSq) = BuildSqureCircle(a, b, c);
 
-            new EquationCircle(radius, new PointF(p, q));
+            new EquationCircle(radiusSq, new PointF(p, q));
         }
 
         private (decimal a, decimal b, decimal c) 
-            BuildGeneralParameterCircle(decimal radius, PointF circleCenterPoint)
+            BuildGeneralParameterCircle(decimal radiusSq, PointF circleCenterPoint)
         {
             // [(x - p) ^ 2 + (y - q) ^ 2 = r ^ 2]  ->  [x ^ 2 + y ^ 2 + a x + b y + c = 0]
             // x ^ 2 - 2 p x + p ^ 2 + y ^ 2 - 2 q y + q ^ 2 = r ^ 2
-            // x ^ 2 + y ^ 2 - 2 p - 2 q y + p ^ 2 + q ^ 2 - r ^ 2 = 0
+            // x ^ 2 + y ^ 2 - 2 p x - 2 q y + p ^ 2 + q ^ 2 - r ^ 2 = 0
             decimal p = (decimal)circleCenterPoint.X;
             decimal q = (decimal)circleCenterPoint.Y;
             
             decimal a = -2M * p;
             decimal b = -2M * q;
-            decimal c = p * p + q * q - radius * radius;
+            decimal c = p * p + q * q - radiusSq;
 
             return (a, b, c);
         }//BuildGeneralParam()
 
-        private (float p, float q, decimal radius) BuildSqureCircle(
+        private (float p, float q, decimal radiusSq) BuildSqureCircle(
             decimal a, decimal b, decimal c)
         {
             // [x ^ 2 + y ^ 2 + a x + b y + c = 0]  -> Completed Squre [(x - p) ^ 2 + (y - q) ^ 2 = r ^ 2]
-            // (x - (- a / 2)) ^ 2 + (y - (- b / 2)) ^ 2 = √[(a ^ 2 + b ^ 2 - 4 c) / 4)] ^ 2
+            // (x - (- a / 2)) ^ 2 + (y - (- b / 2)) ^ 2 = (a ^ 2 + b ^ 2 - 4 c) / 4 )
             float p = (float)(-a / 2M);
             float q = (float)(-b / 2M);
-            decimal radius = (decimal)Math.Sqrt((double)((a * a + b * b - 4M * c) / 4M));
+            decimal radiusSq = (a * a + b * b - 4M * c) / 4M;
 
-            return (p, q, radius);
+            if (radiusSq <= 0)
+            {
+                throw new ArgumentException("Circle radius should be plus value from a, b, c.");
+            }
+
+            return (p, q, radiusSq);
         }//BuildSqureCircle()
 
         private PointF[] BuildEqPointAry()
@@ -181,7 +187,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             decimal dx = (decimal)pt.X - (decimal)CircleCenterPoint.X;
             decimal dy = (decimal)pt.Y - (decimal)CircleCenterPoint.Y;
 
-            return dx * dx + dy * dy == Radius * Radius;
+            return dx * dx + dy * dy == RadiusSq;
         }//CheckOnLine()
 
         public float[] AlgoFunctionXtoY(float x)
@@ -196,7 +202,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         public float[] AlgoCircleFunctionXtoY(float x, EquationCircle eqCircle)
         {
-            decimal radius = eqCircle.Radius;
+            decimal radiusSq = eqCircle.RadiusSq;
             decimal p = (decimal)eqCircle.CircleCenterPoint.X;
             decimal q = (decimal)eqCircle.CircleCenterPoint.Y;
 
@@ -204,32 +210,32 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             // (x - p) ^ 2 + y ^ 2 - 2 q y + q ^ 2 = r ^ 2
             var eqQuadX = new EquationQuadratic(1f, new PointF((float)p, 0f));
             float solutionX = eqQuadX.AlgoFunctionXtoY(x)[0];   // z = (x - p) ^ 2 
-
-            // y ^ 2 - 2 q y + q ^ 2 - (x - p) ^ 2 - r ^ 2 = 0
+            
+            // y ^ 2 - 2 q y + q ^ 2 + (x - p) ^ 2 - r ^ 2 = 0
             var eqQuadY = new EquationQuadratic(
                 a: 1M,
                 b: -2M * q,
-                c: q * q - (decimal)solutionX - radius * radius);
+                c: q * q + (decimal)solutionX - radiusSq);
 
             return eqQuadY.AlgoQuadSolutionFormula();
         }//AlgoCircleFunctionXtoY()
 
         public float[] AlgoCircleFunctionYtoX(float y, EquationCircle eqCircle)
         {
-            decimal radius = eqCircle.Radius;
+            decimal radiusSq = eqCircle.RadiusSq;
             decimal p = (decimal)eqCircle.CircleCenterPoint.X;
             decimal q = (decimal)eqCircle.CircleCenterPoint.Y;
 
             // (x - p) ^ 2 + (y - q) ^ 2 = r ^ 2
             // x ^ 2 - 2 p x + p ^ 2 + (y - q) ^ 2 = r ^ 2
             var eqQuadY = new EquationQuadratic(1f, new PointF((float)q, 0f));
-            float solutionY = eqQuadY.AlgoFunctionXtoY(y)[0];   // z = (y - p) ^ 2 
+            float solutionY = eqQuadY.AlgoFunctionXtoY(y)[0];   // z = (y - q) ^ 2 
 
-            // x ^ 2 - 2 p x + p ^ 2 - (y - q) ^ 2 - r ^ 2 = 0
+            // x ^ 2 - 2 p x + p ^ 2 + (y - q) ^ 2 - r ^ 2 = 0
             var eqQuadX = new EquationQuadratic(
                 a: 1M,
                 b: -2M * p,
-                c: p * p - (decimal)solutionY - radius * radius);
+                c: p * p + (decimal)solutionY - radiusSq);
 
             return eqQuadX.AlgoQuadSolutionFormula();
         }//AlgoCircleFunctionYtoX()
@@ -241,9 +247,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             decimal distanceSqure = dx * dx + dy * dy;
 
             int solutionNum = -1;
-            if (distanceSqure > Radius * Radius) { solutionNum = 0; }
-            if (distanceSqure == Radius * Radius) { solutionNum = 1; }
-            if (distanceSqure < Radius * Radius) { solutionNum = 2; }
+            if (distanceSqure > RadiusSq) { solutionNum = 0; }
+            if (distanceSqure == RadiusSq) { solutionNum = 1; }
+            if (distanceSqure < RadiusSq) { solutionNum = 2; }
 
             return solutionNum;
         }//AlgoJudgeCircle()
