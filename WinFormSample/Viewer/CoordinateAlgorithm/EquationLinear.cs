@@ -275,8 +275,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         private float AlgoLinearFunctionXtoY(float x, float slope, float intercept)
         {
             if (float.IsInfinity(slope)) { return float.NaN; }  // x = c
-
-            // y = a x + b | y = b
+            
+            // y = a x + b 
             return (float)((decimal)slope * (decimal)x + (decimal)intercept);
         }//AlgoLinearFunction(x) -> y
 

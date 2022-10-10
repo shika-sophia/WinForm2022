@@ -71,7 +71,33 @@
  *         cosC = (c ^ 2 - a ^ 2 - b ^ 2) / (- 2 a b)
  *         ∠C: 中心線と eqCircle1の半径のなす角
  *              ->  a = r2, b = d, c = r1
- */
+ *
+ *@subject 円と直線の交点
+ *
+ *
+ *@NOTE【Problem】
+ *      円と直線の連立を２次方程式の一般式で定義したら、交点が正しく表示されたが、
+ *      下記のような平方式では、正しい解が求められなかった。
+ *      パラメータの計算ミスや記述ミスかと思い、かなりの時間 確認したが、
+ *      原因不明のままである。
+ *      
+ *      //----平方式----
+ *      //y = a x + b | (x - p) ^ 2 + (y - q) ^ 2 = r ^ 2
+ *      //x ^ 2 - 2 p x + p ^ 2 + y ^ 2 - 2 q y + q ^ 2 = r ^ 2
+ *      //x ^ 2 - 2 p x + p ^ 2 + (a x + b) ^2 - 2 q(a x + b) + q ^ 2 = r ^ 2
+ *      //x ^ 2 - 2px + p ^ 2 + a ^ 2 x ^ 2 + 2abx + b ^ 2 - 2aqx - 2bq + q ^ 2 = r ^ 2
+ *      //(1 + a ^ 2) x ^ 2 + (2ab - 2p - 2aq) x + p ^ 2 + q ^ 2 - 2bq - r ^ 2 = 0
+ *      decimal a = (decimal)eqLinear.Slope;
+ *      decimal b = (decimal)eqLinear.Intercept;
+ *      decimal p = (decimal)eqCircle.CircleCenterPoint.X;
+ *      decimal q = (decimal)eqCircle.CircleCenterPoint.Y;
+ *
+ *      var eqSolutionQuad = new EquationQuadratic(
+ *          a: 1 + a * a,               // 必ず 1 + a ^ 2 > 0
+ *          b: 2M * (a * b - p - a * q),
+ *          c: p * p + q * q - 2M * b * q - eqCircle.RadiusSq
+ *      );
+*/
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -453,20 +479,20 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             {   
                 // 中心線
                 var eqCenterLine = new EquationLinear(origin1, origin2);
-                
+
                 // 余弦定理: c ^ 2 = a ^ 2 + b ^ 2 - 2 a b cosC
-                // cosC = (c ^ 2 - a ^ 2 - b ^ 2) / (- 2 a b)
-                // ∠C: 中心線と eqCircle1の半径のなす角 ->  a = r2, b = d, c = r1
-                decimal cos = (r1 * r1 - r2 * r2 - distanceSq)
-                    / (-2M * r2 * (decimal)Math.Sqrt((double)distanceSq));
-                float solutionX = (float)(r1 * cos) + origin1.X;
+                // cosC = (a ^ 2 + b ^ 2 - c ^ 2) / 2 a b
+                // ∠C: 中心線と eqCircle1の半径のなす角 ->  a = r1, b = d, c = r2
+                decimal cos = (r1 * r1 + distanceSq - r2 * r2)
+                    / (2M * r1 * (decimal)Math.Sqrt((double)distanceSq));
+                float solutionX = origin1.X + (float)(r1 * cos);
                 float solutionY = eqCenterLine.AlgoFunctionXtoY(solutionX)[0];
                 var eqSolutionLine =
                     AlgoVirticalLine(new PointF(solutionX, solutionY), eqCenterLine);
 
-                //SetScaleRate(1.0M);
-                //DrawLinearFunction(eqCenterLine);
-                //DrawLinearFunction(eqSolutionLine);
+                SetScaleRate(1.0M);
+                DrawLinearFunction(eqCenterLine);
+                DrawLinearFunction(eqSolutionLine);
                 pointList.AddRange(AlgoSimultaneousCircleLinear(eqCircle1, eqSolutionLine));
             }
             else if(distanceSq == radiusSumSq)
@@ -495,20 +521,21 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 return pointList.ToArray();
             }
 
-            // y = a x + b | (x - p) ^ 2 + (y - q) ^ 2 = r ^ 2
-            // x ^ 2 - 2 p x + p ^ 2 + y ^ 2 - 2 q y + q ^ 2 = r ^ 2
-            // x ^ 2 - 2 p x + p ^ 2 + (a x + b) ^ 2 - 2 q (a x + b) + q ^ 2 = r ^ 2
-            // x^2 - 2px + p^2 + a^2 x^2 + 2abx + b^2 -2aqx -2bq + q ^ 2 = r ^ 2
-            // (1 + a^2) x ^ 2 + (2ab -2p -2aq) x + p^2 + q^2 - 2bq - r^2 = 0
-            decimal a = (decimal)eqLinear.Slope;
-            decimal b = (decimal)eqLinear.Intercept;
-            decimal p = (decimal)eqCircle.CircleCenterPoint.X;
-            decimal q = (decimal)eqCircle.CircleCenterPoint.Y;
+            //---- 一般式 ----
+            //y = d x + e | x ^ 2 + y ^ 2 + a x + b y + c = 0
+            //x ^ 2 + (d x + e) ^ 2 + a x + b (d x + e) + c = 0
+            //x ^ 2 + d^2x^2 + 2dex + e^2 + ax +bdx + be + c = 0
+            //(1 + d^2) x ^ 2 + (2de + a + bd) x + e^2 + be + c = 0
+            decimal d = (decimal)eqLinear.Slope;
+            decimal e = (decimal)eqLinear.Intercept;
+            decimal a = eqCircle.A;
+            decimal b = eqCircle.B;
+            decimal c = eqCircle.C;
 
             var eqSolutionQuad = new EquationQuadratic(
-                a: 1 + a * a,               // 必ず 1 + a ^ 2 > 0
-                b: 2M * (a * b - p - a * q),
-                c: p * p + q * q - 2M * b * q - eqCircle.RadiusSq
+                a: 1 + d * d,              // 必ず 1 + d ^ 2 > 0
+                b: 2M * d * e + a + b * d,
+                c: e * e + b * e + c
             );
 
             float[] xAry = eqSolutionQuad.AlgoQuadSolutionFormula();

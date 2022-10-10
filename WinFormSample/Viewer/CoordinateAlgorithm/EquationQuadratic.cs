@@ -100,7 +100,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             {
                 throw new ArgumentException("Quadratic should not be 'a == 0' ");
             }
-
+            
             // y = a x ^ 2 + b x + c
             this.QuadCoefficient = (float)a;
             this.Vertex = BuildSqureQuad(a, b, c);
@@ -256,7 +256,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         public float[] AlgoQuadSolutionFormula()
         {
-            return AlgoQuadSolutionFormula(A, B, C);
+            return AlgoQuadSolutionFormula(this.A, this.B, this.C);
         }
 
         public float[] AlgoQuadSolutionFormula(decimal a, decimal b, decimal c)
@@ -265,16 +265,16 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             {
                 throw new ArgumentException();
             }
-
+           
             int solutionNum = AlgoJudge(a, b, c, out decimal judge);
             float[] solutionXAry = new float[solutionNum];
 
             if (judge > 0)
             {
                 solutionXAry[0] =
-                    (float)((-b + (decimal)Math.Sqrt((double)judge)) / (2M * a));
+                    (float)(-b / (2M * a) + (decimal)Math.Sqrt((double)judge) / (2M * a));
                 solutionXAry[1] =
-                    (float)((-b - (decimal)Math.Sqrt((double)judge)) / (2M * a));
+                    (float)(-b / (2M * a) - (decimal)Math.Sqrt((double)judge) / (2M * a));
             }
             else if (judge == 0)
             {
