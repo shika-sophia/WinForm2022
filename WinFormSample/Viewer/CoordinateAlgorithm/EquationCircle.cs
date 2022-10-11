@@ -117,13 +117,13 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         {
             List<PointF> pointList = new List<PointF>();
 
-            if ((decimal)CircleCenterPoint.X < Radius)  // d < r
+            if ((decimal)Math.Abs(CircleCenterPoint.X) < Radius)  // d < r
             {
                 float[] yAry = AlgoFunctionXtoY(x: 0f); // x = 0 | (x - p) ^ 2 + (y - q) ^ 2 = r ^ 2
                 pointList.Add(new PointF(0, yAry[0]));
                 pointList.Add(new PointF(0, yAry[1]));
             }
-            else if ((decimal)CircleCenterPoint.X == Radius) // d == r
+            else if ((decimal)Math.Abs(CircleCenterPoint.X) == Radius) // d == r
             {
                 pointList.Add(new PointF(0, CircleCenterPoint.Y));
             }

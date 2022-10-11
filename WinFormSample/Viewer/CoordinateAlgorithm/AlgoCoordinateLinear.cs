@@ -68,7 +68,18 @@
  *         ・垂直条件 virtical condition: a c = -1  when y = a x + b | y = c x + d 
  *
  *           EquationLinear  AlgoVirticalLine(EquationLinear, PointF)
- *           
+ *         
+ *         NOTE【Problem】IsVirtical()
+ *         割り切れない循環小数の場合、垂直とは みなされない。
+ *         => Math.Round()で比較しても解決しない
+ *         
+ *         IsVirtical() y = 0.3 x + 20
+ *         IsVirtical() y = -3.333333 x + 261.6666
+ *         2 lines are not virtical.
+ *         
+ *         => if (-1M < multipleSlope && multipleSlope < -0.99M) { return true; }
+ *            この条件を付けて、-1と みなすと解決
+ *            
  *@subject 距離 distance
  *         ・三平方の定理 Three Squre Theorem:  z ^ 2 = x ^ 2 + y ^ 2 
  *         
@@ -282,6 +293,16 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             DrawLinearFunction(new EquationLinear(slope, intercept));
         }//DrawLinearFunction(float, float)
 
+        public void DrawLinearSegment(Pen pen, PointF startPoint, PointF endPoint)
+        {
+            g.DrawLine(pen, 
+                (float)((decimal)startPoint.X * scaleRate),
+                (float)((decimal)-startPoint.Y * scaleRate),
+                (float)((decimal)endPoint.X * scaleRate),
+                (float)((decimal)-endPoint.Y * scaleRate)
+            );
+        }//DrawLinearSegment()
+
         //====== Simultaneous 連立方程式 ======
         public bool TrySolution(
             EquationLinear eqLinear1, EquationLinear eqLinear2, out PointF solution)
@@ -298,7 +319,13 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             if (eqLinear1.Slope == 0) { return float.IsInfinity(eqLinear2.Slope); }
             if (eqLinear2.Slope == 0) { return float.IsInfinity(eqLinear1.Slope); }
 
-            return eqLinear1.Slope * eqLinear2.Slope == -1;
+            //Console.WriteLine($"IsVirtical() {eqLinear1}");
+            //Console.WriteLine($"IsVirtical() {eqLinear2}");
+
+            decimal multipleSlope = (decimal)eqLinear1.Slope * (decimal)eqLinear2.Slope;
+            if (-1M < multipleSlope && multipleSlope < -0.99M) { return true; }
+            
+            return multipleSlope == -1M;
         }//IsVirtical()
 
         public EquationLinear AlgoVirticalLine(PointF pt, EquationLinear eqLinear)
@@ -338,7 +365,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         {
             if (!IsVirtical(eqLinear, virticalLine))
             {
-                throw new ArgumentException("2 lines are not virtical.");
+                Console.WriteLine("2 lines are not virtical.");
+                return;
             }
 
             PointF solutionPoint = eqLinear.AlgoSimultaneous(virticalLine)[0];

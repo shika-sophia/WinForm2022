@@ -1,9 +1,23 @@
-﻿/*
- * 
+﻿/*/** 
+ *@title WinFormGUI / WinFormSample / 
+ *@class Main.cs
+ *@class   └ new Form1() : Form
+ *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
+ *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
+ *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
+ *@reference KT ナガノ  『Windows Form C#』KaiteiNet, 2018
+ *           http://kaitei.net/csforms/
+ *           =>〔~/Reference/Article_KaiteiNet/WinForm_.txt〕
+ *           
+ *@content 
+ *@subject 複数関数の描画 
+ *         void DrawMultiCircleFunction(
+ *                ICoordinateEquation[] eqAry, params PointF[] pointAryArgs)
+ *         
  *@subject 角度から円上の点  angle from X-Axis => PointF on Circle.
  *         PointF AlgoRadiusPoint(decimal angle, EquationCircle)
  *         
- *@NOTE【註】誤差が多い
+ *@NOTE【註】Math.Cos(), Math.Sin() double計算により誤差が多い
  *      // PointF(r * cosθ, r * sinθ)
  *      // ※ when θ = 0,  Y = 0  as expected
  *      // ※ when θ = 90, X = 1.615543E-13 (expected x = 0)
@@ -31,6 +45,7 @@
  *         ＊【代数的解法】 Algebraic Solver
  *         ・２円の方程式を連立 -> 二乗項を消去すると、求める直線の式になっている
  *         ・複雑な代数計算をする、0除算の場合分けが必要
+ *         
  *          // solutionNum = 2;  d < r1 + r2, d > r1 - r2
  *          // (x - p) ^ 2 + (y - q) ^ 2 = r ^ 2 | (x - m) ^ 2 + (y - n) ^ 2 = R ^ 2
  *          //    x ^ 2 - 2 p x + p ^ 2 + y ^ 2 - 2 q y + q ^ 2 = r ^ 2
@@ -68,12 +83,25 @@
  *         ・複雑な代数計算をせずに済み、0除算の場合分けも不要
  *         
  *         余弦定理: c ^ 2 = a ^ 2 + b ^ 2 - 2 a b cosC
- *         cosC = (c ^ 2 - a ^ 2 - b ^ 2) / (- 2 a b)
- *         ∠C: 中心線と eqCircle1の半径のなす角
- *              ->  a = r2, b = d, c = r1
- *
+ *         cosC = (a ^ 2 + b ^ 2 - c ^ 2) / 2 a b
+ *         ∠C: 中心線と eqCircle1の半径のなす角 ->  a = r1, b = d, c = r2
+ *         ∠C が鈍角の場合 (90 < ∠C < 270)   cos(180 - C) = -cosC
+ *         
+ *                 |   <-- eqVirticalLine
+ *                /|\
+ *               ／| \
+ *          r1 ／  |  \ r2
+ *           ／    |   \
+ *       O1 ∠C___┌|____\ O2   <- eqCenterLine
+ *          r1*cosC 
+ *          └-    d    -┘
+ *          
  *@subject 円と直線の交点
- *
+ *         //---- 一般式 ----
+ *         //y = d x + e | x ^ 2 + y ^ 2 + a x + b y + c = 0
+ *         //x ^ 2 + (d x + e) ^ 2 + a x + b (d x + e) + c = 0
+ *         //x ^ 2 + d^2x^2 + 2dex + e^2 + ax +bdx + be + c = 0
+ *         //(1 + d^2) x ^ 2 + (2de + a + bd) x + e^2 + be + c = 0
  *
  *@NOTE【Problem】
  *      円と直線の連立を２次方程式の一般式で定義したら、交点が正しく表示されたが、
@@ -97,7 +125,11 @@
  *          b: 2M * (a * b - p - a * q),
  *          c: p * p + q * q - 2M * b * q - eqCircle.RadiusSq
  *      );
-*/
+ *      
+ *@see 
+ *@author shika
+ *@date 2022-10-11
+ */
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -134,7 +166,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                     //case same
                     if(j == i) { continue; }
 
-                    //---- TrySolution ----
+                    //---- TrySolutionCircle() ----
                     bool existSolution = TrySolutionCircle(eqAry[i], eqAry[j], out PointF[] solutionAry);
 
                     if (existSolution)
@@ -419,6 +451,18 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return new EquationLinear(pt1: radiusPoint, pt2: eqCircle.CircleCenterPoint);
         }//AlgoRadiusLine()
 
+        public EquationLinear AlgoTangentLineCircle(PointF pt, EquationCircle eqCircle)
+        {
+            if (!eqCircle.CheckOnLine(pt))
+            {
+                throw new ArgumentException("PointF pt is not on the EquationCircle.");
+            }
+
+            EquationLinear radiusLine = AlgoRadiusLine(pt, eqCircle);
+
+            return AlgoVirticalLine(pt, radiusLine);
+        }//AlgoTangentLineCircle()
+
         //====== TrySolutionCircle() ======
         public bool TrySolutionCircle(
             ICoordinateEquation eq1, ICoordinateEquation eq2, out PointF[] solutionAry)
@@ -465,45 +509,80 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         private PointF[] AlgoSimultaneousCircleBoth
             (EquationCircle eqCircle1, EquationCircle eqCircle2)
         {
-            decimal r1 = eqCircle1.Radius;
-            decimal r2 = eqCircle2.Radius;
+            decimal r1 = eqCircle1.Radius;  //【Deprecated】非推奨: including Math.Sqrt(double)
+            decimal r2 = eqCircle2.Radius;  //【Deprecated】非推奨: including Math.Sqrt(double)
             PointF origin1 = eqCircle1.CircleCenterPoint;
             PointF origin2 = eqCircle2.CircleCenterPoint;
 
-            decimal distanceSq = AlgoDistanceSq(origin1, origin2); // d ^ 2 : distance between both circle center points as squre.
-            decimal radiusSumSq = (r1 + r2) * (r1 + r2);           // (r1 + r2) ^ 2 : sum of both radius as squre.
-            decimal radiusSubtractSq = (r1 - r2) * (r1 - r2);      // (r1 - r2) ^ 2 : subtract of both radius as squre.
+            decimal distanceSq = AlgoDistanceSq(origin1, origin2);     // d ^ 2 : distance between both circle center points as squre.
+            decimal distance = (decimal)Math.Sqrt((double)distanceSq); //【Deprecated】非推奨: including Math.Sqrt(double)
+            decimal radiusSumSq = (r1 + r2) * (r1 + r2);               // (r1 + r2) ^ 2 : sum of both radius as squre.
+            decimal radiusSubtractSq = (r1 - r2) * (r1 - r2);          // (r1 - r2) ^ 2 : subtract of both radius as squre.
+
+            SetScaleRate(1.5M);
+            penViolet.Width = 1f;
+            penViolet.DashStyle = DashStyle.Dash;
+
+            //---- center point line 中心線 ----
+            var eqCenterLine = new EquationLinear(origin1, origin2);
+            DrawLinearSegment(penViolet, origin1, origin2);  // d: eqCenterLine
 
             List<PointF> pointList = new List<PointF>();
-            if(distanceSq < radiusSumSq && distanceSq > radiusSubtractSq)
-            {   
-                // 中心線
-                var eqCenterLine = new EquationLinear(origin1, origin2);
-
+            if (distanceSq < radiusSumSq && distanceSq > radiusSubtractSq)
+            {
                 // 余弦定理: c ^ 2 = a ^ 2 + b ^ 2 - 2 a b cosC
                 // cosC = (a ^ 2 + b ^ 2 - c ^ 2) / 2 a b
                 // ∠C: 中心線と eqCircle1の半径のなす角 ->  a = r1, b = d, c = r2
-                decimal cos = (r1 * r1 + distanceSq - r2 * r2)
-                    / (2M * r1 * (decimal)Math.Sqrt((double)distanceSq));
-                float solutionX = origin1.X + (float)(r1 * cos);
-                float solutionY = eqCenterLine.AlgoFunctionXtoY(solutionX)[0];
-                var eqSolutionLine =
-                    AlgoVirticalLine(new PointF(solutionX, solutionY), eqCenterLine);
+                // ∠C が鈍角の場合 (90 < ∠C < 270)  cos(180 - C) = -cosC
 
-                SetScaleRate(1.0M);
-                DrawLinearFunction(eqCenterLine);
-                DrawLinearFunction(eqSolutionLine);
-                pointList.AddRange(AlgoSimultaneousCircleLinear(eqCircle1, eqSolutionLine));
+                decimal cos = (r1 * r1 + distanceSq - r2 * r2) / (2M * r1 * distance);
+
+                if (origin2.X < origin1.X)  //∠C が鈍角の場合  -cosC
+                {
+                    cos *= -1;
+                }
+
+                PointF centerVirticalPoint = AlgoDistanceOnLinePoint(
+                    r1 * cos, origin1, eqCenterLine);
+
+                EquationLinear eqVirticalLine =
+                    AlgoVirticalLine(centerVirticalPoint, eqCenterLine);
+
+                PointF[] solutionPointAry = AlgoSimultaneousCircleLinear(eqCircle1, eqVirticalLine);
+                pointList.AddRange(solutionPointAry);
+
+                //---- Draw ----
+                if (solutionPointAry.Length == 2)
+                {
+                    DrawPointLine(centerVirticalPoint);
+
+                    foreach (PointF solutionPoint in solutionPointAry)
+                    {
+                        DrawLinearSegment(penViolet, origin1, solutionPoint);  // r1
+                        DrawLinearSegment(penViolet, origin2, solutionPoint);  // r2
+                    }//foreach
+                    DrawLinearSegment(penViolet, solutionPointAry[0], solutionPointAry[1]);    //eqVirticalLine
+                    DrawVirticalMark(eqCenterLine, eqVirticalLine, plusX: false, plusY: true);
+                }
             }
-            else if(distanceSq == radiusSumSq)
+            else if (distanceSq == radiusSumSq)
             {   // solutionNum = 1;  d == r1 + r2  ２円外接、内分点
-                pointList.Add(AlgoInternalPoint(r1, r2, origin1, origin2));
+                PointF internalPoint = AlgoInternalPoint(r1, r2, origin1, origin2);
+                pointList.Add(internalPoint);
+
+                EquationLinear eqTangentLine = AlgoTangentLineCircle(internalPoint, eqCircle1);
+                DrawLinearFunction(eqTangentLine);
             }
             else if (distanceSq == radiusSubtractSq && r1 - r2 != 0)
             {   // solutionNum = 1;  d == r1 - r2  ２円内接、外分点
-                pointList.Add(AlgoExternalPoint(r1, r2, origin1, origin2));
+                PointF externalPoint = AlgoExternalPoint(r1, r2, origin1, origin2);
+                pointList.Add(externalPoint);
+
+                EquationLinear eqTangentLine = AlgoTangentLineCircle(externalPoint, eqCircle1);
+                DrawLinearFunction(eqTangentLine);
             }
 
+            DrawLinearSegment(penViolet, origin1, origin2);
             return pointList.ToArray();
         }//AlgoSimultaneousCircleBoth()
 
@@ -540,7 +619,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             float[] xAry = eqSolutionQuad.AlgoQuadSolutionFormula();
 
-            foreach(float solutionX in xAry)
+            foreach (float solutionX in xAry)
             {
                 float solutionY = eqLinear.AlgoFunctionXtoY(solutionX)[0];
                 pointList.Add(new PointF(solutionX, solutionY));
