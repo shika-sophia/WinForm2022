@@ -23,6 +23,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using System.Windows.Forms;
 
@@ -37,8 +38,8 @@ namespace WinFormGUI.CsharpCode
         //static void Main()
         public void Main()
         {
-            var here = new ShowEnumValue(typeof(HatchStyle));
-            string content = here.BuildEnumContent(here.enumType);
+            var here = new ShowEnumValue(typeof(FileMode));
+            string content = here.BuildEnumContent(here.enumType, subject: true);
             Console.WriteLine(content);
         }//Main()
 
@@ -71,19 +72,31 @@ namespace WinFormGUI.CsharpCode
             }
         }
 
-        private string BuildEnumContent(Type enumType)
+        private string BuildEnumContent(Type enumType, bool subject = true)
         {
             int length = Enum.GetNames(enumType).Length * 20;
 
             var bld = new StringBuilder(length);
+            if(subject)
+            {
+                bld.Append("/*\n");
+                bld.Append(" *@subject "); 
+            }
             bld.Append($"enum {enumName}\n");
+
+            if (subject) { bld.Append(" *         "); }
             bld.Append("{\n");
 
             foreach (var value in Enum.GetValues(enumType))
             {
+                if (subject) { bld.Append(" *         "); }
                 bld.Append($"    {value} = {(int)value},\n");
             }//foreach
+
+            if (subject) { bld.Append(" *         "); }
             bld.Append("}\n");
+
+            if (subject) { bld.Append(" */\n"); }
 
             //Console.WriteLine($"length:{length}");
             //Console.WriteLine($"bld.Length:{bld.Length}");
@@ -92,6 +105,19 @@ namespace WinFormGUI.CsharpCode
     }//class
 }
 
+
+//==== bool subject true ====
+/*
+ *@subject enum FileMode
+ *         {
+ *             CreateNew = 1,
+ *             Create = 2,
+ *             Open = 3,
+ *             OpenOrCreate = 4,
+ *             Truncate = 5,
+ *             Append = 6,
+ *         }
+ */
 /*
 enum MessageBoxButtons
 {

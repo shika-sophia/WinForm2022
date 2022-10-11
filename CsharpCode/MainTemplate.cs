@@ -21,6 +21,7 @@
  */
 using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
 /*
@@ -41,16 +42,28 @@ using System.Windows.Forms;
 
 class Form1 : Form
 {
+    private readonly PictureBox pic;
+
     public Form1()
     {
         this.Text = "Form1";
         this.Font = new Font("consolas", 12, FontStyle.Regular);
+        this.ClientSize = new Size(640, 640);
+        this.FormBorderStyle = FormBorderStyle.FixedSingle;
         this.AutoSize = true;
+        this.BackColor = SystemColors.Window;
+
+        pic = new PictureBox()
+        {
+            ClientSize = this.ClientSize,
+            BorderStyle = BorderStyle.Fixed3D,
+            Dock = DockStyle.Fill,
+        };
 
 
         this.Controls.AddRange(new Control[]
         {
-
+            pic,
         });
     }//constructor
 }//class
@@ -61,7 +74,7 @@ namespace WinFormGUI.CsharpCode
     class MainTemplate
     {
         //static void Main(string[] args)
-        public void Main(string[] args)
+        public void Main()
         {
             // Csharp2022 / CsharpBeginプロジェクト (未参照)
             // new Utility.FileDocumentDiv.FileDocExecute().ReadWriteExe();
