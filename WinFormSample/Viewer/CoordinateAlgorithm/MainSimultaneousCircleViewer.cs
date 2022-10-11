@@ -62,8 +62,13 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             circle.DrawCoordinateAxis();
 
             var eqCircle1 = new EquationCircle(radiusSq: 100M * 100M, new PointF(0, 0));
-            var eqCircle2 = new EquationCircle(radiusSq: 80M * 80M, new PointF(100, 50));
-            //var eqLinear = new EquationLinear(slope: 1f, intercept: -50f);
+            var eqCircle2 = new EquationCircle(radiusSq: 20M * 20M, new PointF(84.8528f, 84.8528f));
+           
+            //var eqLinear = new EquationLinear(eqCircle1.CircleCenterPoint, eqCircle2.CircleCenterPoint);
+            //PointF pt = circle.AlgoDistanceOnLinePoint(eqCircle1.Radius + eqCircle2.Radius,
+            //    eqCircle1.CircleCenterPoint, eqLinear);
+            //Console.WriteLine($"pt: ({pt.X}f,{pt.Y}f)");
+            
             circle.DrawMultiCircleFunction(
                 new ICoordinateEquation[] { eqCircle1, eqCircle2, /*eqLinear*/ });
             

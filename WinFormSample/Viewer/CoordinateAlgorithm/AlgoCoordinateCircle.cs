@@ -9,10 +9,13 @@
  *           http://kaitei.net/csforms/
  *           =>〔~/Reference/Article_KaiteiNet/WinForm_.txt〕
  *           
- *@content 
- *@subject 複数関数の描画 
- *         void DrawMultiCircleFunction(
+ *@content 円と複数関数の描画
+ *@subject void DrawMultiCircleFunction(
  *                ICoordinateEquation[] eqAry, params PointF[] pointAryArgs)
+ *         
+ *         【註】AlgoSimultaneousCircleBoth()から、Drawの分離が難しく、
+ *          SetScaleRate(decimal)で適正な scaleRateを設定する必要がある
+ *         〔AlgoAutoScale()が起こると、それ以前の描画が消えてしまうので注意〕
  *         
  *@subject 角度から円上の点  angle from X-Axis => PointF on Circle.
  *         PointF AlgoRadiusPoint(decimal angle, EquationCircle)
@@ -96,6 +99,10 @@
  *          r1*cosC 
  *          └-    d    -┘
  *          
+ *@NOTE【Problem】２円が１点で接する場合
+ *      判別式は小数だと ほぼ無理で２解 or 解なしになってしまう
+ *      => Math.Round()でも解決しない
+ *
  *@subject 円と直線の交点
  *         //---- 一般式 ----
  *         //y = d x + e | x ^ 2 + y ^ 2 + a x + b y + c = 0
@@ -125,7 +132,7 @@
  *          b: 2M * (a * b - p - a * q),
  *          c: p * p + q * q - 2M * b * q - eqCircle.RadiusSq
  *      );
- *      
+ *     
  *@see 
  *@author shika
  *@date 2022-10-11
@@ -565,7 +572,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                     DrawVirticalMark(eqCenterLine, eqVirticalLine, plusX: false, plusY: true);
                 }
             }
-            else if (distanceSq == radiusSumSq)
+            else if (Math.Round(distanceSq, 1) == Math.Round(radiusSumSq, 1))
             {   // solutionNum = 1;  d == r1 + r2  ２円外接、内分点
                 PointF internalPoint = AlgoInternalPoint(r1, r2, origin1, origin2);
                 pointList.Add(internalPoint);
@@ -573,7 +580,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 EquationLinear eqTangentLine = AlgoTangentLineCircle(internalPoint, eqCircle1);
                 DrawLinearFunction(eqTangentLine);
             }
-            else if (distanceSq == radiusSubtractSq && r1 - r2 != 0)
+            else if (Math.Round(distanceSq, 1) == Math.Round(radiusSubtractSq, 1) && r1 - r2 != 0)
             {   // solutionNum = 1;  d == r1 - r2  ２円内接、外分点
                 PointF externalPoint = AlgoExternalPoint(r1, r2, origin1, origin2);
                 pointList.Add(externalPoint);
