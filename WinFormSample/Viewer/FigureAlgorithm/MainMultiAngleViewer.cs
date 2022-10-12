@@ -50,6 +50,9 @@
  *         
  *         decimal centerAngleRadian = 
  *             (360M / (decimal)num) * (decimal)Math.PI / 180M;
+ *             
+ *         ※【註】 Math.Cos(), Sin(), Tan() | Math.Sqrt() は 引数 doubleのみ
+ *         精密な計算をする場合は計算誤差の可能性があることに注意
  *         
  *@NOTE【考察】
  *      数学の原点(0, 0)に対し (+, +)領域は 右上方向だが、
@@ -105,6 +108,7 @@
  *         
  *@see ImageMultiAngleViewer.jpg
  *@see CoordinateAlgorithm/AlgoCoordinateDifferenciate.AlgoDiatanceOnLine()
+ *@copyTo ~\WinFormSample\TriangularRatioReference.txt
  *@author shika
  *@date 2022-09-12
  */
