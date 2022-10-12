@@ -16,6 +16,10 @@
  *         [英] slope:     傾き
  *         [英] gradient:  勾配
  *         [英] intercept: 切片  x-intercept, y-intercept
+ *         [英] internal divide point: 内分点
+ *         [英] external divide point: 外分点
+ *         [英] circumscribe           外接
+ *         [英] inscribe               内接
  *         
  *@subject Matrix 平行移動
  *         =>〔AlgoCoordinateAxis.cs〕
@@ -196,7 +200,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             Console.WriteLine("\n");
 
             //---- Draw ----
-            DrawMultiPointLine(pointList.ToArray(), false);
+            DrawMultiPointLine(pointList.ToArray());
             Console.WriteLine($"scaleRate = {scaleRate}");
             Console.WriteLine($"height / width = {ratioWidthHeight:0.##}");
 

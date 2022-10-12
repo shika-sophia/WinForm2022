@@ -13,8 +13,8 @@
  *@subject void DrawMultiCircleFunction(
  *                ICoordinateEquation[] eqAry, params PointF[] pointAryArgs)
  *         
- *         【註】AlgoSimultaneousCircleBoth()から、Drawの分離が難しく、
- *          SetScaleRate(decimal)で適正な scaleRateを設定する必要がある
+ *         【註】AlgoSimultaneousCircleBoth()から、Draw, Algo の分離が難しく、
+ *          SetScaleRate(decimal)で適正な scaleRateを設定する必要がある。
  *         〔AlgoAutoScale()が起こると、それ以前の描画が消えてしまうので注意〕
  *         
  *@subject 角度から円上の点  angle from X-Axis => PointF on Circle.
@@ -102,7 +102,34 @@
  *@NOTE【Problem】２円が１点で接する場合
  *      判別式は小数だと ほぼ無理で２解 or 解なしになってしまう
  *      => Math.Round()でも解決しない
+ *      
+ *      整数交点(72,96) なら接点１つで描画可能 
+ *      (整数比[3 : 4 : 5]の三角形になるよう設定)
+ *      new EquationCircle(radius: 120M, new PointF(0, 0));
+ *      new EquationCircle(radius: 80M, new PointF(120f, 160f)
+ *      
+ *      外接円の整数交点(72,96) は
+ *      AlgoCoordinateCiecle.AlgoSimultaneousCircleBoth()から
+ *      AlgoCoordinateLinear.AlgoInternalPoint()において
+ *      (0,0)-(120, 160) r1 : r2 の内分点で導出  (y = 1.33333333 x を利用していない)
+ *      
+ *      y = 1.33333333 x        <- 原点(0, 0)から接点までの直線
+ *      y = 0.75000002 x + 150  <- 接点における接線
+ *      
+ *      existSolution = True
+ *      (72,96),                <- AlgoInternalPoint()内で
+ *                                 (0,0)-(120, 160) r1 : r2 の内分点
+ *      existSolution = True
+ *      (72.00002,96), (-72.00002,-96),  <- 円１と y = 1.33333333 x の連立解
+ *      existSolution = True  
+ *      (168,223.9999), (72.00002,96),   <- 円２と y = 1.33333333 x の連立解
+ *      
+ *      やはり 1.33333333のような 循環小数の計算で誤差が出る様子
  *
+ *      内接円は 
+ *      new EquationCircle(radius: 120M, new PointF(0, 0));
+ *      new EquationCircle(radius: 80M, new PointF(-24, -32));
+ *      
  *@subject 円と直線の交点
  *         //---- 一般式 ----
  *         //y = d x + e | x ^ 2 + y ^ 2 + a x + b y + c = 0
@@ -151,7 +178,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         public AlgoCoordinateCircle(PictureBox pic) : base(pic) { }
 
         //====== Draw ======
-        public void DrawMultiCircleFunction(ICoordinateEquation[] eqAry, params PointF[] pointAryArgs)
+        public void DrawMultiCircleFunction(decimal scaleRateHere, 
+            ICoordinateEquation[] eqAry, 
+            params PointF[] pointAryArgs)
         {
             //---- Test Print ----
             Console.WriteLine("Equation Array:");
@@ -163,6 +192,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             //---- pointList ----
             List<PointF> pointList = new List<PointF>(pointAryArgs);
             List<EquationLinear> virticalLineList = new List<EquationLinear>();
+            List<PointF> segmentList = new List<PointF>();
 
             for (int i = 0; i < eqAry.Length; i++)
             {
@@ -174,7 +204,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                     if(j == i) { continue; }
 
                     //---- TrySolutionCircle() ----
-                    bool existSolution = TrySolutionCircle(eqAry[i], eqAry[j], out PointF[] solutionAry);
+                    bool existSolution = TrySolutionCircle(eqAry[i], eqAry[j], 
+                        out PointF[] solutionAry, scaleRateHere);
 
                     if (existSolution)
                     {
@@ -214,7 +245,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             Console.WriteLine("\n");
 
             //---- Draw ----
-            DrawMultiPointLine(pointList.ToArray());
+            DrawMultiPointLine(pointList.ToArray(), autoScale: false);
+            //autoScale false: need SetScaleRate(decimal) in AlgoSimultaneousCircleBoth 
 
             foreach (ICoordinateEquation eq in eqAry)
             {
@@ -472,13 +504,14 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         //====== TrySolutionCircle() ======
         public bool TrySolutionCircle(
-            ICoordinateEquation eq1, ICoordinateEquation eq2, out PointF[] solutionAry)
+            ICoordinateEquation eq1, ICoordinateEquation eq2, 
+            out PointF[] solutionAry, decimal scaleRateHere)
         {
             List<PointF> solutionList = new List<PointF>();
             if(eq1 is EquationCircle && eq2 is EquationCircle)
             {
                 solutionList.AddRange(AlgoSimultaneousCircleBoth(
-                    eq1 as EquationCircle, eq2 as EquationCircle));
+                    eq1 as EquationCircle, eq2 as EquationCircle, scaleRateHere));
             }
              
             if (eq1 is EquationCircle && eq2 is EquationQuadratic)
@@ -514,7 +547,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         }//TrySolutionCircle()
 
         private PointF[] AlgoSimultaneousCircleBoth
-            (EquationCircle eqCircle1, EquationCircle eqCircle2)
+            (EquationCircle eqCircle1, EquationCircle eqCircle2, decimal scaleRateHere)
         {
             decimal r1 = eqCircle1.Radius;  //【Deprecated】非推奨: including Math.Sqrt(double)
             decimal r2 = eqCircle2.Radius;  //【Deprecated】非推奨: including Math.Sqrt(double)
@@ -526,7 +559,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             decimal radiusSumSq = (r1 + r2) * (r1 + r2);               // (r1 + r2) ^ 2 : sum of both radius as squre.
             decimal radiusSubtractSq = (r1 - r2) * (r1 - r2);          // (r1 - r2) ^ 2 : subtract of both radius as squre.
 
-            SetScaleRate(1.5M);
+            SetScaleRate(scaleRateHere);
             penViolet.Width = 1f;
             penViolet.DashStyle = DashStyle.Dash;
 
@@ -572,7 +605,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                     DrawVirticalMark(eqCenterLine, eqVirticalLine, plusX: false, plusY: true);
                 }
             }
-            else if (Math.Round(distanceSq, 1) == Math.Round(radiusSumSq, 1))
+            else if (Math.Round(distanceSq, 4) == Math.Round(radiusSumSq, 1))
             {   // solutionNum = 1;  d == r1 + r2  ２円外接、内分点
                 PointF internalPoint = AlgoInternalPoint(r1, r2, origin1, origin2);
                 pointList.Add(internalPoint);
@@ -580,7 +613,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 EquationLinear eqTangentLine = AlgoTangentLineCircle(internalPoint, eqCircle1);
                 DrawLinearFunction(eqTangentLine);
             }
-            else if (Math.Round(distanceSq, 1) == Math.Round(radiusSubtractSq, 1) && r1 - r2 != 0)
+            else if (Math.Round(distanceSq, 4) == Math.Round(radiusSubtractSq, 1) && r1 - r2 != 0)
             {   // solutionNum = 1;  d == r1 - r2  ２円内接、外分点
                 PointF externalPoint = AlgoExternalPoint(r1, r2, origin1, origin2);
                 pointList.Add(externalPoint);

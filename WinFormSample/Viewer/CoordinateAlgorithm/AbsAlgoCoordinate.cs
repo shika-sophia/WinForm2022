@@ -4,7 +4,7 @@
  *@subject Inherit 継承関係
  *         AbsAlgoCoordinate     共通フィールドの保持
  *             ↑
- *         AlgoCoordinateAxis    十字座標系
+ *         AlgoCoordinateAxis    座標系
  *             ↑
  *         AlgoCoordinateLinear : AlgoCoordinateAxis      線形 １次関数、垂直、
  *             ↑
@@ -13,6 +13,24 @@
  *         AlgoCoordinateDifferentiate : AlgoCoordinateQuadratic  微分、接線
  *             ↑
  *         AlgoCoordinateCircle : AlgoCoordinateDifferentiate     円、三角比
+ *
+ *@subject Method INDEX
+ *         ◆AlgoCoordinateAxis    座標系
+ *         - Graphics  BuildGraphics()     十字座標系
+ *         + void  DrawCoordinateAxis()    座標軸の描画
+ *         - void  DrawAxisScale()         軸の目盛り AxisScale
+ *         + void  DrawMultiPointLine(PointF[], bool autoScale = true)  複数 PointFの描画
+ *         + void  DrawPointLine(PointF pt, bool withLine = false)      点の描画
+ *         + void  PointAutoScale(PointF)   自動スケール調整
+ *         + void  SetScaleRate(decimal)    scaleRateの設定 -> AbsAlgoCoordinate内のフィールド
+ *         
+ *         ◆AlgoCoordinateLinear : AlgoCoordinateAxis      線形 １次関数、垂直、
+ *             
+ *         ◆AlgoCoordinateQuadratic : AlgoCoordinateLinear 放物線 ２次関数
+ *             
+ *         ◆AlgoCoordinateDifferentiate : AlgoCoordinateQuadratic  微分、接線
+ *             ↑
+ *         ◆AlgoCoordinateCircle : AlgoCoordinateDifferentiate     円、三角比
  *         
  */
 using System.Drawing;

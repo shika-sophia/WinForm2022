@@ -10,8 +10,13 @@
  *           
  *@content CoordinateAxisViewer
  *         座標軸のみを描画
+ */
+#region Method Algorithm
+/*
+ *@subject - Graphics  BuildGraphics()
+ *         AlgoCoordinateAxis 十字座標系に特化したメソッド
  *         
- *@subject Matrix 平行移動, 拡大縮小
+ *         Matrix 平行移動, 拡大縮小
  *         void  matrix.Translate(float offsetX, float offsetY) 
  *         void  matrix.Scale(float sx, float sy)  拡大縮小
  *         g.Transform = matrix;
@@ -20,30 +25,24 @@
  *         ・これにより、数学の点の座標のまま、Graphicsの座標にすることができる。
  *         ・Y座標の反転を image.RotateFlip()で行うと、文字まで反転してしまうので、
  *           DrawLine(), DrawString()時に Y座標に「-」を付けて反転させる。
- *        
- *@subject 点の描画
- *         void  +DrawPointLine(PointF pt, bool withLine = false)
- *         
- *@subject 軸の目盛り AxisScale
- *         void  -DrawAxisScale()  自己定義メソッド
- *                100, -100ごとに目盛りを付加 (座標範囲によって 1000, -1000)
  *
- *@subject decimal  scaleRate プロパティ
- *         void  SetScaleRate(decimal)
- *         ・DrawCoordinateAxis(), DrawAxisScale()
- *         ・DrawPointLine()
- *         ・DrawLine(), DrawString()
- *         各 X, Y座標に scaleRateを乗算する。
- *         これにより、座標範囲を超えた点も、描画可能。
- *         座標の目盛りのほうを 50%, 25%, 12.5%...と縮小していく
- *         縮小していくと目盛りが細かくなりすぎて、見ずらくなるので、
- *         1000, -1000単位で区切り、1k, 2k, ...と表示
+ *@subject + void  DrawCoordinateAxis()  座標軸の描画
+ *
+ *@subject - void  DrawAxisScale()  軸の目盛り AxisScale 自己定義メソッド
+ *         100, -100ごとに目盛りを付加 (座標範囲によって 1000, -1000)
  *         
- *         ※ 軸と目盛りはデフォルトで再描画するが、DrawPointLine()以前の
- *         DrawLine(), DrawString()は消えてしまうので、手動で再描画することに注意
+ *@subject + void DrawMultiPointLine(PointF[], bool autoScale = true)
+ *         複数 PointFの描画
  *         
- *@subject 自動スケール調整
- *         void  PointAutoScale(PointF)
+ *         絶対値で最大値(X座標とY座標の比を考慮した最大値)を持つ PointFで
+ *          PointAutoScale()してから DrawPointLine()
+ *          
+ *@subject + void  DrawPointLine(PointF pt, bool withLine = false)
+ *         点の描画
+ *         
+ *@subject + void  PointAutoScale(PointF)
+ *         自動スケール調整
+ *         
  *         ・引数 PointFが 座標範囲外の場合、座標範囲内になるまで scaleRateを調整
  *         ・scaleRate = 2.0M, 1.0M, 0.5M, 2.5M, 1.25M ...
  *         
@@ -53,9 +52,20 @@
  *              SetScaleRate(scaleRate / 2M);
  *          }//while
  *
- *@subject Graphics BuildGraphics()
- *         AlgoCoordinateAxis 十字座標系に特化したメソッド
+ *@subject + void  SetScaleRate(decimal)
+ *         decimal  scaleRate プロパティ
  *         
+ *         各 X, Y座標に scaleRateを乗算する。
+ *         これにより、座標範囲を超えた点も、描画可能。
+ *         座標の目盛りのほうを 50%, 25%, 12.5%...と縮小していく
+ *         縮小していくと目盛りが細かくなりすぎて、見ずらくなるので、
+ *         1000, -1000単位で区切り、1k, 2k, ...と表示
+ *         
+ *         ※ 軸と目盛りはデフォルトで再描画するが、DrawPointLine()以前の
+ *         DrawLine(), DrawString()は消えてしまうので、手動で再描画することに注意
+ */
+#endregion
+/*
  *@see ImageCoordinateAxisViewer.jpg
  *@see 
  *@author shika
@@ -93,6 +103,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return g;
         }//BuildGraphics()
 
+        //====== Axis ======
         public void DrawCoordinateAxis()
         {
             penBlue.DashStyle = DashStyle.Solid;
@@ -160,6 +171,37 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             }//for
         }//DrawAxisScale()
 
+        //====== Draw Point ======
+        public void DrawMultiPointLine(PointF[] pointAry, bool autoScale = true)
+        {
+            //絶対値で最大値(X座標とY座標の比を考慮した最大値)を持つ PointFで
+            //PointAutoScale()してから DrawPointLine()
+
+            decimal max = 0M;
+            PointF maxPoint = new PointF(0, 0);
+            foreach (PointF pt in pointAry)
+            {
+                if (float.IsNaN(pt.X) || float.IsNaN(pt.Y)) { continue; }
+
+                decimal lager = Math.Max(
+                    Math.Abs((decimal)pt.X * ratioWidthHeight),
+                    Math.Abs((decimal)pt.Y));
+
+                if (max < lager)
+                {
+                    max = lager;
+                    maxPoint = pt;
+                }
+            }//foreach
+
+            PointAutoScale(maxPoint, autoScale);
+
+            foreach (PointF pt in pointAry)
+            {
+                DrawPointLine(pt);
+            }//forech
+        }//DrawMultiPointLine()
+
         public void DrawPointLine(PointF pt, bool withLine = false)
         {
             //PointAutoScale(pt);
@@ -209,45 +251,11 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             brushPink.Dispose();
         }//DrawPointLine()
 
-        public void DrawMultiPointLine(PointF[] pointAry, bool withLine = false)
+        //====== Auto Scale ======
+        public void PointAutoScale(PointF pt, bool autoScale = true)
         {
-            //絶対値で最大値(X座標とY座標の比を考慮した最大値)を持つ PointFで
-            //PointAutoScale()してから DrawPointLine()
-
-            decimal max = 0M;
-            PointF maxPoint = new PointF(0, 0);
-            foreach (PointF pt in pointAry)
-            {
-                if(float.IsNaN(pt.X) || float.IsNaN(pt.Y)) { continue; }
-
-                decimal lager = Math.Max(
-                    Math.Abs((decimal)pt.X * ratioWidthHeight),  
-                    Math.Abs((decimal)pt.Y)); 
-
-                if(max < lager)
-                {
-                    max = lager;
-                    maxPoint = pt;
-                }
-            }//foreach
+            if(!autoScale) { return; }
             
-            PointAutoScale(maxPoint);
-
-            foreach (PointF pt in pointAry)
-            {
-                DrawPointLine(pt, withLine);
-            }//forech
-        }//DrawMultiPointLine()
-
-        public void SetScaleRate(decimal scaleRate)
-        {
-            this.scaleRate = scaleRate;
-            g.Clear(SystemColors.Window);
-            DrawCoordinateAxis();
-        }//SetScaleRate()
-
-        public void PointAutoScale(PointF pt)
-        {
             while ((Math.Abs((decimal)centerPoint.X) / scaleRate) < Math.Abs((decimal)pt.X)
                 || (Math.Abs((decimal)centerPoint.Y) / scaleRate) < Math.Abs((decimal)pt.Y))
             {
@@ -256,5 +264,12 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 if(scaleRate < 0.02M) { break; }  
             }//while
         }//PointAutoScale()
+
+        public void SetScaleRate(decimal scaleRate)
+        {
+            this.scaleRate = scaleRate;
+            g.Clear(SystemColors.Window);
+            DrawCoordinateAxis();
+        }//SetScaleRate()
     }//class
 }
