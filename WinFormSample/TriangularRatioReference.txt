@@ -58,13 +58,13 @@
  *@copyFrom CoordinateAlgorithm\AlgoCoordinateLinear.cs
  *@subject【Triangular ratio Formula】三角比の公式
  *         tanθ = sinθ / cosθ
- *             on the basis of Triangular Ratio definition,  三角比の定義
+ *             on the basis of Triangular Ratio definition.  三角比の定義
  *
  *         cos^2 θ + sin^2 θ = 1
- *             on the basis of Three Square Theorem  三平方の定理
+ *             on the basis of Three Square Theorem.  三平方の定理
  *
  *         tan^2 θ + 1 = 1 / cos^2 θ
- *             on simultaneous both above,  両式の連立
+ *             on simultaneous both above.  両式の連立
  *         
  *         By these Formula, if any value of cosθ, sinθ, tanθ were obtained, 
  *         all others values can be calculated.
