@@ -1,0 +1,172 @@
+﻿/*
+ *@title WinFormGUI/WinFormSample/TriangularRatioReference.txt
+ *@content Definition and Formula of Triangular Ratio
+ *         三角比の定義と公式
+ *@copyFrom ~\WinFormSample\Viewer\FigureAlgorithm\MainMultiAngleViewer.cs
+ *@copyFrom ~\WinFormSample\Viewer\CoordinateAlgorithm\AlgoCoordinateLinear.cs
+ *@copyFrom ~\WinFormSample\Viewer\CoordinateAlgorithm\AlgoCoordinateCircle.cs
+ *@author shika
+ *@date 2022-10-13
+ */
+
+■ Triangular Ratio 三角比
+◆Definition 定義
+ Triangular Ratio is defined as below, 
+ when Angle is θ [=Theta] on virtical Triangle.
+ 直角三角形において 角θ のとき、三角形の辺比を以下のように定義する
+
+                             . A (a, b)
+ 　  sinθ = b / c           /|  
+     cosθ = a / c       c ／ ｜ b
+     tanθ = b / a       ／    |
+                    Ｏ ∠θ___┌| 
+                          a
+
+     (Example) Three Square Theorem
+     例 三平方の定理より、 sin60° = b / c = √3 / 2
+                         cos60° = a / c =  1 / 2
+     
+     (Example) The slope of Linear OA is tanθ = b / a 
+     例 直線 OA の傾きは tanθ = b / a 
+
+     (Example) When Circle is defined the center point(p, q) and the radius: r,
+               the coordinate of the point on this circle: 
+     例 中心(p, q) 半径 r の円上の点の座標:  A (a, b) = (p + r * cosθ, q + r * sinθ)
+
+ *@copyFrom FigureAlgorithm\MainMultiAngleViewer.cs
+ *@subject Math class 〔C#〕
+ *         double  Math.Sin(double radian)
+ *         double  Math.Cos(double radian)
+ *         double  Math.Tan(double radian)
+ *
+ *         Argument: angle unit is Radian.  角のラジアン(弧度法)単位  
+ *               Radian = θ π / 180         (π: circumference rate 円周率)
+ *                      = θ * Math.PI / 180
+ *         
+ *         center angle of Regular n angles Polygon:
+ *         正n角形の中心角は θ = 360° / n
+ *         
+ *         decimal centerAngleRadian = 
+ *             (360M / (decimal)num) * (decimal)Math.PI / 180M;
+ *         
+ *         ※【Note】Math.Cos(), Sin(), Tan() | Math.Sqrt() use only 'double' type as the argument.
+ *            Therefore these methods calcuiation could be not precisely.
+ *         
+ *         ※【註】 Math.Cos(), Sin(), Tan() | Math.Sqrt() は 引数 doubleのみ
+ *         精密な計算をする場合は計算誤差の可能性があることに注意。
+ *
+ *@copyFrom CoordinateAlgorithm\AlgoCoordinateLinear.cs
+ *@subject【Triangular ratio Formula】三角比の公式
+ *         tanθ = sinθ / cosθ
+ *             on the basis of Triangular Ratio definition,  三角比の定義
+ *
+ *         cos^2 θ + sin^2 θ = 1
+ *             on the basis of Three Square Theorem  三平方の定理
+ *
+ *         tan^2 θ + 1 = 1 / cos^2 θ
+ *             on simultaneous both above,  両式の連立
+ *         
+ *         By these Formula, if any value of cosθ, sinθ, tanθ were obtained, 
+ *         all others values can be calculated.
+ *
+ *         これらの公式により、cosθ, sinθ, tanθ のいずれかの値がわかると、
+ *         他のすべての値を求めることができる。
+ *          =>〔FigureAlgorithm\MainMultiAngleViewer.cs〕
+ *        
+ 
+ ＊【Additive Theorem】加法定理
+  sin(A ± B) = sinA cosB ± cosA sinB
+  cos(A ± B) = cosA cosB 干 sinA sinB
+  tan(A ± B) = (tanA ± tanB) / (1 干 tanA tanB)
+
+  【Note】 Character depended on Device Environment:  環境依存文字
+  '±': 土 plus minus | '∓': 干 minus plus
+
+  On the basis above:
+  sin(90 + θ) = cosθ
+  cos(90 + θ) = -sinθ
+  tan(90 + θ) = -1 / tanθ
+
+  sin(90 - θ) = cosθ
+  cos(90 - θ) = sinθ
+  tan(90 - θ) = 1 / tanθ
+
+  sin(180 ± θ) = sinθ
+  cos(180 ± θ) = -cosθ
+  tan(180 ± θ) = -tanθ
+
+  ・Double angele Formula: ２倍角の公式
+  sin2θ = 2 sinθ cosθ
+  cos2θ = cos^2 θ − sin^2 θ
+        = 1 - 2 sin^2 θ
+        = 2 cos^2 θ - 1
+  tan2θ = 2 tanθ / (1 − tan^2 θ)
+
+
+ ＊【Sine Theorem】正弦定理
+    (1 / sinA) = (1 / sinB) = (1 / sinC) = 2 r
+    
+    on Triangle ABC inscribed of circle whose radius is 'r'.
+    半径 r の円に内接する三角形において 上記の公式が成り立つ。
+
+
+ ＊【Cosine Theorem】余弦定理
+ a^2 = b^2 + c^2 - b c cosA
+ b^2 = a^2 + c^2 - a c cosB
+ c^2 = a^2 + b^2 - a b cosC
+
+ If 3 line length of Triangle are obvious, 
+ cosθ value, virtical line length, intersection point coordinate with virtical line,
+ and area value of the Triangle can be obtained by this theorem.
+ Especially it is important for C# programming to obtain cosθ value 
+ without 'double' type calculation of 'Math.Cos(double)' and without θ angle value.
+
+ 三辺の長さが分っているなら、[cosθ の値, 垂線の長さ, 垂線との交点座標, 三角形の面積] が求まる。
+ 特に C# プログラミングにおいて重要なのは、cosθの値が Math.Cos(double)の double計算せずに求まることである。
+ その際、角 θの値を 知らなくても求められるのも ありがたい。
+
+ *@copyFrom CoordinateAlgorithm\AlgoCoordinateCircle.cs
+ *@subject ２ Circles intersection points  ２円の交点
+ *
+ *                 |   <-- VirticalLine Equation
+ *                /|\
+ *               ／| \
+ *          r1 ／  |  \ r2
+ *           ／    |   \
+ *       O1 ∠C___┌|____\ O2   <- CenterLine Equation
+ *        p + r1*cosC 
+ *          └-    d    -┘
+ *          
+ *         ＊【Geometrical Solver】幾何的解法
+ *         ・ The center line is on the center point of ２ circles.
+ *            The solution line is on ２ intersection points 
+ *            These lines cross virtically, because of equally dividing angle line of isosceles triangle.
+ *
+ *         ・ When | r1 - r2 | < d < | r1 + r2|, the slope of solution line can be obtained.
+ *
+ *           ２円の交点を通る直線は、２円の中心を結ぶ線と垂直に交わる (r による二等辺三角形の角２等分線)
+ *           -> 直線の傾き slopeが求まる
+ *
+ *         ・On the basis of Cosine Theorem, because of 3 line length [d, r1, r2] are constant,
+ *           cosθ value, intersection point can be calucutated.
+ *
+ *         ・３辺の長さ d, r1, r2 が分っているので、余弦定理より cosθの値を得て、
+ *           -> 上記２直線の交点座標が求まる
+ *
+ *         ・Algebraic Solver need confusing both two-dimensional simultaneous caluculation
+ *           and need consider 0 divide case.
+ *
+ *           複雑な２次どうしの代数計算をせずに済み、0除算の場合分けも不要
+ *
+ *         ・Linear Equation as solution line 'y = a x + b' can be obtained by slope, point.
+ *           ２円の交点を通る直線は、傾き slope, 通る点 pointから求まる
+ *
+ *         ・The intersection points can caluculate by simultaneous between circle and solution line.
+ *           ２円の交点は、円と ２円の交点を通る直線の連立で求められる。
+ *
+ *         Cosine Theorem: c ^ 2 = a ^ 2 + b ^ 2 - 2 a b cosC
+ *         cosC = (a ^ 2 + b ^ 2 - c ^ 2) / 2 a b
+ *         ∠C: angle between center line and radius line ->  a = r1, b = d, c = r2
+ *         if (90 < ∠C < 270)  then cos(180 - C) = -cosC
+ *         
+ */
