@@ -99,6 +99,8 @@
  *          r1*cosC 
  *          └-    d    -┘
  *          
+ *       => copyTo〔~\WinFormSample\TriangularRatioReference.txt〕
+ *          
  *@NOTE【Problem】２円が１点で接する場合
  *      判別式は小数だと ほぼ無理で２解 or 解なしになってしまう
  *      => Math.Round()でも解決しない

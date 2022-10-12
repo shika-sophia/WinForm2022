@@ -101,7 +101,8 @@
  *         これらの公式により、cosθ, sinθ, tanθ のいずれかの値がわかると、
  *         他のすべての値を求めることができる。
  *          =>〔三角比 | FigureAlgorithm\MainMultiAngleViewer.cs〕
- *         
+ *          => copyTo 〔~\WinFormSample\TriangularRatioReference.txt〕
+ *          
  *@subject AlgoVirticleMark()
  *         tanθ = dy / dx = 傾き slope (直線の式から値がわかる)。
  *         斜辺の長さ distanceは所与 (引数で与えられる)
