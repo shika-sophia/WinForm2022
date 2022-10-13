@@ -451,7 +451,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             return pt;
         }//AlgoDistanceOnLinePoint()
-
+        
         public PointF AlgoMidpoint(PointF pt1, PointF pt2)
         {   // midpoint 中点 = (sumX / 2, sumY / 2)
             float midX = (float)(((decimal)pt1.X + (decimal)pt2.X) / 2M);

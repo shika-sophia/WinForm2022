@@ -190,7 +190,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             decimal dx = (decimal)pt.X - (decimal)CircleCenterPoint.X;
             decimal dy = (decimal)pt.Y - (decimal)CircleCenterPoint.Y;
 
-            return dx * dx + dy * dy == RadiusSq;
+            return Math.Round(dx * dx + dy * dy, 4) == Math.Round(RadiusSq, 4);
         }//CheckOnLine()
 
         public float[] AlgoFunctionXtoY(float x)

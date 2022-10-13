@@ -267,7 +267,14 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         public void SetScaleRate(decimal scaleRate)
         {
-            this.scaleRate = scaleRate;
+            if (base.scaleRate == scaleRate) { return; }
+
+            if (scaleRate < 0.02M) 
+            {
+                throw new ArgumentException("scaleRate should be over 0.02M.");
+            }
+
+            base.scaleRate = scaleRate;
             g.Clear(SystemColors.Window);
             DrawCoordinateAxis();
         }//SetScaleRate()

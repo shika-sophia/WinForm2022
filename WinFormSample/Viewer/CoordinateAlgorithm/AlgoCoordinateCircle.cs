@@ -162,6 +162,34 @@
  *          c: p * p + q * q - 2M * b * q - eqCircle.RadiusSq
  *      );
  *     
+ *@subject 円上の点における接線
+ *         EquationLinear  AlgoTangentLineOnCircle(PointF, EquationCircle)
+ *         
+ *         ・中心点と円上の点を結ぶ半径線の方程式を求め、
+ *           接線は半径線と垂直に交わるので、接線の傾きを求める
+ *         ・傾きと一点から接線の方程式を導く
+ *           EquationLinear  AlgoRadiusLine(PointF, EquationCircle)
+ *           EquationLinear  AlgoVirticalLine(PointF, EquationLinear)
+ *           
+ *@subject 円外の点からの接線
+ *         EquationLinear[]  AlgoTangentLineOutCircle(PointF, EquationCircle)
+ *         
+ *         ・円外の点の位置関係により接線の個数が異なる
+ *         ・接点と 接線の方程式が不明
+ *         ・代数的解法は 接線の公式, 距離の公式を利用
+ *         ・幾何的解法は 余弦定理で cosθを求めて、接点を求め、接線の方程式を導く
+ *         ・d < r の場合、接線は２つ
+ *         ・円の中心点, 円外の点, 接点による三角形
+ *         
+ *                       \ Ｃ   <- Contact Point  OC ⊥ CT
+ *                      └/|\
+ *                     ／ | \  
+ *                 r ／   |  \ √ (d^2 - r^2)
+ *                 ／     |   \
+ *      (p, q) Ｏ ∠_θ____┌|____\ Ｔ  <- point out of Circle
+ *               p + r*cosθ
+ *               └----   d   ---┘
+ *               
  *@see 
  *@author shika
  *@date 2022-10-11
@@ -184,6 +212,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             ICoordinateEquation[] eqAry, 
             params PointF[] pointAryArgs)
         {
+            SetScaleRate(scaleRateHere);
+
             //---- Test Print ----
             Console.WriteLine("Equation Array:");
             foreach (var eq in eqAry) { Console.WriteLine(eq); };
@@ -207,7 +237,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
                     //---- TrySolutionCircle() ----
                     bool existSolution = TrySolutionCircle(eqAry[i], eqAry[j], 
-                        out PointF[] solutionAry, scaleRateHere);
+                        out PointF[] solutionAry);
 
                     if (existSolution)
                     {
@@ -249,6 +279,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             //---- Draw ----
             DrawMultiPointLine(pointList.ToArray(), autoScale: false);
             //autoScale false: need SetScaleRate(decimal) in AlgoSimultaneousCircleBoth 
+            
+            Console.WriteLine($"scaleRate = {scaleRate}");
+            Console.WriteLine($"scaleRateHere = {scaleRateHere}");
 
             foreach (ICoordinateEquation eq in eqAry)
             {
@@ -477,7 +510,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 return new PointF((float)(sign * radius), 0f);
             }
 
-            // PointF(r * cosθ, r * sinθ)
+            // PointF(p + r * cosθ, q + r * sinθ)
             decimal angleRadian = angle / 180M * (decimal)Math.PI;
             decimal cos = (decimal)Math.Cos((double)angleRadian);
             decimal sin = (decimal)Math.Sin((double)angleRadian);
@@ -492,28 +525,117 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return new EquationLinear(pt1: radiusPoint, pt2: eqCircle.CircleCenterPoint);
         }//AlgoRadiusLine()
 
-        public EquationLinear AlgoTangentLineCircle(PointF pt, EquationCircle eqCircle)
+        public EquationLinear AlgoTangentLineOnCircle(PointF ptOnCircle, EquationCircle eqCircle)
         {
-            if (!eqCircle.CheckOnLine(pt))
+            if (!eqCircle.CheckOnLine(ptOnCircle))
             {
-                throw new ArgumentException("PointF pt is not on the EquationCircle.");
+                Console.WriteLine("PointF pt is not on the EquationCircle.");
+                return AlgoTangentLineOutCircle(ptOnCircle, eqCircle, out PointF[] contactPointAry)[0];
             }
 
-            EquationLinear radiusLine = AlgoRadiusLine(pt, eqCircle);
+            EquationLinear radiusLine = AlgoRadiusLine(ptOnCircle, eqCircle);
 
-            return AlgoVirticalLine(pt, radiusLine);
-        }//AlgoTangentLineCircle()
+            return AlgoVirticalLine(ptOnCircle, radiusLine);
+        }//AlgoTangentLineOnCircle()
+
+        public EquationLinear[] AlgoTangentLineOutCircle(PointF ptOuter, EquationCircle eqCircle, out PointF[] contactPointAry)
+        {
+            if (eqCircle.CheckOnLine(ptOuter))
+            {
+                Console.WriteLine("PointF pt is on the EquationCircle.");
+                contactPointAry = new PointF[] { ptOuter };
+                return new EquationLinear[] { AlgoTangentLineOnCircle(ptOuter, eqCircle) };
+            }
+
+            PointF origin = eqCircle.CircleCenterPoint;
+            decimal distanceSq = AlgoDistanceSq(origin, ptOuter);
+            decimal distance = (decimal)Math.Sqrt((double)distanceSq);
+            decimal radiusSq = eqCircle.RadiusSq;
+            decimal radius = eqCircle.Radius;
+            decimal pointToContactSq = distanceSq - radiusSq;
+
+            penViolet.Width = 1;
+            penViolet.DashStyle = DashStyle.Dash;
+            DrawLinearSegment(penViolet, origin, ptOuter);
+
+            List<EquationLinear> tangentLineAry = new List<EquationLinear>();
+            List<PointF> contactPointList = new List<PointF>();
+
+            if(pointToContactSq > 0)  // d > r
+            {
+                // ---- cosPtOuterToConact ----
+                // OT^2 = r^2 + d^2 - 2 r d cosθ
+                // cosθ = (r^2 + d^2 - OT^2) / 2 r d
+                decimal cosPtOuterToContact =
+                    (radiusSq + distanceSq - pointToContactSq) /
+                    (2M * radius * distance);
+                
+                // sin^2 θ + cos^2 θ = 1
+                // sinθ = √ (1 - cos^2 θ)
+                decimal sinPtOuterToContact = (decimal)Math.Sqrt(
+                    (double)(1M - cosPtOuterToContact * cosPtOuterToContact)
+                );
+
+                // ---- cosPtOuter ----
+                decimal cosPtOuter = distance / (decimal)ptOuter.X;
+                decimal sinPtOuter = distance / (decimal)ptOuter.Y;
+
+                // Additive Theorem 加法定理 
+                // cos(A ± B) = cosA cosB 干 sinA sinB
+                decimal cos = cosPtOuterToContact * cosPtOuter - sinPtOuterToContact * sinPtOuter;
+                cos = (origin.X < ptOuter.X) ? cos : -cos;  // ∠C が鈍角の場合  -cosC
+
+                float contactX = (float)((decimal)origin.X + radius * cos);
+                float[] contctYAry = eqCircle.AlgoFunctionXtoY(contactX);
+
+                foreach (float contactY in contctYAry)
+                {
+                    PointF contactPoint = new PointF(contactX, contactY);
+                    EquationLinear tangentLine = new EquationLinear(ptOuter, contactPoint);
+                    
+                    contactPointList.Add(contactPoint);
+                    tangentLineAry.Add(tangentLine);
+
+                    DrawLinearSegment(penViolet, origin, contactPoint);
+                    DrawVirticalMark(tangentLine, new EquationLinear(origin, contactPoint),
+                        plusX: (origin.X < contactPoint.X) ? false : true, 
+                        plusY: (origin.Y < contactPoint.Y) ? false : true);
+                }//foreach
+            }
+            //else if (pointToContactSq == 0)  // d == r  -> AlgoTangentOnCircle()
+            //else if (pointToContactSq < 0)   // d < r   -> (No solution)
+            
+            contactPointAry = contactPointList.ToArray();
+            return tangentLineAry.ToArray();
+        }//AlgoTangentLineOutCircle()
+
+        public EquationLinear[] AlgoCotangentLineTwoCircle(EquationCircle eqCircle1, EquationCircle eqCircle2)
+        {
+            decimal r1 = eqCircle1.Radius;
+            decimal r2 = eqCircle2.Radius;
+            decimal radiusSumSq = (r1 + r2) * (r1 + r2);
+            decimal radiusSubtractSq = (r1 - r2) * (r1 - r2);
+            PointF origin1 = eqCircle1.CircleCenterPoint;
+            PointF origin2 = eqCircle2.CircleCenterPoint;
+            decimal distanceSq = AlgoDistanceSq(origin1, origin2);
+
+            List<EquationLinear> cotangentList = new List<EquationLinear>();
+
+            //(editing...)
+
+            return cotangentList.ToArray();
+        }//AlgoCotangentLineTwoCircle()
 
         //====== TrySolutionCircle() ======
         public bool TrySolutionCircle(
             ICoordinateEquation eq1, ICoordinateEquation eq2, 
-            out PointF[] solutionAry, decimal scaleRateHere)
+            out PointF[] solutionAry)
         {
             List<PointF> solutionList = new List<PointF>();
             if(eq1 is EquationCircle && eq2 is EquationCircle)
             {
                 solutionList.AddRange(AlgoSimultaneousCircleBoth(
-                    eq1 as EquationCircle, eq2 as EquationCircle, scaleRateHere));
+                    eq1 as EquationCircle, eq2 as EquationCircle));
             }
              
             if (eq1 is EquationCircle && eq2 is EquationQuadratic)
@@ -549,7 +671,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         }//TrySolutionCircle()
 
         private PointF[] AlgoSimultaneousCircleBoth
-            (EquationCircle eqCircle1, EquationCircle eqCircle2, decimal scaleRateHere)
+            (EquationCircle eqCircle1, EquationCircle eqCircle2)
         {
             decimal r1 = eqCircle1.Radius;  //【Deprecated】非推奨: including Math.Sqrt(double)
             decimal r2 = eqCircle2.Radius;  //【Deprecated】非推奨: including Math.Sqrt(double)
@@ -561,8 +683,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             decimal radiusSumSq = (r1 + r2) * (r1 + r2);               // (r1 + r2) ^ 2 : sum of both radius as squre.
             decimal radiusSubtractSq = (r1 - r2) * (r1 - r2);          // (r1 - r2) ^ 2 : subtract of both radius as squre.
 
-            SetScaleRate(scaleRateHere);
-            penViolet.Width = 1f;
+            penViolet.Width = 1.0f;
             penViolet.DashStyle = DashStyle.Dash;
 
             //---- center point line 中心線 ----
@@ -578,11 +699,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 // ∠C が鈍角の場合 (90 < ∠C < 270)  cos(180 - C) = -cosC
 
                 decimal cos = (r1 * r1 + distanceSq - r2 * r2) / (2M * r1 * distance);
-
-                if (origin2.X < origin1.X)  //∠C が鈍角の場合  -cosC
-                {
-                    cos *= -1;
-                }
+                cos = (origin1.X < origin2.X) ? cos : -cos;  // ∠C が鈍角の場合  -cosC
 
                 PointF centerVirticalPoint = AlgoDistanceOnLinePoint(
                     r1 * cos, origin1, eqCenterLine);
@@ -612,7 +729,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 PointF internalPoint = AlgoInternalPoint(r1, r2, origin1, origin2);
                 pointList.Add(internalPoint);
 
-                EquationLinear eqTangentLine = AlgoTangentLineCircle(internalPoint, eqCircle1);
+                EquationLinear eqTangentLine = AlgoTangentLineOnCircle(internalPoint, eqCircle1);
                 DrawLinearFunction(eqTangentLine);
             }
             else if (Math.Round(distanceSq, 4) == Math.Round(radiusSubtractSq, 1) && r1 - r2 != 0)
@@ -620,7 +737,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 PointF externalPoint = AlgoExternalPoint(r1, r2, origin1, origin2);
                 pointList.Add(externalPoint);
 
-                EquationLinear eqTangentLine = AlgoTangentLineCircle(externalPoint, eqCircle1);
+                EquationLinear eqTangentLine = AlgoTangentLineOnCircle(externalPoint, eqCircle1);
                 DrawLinearFunction(eqTangentLine);
             }
 
@@ -669,5 +786,6 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             return pointList.ToArray();
         }//AlgoSimultaneousCircleLinear()
+
     }//class
 }

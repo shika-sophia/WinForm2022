@@ -132,25 +132,25 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             string text = null;
             if (float.IsInfinity(slope))  // x = c
             {
-                return $"x = {intercept}";
+                return $"x = {intercept:0.##}";
             }
             
             if (slope == 0)  // y = b
             {
-                return $"y = {intercept}";
+                return $"y = {intercept:0.##}";
             }
 
             if(intercept > 0)
             { 
-                text = $"y = {slope} x + {intercept}";
+                text = $"y = {slope:0.##} x + {intercept:0.##}";
             }
             else if (intercept == 0)
             {
-                text = $"y = {slope} x";
+                text = $"y = {slope:0.##} x";
             }
             else if (intercept < 0)
             {
-                text = $"y = {slope} x - {-intercept}";
+                text = $"y = {slope:0.##} x - {-intercept:0.##}";
             }
 
             return text;
