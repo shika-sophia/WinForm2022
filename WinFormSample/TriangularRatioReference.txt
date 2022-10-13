@@ -26,12 +26,15 @@
      例 三平方の定理より、 sin60° = b / c = √3 / 2
                          cos60° = a / c =  1 / 2
      
-     (Example) The slope of Linear OA is tanθ = b / a 
-     例 直線 OA の傾きは tanθ = b / a 
+     (Example) The slope of Linear OA is tanθ = b / a , 
+     only when θ between the line and parallel with X-Axis. 
+     例 直線 OA の傾きは tanθ = b / a  (θが X軸と平行な線との角の場合のみ)
 
-     (Example) When Circle is defined the center point(p, q) and the radius: r,
+     (Example) Circle is defined the center point(p, q) and the radius: r,
+               only when θ between the line and parallel with X-Axis.
                the coordinate of the point on this circle: 
-     例 中心(p, q) 半径 r の円上の点の座標:  A (a, b) = (p + r * cosθ, q + r * sinθ)
+     例 中心(p, q) 半径 r の円上の点の座標: (θが X軸と平行な線との角の場合のみ)
+     A (a, b) = (p + r * cosθ, q + r * sinθ)
 
  *@copyFrom FigureAlgorithm\MainMultiAngleViewer.cs
  *@subject Math class 〔C#〕
