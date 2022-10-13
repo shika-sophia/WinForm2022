@@ -26,9 +26,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 {
     class MainSimultaneousCircleViewer
     {
-        [STAThread]
-        static void Main()
-        //public void Main()
+        //[STAThread]
+        //static void Main()
+        public void Main()
         {
             Console.WriteLine("new FormSimultaneousCircleViewer()");
 
@@ -62,13 +62,15 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             circle.DrawCoordinateAxis();
 
             var eqCircle1 = new EquationCircle(radius: 120M, new PointF(0, 0));
-            var eqCircle2 = new EquationCircle(radius: 80M, new PointF(100, 50));
+            var eqCircle2 = new EquationCircle(radius: 80M, new PointF(100, 50));    // | r1 - r2 | < d < r1 + r2
+            //var eqCircle2 = new EquationCircle(radius: 80M, new PointF(160, 120)); // d == r1 + r2
+            //var eqCircle2 = new EquationCircle(radius: 80M, new PointF(-24, -36)); // d == | r1 - r2 |
 
             //var eqLinear = new EquationLinear(eqCircle1.CircleCenterPoint, eqCircle2.CircleCenterPoint);
             //PointF circumscribePoint = circle.AlgoDistanceOnLinePoint(eqCircle1.Radius + eqCircle2.Radius,
-            //    eqCircle1.CircleCenterPoint, eqLinear);
+            //    eqCircle1.CircleCenterPoint, eqLinear);       // d == r1 + r2 となる PointF
             //PointF inscribePoint = circle.AlgoDistanceOnLinePoint(eqCircle1.Radius - eqCircle2.Radius,
-            //    eqCircle1.CircleCenterPoint, eqLinear);
+            //    eqCircle1.CircleCenterPoint, eqLinear);       // d == | r1 - r2  | となる PointF
             //Console.WriteLine($"circumscribePoint: ({circumscribePoint.X}f,{circumscribePoint.Y}f)");
             //Console.WriteLine($"inscribePoint: ({inscribePoint.X}f,{inscribePoint.Y}f)");
 
