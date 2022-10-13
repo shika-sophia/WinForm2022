@@ -111,9 +111,9 @@
 
 
  ＊【Cosine Theorem】余弦定理
- a^2 = b^2 + c^2 - b c cosA
- b^2 = a^2 + c^2 - a c cosB
- c^2 = a^2 + b^2 - a b cosC
+ a^2 = b^2 + c^2 - 2 b c cosA
+ b^2 = a^2 + c^2 - 2 a c cosB
+ c^2 = a^2 + b^2 - 2 a b cosC
 
  If 3 line length of Triangle are obvious, 
  cosθ value, virtical line length, intersection point coordinate with virtical line,
