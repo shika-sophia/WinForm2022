@@ -79,7 +79,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             //---- 接点 PointF(100, ptY)における接線 ----
             //float ptX = 100f;
             //float ptY = diff.AlgoFunctionXtoY(ptX, eqQuad);
-            //EquationLinear eqLinear = diff.AlgoTangentLineOnContact(eqQuad, new PointF(ptX, ptY));
+            //EquationLinear eqLinear = diff.AlgoTangentLineQuadOnContact(eqQuad, new PointF(ptX, ptY));
             //eqList.Add(eqLinear);
 
             //---- 任意の点 PointF(x, y)を通る接線 ----
@@ -89,7 +89,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             pointList.Add(givenPoint);
 
             EquationLinear[] tangentLineAry = 
-                diff.AlgoTangentLineFree(
+                diff.AlgoTangentLineQuadFree(
                     eqQuad, givenPoint, out PointF[] contactAry);
             eqList.AddRange(tangentLineAry);
             pointList.AddRange(contactAry);

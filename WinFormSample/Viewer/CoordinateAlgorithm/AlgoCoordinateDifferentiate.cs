@@ -85,7 +85,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
     {
         public AlgoCoordinateDifferentiate(PictureBox pic) : base(pic) { }
 
-        public EquationLinear[] AlgoTangentLineFree(
+        public EquationLinear[] AlgoTangentLineQuadFree(
             ICoordinateEquation eq, PointF pt, out PointF[] contactPointAry)
         {
             if(eq is EquationLinear)
@@ -97,7 +97,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             
             if(eqQuad.CheckOnLine(pt))
             {
-                EquationLinear eqLinear = AlgoTangentLineOnContact(eqQuad, pt, out PointF contactPoint);
+                EquationLinear eqLinear = AlgoTangentLineQuadOnContact(eqQuad, pt, out PointF contactPoint);
                 contactPointAry = new PointF[] { contactPoint };
                 return new EquationLinear[] { eqLinear };
             }
@@ -129,9 +129,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             }//for
             
             return tangentLineAry;
-        }//AlgoTangentLineFree()
+        }//AlgoTangentLineQuadFree()
 
-        public EquationLinear AlgoTangentLineOnContact(
+        public EquationLinear AlgoTangentLineQuadOnContact(
             ICoordinateEquation eq, PointF pt, out PointF contactPoint)
         {
             if (eq is EquationLinear)
@@ -238,7 +238,7 @@ pointAry:
 (0,-49.99998),                                     // ここの(0,-49.99998)は重複解消しているが、上の点とは重複
 (-39.52846,0),
 
-//==== AlgoCoordinateDifferenciate.AlgoTangentLineFree() ====
+//==== AlgoCoordinateDifferenciate.AlgoTangentLineQuadFree() ====
 tangentLineAry[i] = 
     new EquationLinear(slope, contactPoint) ->  new EquationLinear(slope, pt);
 

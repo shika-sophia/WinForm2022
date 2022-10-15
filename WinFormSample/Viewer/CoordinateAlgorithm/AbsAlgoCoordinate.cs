@@ -33,6 +33,7 @@
  *         ◆AlgoCoordinateCircle : AlgoCoordinateDifferentiate     円、三角比
  *         
  */
+using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -52,6 +53,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         protected Graphics g;
         protected GraphicsState defaultGrapics;
         protected decimal scaleRate = 2.0M;
+        internal SegmentPair segmentPair;
 
         protected AbsAlgoCoordinate(PictureBox pic)
         {
@@ -64,5 +66,27 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 (decimal)pic.ClientSize.Width;
         }//constructor
 
+        internal struct SegmentPair
+        {
+            public PointF startPt;
+            public PointF endPt;
+            public float slope;
+
+            public SegmentPair(PointF pt1, PointF pt2)
+            {
+                this.startPt = pt1;
+                this.endPt = pt2;
+
+                if ( Math.Round(pt1.X, 4) == Math.Round(pt2.X, 4))
+                {
+                    this.slope = float.PositiveInfinity;
+                }
+                else
+                {
+                    this.slope = (float)( ((decimal)pt1.Y - (decimal)pt2.Y) 
+                        / ((decimal)pt1.X - (decimal)pt2.X) );
+                }
+            }//constructor
+        }//struct SegmentPair
     }//class
 }

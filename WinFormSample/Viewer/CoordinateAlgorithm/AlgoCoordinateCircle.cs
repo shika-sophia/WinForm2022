@@ -208,49 +208,11 @@
  *               EquationCircle, EquationCircle, out contactPointAry)
  *               
  *@subject 乖離 d > r1 + r2  共通接線 4
- *        【幾何的解法】両側 2, 交差 2で場合分けが必要
- *         ＊両側:  相似で接点座標を求める
- *         ・平行  O1 C1 // O2 C2 
- *           円の中心 O1, O2 / 接点 C1, C2 とすると、O1 C1 // O2 C2 平行 (接線 ⊥ 半径線)
- * 
- *         ・O1 の接点 C1 (dx, dy)と置く。 dx, dy は O1との差。
- *               ・ C1                ・ C2
- *               |\                   |\
- *               | \                  | \
- *            dy |  \ r1          dy2 |  \ r2
- *               |   \                |   \
- *           V1  |┐___\ O1            |    \
- *                 dx             V2  |┐____\ O2
- *                                      dx2
- *                                      
- *         ・O1 C1 // O2 C2 平行より、三角相当で相似
- *           dx : dx2 = r1 : r2  ->  dx2 = (r1 / r2)dx = R dx  (R = r1 / r2)
- *           dy : dy2 = r1 : r2  ->  dy2 = (r1 / r2)dy = R dy
+ *        【幾何的解法】共通外接線(両側) 2, 共通内接線(交差) 2で場合分けが必要
+ *         ＊共通外接線(両側) 中心線の延長上の r1 : r2 の外分点で 両接線は交わるので、極の接線を引く。
+ *           平行の場合分けが必要。平行時は直径と垂直な接線となる。
  *           
- *         ・三平方の定理
- *           dy^2 = r1^2 - dx^2
- *           dy2 ^2 = (r1 / r2)^2 (r1^2 - dx^2) = R^2 (r1^2 - dx^2)
- *
- *         ・O1 C1, O2 C2の傾きは平行のため等しい
- *         (dy / dx) = (dy2 / dx2)  
- *         dx dy2 = dy dx2         <- 両辺２乗して、dx2, dy, dy2を代入
- *         dx^2 * [R^2 (r1^2 - dx^2)] = (r1^2 - dx^2) R dx
- *         dx^2 * (R^2 r1^2 - R^2 dx^2) = R r1^2 dx^3 ...
- *         
- *         
- *         
- *     
- * 
- * 
- * 
- * 
- * 
- * 
- *                 
- *           O2 の接点 C2 は 
- *         
- *         
- *         ＊交差 中心線を r1 : r2 の内分点で交差するので、極の接線
+ *         ＊共通内接線(交差) 中心線を r1 : r2 の内分点で交差するので、極の接線
  *           AlgoTangentLineOutCircle()
  */
 #endregion
@@ -669,21 +631,120 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return tangentLineList.ToArray();
         }//AlgoTangentLineOutCircle()
 
-        public EquationLinear[] AlgoCotangentLineTwoCircle(EquationCircle eqCircle1, EquationCircle eqCircle2)
+        public EquationLinear[] AlgoCotangentLineTwoCircle(
+            EquationCircle eqCircle1, EquationCircle eqCircle2,
+            out PointF[] pointAry, out SegmentPair[] segmentPairAry)
         {
             decimal r1 = eqCircle1.Radius;
             decimal r2 = eqCircle2.Radius;
-            decimal radiusSumSq = (r1 + r2) * (r1 + r2);
-            decimal radiusSubtractSq = (r1 - r2) * (r1 - r2);
             PointF origin1 = eqCircle1.CircleCenterPoint;
             PointF origin2 = eqCircle2.CircleCenterPoint;
-            decimal distanceSq = AlgoDistanceSq(origin1, origin2);
 
-            List<EquationLinear> cotangentList = new List<EquationLinear>();
+            List<EquationLinear> cotangentLineList = new List<EquationLinear>();
+            List<PointF> pointList = new List<PointF>();
+            List<SegmentPair> segmentPairList = new List<SegmentPair>();
 
-            //(editing...)
+            EquationLinear centerLine = new EquationLinear(origin1, origin2);
+            segmentPairList.Add(new SegmentPair(origin1, origin2));
+            
+            //======= External co-tangent line ======
+            if (r1 == r2) //接線は平行線
+            {   //直径線と円の交点
+                EquationLinear diameterLine = AlgoVirticalLine(origin1, centerLine);
+                PointF[] externalContactPointAry1 = AlgoSimultaneousCircleLinear(eqCircle1, diameterLine);
+                PointF[] externalContactPointAry2 = AlgoSimultaneousCircleLinear(eqCircle2, diameterLine);
+                pointList.AddRange(externalContactPointAry1);
+                pointList.AddRange(externalContactPointAry2);
 
-            return cotangentList.ToArray();
+                for(int i = 0; i < externalContactPointAry1.Length; i++)
+                {
+                    EquationLinear externalCotangentLine = AlgoVirticalLine(externalContactPointAry1[i], diameterLine);
+                    cotangentLineList.Add(externalCotangentLine);
+
+                    if(externalContactPointAry2.Length < externalContactPointAry1.Length)
+                    {
+                        Console.WriteLine("externalContactAry2 is lacked value.");
+                    }
+                    else
+                    {
+                        segmentPairList.Add(new SegmentPair(
+                            externalContactPointAry1[i], externalContactPointAry2[i]));
+                    }
+                    
+                }//for
+            }//if r1 == r2
+            else if (Math.Abs(r1 - r2) > 0)
+            {
+                //外分点 T
+                PointF externalPoint = AlgoExternalPoint(r1, r2, origin1, origin2);
+
+                //外分点を極とする接線
+                EquationLinear[] externalCotangentLineAry1 = AlgoTangentLineOutCircle(
+                    externalPoint, eqCircle1, out PointF[] externalContactPointAry1);
+                EquationLinear[] externalCotangentLineAry2 = AlgoTangentLineOutCircle(
+                    externalPoint, eqCircle2, out PointF[] externalContactPointAry2);
+                cotangentLineList.AddRange(externalCotangentLineAry1);
+
+                pointList.Add(externalPoint);
+                pointList.AddRange(externalContactPointAry1);
+                pointList.AddRange(externalContactPointAry2);
+
+                segmentPairList.Add(new SegmentPair(externalPoint, origin1));
+                segmentPairList.Add(new SegmentPair(externalPoint, origin2));
+                
+                for(int i = 0; i < externalContactPointAry1.Length; i += 2)
+                {
+                    segmentPairList.Add(new SegmentPair(
+                        externalContactPointAry1[i],
+                        externalContactPointAry1[i + 1]));
+
+                    if (externalContactPointAry2.Length < externalContactPointAry1.Length)
+                    {
+                        Console.WriteLine("externalContactPointAry2 is lacked value.");
+                    }
+                    else
+                    {
+                        segmentPairList.Add(new SegmentPair(
+                        externalContactPointAry2[i],
+                        externalContactPointAry2[i + 1]));
+                    }
+                }//for
+            }//if (r1 - r2) > 0
+
+            //======= Internal co-tangent line ======
+            PointF internalPoint = AlgoInternalPoint(r1, r2, origin1, origin2);
+            EquationLinear[] internalCotangentLineAry1 = AlgoTangentLineOutCircle(
+                internalPoint, eqCircle1, out PointF[] internalContactPointAry1);
+            EquationLinear[] internalCotangentLineAry2 = AlgoTangentLineOutCircle(
+                internalPoint, eqCircle2, out PointF[] internalContactPointAry2);
+            cotangentLineList.AddRange(internalCotangentLineAry1);
+
+            pointList.Add(internalPoint);
+            pointList.AddRange(internalContactPointAry1);
+            pointList.AddRange(internalContactPointAry2);
+
+            segmentPairList.Add(new SegmentPair(internalPoint, origin1));
+            segmentPairList.Add(new SegmentPair(internalPoint, origin2));
+
+            for(int i = 0; i < internalContactPointAry1.Length; i++)
+            {
+                segmentPairList.Add(new SegmentPair(
+                    internalContactPointAry1[i], origin1));
+
+                if (internalContactPointAry2.Length < internalContactPointAry1.Length)
+                {
+                    Console.WriteLine("internalContactAry2 is lacked value.");
+                }
+                else
+                {
+                    segmentPairList.Add(new SegmentPair(
+                    internalContactPointAry2[i], origin2));
+                }
+            }//for
+
+            pointAry = pointList.ToArray();
+            segmentPairAry = segmentPairList.ToArray();
+            return cotangentLineList.ToArray();
         }//AlgoCotangentLineTwoCircle()
 
         //====== TrySolutionCircle() ======
