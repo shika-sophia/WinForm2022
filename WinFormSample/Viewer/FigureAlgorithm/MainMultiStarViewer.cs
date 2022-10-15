@@ -62,7 +62,6 @@ namespace WinFormGUI.WinFormSample.Viewer.FigureAlgorithm
     class FormMultiStarViewer : Form
     {
         private readonly PictureBox pic;
-        private readonly Graphics g;
         private readonly Pen penBlue = new Pen(Color.CornflowerBlue, 2);
         private readonly Pen penPink = new Pen(Color.HotPink, 2);
         private readonly PointF centerPoint;
