@@ -1,0 +1,61 @@
+livedoorlivedoor Blog
+のぶろぐ
+http://blog.livedoor.jp/ossaka/archives/51567931.html (セキュリティの警告が出る)
+2009年02月20日
+
+■2円の共通接線の作図
+◆2円の共通外接線
+http://homepage2.nifty.com/sintakenoko/Construction/Draw11.html (リンクアウト)
+2円の共通外接線
+[CotangentOuterOfTwoCircle.png]
+
+ここで，２円 O，O' の半径を r，r' とします。
+(1)　線分 OO' の中点 M をとり，OO' を直径とする円をかく。
+(2)　円 O と OO' の交点 A を中心に，半径 r' の弧をかき，
+　　OO' との交点を B とする。
+(3)　O を中心に B を通る円をかき交点を C とする。
+　　( OC = r - r'，∠OCO' = 90°)
+(4)　OC と円 O の交点を D とし，D を中心に半径
+　　CO' で弧をかき，円 O' との交点を E とする。
+(5)　DE が求める接線となる。( DCO'E は長方形 )
+
+
+■2円の共通内接線
+http://homepage2.nifty.com/sintakenoko/Construction/Draw12.html (リンクアウト)
+2円の共通内接線
+[CotangentInnerOfTwoCircle.png]
+
+ここで，２円 O，O' の半径を r，r' とします。
+(1)　線分 OO' の中点 M をとり，OO' を直径とする円をかく。
+(2)　円 O と OO' の交点 A を中心に，半径 r' の弧をかき，
+　　OO' との交点を B とする。
+(3)　O を中心に B を通る円をかき交点を C とする。
+　　( OC = r + r'，∠OCO' = 90°)
+(4)　OC と円Oの交点を D とし，D を中心に半径 CO' で弧を
+　　かき，円 O' との交点を E とする。
+(5)　DE が求める接線となる。( CDEO' は長方形 )
+
+
+
+※「作図の小部屋」を参照
+http://homepage2.nifty.com/sintakenoko/index_d.html
+
+ossaka at 14:29│Comments(0)│  │メモ 
+このBlogのトップへ│前の記事│次の記事
+
+
+//====== 失敗アルゴリズム =====
+WinFormGUI/WinFormSample/Viewer/CoordinateAlgorithm/AlgoCoordinateCircle.cs
+
+＊共通外接線(両側):  接点は、接線 ⊥ 半径線、半径線の差 | r1 - r2 | となる点
+ *         => see 〔~\Reference\CotangentTwoCircle\CotangentDrawByCompus.txt〕
+ *         
+ *         ・２円の中心線の中点を中心に、O1 O2 を直径とする円 O3 を描く
+ *           (直径の円周角は直角なので、円 O3上の点 Pは O1 P ⊥ )2 P となる)
+ *         
+ *         ・O1 を中心に 半径 |r1 - r2|となる円 O4を描く
+ *         
+ *         ・２円 O3, O4 の交点 P, Q と中心 O1 を結ぶ線 O1 P, O1 Q を伸ばして
+ *           O1 円周との交点 が 共通外接線の接点となる。
+ *
+ *         (接点ではない点を除外ため位置関係の場合分けをする必要がある)
