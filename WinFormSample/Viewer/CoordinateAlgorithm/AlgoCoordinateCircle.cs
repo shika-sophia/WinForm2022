@@ -9,8 +9,13 @@
  *           http://kaitei.net/csforms/
  *           =>〔~/Reference/Article_KaiteiNet/WinForm_.txt〕
  *           
- *@content 円と複数関数の描画
- *@subject void DrawMultiCircleFunction(
+ *@content Algorithm and Draw about Circle
+ *         円に関するアルゴリズムと描画
+ */
+#region Method Algorithm
+/*
+ *@subject 円と複数関数の描画
+ *         void DrawMultiCircleFunction(
  *                ICoordinateEquation[] eqAry, params PointF[] pointAryArgs)
  *         
  *         【註】AlgoSimultaneousCircleBoth()から、Draw, Algo の分離が難しく、
@@ -55,28 +60,6 @@
  *          // -) x ^ 2 - 2 m x + m ^ 2 + y ^ 2 - 2 n y + n ^ 2 = R ^ 2
  *          //          - 2 p x + 2 m x         - 2 q y + 2 n y = r^2 - R^2 - p^2 + m^2 - q^2 + n^2
  *          // y = (r^2 - R^2 - p^2 - q^2 + m^2 + n^2 + 2 (p - m) x) / 2(q - n)
- *
- *          decimal p = (decimal)origin1.X;
- *          decimal q = (decimal)origin1.Y;
- *          decimal m = (decimal)origin2.X;
- *          decimal n = (decimal)origin2.Y;
- *
- *          if(q - n == 0) 
- *          {
- *              //eqLinear = new EquationLinear(
- *              //    slope: float.PositiveInfinity,
- *              //    intercept: );
- *              
- *               throw new ArgumentException("q - n == 0  in AlgoSimultaneousCircleBoth()");
- *          }
- *               
- *          var eqLinear = new EquationLinear(
- *              slope: (float)((p - m) / (q - n)),
- *               intercept: (float)((r1 * r1 - r2 * r2 - p * p - q * q + m * m + n * n) 
- *                   / (2M * (q - n)))
- *          );
- *           
- *          pointList.AddRange(AlgoSimultaneousCircleLinear(eqCircle1, eqLinear));
  *          
  *@subject ＊【幾何的解法】 Geometrical Solver
  *         ・２円の交点を通る直線は、２円の中心を結ぶ線と垂直に交わる (r による二等辺三角形の角２等分線)
@@ -176,20 +159,102 @@
  *         
  *         ・円外の点の位置関係により接線の個数が異なる
  *         ・接点と 接線の方程式が不明
- *         ・代数的解法は 接線の公式, 距離の公式を利用
- *         ・幾何的解法は 余弦定理で cosθを求めて、接点を求め、接線の方程式を導く
- *         ・d < r の場合、接線は２つ
- *         ・円の中心点, 円外の点, 接点による三角形
+ *         ＊【代数的解法】は 接線の公式, 距離の公式を利用し、円の方程式との連立
+ *            接線の公式: 円の中心 O (x0, y0) , 極 P (p, q), 接点 C (s, t)
+ *                       (s - x0)(x - x0) + (t - y0)(y - y0) = r^2   
+ *            距離の公式  | (s - x0)(x - x0) + (t - y0)(y - y0) - r^2 | / √ [(s - x0)^2 +(t - y0)^2] 
+ *            
+ *            円の方程式  (x - x0)^2 + (y - y0)^2 = r^2
+ *            
+ *            => 代数計算がとても複雑で計算ミス, 記述ミスが起こりやすい
+ *            
+ *         ＊【幾何的解法】極線を求めて、円の方程式と連立
+ *         ・極 P: 円外の点, 極線 CC' = CQ: 極から引いた接線の接点を結ぶ線 (1)
+ *         ・円の中心点から極点までの線 OP (2)
+ *         ・極線の傾き: (2)と垂直 OP ⊥ CQ (二等辺三角形の角二等分線)から求まる
  *         
- *                       \ Ｃ   <- Contact Point  OC ⊥ CT
+ *         ・相似から、(1),(2)交点の内分点 Q の内分比が分かる
+ *              △OCP ∽ △ OCQ (相似: 三角相等) d : r = r : OQ 
+ *              -> OQ = r^2 / d
+ *              △OCP ∽ △ CQP (相似: 三角相等) d : √(d^2 - r^2) = √(d^2 - r^2) : PQ  
+ *              -> PQ = (d^2 - r^2) / d
+ *           OQ : PQ = r^2 : (d^2 - r^2)
+ *           
+ *         ・【別解】円の中心点 O, 円外の点 P, 接点 C による三角形 △OCP -> ３辺の長さがわかる
+ *           余弦定理で cosθ の値が求まる。 OQ : PQ = (r * cosθ) : (d - r * cosθ)
+ *           (この cosθ は X軸と平行ではないので直接に座標は求められないことに注意)
+ *           
+ *         ・極線: 傾きと一点 Q から決定。
+ *         ・接点: 円と極線の交点 C, C' を求め、接線: 極点 P と接点 C, C' を結ぶ直線を導出
+ *         
+ *                       \ Ｃ   <- Contact Point  OC ⊥ CP (接線と半径線)
  *                      └/|\
  *                     ／ | \  
  *                 r ／   |  \ √ (d^2 - r^2)
  *                 ／     |   \
- *      (p, q) Ｏ ∠_θ____┌|____\ Ｔ  <- point out of Circle
- *               p + r*cosθ
+ *    (x0, y0) Ｏ ∠_θ____┌|Q __\ Ｐ  <- polar: point out of Circle
+ *                 r*cosθ            <- OP ⊥ CQ (二等辺三角形の角二等分線)
  *               └----   d   ---┘
  *               
+ *@subject ２円の共通接線
+ *         ・２円の位置関係は ２円の交点〔上記〕
+ *         ・乖離 d > r1 + r2                 共通接線 4
+ *           外接 d == r1 + r2                共通接線 3
+ *           交円 | r1 - r2 | < d < r1 + r2   共通接線 2
+ *           内接 d == | r1 - r2 |            共通接線 1
+ *           内包 d <  | r1 - r2 |            共通接線 0
+ *           
+ *           EquationLinear[]  AlgoCotangentTwoCircle(
+ *               EquationCircle, EquationCircle, out contactPointAry)
+ *               
+ *@subject 乖離 d > r1 + r2  共通接線 4
+ *        【幾何的解法】両側 2, 交差 2で場合分けが必要
+ *         ＊両側:  相似で接点座標を求める
+ *         ・平行  O1 C1 // O2 C2 
+ *           円の中心 O1, O2 / 接点 C1, C2 とすると、O1 C1 // O2 C2 平行 (接線 ⊥ 半径線)
+ * 
+ *         ・O1 の接点 C1 (dx, dy)と置く。 dx, dy は O1との差。
+ *               ・ C1                ・ C2
+ *               |\                   |\
+ *               | \                  | \
+ *            dy |  \ r1          dy2 |  \ r2
+ *               |   \                |   \
+ *           V1  |┐___\ O1            |    \
+ *                 dx             V2  |┐____\ O2
+ *                                      dx2
+ *                                      
+ *         ・O1 C1 // O2 C2 平行より、三角相当で相似
+ *           dx : dx2 = r1 : r2  ->  dx2 = (r1 / r2)dx = R dx  (R = r1 / r2)
+ *           dy : dy2 = r1 : r2  ->  dy2 = (r1 / r2)dy = R dy
+ *           
+ *         ・三平方の定理
+ *           dy^2 = r1^2 - dx^2
+ *           dy2 ^2 = (r1 / r2)^2 (r1^2 - dx^2) = R^2 (r1^2 - dx^2)
+ *
+ *         ・O1 C1, O2 C2の傾きは平行のため等しい
+ *         (dy / dx) = (dy2 / dx2)  
+ *         dx dy2 = dy dx2         <- 両辺２乗して、dx2, dy, dy2を代入
+ *         dx^2 * [R^2 (r1^2 - dx^2)] = (r1^2 - dx^2) R dx
+ *         dx^2 * (R^2 r1^2 - R^2 dx^2) = R r1^2 dx^3 ...
+ *         
+ *         
+ *         
+ *     
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ *                 
+ *           O2 の接点 C2 は 
+ *         
+ *         
+ *         ＊交差 中心線を r1 : r2 の内分点で交差するので、極の接線
+ *           AlgoTangentLineOutCircle()
+ */
+#endregion
+/*
  *@see 
  *@author shika
  *@date 2022-10-11
@@ -538,75 +603,70 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return AlgoVirticalLine(ptOnCircle, radiusLine);
         }//AlgoTangentLineOnCircle()
 
-        public EquationLinear[] AlgoTangentLineOutCircle(PointF ptOuter, EquationCircle eqCircle, out PointF[] contactPointAry)
+        public EquationLinear[] AlgoTangentLineOutCircle(PointF polar, EquationCircle eqCircle, out PointF[] contactPointAry)
         {
-            if (eqCircle.CheckOnLine(ptOuter))
+            if (eqCircle.CheckOnLine(polar))
             {
                 Console.WriteLine("PointF pt is on the EquationCircle.");
-                contactPointAry = new PointF[] { ptOuter };
-                return new EquationLinear[] { AlgoTangentLineOnCircle(ptOuter, eqCircle) };
+                contactPointAry = new PointF[] { polar };
+                return new EquationLinear[] { AlgoTangentLineOnCircle(polar, eqCircle) };
             }
 
             PointF origin = eqCircle.CircleCenterPoint;
-            decimal distanceSq = AlgoDistanceSq(origin, ptOuter);
-            decimal distance = (decimal)Math.Sqrt((double)distanceSq);
-            decimal radiusSq = eqCircle.RadiusSq;
-            decimal radius = eqCircle.Radius;
-            decimal pointToContactSq = distanceSq - radiusSq;
+            decimal distanceSq = AlgoDistanceSq(origin, polar);         // d^2
+            decimal distance = (decimal)Math.Sqrt((double)distanceSq);  // d  【Deprecated】非推奨: Math.Sqrt(double)
+            decimal radiusSq = eqCircle.RadiusSq;              // r^2
+            decimal radius = eqCircle.Radius;                  // r
+            decimal polarToContactSq = distanceSq - radiusSq;  // CP^2
 
-            penViolet.Width = 1;
-            penViolet.DashStyle = DashStyle.Dash;
-            DrawLinearSegment(penViolet, origin, ptOuter);
-
-            List<EquationLinear> tangentLineAry = new List<EquationLinear>();
+            List<EquationLinear> tangentLineList = new List<EquationLinear>();
             List<PointF> contactPointList = new List<PointF>();
 
-            if(pointToContactSq > 0)  // d > r
+            if(polarToContactSq > 0)  // d > r
             {
-                // ---- cosPtOuterToConact ----
-                // OT^2 = r^2 + d^2 - 2 r d cosθ
-                // cosθ = (r^2 + d^2 - OT^2) / 2 r d
-                decimal cosPtOuterToContact =
-                    (radiusSq + distanceSq - pointToContactSq) /
-                    (2M * radius * distance);
+                EquationLinear centerPolarLine = new EquationLinear(origin, polar);
+
+                // △OCP ∽ △ OCQ (相似: 三角相等) d : r = r : OQ  -> OQ = r^2 / d
+                // △OCP ∽ △ CQP (相似: 三角相等) d : √(d^2 - r^2) = √(d^2 - r^2) : PQ  -> PQ = (d^2 - r^2) / d
+                // OQ : PQ = r^2 : (d^2 - r^2)
+                PointF pointQ = AlgoInternalPoint(radiusSq, polarToContactSq, origin, polar);
+
+                // OP ⊥ CQ  (二等辺三角形の角二等分線)
+                EquationLinear polarLine = AlgoVirticalLine(pointQ, centerPolarLine);
+
+                // 円と極線の連立
+                contactPointList.AddRange(AlgoSimultaneousCircleLinear(eqCircle, polarLine));
                 
-                // sin^2 θ + cos^2 θ = 1
-                // sinθ = √ (1 - cos^2 θ)
-                decimal sinPtOuterToContact = (decimal)Math.Sqrt(
-                    (double)(1M - cosPtOuterToContact * cosPtOuterToContact)
-                );
+                //---- 接線 ----
+                //---- Draw ----
+                penViolet.Width = 1;
+                penViolet.DashStyle = DashStyle.Dash;
+                DrawLinearSegment(penViolet, origin, polar);      // OP
 
-                // ---- cosPtOuter ----
-                decimal cosPtOuter = distance / (decimal)ptOuter.X;
-                decimal sinPtOuter = distance / (decimal)ptOuter.Y;
-
-                // Additive Theorem 加法定理 
-                // cos(A ± B) = cosA cosB 干 sinA sinB
-                decimal cos = cosPtOuterToContact * cosPtOuter - sinPtOuterToContact * sinPtOuter;
-                cos = (origin.X < ptOuter.X) ? cos : -cos;  // ∠C が鈍角の場合  -cosC
-
-                float contactX = (float)((decimal)origin.X + radius * cos);
-                float[] contctYAry = eqCircle.AlgoFunctionXtoY(contactX);
-
-                foreach (float contactY in contctYAry)
+                foreach(PointF contactPoint in contactPointList)
                 {
-                    PointF contactPoint = new PointF(contactX, contactY);
-                    EquationLinear tangentLine = new EquationLinear(ptOuter, contactPoint);
-                    
-                    contactPointList.Add(contactPoint);
-                    tangentLineAry.Add(tangentLine);
+                    var tangentLine = new EquationLinear(polar, contactPoint);
+                    tangentLineList.Add(tangentLine);
 
-                    DrawLinearSegment(penViolet, origin, contactPoint);
-                    DrawVirticalMark(tangentLine, new EquationLinear(origin, contactPoint),
+                    DrawLinearSegment(penViolet, origin, contactPoint);   // OC, OC'
+                    DrawVirticalMark(tangentLine, new EquationLinear(origin, contactPoint),  // OC ⊥ CP
                         plusX: (origin.X < contactPoint.X) ? false : true, 
                         plusY: (origin.Y < contactPoint.Y) ? false : true);
                 }//foreach
-            }
+
+                DrawPointLine(pointQ);
+                if(contactPointList.Count == 2)
+                {
+                    DrawLinearSegment(penViolet, contactPointList[0], contactPointList[1]);  // CC'
+                    DrawVirticalMark(centerPolarLine, polarLine);                            // OP ⊥ CQ
+                }
+
+            }// if d > r
             //else if (pointToContactSq == 0)  // d == r  -> AlgoTangentOnCircle()
             //else if (pointToContactSq < 0)   // d < r   -> (No solution)
-            
+
             contactPointAry = contactPointList.ToArray();
-            return tangentLineAry.ToArray();
+            return tangentLineList.ToArray();
         }//AlgoTangentLineOutCircle()
 
         public EquationLinear[] AlgoCotangentLineTwoCircle(EquationCircle eqCircle1, EquationCircle eqCircle2)

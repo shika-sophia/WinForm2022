@@ -263,7 +263,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         {   // ２次方程式の解の公式
             if (a == 0)
             {
-                throw new ArgumentException();
+                throw new ArgumentException("AlgoQuadSolutionFormula 'a == 0'.");
             }
            
             int solutionNum = AlgoJudge(a, b, c, out decimal judge);
