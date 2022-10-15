@@ -67,15 +67,23 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             var eqCircle1 = new EquationCircle(radius: 100M, new PointF(0, 0));
             //var eqCircle2 = new EquationCircle(radius: 60M, new PointF(150, 200));
       
-            PointF ptOuter = new PointF(150, 150);
+            PointF polar = new PointF(200, 160);
 
-            circle.SetScaleRate(1.5M);
+            circle.SetScaleRate(1.0M);
             EquationLinear[] tangentAry = circle.AlgoTangentLineOutCircle(
-                ptOuter, eqCircle1, out PointF[] contactPointAry);
+                polar, eqCircle1, out PointF[] contactPointAry);
 
-            circle.DrawMultiCircleFunction(scaleRateHere: 1.5M,
-                new ICoordinateEquation[] { eqCircle1, tangentAry[0], tangentAry[1] },
-                ptOuter, contactPointAry[0], contactPointAry[1]);
+            for(int i = 0; i < tangentAry.Length; i++)
+            {
+                circle.DrawMultiCircleFunction(scaleRateHere: 1.0M,
+                    new ICoordinateEquation[] { eqCircle1, tangentAry[i] }, polar, contactPointAry[i]);
+            }//for
+            
+            if (tangentAry.Length == 0)
+            {
+                circle.DrawMultiCircleFunction(scaleRateHere: 1.5M,
+                    new ICoordinateEquation[] { eqCircle1 }, polar);
+            }
 
             this.Controls.AddRange(new Control[]
             {
