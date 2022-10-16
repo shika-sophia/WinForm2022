@@ -108,8 +108,14 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             pointList.ForEach(pt => { Console.Write($"({pt.X},{pt.Y}), "); });
 
             //---- Remove overlapped point and NaN ----
-            PointF[] pointAry = pointList.Select(pt => pt)
+            PointF[] pointAry = pointList
                 .Where(pt => !float.IsNaN(pt.X) || !float.IsNaN(pt.Y))
+                .Select<PointF, PointF>(pt =>
+                {
+                    pt.X = (float)Math.Round((double)pt.X, 2);
+                    pt.Y = (float)Math.Round((double)pt.Y, 2);
+                    return pt;
+                })
                 .Distinct()
                 .ToArray();
 

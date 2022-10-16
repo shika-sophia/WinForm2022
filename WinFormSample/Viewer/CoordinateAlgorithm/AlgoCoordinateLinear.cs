@@ -190,8 +190,14 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             pointList.ForEach(pt => { Console.Write($"({pt.X},{pt.Y}), "); });
 
             //---- Remove overlapped point and NaN ----
-            PointF[] pointAry = pointList.Select(pt => pt)
+            PointF[] pointAry = pointList
                 .Where(pt => !float.IsNaN(pt.X) || !float.IsNaN(pt.Y))
+                .Select<PointF, PointF>(pt =>
+                {
+                    pt.X = (float)Math.Round((double)pt.X, 2);
+                    pt.Y = (float)Math.Round((double)pt.Y, 2);
+                    return pt;
+                })
                 .Distinct()
                 .ToArray();
 
@@ -225,9 +231,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             {
                 g.DrawLine(penPink,
                     (float)((decimal)intercept * scaleRate),
-                    (float)((decimal)-centerPoint.Y * scaleRate),
+                    (float)((decimal)-centerPoint.Y / scaleRate),
                     (float)((decimal)intercept * scaleRate),
-                    (float)((decimal)centerPoint.Y * scaleRate));
+                    (float)((decimal)centerPoint.Y / scaleRate));
          
                 g.DrawString($"x = {intercept}", font, penPink.Brush,
                     (float)((decimal)intercept * scaleRate + 5M), 20f);
@@ -237,9 +243,9 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             if (slope == 0)  // y = b (Horizontal)
             {
                 g.DrawLine(penPink,
-                    (float)((decimal)-centerPoint.X * scaleRate),
+                    (float)((decimal)-centerPoint.X / scaleRate),
                     (float)((decimal)-intercept * scaleRate),
-                    (float)((decimal)centerPoint.X * scaleRate),
+                    (float)((decimal)centerPoint.X / scaleRate),
                     (float)((decimal)-intercept * scaleRate));
 
                 SizeF textSizeHorizontal = g.MeasureString(eqLinear.Text, font);
@@ -321,13 +327,14 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         {
             if (float.IsInfinity(eqLinear1.Slope)) { return eqLinear2.Slope == 0; }
             if (float.IsInfinity(eqLinear2.Slope)) { return eqLinear1.Slope == 0; }
-            if (eqLinear1.Slope == 0) { return float.IsInfinity(eqLinear2.Slope); }
-            if (eqLinear2.Slope == 0) { return float.IsInfinity(eqLinear1.Slope); }
+            if (Math.Round(eqLinear1.Slope, 2) == 0) { return float.IsInfinity(eqLinear2.Slope); }
+            if (Math.Round(eqLinear2.Slope, 2) == 0) { return float.IsInfinity(eqLinear1.Slope); }
 
             //Console.WriteLine($"IsVirtical() {eqLinear1}");
             //Console.WriteLine($"IsVirtical() {eqLinear2}");
 
-            decimal multipleSlope = (decimal)eqLinear1.Slope * (decimal)eqLinear2.Slope;
+            decimal multipleSlope = Math.Round(
+                (decimal)eqLinear1.Slope * (decimal)eqLinear2.Slope, 2);
             if (-1M < multipleSlope && multipleSlope < -0.99M) { return true; }
             
             return multipleSlope == -1M;
@@ -358,11 +365,15 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
         protected void DrawVirticalMark(EquationLinear[] eqLinearAry)
         {
-            for(int i = 0; i < eqLinearAry.Length; i += 2)
+            for(int i = 0; i < eqLinearAry.Length; i++)
             {
-                 DrawVirticalMark(eqLinearAry[i], eqLinearAry[i + 1]);
+                for (int j = i; j < eqLinearAry.Length; j++)
+                {
+                    if (j == i) { continue; }
+                    DrawVirticalMark(eqLinearAry[i], eqLinearAry[j]);
+                }
             }//for
-        }
+        }//DrawVirticalMark(EquationLinear[])
 
         protected void DrawVirticalMark(
             EquationLinear eqLinear, EquationLinear virticalLine, 
@@ -370,7 +381,6 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         {
             if (!IsVirtical(eqLinear, virticalLine))
             {
-                Console.WriteLine("2 lines are not virtical.");
                 return;
             }
 

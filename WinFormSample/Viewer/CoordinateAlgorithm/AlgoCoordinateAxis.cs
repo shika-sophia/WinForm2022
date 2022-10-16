@@ -202,7 +202,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             }//forech
         }//DrawMultiPointLine()
 
-        public void DrawPointLine(PointF pt, bool withLine = false)
+        public void DrawPointLine(PointF pt, bool withLine = false, bool withText = true)
         {
             //PointAutoScale(pt);
 
@@ -213,11 +213,14 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                 (float)((decimal)pt.X * scaleRate - 3M),
                 -(float)((decimal)pt.Y * scaleRate + 3M), 6, 6);
 
-            SizeF pointSize = g.MeasureString($"({pt.X},{pt.Y})", fontSmall);
-            g.DrawString($"({pt.X:0.##},{pt.Y:0.##})", fontSmall, brushPink,
-                (float)((decimal)pt.X * scaleRate - (decimal)pointSize.Width / 2M),
-                -(float)((decimal)pt.Y * scaleRate +
-                    ((pt.Y > 0) ? (decimal)pointSize.Height + 5M: (decimal)-pointSize.Height + 5M)));
+            if (withText)
+            {
+                SizeF pointSize = g.MeasureString($"({pt.X},{pt.Y})", fontSmall);
+                g.DrawString($"({pt.X:0.##},{pt.Y:0.##})", fontSmall, brushPink,
+                    (float)((decimal)pt.X * scaleRate - (decimal)pointSize.Width / 2M),
+                    -(float)((decimal)pt.Y * scaleRate +
+                        ((pt.Y > 0) ? (decimal)pointSize.Height + 5M: (decimal)-pointSize.Height + 5M)));
+            }
 
             if (withLine)
             {

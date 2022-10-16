@@ -20,9 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm;
 
 namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 {
@@ -65,18 +63,23 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             circle.DrawCoordinateAxis();
 
             var eqCircle1 = new EquationCircle(radius: 100M, new PointF(0, 0));
-            var eqCircle2 = new EquationCircle(radius: 50M, new PointF(150, 120));
+            var eqCircle2 = new EquationCircle(radius: 80M, new PointF(150, 160));
 
             EquationLinear[] cotangentLineAry = circle.AlgoCotangentLineTwoCircle(
-                eqCircle1, eqCircle2, out PointF[] pointAry, 
-                out AbsAlgoCoordinate.SegmentPair[] segmentPairAry);
+                eqCircle1, eqCircle2, 
+                out PointF[] pointAry, 
+                out AbsAlgoCoordinate.SegmentPair[] segmentPairAry,
+                out EquationLinear[] virticalLineAry);
 
             List<ICoordinateEquation> eqList = new List<ICoordinateEquation>();
             eqList.Add(eqCircle1);
             eqList.Add(eqCircle2);
             eqList.AddRange(cotangentLineAry);
-            
-            circle.DrawMultiCircleFunction(1.0M, eqList.ToArray(), pointAry);
+
+            circle.SetScaleRate(1.0M);
+            circle.DrawMultiCircleFunction(
+                eqList.ToArray(), virticalLineAry, 
+                segmentPairAry, pointAry, isAutoScale: false);
 
             this.Controls.AddRange(new Control[]
             {

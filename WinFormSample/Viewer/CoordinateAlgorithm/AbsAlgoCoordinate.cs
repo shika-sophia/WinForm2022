@@ -53,7 +53,6 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         protected Graphics g;
         protected GraphicsState defaultGrapics;
         protected decimal scaleRate = 2.0M;
-        internal SegmentPair segmentPair;
 
         protected AbsAlgoCoordinate(PictureBox pic)
         {

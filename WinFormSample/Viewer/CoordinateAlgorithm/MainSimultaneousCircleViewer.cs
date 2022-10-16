@@ -74,8 +74,12 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             //Console.WriteLine($"circumscribePoint: ({circumscribePoint.X}f,{circumscribePoint.Y}f)");
             //Console.WriteLine($"inscribePoint: ({inscribePoint.X}f,{inscribePoint.Y}f)");
 
-            circle.DrawMultiCircleFunction(scaleRateHere: 1.5M,
-                new ICoordinateEquation[] { eqCircle1, eqCircle2, /*eqLinear*/ });
+            circle.DrawMultiCircleFunction(
+                new ICoordinateEquation[] { eqCircle1, eqCircle2, /*eqLinear*/ },
+                virticalLineAryArgs: new EquationLinear[0],
+                segmentPairAryArgs: new AbsAlgoCoordinate.SegmentPair[0],
+                pointAryArgs: new PointF[0]
+            );
             
             this.Controls.AddRange(new Control[]
             {

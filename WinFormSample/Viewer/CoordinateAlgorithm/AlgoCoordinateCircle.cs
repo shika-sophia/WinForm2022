@@ -235,12 +235,13 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
         public AlgoCoordinateCircle(PictureBox pic) : base(pic) { }
 
         //====== Draw ======
-        public void DrawMultiCircleFunction(decimal scaleRateHere, 
-            ICoordinateEquation[] eqAry, 
-            params PointF[] pointAryArgs)
+        public void DrawMultiCircleFunction(
+            ICoordinateEquation[] eqAry,
+            EquationLinear[] virticalLineAryArgs,
+            SegmentPair[] segmentPairAryArgs,
+            PointF[] pointAryArgs,
+            bool isAutoScale = true)
         {
-            SetScaleRate(scaleRateHere);
-
             //---- Test Print ----
             Console.WriteLine("Equation Array:");
             foreach (var eq in eqAry) { Console.WriteLine(eq); };
@@ -250,8 +251,8 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             //---- pointList ----
             List<PointF> pointList = new List<PointF>(pointAryArgs);
-            List<EquationLinear> virticalLineList = new List<EquationLinear>();
-            List<PointF> segmentList = new List<PointF>();
+            List<EquationLinear> virticalLineList = new List<EquationLinear>(virticalLineAryArgs);
+            List<SegmentPair> segmentPairList = new List<SegmentPair>(segmentPairAryArgs);
 
             for (int i = 0; i < eqAry.Length; i++)
             {
@@ -263,13 +264,13 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                     if(j == i) { continue; }
 
                     //---- TrySolutionCircle() ----
-                    bool existSolution = TrySolutionCircle(eqAry[i], eqAry[j], 
-                        out PointF[] solutionAry);
-
-                    if (existSolution)
-                    {
-                        pointList.AddRange(solutionAry);
-                    }
+                    bool existSolution = TrySolutionCircle(eqAry[i], eqAry[j],
+                        out PointF[] pointAryTry,
+                        out EquationLinear[] virticalLineAry,
+                        out SegmentPair[] segmentPairAryTry);
+                    pointList.AddRange(pointAryTry);
+                    virticalLineList.AddRange(virticalLineAry);
+                    segmentPairList.AddRange(segmentPairAryTry);
 
                     //case virtical
                     if (eqAry[i] is EquationLinear && eqAry[j] is EquationLinear
@@ -282,7 +283,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
                     //---- Test Print TrySolution() ----
                     Console.WriteLine($"\nexistSolution = {existSolution}");
-                    foreach (var solution in solutionAry) { Console.Write($"({solution.X},{solution.Y}), "); }
+                    foreach (var pt in pointAryTry) { Console.Write($"({pt.X},{pt.Y}), "); }
                 }//for j
 
                 pointList.AddRange(eq.GetEqPointAry());
@@ -293,8 +294,14 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             pointList.ForEach(pt => { Console.Write($"({pt.X},{pt.Y}), "); });
 
             //---- Remove overlapped point and NaN ----
-            PointF[] pointAry = pointList.Select(pt => pt)
+            PointF[] pointAry = pointList
                 .Where(pt => !float.IsNaN(pt.X) || !float.IsNaN(pt.Y))
+                .Select<PointF,PointF>(pt =>
+                {
+                    pt.X = (float)Math.Round((double)pt.X, 2);
+                    pt.Y = (float)Math.Round((double)pt.Y, 2);
+                    return pt;
+                })
                 .Distinct()
                 .ToArray();
 
@@ -304,27 +311,26 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             Console.WriteLine("\n");
 
             //---- Draw ----
-            DrawMultiPointLine(pointList.ToArray(), autoScale: false);
+            DrawMultiPointLine(pointList.ToArray(), autoScale: isAutoScale);
             //autoScale false: need SetScaleRate(decimal) in AlgoSimultaneousCircleBoth 
             
             Console.WriteLine($"scaleRate = {scaleRate}");
-            Console.WriteLine($"scaleRateHere = {scaleRateHere}");
 
             foreach (ICoordinateEquation eq in eqAry)
             {
                 if (eq is EquationCircle)
                 {
-                    Console.WriteLine($"DrawCircleFunction({eq})");
+                    //Console.WriteLine($"DrawCircleFunction({eq})");
                     DrawCircleFunction(eq as EquationCircle);
                 }
                 else if (eq is EquationQuadratic)
                 {
-                    Console.WriteLine($"DrawParabolaFunction({eq})");
+                    //Console.WriteLine($"DrawParabolaFunction({eq})");
                     DrawParabolaFunction(eq as EquationQuadratic);
                 }
                 else if (eq is EquationLinear)
                 {
-                    Console.WriteLine($"DrawLinearFunction({eq})");
+                    //Console.WriteLine($"DrawLinearFunction({eq})");
                     DrawLinearFunction(eq as EquationLinear);
                 }
 
@@ -333,6 +339,18 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
                     DrawVirticalMark(virticalLineList.ToArray());
                 }
             }//foreach
+
+            penViolet.Width = 1.0f;
+            penViolet.DashStyle = DashStyle.Dash;
+            foreach (SegmentPair pair in segmentPairList)
+            {
+                DrawLinearSegment(penViolet, pair.startPt, pair.endPt);
+            }
+
+            if (virticalLineList.Count > 0)
+            {
+                DrawVirticalMark(virticalLineList.ToArray());
+            }
         }//DrawMultiFunctionCircle()
 
         public void DrawTriangleTheta(decimal angle, EquationCircle eqCircle)
@@ -557,7 +575,11 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             if (!eqCircle.CheckOnLine(ptOnCircle))
             {
                 Console.WriteLine("PointF pt is not on the EquationCircle.");
-                return AlgoTangentLineOutCircle(ptOnCircle, eqCircle, out PointF[] contactPointAry)[0];
+                return AlgoTangentLineOutCircle(
+                    ptOnCircle, eqCircle, 
+                    out PointF[] pointAry, 
+                    out SegmentPair[] segmentPairAry,
+                    out EquationLinear[] virticalLineAry)[0];
             }
 
             EquationLinear radiusLine = AlgoRadiusLine(ptOnCircle, eqCircle);
@@ -565,198 +587,320 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             return AlgoVirticalLine(ptOnCircle, radiusLine);
         }//AlgoTangentLineOnCircle()
 
-        public EquationLinear[] AlgoTangentLineOutCircle(PointF polar, EquationCircle eqCircle, out PointF[] contactPointAry)
+        public EquationLinear[] AlgoTangentLineOutCircle(PointF polar, EquationCircle eqCircle, 
+            out PointF[] pointAryOut,
+            out SegmentPair[] segmentPairAryOut,
+            out EquationLinear[] virticalLineAryOut)
         {
             if (eqCircle.CheckOnLine(polar))
             {
                 Console.WriteLine("PointF pt is on the EquationCircle.");
-                contactPointAry = new PointF[] { polar };
+                pointAryOut = new PointF[] { polar };
+                segmentPairAryOut = new SegmentPair[0];
+                virticalLineAryOut = new EquationLinear[0];
                 return new EquationLinear[] { AlgoTangentLineOnCircle(polar, eqCircle) };
             }
 
             PointF origin = eqCircle.CircleCenterPoint;
-            decimal distanceSq = AlgoDistanceSq(origin, polar);         // d^2
-            decimal distance = (decimal)Math.Sqrt((double)distanceSq);  // d  【Deprecated】非推奨: Math.Sqrt(double)
+            decimal distanceSq = AlgoDistanceSq(origin, polar);// d^2
             decimal radiusSq = eqCircle.RadiusSq;              // r^2
-            decimal radius = eqCircle.Radius;                  // r
             decimal polarToContactSq = distanceSq - radiusSq;  // CP^2
 
+            List<PointF> pointList = new List<PointF>();
+            List<SegmentPair> segmentPairList = new List<SegmentPair>();
+            List<EquationLinear> virticalLineList = new List<EquationLinear>();
             List<EquationLinear> tangentLineList = new List<EquationLinear>();
-            List<PointF> contactPointList = new List<PointF>();
 
             if(polarToContactSq > 0)  // d > r
             {
                 EquationLinear centerPolarLine = new EquationLinear(origin, polar);
+                segmentPairList.Add(new SegmentPair(origin, polar));
+                virticalLineList.Add(centerPolarLine);
 
                 // △OCP ∽ △ OCQ (相似: 三角相等) d : r = r : OQ  -> OQ = r^2 / d
                 // △OCP ∽ △ CQP (相似: 三角相等) d : √(d^2 - r^2) = √(d^2 - r^2) : PQ  -> PQ = (d^2 - r^2) / d
                 // OQ : PQ = r^2 : (d^2 - r^2)
-                PointF pointQ = AlgoInternalPoint(radiusSq, polarToContactSq, origin, polar);
+                PointF internalPoint = AlgoInternalPoint(
+                    radiusSq, polarToContactSq, origin, polar);
 
                 // OP ⊥ CQ  (二等辺三角形の角二等分線)
-                EquationLinear polarLine = AlgoVirticalLine(pointQ, centerPolarLine);
+                EquationLinear polarVirticalLine = AlgoVirticalLine(internalPoint, centerPolarLine);
+                virticalLineList.Add(polarVirticalLine);   // OP ⊥ CQ
 
                 // 円と極線の連立
-                contactPointList.AddRange(AlgoSimultaneousCircleLinear(eqCircle, polarLine));
+                pointList.AddRange(AlgoSimultaneousCircleLinear(eqCircle, polarVirticalLine));
                 
                 //---- 接線 ----
-                //---- Draw ----
-                penViolet.Width = 1;
-                penViolet.DashStyle = DashStyle.Dash;
-                DrawLinearSegment(penViolet, origin, polar);      // OP
-
-                foreach(PointF contactPoint in contactPointList)
+                foreach(PointF contactPoint in pointList)
                 {
                     var tangentLine = new EquationLinear(polar, contactPoint);
                     tangentLineList.Add(tangentLine);
-
-                    DrawLinearSegment(penViolet, origin, contactPoint);   // OC, OC'
-                    DrawVirticalMark(tangentLine, new EquationLinear(origin, contactPoint),  // OC ⊥ CP
-                        plusX: (origin.X < contactPoint.X) ? false : true, 
-                        plusY: (origin.Y < contactPoint.Y) ? false : true);
+                    virticalLineList.Add(tangentLine);  // OC ⊥ OP
+                    segmentPairList.Add(new SegmentPair(origin, contactPoint));   // OC, OC'
                 }//foreach
 
-                DrawPointLine(pointQ);
-                if(contactPointList.Count == 2)
+                if (pointList.Count == 2)
                 {
-                    DrawLinearSegment(penViolet, contactPointList[0], contactPointList[1]);  // CC'
-                    DrawVirticalMark(centerPolarLine, polarLine);                            // OP ⊥ CQ
+                    segmentPairList.Add(
+                        new SegmentPair(pointList[0], pointList[1]));  // CC'
                 }
 
+                pointList.Add(internalPoint); //pointListは接点の判定に利用しているので、この位置で Add()
             }// if d > r
             //else if (pointToContactSq == 0)  // d == r  -> AlgoTangentOnCircle()
             //else if (pointToContactSq < 0)   // d < r   -> (No solution)
 
-            contactPointAry = contactPointList.ToArray();
+            pointAryOut = pointList.ToArray();
+            segmentPairAryOut = segmentPairList.ToArray();
+            virticalLineAryOut = virticalLineList.ToArray();
             return tangentLineList.ToArray();
         }//AlgoTangentLineOutCircle()
 
         public EquationLinear[] AlgoCotangentLineTwoCircle(
             EquationCircle eqCircle1, EquationCircle eqCircle2,
-            out PointF[] pointAry, out SegmentPair[] segmentPairAry)
+            out PointF[] pointAry, 
+            out SegmentPair[] segmentPairAry,
+            out EquationLinear[] virticalLineAry)
+        {      
+            List<PointF> pointList = new List<PointF>();
+            List<SegmentPair> segmentPairList = new List<SegmentPair>();
+            List<EquationLinear> virticalLineList = new List<EquationLinear>();
+            List<EquationLinear> cotangentLineList = new List<EquationLinear>();
+
+            cotangentLineList.AddRange(
+                AlgoInternalCotangentTwoCircle(eqCircle1, eqCircle2,
+                    out PointF[] pointAryInternal,
+                    out SegmentPair[] segmentPairAryInternal,
+                    out EquationLinear[] virticalLineAryInternal));
+            pointList.AddRange(pointAryInternal);
+            segmentPairList.AddRange(segmentPairAryInternal);
+            virticalLineList.AddRange(virticalLineAryInternal);
+
+            cotangentLineList.AddRange(
+                AlgoExternalCotangentTwoCircle(eqCircle1, eqCircle2,
+                    out PointF[] pointAryExternal,
+                    out SegmentPair[] segmentPairAryExternal,
+                    out EquationLinear[] virticalLineAryExternal));
+            pointList.AddRange(pointAryExternal);
+            segmentPairList.AddRange(segmentPairAryExternal);
+            virticalLineList.AddRange(virticalLineAryExternal);
+
+            pointAry = pointList.ToArray();
+            segmentPairAry = segmentPairList.ToArray();
+            virticalLineAry = virticalLineList.ToArray();
+            return cotangentLineList.ToArray();
+        }//AlgoCotangentLineTwoCircle()
+
+        public EquationLinear[] AlgoInternalCotangentTwoCircle(
+            EquationCircle eqCircle1, EquationCircle eqCircle2,
+            out PointF[] pointAryInternal,
+            out SegmentPair[] segmentPairAryInternal,
+            out EquationLinear[] virticalLineAryOut)
         {
             decimal r1 = eqCircle1.Radius;
             decimal r2 = eqCircle2.Radius;
             PointF origin1 = eqCircle1.CircleCenterPoint;
             PointF origin2 = eqCircle2.CircleCenterPoint;
 
-            List<EquationLinear> cotangentLineList = new List<EquationLinear>();
             List<PointF> pointList = new List<PointF>();
             List<SegmentPair> segmentPairList = new List<SegmentPair>();
+            List<EquationLinear> virticalLineList = new List<EquationLinear>();
+            List<EquationLinear> cotangentLineList = new List<EquationLinear>();
+            
+            EquationLinear centerLine = new EquationLinear(origin1, origin2);
+            segmentPairList.Add(new SegmentPair(origin1, origin2));
+
+            //======= Internal co-tangent line ======
+            PointF internalPoint = AlgoInternalPoint(r1, r2, origin1, origin2);
+            pointList.Add(internalPoint);
+            segmentPairList.Add(new SegmentPair(internalPoint, origin1));
+            segmentPairList.Add(new SegmentPair(internalPoint, origin2));
+
+            EquationLinear[] internalCotangentLineAry1 = 
+                AlgoTangentLineOutCircle(internalPoint, eqCircle1, 
+                out PointF[] internalContactPointAry1,
+                out SegmentPair[] internalSegmentPairAry1,
+                out EquationLinear[] virticalLineAry1);
+            pointList.AddRange(internalContactPointAry1);
+            virticalLineList.AddRange(virticalLineAry1);
+            segmentPairList.AddRange(internalSegmentPairAry1);
+
+            EquationLinear[] internalCotangentLineAry2 = 
+                AlgoTangentLineOutCircle(internalPoint, eqCircle2, 
+                out PointF[] internalContactPointAry2,
+                out SegmentPair[] internalSegmentPairAry2,
+                out EquationLinear[] virticalLineAry2);
+            pointList.AddRange(internalContactPointAry2);
+            virticalLineList.AddRange(virticalLineAry2);
+            segmentPairList.AddRange(internalSegmentPairAry2);
+
+            cotangentLineList.AddRange(internalCotangentLineAry1);
+            virticalLineList.AddRange(internalCotangentLineAry1);
+            virticalLineList.AddRange(internalCotangentLineAry2);
+
+            //for (int i = 0; i < internalContactPointAry1.Length; i++)
+            //{
+            //    segmentPairList.Add(new SegmentPair(
+            //        internalContactPointAry1[i], origin1));
+            //    virticalLineList.Add(
+            //        new EquationLinear(internalContactPointAry1[i], origin1));
+
+            //    if (internalContactPointAry2.Length < internalContactPointAry1.Length)
+            //    {
+            //        Console.WriteLine("internalContactAry2 is lacked value.");
+            //    }
+            //    else
+            //    {
+            //        segmentPairList.Add(new SegmentPair(
+            //            internalContactPointAry2[i], origin2));
+            //        virticalLineList.Add(
+            //            new EquationLinear(internalContactPointAry2[i], origin2));
+            //    }
+            //}//for
+
+            pointAryInternal = pointList.ToArray();
+            segmentPairAryInternal = segmentPairList.ToArray();
+            virticalLineAryOut = virticalLineList.ToArray();
+            return cotangentLineList.ToArray();
+        }//AlgoInternalCotangentTwoCircle()
+
+        public EquationLinear[] AlgoExternalCotangentTwoCircle(
+            EquationCircle eqCircle1, EquationCircle eqCircle2,
+            out PointF[] pointAryExternal, 
+            out SegmentPair[] segmentPairAryExternal,
+            out EquationLinear[] virticalLineAryExternal)
+        {
+            decimal r1 = eqCircle1.Radius;
+            decimal r2 = eqCircle2.Radius;
+            PointF origin1 = eqCircle1.CircleCenterPoint;
+            PointF origin2 = eqCircle2.CircleCenterPoint;
+
+            List<PointF> pointList = new List<PointF>();
+            List<SegmentPair> segmentPairList = new List<SegmentPair>();
+            List<EquationLinear> virticalLineList = new List<EquationLinear>();
+            List<EquationLinear> cotangentLineList = new List<EquationLinear>();
 
             EquationLinear centerLine = new EquationLinear(origin1, origin2);
             segmentPairList.Add(new SegmentPair(origin1, origin2));
-            
+            virticalLineList.Add(centerLine);
+
             //======= External co-tangent line ======
             if (r1 == r2) //接線は平行線
             {   //直径線と円の交点
                 EquationLinear diameterLine = AlgoVirticalLine(origin1, centerLine);
                 PointF[] externalContactPointAry1 = AlgoSimultaneousCircleLinear(eqCircle1, diameterLine);
                 PointF[] externalContactPointAry2 = AlgoSimultaneousCircleLinear(eqCircle2, diameterLine);
+                
+                virticalLineList.Add(diameterLine);
                 pointList.AddRange(externalContactPointAry1);
                 pointList.AddRange(externalContactPointAry2);
 
-                for(int i = 0; i < externalContactPointAry1.Length; i++)
+                for (int i = 0; i < externalContactPointAry1.Length; i++)
                 {
-                    EquationLinear externalCotangentLine = AlgoVirticalLine(externalContactPointAry1[i], diameterLine);
+                    EquationLinear externalCotangentLine = 
+                        AlgoVirticalLine(externalContactPointAry1[i], diameterLine);
                     cotangentLineList.Add(externalCotangentLine);
+                    virticalLineList.Add(externalCotangentLine);
 
-                    if(externalContactPointAry2.Length < externalContactPointAry1.Length)
-                    {
-                        Console.WriteLine("externalContactAry2 is lacked value.");
-                    }
-                    else
-                    {
-                        segmentPairList.Add(new SegmentPair(
-                            externalContactPointAry1[i], externalContactPointAry2[i]));
-                    }
-                    
+                    //if (externalContactPointAry2.Length < externalContactPointAry1.Length)
+                    //{
+                    //    Console.WriteLine("externalContactAry2 is lacked value.");
+                    //}
+                    //else
+                    //{
+                    //    segmentPairList.Add(new SegmentPair(
+                    //        externalContactPointAry1[i], externalContactPointAry2[i]));
+                    //    virticalLineList.Add(new EquationLinear(
+                    //        externalContactPointAry1[i], externalContactPointAry2[i]));
+                    //}
                 }//for
             }//if r1 == r2
             else if (Math.Abs(r1 - r2) > 0)
             {
                 //外分点 T
                 PointF externalPoint = AlgoExternalPoint(r1, r2, origin1, origin2);
-
-                //外分点を極とする接線
-                EquationLinear[] externalCotangentLineAry1 = AlgoTangentLineOutCircle(
-                    externalPoint, eqCircle1, out PointF[] externalContactPointAry1);
-                EquationLinear[] externalCotangentLineAry2 = AlgoTangentLineOutCircle(
-                    externalPoint, eqCircle2, out PointF[] externalContactPointAry2);
-                cotangentLineList.AddRange(externalCotangentLineAry1);
-
                 pointList.Add(externalPoint);
-                pointList.AddRange(externalContactPointAry1);
-                pointList.AddRange(externalContactPointAry2);
-
                 segmentPairList.Add(new SegmentPair(externalPoint, origin1));
                 segmentPairList.Add(new SegmentPair(externalPoint, origin2));
                 
-                for(int i = 0; i < externalContactPointAry1.Length; i += 2)
-                {
-                    segmentPairList.Add(new SegmentPair(
-                        externalContactPointAry1[i],
-                        externalContactPointAry1[i + 1]));
+                //外分点を極とする接線
+                EquationLinear[] externalCotangentLineAry1 = 
+                    AlgoTangentLineOutCircle(externalPoint, eqCircle1,
+                    out PointF[] externalContactPointAry1,
+                    out SegmentPair[] externalSegmentPairAry1,
+                    out EquationLinear[] externalVirticalLineAry1);
+                pointList.AddRange(externalContactPointAry1);
+                segmentPairList.AddRange(externalSegmentPairAry1);
+                virticalLineList.AddRange(externalVirticalLineAry1);
 
-                    if (externalContactPointAry2.Length < externalContactPointAry1.Length)
-                    {
-                        Console.WriteLine("externalContactPointAry2 is lacked value.");
-                    }
-                    else
-                    {
-                        segmentPairList.Add(new SegmentPair(
-                        externalContactPointAry2[i],
-                        externalContactPointAry2[i + 1]));
-                    }
-                }//for
+                EquationLinear[] externalCotangentLineAry2 = 
+                    AlgoTangentLineOutCircle(externalPoint, eqCircle2,
+                    out PointF[] externalContactPointAry2,
+                    out SegmentPair[] externalSegmentPairAry2,
+                    out EquationLinear[] externalVirticalLineAry2);
+                pointList.AddRange(externalContactPointAry2);
+                segmentPairList.AddRange(externalSegmentPairAry2);
+                virticalLineList.AddRange(externalVirticalLineAry2);
+
+                cotangentLineList.AddRange(externalCotangentLineAry1);
+                virticalLineList.AddRange(externalCotangentLineAry1);
+                virticalLineList.AddRange(externalCotangentLineAry2);
+
+                //for (int i = 0; i < externalContactPointAry1.Length; i++)
+                //{
+                //    for (int j = i; j < externalContactPointAry1.Length; j++)
+                //    {
+                //        if (j == i) { continue; }
+
+                //        segmentPairList.Add(new SegmentPair(
+                //            externalContactPointAry1[i],
+                //            externalContactPointAry1[j]));
+                //        virticalLineList.Add(new EquationLinear(
+                //            externalContactPointAry1[i],
+                //            externalContactPointAry1[j]));
+
+                //        if (externalContactPointAry2.Length < externalContactPointAry1.Length)
+                //        {
+                //            Console.WriteLine("externalContactPointAry2 is lacked value.");
+                //        }
+                //        else
+                //        {
+                //            segmentPairList.Add(new SegmentPair(
+                //                externalContactPointAry2[i],
+                //                externalContactPointAry2[j]));
+                //            virticalLineList.Add(new EquationLinear(
+                //                externalContactPointAry2[i],
+                //                externalContactPointAry2[j]));
+                //        }
+                //    }//for j
+                //}//for i
             }//if (r1 - r2) > 0
 
-            //======= Internal co-tangent line ======
-            PointF internalPoint = AlgoInternalPoint(r1, r2, origin1, origin2);
-            EquationLinear[] internalCotangentLineAry1 = AlgoTangentLineOutCircle(
-                internalPoint, eqCircle1, out PointF[] internalContactPointAry1);
-            EquationLinear[] internalCotangentLineAry2 = AlgoTangentLineOutCircle(
-                internalPoint, eqCircle2, out PointF[] internalContactPointAry2);
-            cotangentLineList.AddRange(internalCotangentLineAry1);
-
-            pointList.Add(internalPoint);
-            pointList.AddRange(internalContactPointAry1);
-            pointList.AddRange(internalContactPointAry2);
-
-            segmentPairList.Add(new SegmentPair(internalPoint, origin1));
-            segmentPairList.Add(new SegmentPair(internalPoint, origin2));
-
-            for(int i = 0; i < internalContactPointAry1.Length; i++)
-            {
-                segmentPairList.Add(new SegmentPair(
-                    internalContactPointAry1[i], origin1));
-
-                if (internalContactPointAry2.Length < internalContactPointAry1.Length)
-                {
-                    Console.WriteLine("internalContactAry2 is lacked value.");
-                }
-                else
-                {
-                    segmentPairList.Add(new SegmentPair(
-                    internalContactPointAry2[i], origin2));
-                }
-            }//for
-
-            pointAry = pointList.ToArray();
-            segmentPairAry = segmentPairList.ToArray();
+            pointAryExternal = pointList.ToArray();
+            segmentPairAryExternal = segmentPairList.ToArray();
+            virticalLineAryExternal = virticalLineList.ToArray();
             return cotangentLineList.ToArray();
-        }//AlgoCotangentLineTwoCircle()
+        }//AlgoExternalCotangentTwoCircle()
 
         //====== TrySolutionCircle() ======
         public bool TrySolutionCircle(
             ICoordinateEquation eq1, ICoordinateEquation eq2, 
-            out PointF[] solutionAry)
+            out PointF[] pointAryOut,
+            out EquationLinear[] virticalLineAryOut,
+            out SegmentPair[] segmentPairAryOut)
         {
-            List<PointF> solutionList = new List<PointF>();
+            List<PointF> pointList = new List<PointF>();
+            List<SegmentPair> segmentPairList = new List<SegmentPair>();
+            List<EquationLinear> virticalLineList = new List<EquationLinear>();
+
             if(eq1 is EquationCircle && eq2 is EquationCircle)
             {
-                solutionList.AddRange(AlgoSimultaneousCircleBoth(
-                    eq1 as EquationCircle, eq2 as EquationCircle));
+                pointList.AddRange(AlgoSimultaneousCircleBoth(
+                    eq1 as EquationCircle, eq2 as EquationCircle,
+                    out SegmentPair[] segmentPairAry1,
+                    out EquationLinear[] virticalLineAry1));
+                segmentPairList.AddRange(segmentPairAry1);
+                virticalLineList.AddRange(virticalLineAry1);
             }
              
             if (eq1 is EquationCircle && eq2 is EquationQuadratic)
@@ -771,31 +915,35 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
             if (eq1 is EquationCircle && eq2 is EquationLinear)
             {
-                solutionList.AddRange(AlgoSimultaneousCircleLinear(
+                pointList.AddRange(AlgoSimultaneousCircleLinear(
                     eq1 as EquationCircle, eq2 as EquationLinear));
             }
 
             if (eq2 is EquationCircle && eq1 is EquationLinear)
             {
-                solutionList.AddRange(AlgoSimultaneousCircleLinear(
+                pointList.AddRange(AlgoSimultaneousCircleLinear(
                     eq2 as EquationCircle, eq1 as EquationLinear));
             }
 
             if (!(eq1 is EquationCircle) && !(eq2 is EquationCircle))
             {
                 TrySolutionQuad(eq1, eq2, out PointF[] solutionAryQuad);
-                solutionList.AddRange(solutionAryQuad);
+                pointList.AddRange(solutionAryQuad);
             }
 
-            solutionAry = solutionList.ToArray();
-            return solutionAry.Length > 0;
+            pointAryOut = pointList.ToArray();
+            virticalLineAryOut = virticalLineList.ToArray();
+            segmentPairAryOut = segmentPairList.ToArray();
+            return pointAryOut.Length > 0;
         }//TrySolutionCircle()
 
         private PointF[] AlgoSimultaneousCircleBoth
-            (EquationCircle eqCircle1, EquationCircle eqCircle2)
+            (EquationCircle eqCircle1, EquationCircle eqCircle2,
+            out SegmentPair[] segmentPairAryOut,
+            out EquationLinear[] virticalLineAryOut)
         {
-            decimal r1 = eqCircle1.Radius;  //【Deprecated】非推奨: including Math.Sqrt(double)
-            decimal r2 = eqCircle2.Radius;  //【Deprecated】非推奨: including Math.Sqrt(double)
+            decimal r1 = eqCircle1.Radius;
+            decimal r2 = eqCircle2.Radius;
             PointF origin1 = eqCircle1.CircleCenterPoint;
             PointF origin2 = eqCircle2.CircleCenterPoint;
 
@@ -804,14 +952,15 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             decimal radiusSumSq = (r1 + r2) * (r1 + r2);               // (r1 + r2) ^ 2 : sum of both radius as squre.
             decimal radiusSubtractSq = (r1 - r2) * (r1 - r2);          // (r1 - r2) ^ 2 : subtract of both radius as squre.
 
-            penViolet.Width = 1.0f;
-            penViolet.DashStyle = DashStyle.Dash;
+            List<PointF> pointList = new List<PointF>();
+            List<SegmentPair> segmentPairList = new List<SegmentPair>();
+            List<EquationLinear> virticalLineList = new List<EquationLinear>();
 
             //---- center point line 中心線 ----
             var eqCenterLine = new EquationLinear(origin1, origin2);
-            DrawLinearSegment(penViolet, origin1, origin2);  // d: eqCenterLine
+            segmentPairList.Add(new SegmentPair(origin1, origin2));  // d: eqCenterLine
+            virticalLineList.Add(eqCenterLine);
 
-            List<PointF> pointList = new List<PointF>();
             if (distanceSq < radiusSumSq && distanceSq > radiusSubtractSq)
             {
                 // 余弦定理: c ^ 2 = a ^ 2 + b ^ 2 - 2 a b cosC
@@ -824,25 +973,26 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
                 PointF centerVirticalPoint = AlgoDistanceOnLinePoint(
                     r1 * cos, origin1, eqCenterLine);
+                pointList.Add(centerVirticalPoint);
 
                 EquationLinear eqVirticalLine =
                     AlgoVirticalLine(centerVirticalPoint, eqCenterLine);
+                virticalLineList.Add(eqVirticalLine);
 
-                PointF[] solutionPointAry = AlgoSimultaneousCircleLinear(eqCircle1, eqVirticalLine);
+                PointF[] solutionPointAry = AlgoSimultaneousCircleLinear(
+                    eqCircle1, eqVirticalLine);
                 pointList.AddRange(solutionPointAry);
-
-                //---- Draw ----
+             
+                //---- Segment ----
                 if (solutionPointAry.Length == 2)
                 {
-                    DrawPointLine(centerVirticalPoint);
-
                     foreach (PointF solutionPoint in solutionPointAry)
                     {
-                        DrawLinearSegment(penViolet, origin1, solutionPoint);  // r1
-                        DrawLinearSegment(penViolet, origin2, solutionPoint);  // r2
+                        segmentPairList.Add(new SegmentPair(origin1, solutionPoint));  // r1
+                        segmentPairList.Add(new SegmentPair(origin2, solutionPoint));  // r2
                     }//foreach
-                    DrawLinearSegment(penViolet, solutionPointAry[0], solutionPointAry[1]);    //eqVirticalLine
-                    DrawVirticalMark(eqCenterLine, eqVirticalLine, plusX: false, plusY: true);
+
+                    segmentPairList.Add(new SegmentPair(solutionPointAry[0], solutionPointAry[1]));    //eqVirticalLine
                 }
             }
             else if (Math.Round(distanceSq, 4) == Math.Round(radiusSumSq, 1))
@@ -852,6 +1002,7 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
                 EquationLinear eqTangentLine = AlgoTangentLineOnCircle(internalPoint, eqCircle1);
                 DrawLinearFunction(eqTangentLine);
+                virticalLineList.Add(eqTangentLine);
             }
             else if (Math.Round(distanceSq, 4) == Math.Round(radiusSubtractSq, 1) && r1 - r2 != 0)
             {   // solutionNum = 1;  d == r1 - r2  ２円内接、外分点
@@ -860,13 +1011,16 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
 
                 EquationLinear eqTangentLine = AlgoTangentLineOnCircle(externalPoint, eqCircle1);
                 DrawLinearFunction(eqTangentLine);
+                virticalLineList.Add(eqTangentLine);
             }
 
-            DrawLinearSegment(penViolet, origin1, origin2);
+            segmentPairAryOut = segmentPairList.ToArray();
+            virticalLineAryOut = virticalLineList.ToArray();
             return pointList.ToArray();
         }//AlgoSimultaneousCircleBoth()
 
-        private PointF[] AlgoSimultaneousCircleLinear(EquationCircle eqCircle, EquationLinear eqLinear)
+        private PointF[] AlgoSimultaneousCircleLinear(
+            EquationCircle eqCircle, EquationLinear eqLinear)
         {
             List<PointF> pointList = new List<PointF>();
             if (float.IsInfinity(eqLinear.Slope))  // x = c  (virtical)

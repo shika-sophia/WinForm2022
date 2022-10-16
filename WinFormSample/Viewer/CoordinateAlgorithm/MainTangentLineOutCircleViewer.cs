@@ -20,6 +20,7 @@
  *@date 2022-10-14
  */
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -64,27 +65,27 @@ namespace WinFormGUI.WinFormSample.Viewer.CoordinateAlgorithm
             circle = new AlgoCoordinateCircle(pic);
             circle.DrawCoordinateAxis();
             
+            List<PointF> pointList = new List<PointF>();
+            List<ICoordinateEquation> eqList = new List<ICoordinateEquation>();
+            
             var eqCircle1 = new EquationCircle(radius: 100M, new PointF(0, 0));
             //var eqCircle2 = new EquationCircle(radius: 60M, new PointF(150, 200));
+            eqList.Add(eqCircle1);
       
-            PointF polar = new PointF(200, 160);
+            PointF polar = new PointF(180, 160);
+            pointList.Add(polar);
 
-            circle.SetScaleRate(1.0M);
-            EquationLinear[] tangentAry = circle.AlgoTangentLineOutCircle(
-                polar, eqCircle1, out PointF[] contactPointAry);
-
-            for(int i = 0; i < tangentAry.Length; i++)
-            {
-                circle.DrawMultiCircleFunction(scaleRateHere: 1.0M,
-                    new ICoordinateEquation[] { eqCircle1, tangentAry[i] }, polar, contactPointAry[i]);
-            }//for
+            EquationLinear[] tangentAry = 
+                circle.AlgoTangentLineOutCircle(polar, eqCircle1,
+                out PointF[] contactPointAry,
+                out AbsAlgoCoordinate.SegmentPair[] segmentPairAry,
+                out EquationLinear[] virticalLineAry);
+            eqList.AddRange(tangentAry);
+            pointList.AddRange(contactPointAry);
             
-            if (tangentAry.Length == 0)
-            {
-                circle.DrawMultiCircleFunction(scaleRateHere: 1.5M,
-                    new ICoordinateEquation[] { eqCircle1 }, polar);
-            }
-
+            circle.DrawMultiCircleFunction(
+                eqList.ToArray(), virticalLineAry, segmentPairAry, pointList.ToArray());
+            
             this.Controls.AddRange(new Control[]
             {
                 pic,
