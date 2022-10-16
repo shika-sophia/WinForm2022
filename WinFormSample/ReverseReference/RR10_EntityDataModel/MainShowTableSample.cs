@@ -10,10 +10,16 @@
  *           =>〔~/Reference/Article_KaiteiNet/WinForm_.txt〕
  *           
  *@content RR[279][280] p500 / ShowTableSample
+ *         EDM: Entity Data Model 〔Entity Framework | NT 77A〕
+ *              Relation DBの Table DataSet形式を オブジェクト指向で操作できるように
+ *              データ変換(=マッピング)した [.NET Framework 3.5-] Entity Frameworkの機能  
+ *
  *@subject EDM: Entity Data Model の作成 
  *         VS[ソリューションエクスプローラ] -> フォルダ選択 ->
  *         [追加] -> [新しい項目] -> [データ] -> [ADO.NET Entity Data Model]
  *         -> (Model名を入力) -> [OK]
+ *         
+ *         => SQL Server に データ接続した Entity Data Model を自動生成
  *         
  *@subject ＊DBにテーブルを追加
  *         VS [サーバーエクスプローラ] -> [テーブル] 右クリック -> [新しいテーブルの追加]
@@ -43,7 +49,7 @@
  *         ・接続文字列  「(アプリルートからの階層).EntitiDataModelRR.csdl」「.ssdl」「.msl」のクラス名になる
  *         ・接続設定     <connectionStrings><add name="EntityDataModelRRSetting" ...>
  *                       Form内で DB接続のため EDMを newするときのクラス名
- *         ・接続名前空間 
+ *         ・接続名前空間 ??
  *         
  *         〔~/App.config〕内
  *         <configuration>
@@ -51,7 +57,7 @@
  *            //<!ーー For more information on Entity Framework configuration, visit http://go.microsoft.com/fwlink/?LinkID=237468 ーー>
  *            <section name="entityFramework" type="System.Data.Entity.Internal.ConfigFile.EntityFrameworkSection,
  *              EntityFramework, Version=6.0.0.0, 
- *              Culture=neutral, PublicKeyToken=b77a5c561934e089"
+ *              Culture=neutral, PublicKeyToken=xxxxxxxxxxxxx"
  *              requirePermission="false" />
  *         </configSections>
  *         <startup>
