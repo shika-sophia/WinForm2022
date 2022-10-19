@@ -77,7 +77,34 @@
  *                providerName="System.Data.EntityClient" />
  *         </ connectionStrings >
  *                :
- *                
+ *
+ *@NOTE【Problem】DataGrid.ItemsSource
+ *      Compiler Error【CS1061】:
+ *          'type' does not contain a definition for 'name' and no accessible extension method 'name'
+ *          accepting a first argument of type 'type' could be found
+ *          (are you missing a using directive or an assembly reference ?).
+ *           
+ *          DataGrid型に 'ItemsSource'の定義が含まれておらず、
+ *          第１引数に受け入れ可能な 'DataGrid'型の アクセス可能な拡張メソッド 'ItemsSource'は見つけられません。
+ *          (using ディレクティブ もしくは アセンブリ参照が不足していないか確認してください。)
+ *
+ *     【MSDN】DataGrid.ItemsSource Property
+ *      https://learn.microsoft.com/en-us/previous-versions/windows/silverlight/dotnet-windows-silverlight/cc189398(v=vs.95)
+ *      Microsoft Silverlight will reach end of support after October 2021.
+ *      Namespace:  System.Windows.Controls
+ *      Assembly:  System.Windows.Controls.Data (in System.Windows.Controls.Data.dll)
+ *
+ *      すでに Support終了しており、上記のアセンブリ「.dll」も VSの参照候補に存在しない
+ *      
+ *      【MSDN】DataGrid クラス
+ *       https://learn.microsoft.com/ja-jp/dotnet/api/system.windows.forms.datagrid?view=netframework-4.8
+ *       Namespace: System.Windows.Forms
+ *       Assembly:  System.Windows.Forms.dll
+ *       
+ *       スクロールできるグリッドに ADO.NET データを表示します。
+ *       このクラスは .NET Core 3.1 以降のバージョンでは利用できません。
+ *       代わりにコントロールを DataGridView 使用し、コントロールを置き換えて拡張 DataGrid します。
+ *       
  *@see ImagePrepareEntityDataModelSample.jpg
  *@see 
  *@author shika
@@ -85,6 +112,7 @@
  * -->
  */
 using System;
+using System.Data.Entity;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -110,21 +138,22 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
         private readonly FlowLayoutPanel flow;
         private readonly Label label;
         private readonly Button button;
-        private readonly DataGrid dataGrid;
+        private readonly DataGridView grid;
 
         public FormPrepareEntityDataModelSample()
         {
             this.Text = "FormPrepareEntityDataModelSample";
             this.Font = new Font("consolas", 12, FontStyle.Regular);
-            //this.ClientSize = new Size(640, 640);
+            this.ClientSize = new Size(640, 240);
             this.AutoSize = true;
             this.BackColor = SystemColors.Window;
 
             flow = new FlowLayoutPanel()
             {
                 FlowDirection = FlowDirection.TopDown,
+                ClientSize = this.ClientSize,
+                Padding = new Padding(10),
                 Dock = DockStyle.Fill,
-                AutoSize = true,
             };
 
             label = new Label()
@@ -138,18 +167,20 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
 
             button = new Button()
             {
-                Text = "Show Tabel",
+                Text = "Show Table",
                 Dock = DockStyle.Fill,
                 AutoSize = true,
             };
             button.Click += new EventHandler(Button_Click);
             flow.Controls.Add(button);
 
-            dataGrid = new DataGrid()
+            grid = new DataGridView()
             {
+                ClientSize = this.ClientSize,
                 Dock = DockStyle.Fill,
+                AutoSize = true,
             };
-            flow.Controls.Add(dataGrid);
+            flow.Controls.Add(grid);
 
             this.Controls.AddRange(new Control[]
             {
@@ -160,9 +191,8 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
         private void Button_Click(object sender, EventArgs e)
         {
             var entity = new EntityDataModelRRSetting();
-            dataGrid.DataSource = entity.PersonRR;
-
-            //(Studing... about DbContext, DataGrid)
+            grid.DataSource = entity.PersonRR.Local.ToBindingList();
+            grid.AutoGenerateColumns = true;
         }
     }//class
 }

@@ -6,10 +6,10 @@
  *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
  *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
- *@reference KT ナガノ  『Windows Form C#』KaiteiNet, 2018
- *           http://kaitei.net/csforms/
- *           =>〔~/Reference/Article_KaiteiNet/WinForm_.txt〕
- *           
+ *@reference MB marunaka-blog《【C#】DataGridViewの使い方》, 2021
+ *              https://marunaka-blog.com/csharp-datagridview-use/3088/
+ *              =>〔~\Reference\Article_DataGridView.txt〕
+ *              
  *@content RR[281]-[] p505- / DbContext
  *
  */
@@ -133,8 +133,79 @@
  *
  *@subject DbSet<T>
  *
+ *@subject ◆DataGridView : Control, ISupportInitialize -- System.Windows.Forms
+ *         DataGridView   new DataGridView()
+ *         
+ *         (Mainly Members)  dataGrid.Xxxx
+ *         
+ *         ＊Indexer
+ *         DataGridViewCell this[string columnName, int rowIndex] { get; set; }
+ *         DataGridViewCell this[int columnIndex, int rowIndex]   { get; set; }
+ *         
+ *         ＊Property
+ *         string Text { get; set; }
+ *         object DataSource { get; set; }
+ *         string DataMember { get; set; }
+ *         bool AutoGenerateColumns { get; set; }
+ *         DataGridViewColumnCollection Columns { get; }
+ *         DataGridViewRowCollection Rows { get; }
+ *         
+ *         int ColumnCount { get; set; }
+ *         int RowCount { get; set; }
+ *         int ColumnHeadersHeight { get; set; }
+ *         int RowHeadersWidth { get; set; }
+ *         Size DefaultSize { get; }
+ *         DataGridViewAutoSizeRowsMode AutoSizeRowsMode { get; set; }
+ *         DataGridViewAutoSizeColumnsMode AutoSizeColumnsMode { get; set; }
+ *         DataGridViewRowHeadersWidthSizeMode RowHeadersWidthSizeMode { get; set; }
+ *         
+ *         bool MultiSelect { get; set; }
+ *         DataGridViewColumn SortedColumn { get; }
+ *         DataGridViewRow CurrentRow { get; }
+ *         DataGridViewCell CurrentCell { get; set; }
+ *               
+ *         bool EnableHeadersVisualStyles { get; set; }
+ *         DataGridViewCellStyle RowsDefaultCellStyle { get; set; }
+ *         DataGridViewCellStyle RowHeadersDefaultCellStyle { get; set; }
+ *         DataGridViewCellStyle AlternatingRowsDefaultCellStyle { get; set; }
+ *         DataGridViewHeaderBorderStyle RowHeadersBorderStyle { get; set; }
+ *         
+ *         SortOrder SortOrder { get; }
+ *           └ enum SortOrder
+ *         DataGridViewSelectionMode SelectionMode { get; set; }
+ *           └ enum DataGridViewSelectionMode
+ *         
+ *         DataGridViewSelectedColumnCollection SelectedColumns { get; }
+ *         DataGridViewSelectedRowCollection    SelectedRows { get; }
+ *         DataGridViewSelectedCellCollection   SelectedCells { get; }
+ *         
+ *         Panel EditingPanel { get; }
+ *         Control EditingControl { get; }
+ *         DataGridViewEditMode EditMode { get; set; }
+ *           └ enum DataGridViewEditMode
+ *           
+ *         ＊Method
+ *         AutoResizeColumn(int columnIndex, [DataGridViewAutoSizeColumnMode]);
+ *         void AutoResizeColumns([DataGridViewAutoSizeColumnsMode]);
+ *         void AutoResizeColumnHeadersHeight([int columnIndex]);
+ *         void AutoResizeRow(int rowIndex, [DataGridViewAutoSizeRowMode]);
+ *         void AutoResizeRowHeadersWidth(int rowIndex, [DataGridViewRowHeadersWidthSizeMode]);
+ *         void AutoResizeRows(DataGridViewAutoSizeRowsMode autoSizeRowsMode);
+ *         
+ *         bool BeginEdit(bool selectAll);
+ *         bool EndEdit(DataGridViewDataErrorContexts context);
+ *         bool CommitEdit(DataGridViewDataErrorContexts);
+ *         bool CancelEdit();
+ *         bool RefreshEdit();
+ *         
+ *         void UpdateCellValue(int columnIndex, int rowIndex);
+ *         void SelectAll();
+ *         void ClearSelection();
+ *         
+ *         void Sort(DataGridViewColumn dataGridViewColumn, ListSortDirection direction);
+ *         void Sort(IComparer comparer);
  */
-#endregion
+#endregion 
 /*
  *@see ImageDbContextSample.jpg
  *@see 
@@ -142,7 +213,9 @@
  *@date 2022-10-18
  */
 using System;
+using System.Data.Entity;
 using System.Data.Entity.Core.EntityClient;
+using System.Data.Entity.Infrastructure;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -151,9 +224,9 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
 {
     class MainDbContextSample
     {
-        [STAThread]
-        static void Main()
-        //public void Main()
+        //[STAThread]
+        //static void Main()
+        public void Main()
         {
             Console.WriteLine("new FormDbContextSample()");
 
@@ -169,7 +242,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
         private readonly FlowLayoutPanel flow;
         private readonly Label label;
         private readonly Button button;
-        private readonly DataGrid grid;
+        private readonly DataGridView grid;
 
         public FormDbContextSample()
         {
@@ -205,7 +278,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
             button.Click += new EventHandler(Button_Click);
             flow.Controls.Add(button);
 
-            grid = new DataGrid()
+            grid = new DataGridView()
             {
 
             };
@@ -226,14 +299,21 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
             entityBld.Provider = "System.Data.SqlClient";
             entityBld.ProviderConnectionString = connectionString;
             entityBld.Metadata =
-                "res://*/EntitiDataModelRR.csdl|res://*/EntitiDataModelRR.ssdl|res://*/EntitiDataModelRR.msl";
+                "res://*/WinFormSample.ReverseReference.RR10_EntityDataModel.EntitiDataModelRR.csdl | " +
+                "res://*/WinFormSample.ReverseReference.RR10_EntityDataModel.EntitiDataModelRR.ssdl | " +
+                "res://*/WinFormSample.ReverseReference.RR10_EntityDataModel.EntitiDataModelRR.msl";
 
             var conn = new EntityConnection(entityBld.ToString());
             var entity = new SubDbContextEntitySample(conn);
-            grid.DataSource = entity.PersonRR;
+            DbSqlQuery<PersonRR> sql = entity.PersonRR.SqlQuery("SELECT * FROM PersonRR;");
             
+            
+            grid.DataSource = entity.PersonRR.Local.ToBindingList();
+            grid.AutoGenerateColumns = true;
+            grid.Rows.AddRange();
+
             //(Editing...)
-            
+
         }//Button_Click()
     }//class
 }
