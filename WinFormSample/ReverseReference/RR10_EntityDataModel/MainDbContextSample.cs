@@ -6,11 +6,15 @@
  *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
  *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
- *@reference MB marunaka-blog《【C#】DataGridViewの使い方》, 2021
+ *@reference MB marunaka-blog《【C#】DataGridViewの使い方 》, 2021
  *              https://marunaka-blog.com/csharp-datagridview-use/3088/
- *              =>〔~\Reference\Article_DataGridView.txt〕
+ *              =>〔~\Reference\\Article_EntityFrameworkCodeFirst\Article_DataGridView.txt〕
  *              
- *@content RR[281]-[] p505- / DbContext
+ *@reference EF densanlabs『Entity Framework Code First』, 2012
+ *              https://densan-labs.net/tech/codefirst/index.html
+ *              =>〔~\Reference\Article_EntityFrameworkCodeFirst〕
+ *              
+ *@content RR[281]-[286] p505-512 / DbContext
  *
  */
 #region -> ■ DbContext Reference
@@ -112,7 +116,6 @@
  *         
  *         (メンバーは DbConnectionと共通)
  *         
- *         
  *@subject ◆EntityConnectionStringBuilder  : DbConnectionStringBuilder
  *             -- System.Data.Entity.Core.EntityClient.
  *         EntityConnectionStringBuilder  new EntityConnectionStringBuilder()
@@ -131,12 +134,36 @@
  *         bool    entityBld.Remove(string keyword)
  *         void    entityBld.Clear()
  *
- *@subject DbSet<T>
- *
+ *@subject ◆class DbSet<TEntity> : DbQuery<TEntity>, IDbSet<TEntity>, IQueryable<TEntity>, IEnumerable<TEntity>, IQueryable, IEnumerable, IInternalSetAdapter where TEntity : class
+ *                   -- System.Data.Entity
+ *         # DbSet<TEntity>      new DbSet<TEntity>()  where TEntity : class;
+ *         DbSet<TEntity>        DbContext派生クラス.[テーブルクラス]  <- プロパティに「DbSet<T> テーブル名」を記述
+ *         
+ *         ObservableCollection<TEntity>  dbSet.Local { get; }   Entityのキャッシュを保持。自動更新される
+ *         TEntity               dbSet.Add(TEntity entity)
+ *         IEnumerable<TEntity>  dbSet.AddRange(IEnumerable<TEntity> entities)
+ *         TEntity               dbSet.Attach(TEntity entity)
+ *         TEntity               dbSet.Create()
+ *         TDerivedEntity        dbSet.Create<TDerivedEntity>() where TDerivedEntity : class, TEntity;
+ *         TEntity               dbSet.Find(params object[] keyValues);
+ *         Task<TEntity>         dbSet.FindAsync(CancellationToken cancellationToken, params object[] keyValues);
+ *         Task<TEntity>         dbSet.FindAsync(params object[] keyValues);
+ *         TEntity               dbSet.Remove(TEntity entity)
+ *         IEnumerable<TEntity>  dbSet.RemoveRange(IEnumerable<TEntity> entities)
+ *         DbSqlQuery<TEntity>   dbSet.SqlQuery(string sql, params object[] parameters)
+ *         
+ *@subject interface IQueryable : IEnumerable
+ *@subject ◆static class QueryableExtensions -- System.Data.Entity
+ *         void  DbSet<T>.Load(this IQueryable source)  
+ *                 拡張メソッド: 第１引数 this のクラスにこのメソッドを追加
+ *                 Load(): DbSet<T>, ObjectSet<T>, ObjectQuery<T>などのサーバー クエリを対象に、
+ *                         クエリの結果がクライアント上の関連付けられた DbContext, ObjectContextなどのキャッシュに読み込まれるように、
+ *                         クエリを列挙します。これは ToList() を呼び出してから、実際にリストを作成するオーバーヘッドなしでリストを破棄する場合と同じです。
+ *         
  *@subject ◆DataGridView : Control, ISupportInitialize -- System.Windows.Forms
  *         DataGridView   new DataGridView()
  *         
- *         (Mainly Members)  dataGrid.Xxxx
+ *         (Mainly Members)  dataGridView.Xxxx
  *         
  *         ＊Indexer
  *         DataGridViewCell this[string columnName, int rowIndex] { get; set; }
@@ -208,25 +235,23 @@
 #endregion 
 /*
  *@see ImageDbContextSample.jpg
- *@see 
+ *@see MainPrepareEntityFrameworkModelSample.cs
  *@author shika
  *@date 2022-10-18
  */
 using System;
 using System.Data.Entity;
 using System.Data.Entity.Core.EntityClient;
-using System.Data.Entity.Infrastructure;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
 {
     class MainDbContextSample
     {
-        //[STAThread]
-        //static void Main()
-        public void Main()
+        [STAThread]
+        static void Main()
+        //public void Main()
         {
             Console.WriteLine("new FormDbContextSample()");
 
@@ -261,7 +286,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
 
             label = new Label()
             {
-                Text = "",
+                Text = "Connect DB by DbContext",
                 TextAlign = ContentAlignment.MiddleCenter,
                 Dock = DockStyle.Fill,
                 AutoSize = true,
@@ -270,7 +295,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
 
             button = new Button()
             {
-                Text = "",
+                Text = "Show Person Table",
                 TextAlign = ContentAlignment.MiddleCenter,
                 Dock = DockStyle.Fill,
                 AutoSize = true,
@@ -280,7 +305,8 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
 
             grid = new DataGridView()
             {
-
+                Dock = DockStyle.Fill,
+                AutoSize = true,
             };
             flow.Controls.Add(grid);
 
@@ -292,8 +318,8 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
 
         private void Button_Click(object sender, EventArgs e)
         {
-            string connectionString = 
-                "data source = .;initial catalog = ASPState;integrated security = True;";
+            string connectionString =
+                @"data source =(LocalDB)\MSSQLLocalDB;initial catalog = ASPState;integrated security = True;";
 
             var entityBld = new EntityConnectionStringBuilder();
             entityBld.Provider = "System.Data.SqlClient";
@@ -304,15 +330,18 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
                 "res://*/WinFormSample.ReverseReference.RR10_EntityDataModel.EntitiDataModelRR.msl";
 
             var conn = new EntityConnection(entityBld.ToString());
-            var entity = new SubDbContextEntitySample(conn);
-            DbSqlQuery<PersonRR> sql = entity.PersonRR.SqlQuery("SELECT * FROM PersonRR;");
-            
-            
-            grid.DataSource = entity.PersonRR.Local.ToBindingList();
-            grid.AutoGenerateColumns = true;
-            grid.Rows.AddRange();
+            using (var entity = new SubDbContextEntitySample(conn)) 
+            {
+                // この時点で，DBに対して「SELECT * FROM Person;」を発行する
+                entity.PersonRR.Load(); 
 
-            //(Editing...)
+                // DbSet.Localを使う事で，ローカルにキャッシュされたデータを使う
+                grid.DataSource = entity.PersonRR.Local.ToBindingList();
+                grid.AutoGenerateColumns = true;
+
+                entity.Dispose();
+                conn.Close();
+            }//using
 
         }//Button_Click()
     }//class
