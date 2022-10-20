@@ -2,6 +2,17 @@
 7. 高度な話題
 https://densan-labs.net/tech/codefirst/advance.html
 
+Table Of Contents
+7. 高度な話題
+7.1. Entity Framework Power Toolsを用いたER図の確認
+7.1.1. Entity Framework Power Toolsのインストール
+7.1.2. Power Toolsが生成したER図の確認
+7.2. AsNoTrackingによる高速化
+7.3. 大規模データ取扱い時に気を付けること
+7.4. ストアドプロシージャ
+7.5. Proxyオブジェクト
+
+
 7.1. Entity Framework Power Toolsを用いたER図の確認
 Code Firstは，プログラムを実行した段階で，初めて どのようなテーブルが作成されているのかを知ることができます． しかし，場合によってはプログラムを実行する前に，どのようなテーブルが生成されるのかを 知りたい場合があります． そんなときに役立つツールが，Entity Framework Power Toolsです． このツールは，作成したContextクラスを元に，ER図を自動生成してくれます．
 
@@ -34,16 +45,5 @@ TODO: Code Firstだとストアド使えないので、Migrationでストアド�
 TODO: POCO Proxyの作成要件について．クラスのプロパティをpublic, virtual, not-sealedにするなど
 TODO: 遅延読み込みプロキシと変更追跡プロキシの詳細を書く
  
-
-Table Of Contents
-7. 高度な話題
-7.1. Entity Framework Power Toolsを用いたER図の確認
-7.1.1. Entity Framework Power Toolsのインストール
-7.1.2. Power Toolsが生成したER図の確認
-7.2. AsNoTrackingによる高速化
-7.3. 大規模データ取扱い時に気を付けること
-7.4. ストアドプロシージャ
-7.5. Proxyオブジェクト
-
  
 COPYRIGHT (C) 2011- DENSAN-LABS.NET. ALL RIGHTS RESERVED. DESIGN BY FREE CSS TEMPLATES. CREATED USING SPHINX

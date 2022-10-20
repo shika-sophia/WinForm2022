@@ -2,6 +2,14 @@
 2. モデルの変更とコンフィギュレーション
 https://densan-labs.net/tech/codefirst/chapter3.html
 
+Table Of Contents
+2. モデルの変更とコンフィギュレーション
+2.1. モデルの変更
+2.2. Annotation及びFluent APIを用いた自動生成テーブルの制御
+2.2.1. Annotationを用いたテーブルの設定
+2.2.2. Fluent APIを用いたテーブルの設定
+
+
 2.1. モデルの変更
 前章で作成したプログラムを動かして，あらかじめデータベースを 作成しておきましょう．前節で紹介したProductクラスは以下のようなものでした。
 
@@ -215,13 +223,5 @@ modelBuilder.Entity<Product>()
   .IsRequired()
   .HasMaxLength(200);
  
-
-Table Of Contents
-2. モデルの変更とコンフィギュレーション
-2.1. モデルの変更
-2.2. Annotation及びFluent APIを用いた自動生成テーブルの制御
-2.2.1. Annotationを用いたテーブルの設定
-2.2.2. Fluent APIを用いたテーブルの設定
-
  
 COPYRIGHT (C) 2011- DENSAN-LABS.NET. ALL RIGHTS RESERVED. DESIGN BY FREE CSS TEMPLATES. CREATED USING SPHINX

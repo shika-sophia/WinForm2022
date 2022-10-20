@@ -2,6 +2,22 @@
 5. リレーション
 https://densan-labs.net/tech/codefirst/chapter4.html
 
+Table Of Contents
+5. リレーション
+5.1. リレーションシップの作成
+5.1.1. 1対1リレーションの作成
+5.1.2. 1対多リレーションの作成
+5.1.3. 外部キーのカラム名変更
+5.2. リレーションを持ったテーブルへのデータ挿入
+5.3. リレーションデータの読み込み
+5.3.1. Explicit Loading
+5.3.2. Eager Loading
+5.3.3. Lazy Loading
+5.4. リレーションデータの削除
+5.4.1. データの削除
+5.4.2. カスケードデリート
+
+
 5.1. リレーションシップの作成
 リレーションを使うことで、あるテーブルの特定の行と、ほかのテーブルの行を関連付けることができます。 今回は、EntityFramework Code Firstにてリレーションを作成する方法を説明します。
 
@@ -407,21 +423,5 @@ using (var context = new ShoppingContext())
     context.SaveChanges();
 }
  
-
-Table Of Contents
-5. リレーション
-5.1. リレーションシップの作成
-5.1.1. 1対1リレーションの作成
-5.1.2. 1対多リレーションの作成
-5.1.3. 外部キーのカラム名変更
-5.2. リレーションを持ったテーブルへのデータ挿入
-5.3. リレーションデータの読み込み
-5.3.1. Explicit Loading
-5.3.2. Eager Loading
-5.3.3. Lazy Loading
-5.4. リレーションデータの削除
-5.4.1. データの削除
-5.4.2. カスケードデリート
-
 
 COPYRIGHT (C) 2011- DENSAN-LABS.NET. ALL RIGHTS RESERVED. DESIGN BY FREE CSS TEMPLATES. CREATED USING SPHINX

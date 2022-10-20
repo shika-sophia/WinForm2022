@@ -2,6 +2,18 @@
 1. Hello Code First
 https://densan-labs.net/tech/codefirst/chapter2.html
 
+Table Of Contents
+1. Hello Code First
+1.1. Entity Frameworkのインストール
+1.2. Code Firstによるデータベース作成
+1.2.1. モデルとなるクラスの作成
+1.2.2. Contextクラスの作成
+1.2.3. データベースの生成とデータの追加
+1.2.4. データベース接続文字列の設定
+1.2.5. DBの自動生成
+1.3. データベースからの情報の取得
+
+
 1.1. Entity Frameworkのインストール
 まず初めにEntity Framework(EF)のインストールを行いましょう． 今回利用するEFのバージョンは4.3.1です．
 
@@ -198,17 +210,5 @@ context.Productsにアクセスすることで，データベースから値を�
 [3]	connectionStringのnameを変更する方法もあります．ShoppingContextクラスのコンストラクタを， public ShoppingContext() : base(nameOrConnectionString: "name=好きな名前") {} と定義することで変更が可能です．
 [4]	もし自分の好きな値を挿入したい場合はDatabaseGeneratedアノテーション を使って，自動生成を切ることができます．
  
-
-Table Of Contents
-1. Hello Code First
-1.1. Entity Frameworkのインストール
-1.2. Code Firstによるデータベース作成
-1.2.1. モデルとなるクラスの作成
-1.2.2. Contextクラスの作成
-1.2.3. データベースの生成とデータの追加
-1.2.4. データベース接続文字列の設定
-1.2.5. DBの自動生成
-1.3. データベースからの情報の取得
-
 
 COPYRIGHT (C) 2011- DENSAN-LABS.NET. ALL RIGHTS RESERVED. DESIGN BY FREE CSS TEMPLATES. CREATED USING SPHINX
