@@ -1,0 +1,49 @@
+■ densanlabs
+7. 高度な話題
+https://densan-labs.net/tech/codefirst/advance.html
+
+7.1. Entity Framework Power Toolsを用いたER図の確認
+Code Firstは，プログラムを実行した段階で，初めて どのようなテーブルが作成されているのかを知ることができます． しかし，場合によってはプログラムを実行する前に，どのようなテーブルが生成されるのかを 知りたい場合があります． そんなときに役立つツールが，Entity Framework Power Toolsです． このツールは，作成したContextクラスを元に，ER図を自動生成してくれます．
+
+7.1.1. Entity Framework Power Toolsのインストール
+Entity Framework Power Toolsは，拡張機能マネージャから簡単にインストールすることができます． メニューバーのツール，拡張機能マネージャーをクリックし，オンライン上からEntity Framework Power Tools を検索し，インストールを行いましょう(図 entity_pic064)．
+
+../../_images/entity_pic064.JPG
+図:Entity Framework Power Toolsのインストール
+
+7.1.2. Power Toolsが生成したER図の確認
+Entity Framework Power Toolsをインストール後は， Code Firstが作成するテーブルをER図で表示させることができます．
+
+ソリューションエクスプローラから，DbContextが継承されているクラスにカーソルを合わせ，右クリックをします． その後，Entity Framework，View Entity Data Model(Read-Only)をクリックすることで，ER図を確認 することができます(図 entity_pic075).
+
+../../_images/entity_pic075.JPG
+図:ER図の生成方法
+
+生成されたテーブルをER図で表すと図 entity_pic063 のようになります．
+
+../../_images/entity_pic063.JPG
+図:ProductsテーブルとProductCategoriesテーブルのER図
+
+7.2. AsNoTrackingによる高速化
+TODO: データ読み出すだけならAsNoTrackingをつけると1.2倍くらい高速化することを書く
+7.3. 大規模データ取扱い時に気を付けること
+TODO: DbContextは内部で状態を持っている為、大量のデータをAdd, Selectするとメモリ不足に陥ることを書く
+7.4. ストアドプロシージャ
+TODO: Code Firstだとストアド使えないので、MigrationでストアドをDBにいれて、それを直接呼び出すしかない。その方法をここに書く
+7.5. Proxyオブジェクト
+TODO: POCO Proxyの作成要件について．クラスのプロパティをpublic, virtual, not-sealedにするなど
+TODO: 遅延読み込みプロキシと変更追跡プロキシの詳細を書く
+ 
+
+Table Of Contents
+7. 高度な話題
+7.1. Entity Framework Power Toolsを用いたER図の確認
+7.1.1. Entity Framework Power Toolsのインストール
+7.1.2. Power Toolsが生成したER図の確認
+7.2. AsNoTrackingによる高速化
+7.3. 大規模データ取扱い時に気を付けること
+7.4. ストアドプロシージャ
+7.5. Proxyオブジェクト
+
+ 
+COPYRIGHT (C) 2011- DENSAN-LABS.NET. ALL RIGHTS RESERVED. DESIGN BY FREE CSS TEMPLATES. CREATED USING SPHINX

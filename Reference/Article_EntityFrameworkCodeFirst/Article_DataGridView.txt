@@ -1,0 +1,494 @@
+
+■ ○NAKA BLOG
+◆【C#】DataGridViewの使い方をマスターしよう！基本的な操作まとめ
+https://marunaka-blog.com/csharp-datagridview-use/3088/
+ 2021年12月30日 /  2022年6月8日
+
+C#のDataGridViewはデータの一覧を表示したり、データを編集したりすることができる便利なコントロールです。
+
+今回はWindows Formに配置したDataGridViewを使う方法について紹介をしていますので、参考にしてみてください。
+
+
+＊本記事の内容
+DataGridViewについて
+DataGridViewを配置する
+DataGridViewに列を追加する
+デザイナーから列を追加する
+コードから列を追加する
+DataGridViewに行を追加する
+データ付きの行を追加する
+空行を追加する
+指定した行番号に挿入する
+行の背景色を交互に変更
+セルに値をセット
+DataGridViewの列をソート
+選択されている行番号を取得
+DataGridViewの行を削除
+１行削除する
+全行を削除する
+DataGridViewのプロパティ
+Grid幅に列を合わせる
+左端の項目列を削除する
+行の自動追加をオフにする
+行単位で選択をする
+グリッド線を消す
+セルの編集を不可にする
+項目名の文字列を中央揃えする
+DataGridViewのサンプル
+まとめ
+参考記事
+DataGridViewについて
+DataGridViewは、ユーザーインターフェースに表形式のデータを表示または操作する場合に使用するコントロールです。
+Windows Formでは標準コントロールとして搭載されているコントロールです。
+（WPFの場合はDataGridという名称で標準搭載されています。）
+
+
+このコントロール１つでデータを表示するだけでなく、Grid型でCRUD（クラッド）を実現することができます。
+CRUDとはシステムに必要な４つの主要な機能のことで、
+「データの登録（CREATE）」「データの読み取り（READ）」「データの更新（UPDATE）」「データの削除（DELETE）」の頭文字を取ってします。
+
+DataGridViewを使うことでデータを柔軟に扱えるメリットがある一方で、
+プロパティやメソッド、イベントが多数存在するので用途に応じて使い分けが必要です。
+
+アプリケーションを開発する上で欠かせないコントロールなのでしっかりと抑えておきましょう。
+
+
+DataGridViewを配置する
+まずは、Form画面にDataGridViewを配置しましょう。
+
+STEP1
+ツールボックスを開く
+Visual Studioのヘッダーメニューから「表示」→「ツールボックス」の順に選択をします。
+
+
+STEP2
+DataGridViewを配置する
+ツールボックス内にあるDataGridViewコントロールをFormにドラッグ＆ドロップします。
+
+
+DataGridViewの配置が完了したら、DataGridViewを操作してみましょう。
+
+
+DataGridViewに列を追加する
+デザイナーもしくはコードから列を追加する方法がありますので、順番に紹介していきます。
+
+デザイナーから列を追加する
+DataGridViewの右上にある小さい▶ボタンをクリックします。
+
+
+DataGridView タスク画面が開くので、「列の追加…」を選択します。
+
+
+列の追加画面で、カラムの名前とカラムに表示する項目名を入力します。
+
+
+ここでは５つのカラム（Number、Nationality、Player、Positions、Age）を追加しました。
+
+
+ 
+
+コードから列を追加する
+コードからDataGridViewに列を追加する場合は次のように記述します。
+
+
+//列の名前
+var columnNames = new string[]
+{
+    "number", "nationality", "player", "positions", "age"
+};
+
+//列に表示する項目名
+var columnTexts = new string[]
+{
+    "Number", "Nationality", "Player", "Positions", "Age"
+};
+
+for (int i = 0; i < columnNames.Length; i++)
+{
+    var viewColumn = new DataGridViewColumn();
+    viewColumn.Name = columnNames[i];                         //列の名前
+    viewColumn.HeaderText = columnTexts[i];                   //ヘッダーに表示される名称
+    viewColumn.CellTemplate = new DataGridViewTextBoxCell();  //セルのタイプ
+
+    //列の追加
+    dataGridView1.Columns.Add(viewColumn);
+}
+列の名前とヘッダーに表示される名称を予め配列に入れておきます。
+
+DataGridViewColumnオブジェクトに対して必要な設定をして、設定したオブジェクトをCloumnプロパティのAddメソッドでDataGridViewに追加します。繰り返し処理になるのでfor文を使っています。
+
+アプリケーションを起動すれば、DataGridViewに列が追加されることを確認できます。
+
+
+DataGridViewColumnの設定プロパティは次の通りです。必要に応じて設定しましょう。
+
+プロパティ	内容
+Name	列を識別する為の名前です。大文字・小文字は区別されません。
+HeaderText	列のヘッダーセルの見出しの文字列です。
+Width	列の幅を設定します。既定値は100です。
+DividerWidth	区分線の幅を設定します。既定値は０です。
+CellTemplate	セルのタイプを設定します。セルにテキストボックスを表示したり、チェックボックス、コンボボックス等を表示することが可能です。
+Index	DataGridView内での相対位置を取得します。
+ 
+
+
+DataGridViewに行を追加する
+データ付きの行を追加する
+行を追加するには、RowsプロパティのAddメソッドを使用します。
+
+
+//行に追加したいデータ
+var values = new string[]
+{
+    "1", "Japan", "Taro", "Left", "19"
+};
+
+//行の追加
+dataGridView1.Rows.Add(values);
+セルに設定する文字列を配列に入れて、Addメソッドに渡します。
+
+上記のコードでもいいですが、更に簡潔記述することができます。
+
+
+//行の追加
+dataGridView1.Rows.Add("1", "Japan", "Taro", "Left", "19");
+アプリケーションを実行すると、行が追加されることを確認できます。
+
+
+ 
+
+空行を追加する
+DataGridViewに空行を追加することも可能です。この場合はAddメソッドの引数は無しにしましょう。
+
+
+//空行の追加
+dataGridView1.Rows.Add();
+アプリケーションを実行すると、空行が追加されます。
+
+
+まとめて空行を追加するなら次の方法が便利です。
+
+
+//空行の追加
+dataGridView1.RowCount = 30;
+RowCountプロパティに表示したい行の数を設定します。戻り値には表示する行の総数が返ります。
+
+
+ 
+
+指定した行番号に挿入する
+行番号を指定して行を挿入することも可能です。RowsプロパティのInsertメソッドを使って、挿入したい行番号を指定します。
+
+
+var addValues = new string[]
+{
+"追加", "Japan", "Nasu", "Second", "32"
+};
+
+dataGridView1.Rows.Insert(5, addValues);
+引数に５を指定して、６行目に行を追加しています。DataGridViewは行番号が０から始まるので６行目を指定する場合は６－１＝５となるわけです。
+
+
+ 
+
+
+行の背景色を交互に変更
+１行おきに交互に色を付けることで行の境目が分かりやすくなるので、見やすくなります。
+
+DataGridViewで背景色に色づけをするには、次のようにします。
+
+
+//奇数行の背景色を変更
+dataGridView1.AlternatingRowsDefaultCellStyle.BackColor = Color.AliceBlue;
+AlternatingRowsDefaultCellStyleプロパティは、奇数行に適用される規定のセルスタイルをセットすることができます。背景色の色を変更するので、BackColorプロパティに色をセットします。
+
+
+ 
+
+セルに値をセット
+先ほど追加した空行のセルに値をセットしてみましょう。２行目の2列目に「United States」を設定します。
+
+
+//セルに値をセット
+dataGridView1.Rows[1].Cells[1].Value = "United States";
+行番号は０から開始するので、2行目なら１を指定します。セルも同様に０から開始するので、2行目なら１を指定します。
+
+Valueプロパティに値をセットすることで、指定したセルへデータを入力することが可能です。
+
+
+ 
+
+DataGridViewの列をソート
+C#のコードからDataGridViewの並び替えをすることが可能です。昇順または降順に並び替えるならSortメソッドを使います。
+
+
+//降順（Descending）
+dataGridView1.Sort(dataGridView1.Columns["Age"], ListSortDirection.Descending);
+
+//昇順（Ascending）
+dataGridView1.Sort(dataGridView1.Columns["Age"], ListSortDirection.Ascending);
+Sortメソッドにソートする列を指定して、降順または昇順を設定します。上記のコードの降順を実行すると、次のようになります。
+
+
+ 
+
+選択されている行番号を取得
+現在選択されている行番号を取得する方法です。
+
+ここではDataGridViewをマウスで選択した行番号を取得する例を記述しています。
+
+
+//MouseUpイベントをトリガーとして行番号を取得する
+private void dataGridView1_MouseUp(object sender, MouseEventArgs e)
+{
+var selectrow = dataGridView1.CurrentRow?.Index;
+MessageBox.Show($"選択された行番号は{selectrow}です。");
+}
+現在の行番号を取得するにはCurrentRowプロパティを使います。このプロパティはDataGridViewの行が選択されていない場合はnullを返します。
+
+このためIndexプロパティで行番号を取得する際は、CurrentRowがnullでないことに注意しなければなりません。
+
+
+ 
+
+DataGridViewの行を削除
+１行削除する
+DataGridView内にある任意の１行を削除します。削除はRowプロパティのRemoveAtメソッドを使用します。
+
+
+//１行目を削除する
+dataGridView1.Rows.RemoveAt(0);
+RemoveAtメソッドの引数に削除する行番号を指定します。ここでは１行目を削除するために０を渡しています。
+
+
+ 
+
+全行を削除する
+DataGridView内にある行を全て削除します。全て削除する場合はRowプロパティのClearメソッドを使用します。
+
+
+//すべての行を削除する
+dataGridView1.Rows.Clear();
+追加した行が全て削除されます。
+
+
+ 
+
+DataGridViewのプロパティ
+ここではDataGridViewの細かい調整を行うプロパティを紹介します。
+
+Grid幅に列を合わせる
+列の幅を設定する方法に「Fill」を指定することで、幅いっぱいに列を配置することができます。
+
+
+dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+プロパティを追加すると次のようになります。
+
+
+ 
+
+左端の項目列を削除する
+一番左端の項目列（RowHeader）を削除します。
+
+
+dataGridView1.RowHeadersVisible = false;
+RowHeaderVisibleプロパティをfalseにすると削除することができます。
+
+
+ 
+
+行の自動追加をオフにする
+デフォルトの状態だと行の追加が自動で行われます。データベースの情報を表示する場合などには、不必要な機能になるので次の方法でオフにします。
+
+
+dataGridView1.AllowUserToAddRows = false;
+プログラムから追加した行のみ表示がされます。下図は行を追加していない状態です。
+
+
+ 
+
+行単位で選択をする
+初期状態ではセル単位で選択されます。行単位で選択をするには次のプロパティを使用します。
+
+
+dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+SelectionModeを FullRowSelect にすることで行単位で選択できます。
+
+
+ 
+
+グリッド線を消す
+グリッド線が煩わしいなら、グリッドの線を消すことが可能です。線の調整はCellBorderStyleプロパティを変更しましょう。
+
+
+dataGridView1.CellBorderStyle = DataGridViewCellBorderStyle.None;
+上記のコードを追加すると次のような見た目になります。
+
+
+ 
+
+セルの編集を不可にする
+初期状態ではセルをクリックするとセルに入力された値を編集することができます。セルの値を編集できなくするにはReadOnlyプロパティをtrueにします。
+
+
+dataGridView1.ReadOnly = true;
+DataGridViewの見た目に変化はありませんが、セルをクリックしても編集することはできません。
+
+
+ 
+
+項目名の文字列を中央揃えする
+DataGridViewのヘッダーの文字列を中央揃えにするには、ColumnHeadersDefaultCellStyleのAlignmentプロパティを設定します。
+
+
+dataGridView1.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter; //列の項目名を中央揃えdataGridView1.ReadOnly = true;
+AlignmentプロパティにDataGridViewContentAlignment.MiddleCenterをセットすることで中央揃えすることができます。
+
+
+DataGridViewContentAligmentの列挙体メンバと内容の一覧が以下になります。中央揃え以外に変更したい場合は、一覧の中から用途にあったメンバを選択します。
+
+列挙体メンバ	値	内容
+BottomCenter	512	垂直方向は底部に、水平方向はセルの中心に合わせて配置
+BottomLeft	256	垂直方向は底部に、水平方向はセルの左側に合わせて配置
+BottomRight	1024	垂直方向は底部に、水平方向はセルの右側に合わせて配置
+MiddleCenter	32	セルの垂直方向と水平方向の中心に合わせて配置
+MiddleLeft	16	垂直方向は中央に、水平方向はセルの左側に合わせて配置
+MiddleRight	64	垂直方向は中央に、水平方向はセルの右側に合わせて配置
+NotSet	0	配置が設定されていない
+TopCenter	2	垂直方向は上部に、水平方向はセルの中心に合わせて配置
+TopLeft	1	垂直方向は上部に、水平方向はセルの左側に合わせて配置
+TopRight	4	垂直方向は上部に、水平方向はセルの右側に合わせて配置
+ 
+
+DataGridViewのサンプル
+DataGridViewの基本的な機能を使ったサンプルを紹介します。
+
+このサンプルコードを実行すると図のようなDataGridViewが表示されます。
+
+
+
+using System;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace DataGridViewSample
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            //各プロパティの設置
+            dataGridView1.ReadOnly = true;               //読み取り専用
+            dataGridView1.RowHeadersVisible = false;     //左端の項目列を非表示
+            dataGridView1.AllowUserToAddRows = false;    //自動追加オフ
+            dataGridView1.AlternatingRowsDefaultCellStyle.BackColor = Color.AliceBlue;  //奇数行のカラーを変更
+            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;   //列幅自動調整オフ
+            dataGridView1.SelectionMode = DataGridViewSelectionMode.CellSelect;         //セル単位で選択
+            dataGridView1.ColumnHeadersDefaultCellStyle.Alignment 
+                = DataGridViewContentAlignment.MiddleCenter;                            //列の項目名を中央揃え
+
+            //列の名前
+            var columnNames = new string[] { "button", "id", "name", "age", "address", "workplace" };
+
+            //列の項目名
+            var columnTexts = new string[] { "", "ID", "氏名", "年齢", "住所", "勤務先" };
+
+            //列の幅
+            var wight = new int[] { 60, 80, 100, 100, 140, 120 };
+
+            //列のスタイル
+            var celType = new DataGridViewCell[]
+            {
+                new DataGridViewButtonCell(),
+                new DataGridViewTextBoxCell(),
+                new DataGridViewTextBoxCell(),
+                new DataGridViewTextBoxCell(),
+                new DataGridViewTextBoxCell(),
+                new DataGridViewTextBoxCell()
+            };
+
+            for (int i = 0; i < columnNames.Length; i++)
+            {
+                var viewColumn = new DataGridViewColumn();
+                viewColumn.Name = columnNames[i];        //列の名前
+                viewColumn.HeaderText = columnTexts[i];  //列の項目名
+                viewColumn.Width = wight[i];             //列の幅
+                viewColumn.CellTemplate = celType[i];    //列のスタイル
+                viewColumn.DefaultCellStyle.Alignment    //列の中央揃え 
+                    = DataGridViewContentAlignment.MiddleCenter;
+
+                dataGridView1.Columns.Add(viewColumn);   //列の追加
+            }
+
+            //1行目にデータを追加
+            dataGridView1.Rows.Add(new string[]
+            {
+                "ボタン", "1", "Japan", "Taro", "Left", "19"
+            });
+
+            //2行目にデータを追加
+            dataGridView1.Rows.Add(new string[]
+            {
+                "ボタン", "2", "Japan", "Jiro", "Right", "17"
+            });
+
+            //3行目にデータを追加
+            dataGridView1.Rows.Add(new string[]
+            {
+                "ボタン", "3", "Canada", "Mark", "First", "26"
+            });
+
+            //3行目にデータを追加
+            dataGridView1.Rows.Add(new string[]
+            {
+                "ボタン", "4", "Japan", "Yasu", "Center", "21"
+            });
+
+            dataGridView1.Sort(dataGridView1.Columns["年齢"], ListSortDirection.Descending);  //Age列を降順にソート
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) { return; }
+
+            MessageBox.Show($"クリックされたボタンは{e.RowIndex + 1}行目です。");
+        }
+    }
+}
+DataGridViewはセルをボタンにすることが可能で、左端の列はボタンを配置しています。
+
+CellContentClickイベントでボタンのイベント処理を行います。
+
+サンプルではボタンをクリックした行番号をメッセージボックスに表示するようにしています。
+
+プログラミングを更に学びたい方必見
+
+選抜された現役エンジニアから学べるプログラミングスクールで、現場や副業で役に立つノウハウやスキルを習得してみませんか？
+
+オンラインに特化しているので場所に捉われず、自分のライフスタイルに合わせて受講することができます。
+
+副業に興味がある方に人気の「はじめての副業コース」をはじめ、Web開発やシステム開発・アプリ開発などカテゴリ毎に受講ができ、初心者の方でも挫折することなく学ぶことができます。
+
+まずはこの機会に現役のプロに無料相談をしてみましょう。
+
+
+＼ プログラミングスクールの詳細を確認する ／
+
+まとめ
+この記事ではDataGridViewの基本的な使い方についてまとめてご紹介しました。
+
+DataGridViewはC#のWindows Formでよく利用するコントロールなので、使い方を理解しておくとプログラミングの幅が広がると思います。
+
+以上、最後まで読んでいただきありがとうございました。
+
+参考記事
+
+【WPF】DataGridの使い方を徹底解説！基本的な操作方法を紹介
+ C# DataGridView
+

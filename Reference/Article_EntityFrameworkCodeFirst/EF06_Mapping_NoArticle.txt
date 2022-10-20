@@ -1,0 +1,10 @@
+6. マッピング
+https://densan-labs.net/tech/codefirst/chapter5.html
+
+TODO:
+
+mapping
+hierarchy
+
+ここの内容は現在検討中。TPHのことやTPCの事を書く予定
+
