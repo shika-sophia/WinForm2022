@@ -51,8 +51,8 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
     {
         private readonly TableLayoutPanel table;
         private readonly DataGridView grid;
-        private readonly SubDbContextEntitySample entity
-            = new SubDbContextEntitySample();
+        private readonly SubDbContextEntityPersonRR entity
+            = new SubDbContextEntityPersonRR();
         private readonly Label labelName;
         private readonly Label labelAddress;
         private readonly Label labelTel;
