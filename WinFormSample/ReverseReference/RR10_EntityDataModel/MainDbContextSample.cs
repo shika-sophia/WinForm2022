@@ -139,7 +139,9 @@
  *         # DbSet<TEntity>      new DbSet<TEntity>()  where TEntity : class;
  *         DbSet<TEntity>        DbContext派生クラス.[テーブルクラス]  <- プロパティに「DbSet<T> テーブル名」を記述
  *         
- *         ObservableCollection<TEntity>  dbSet.Local { get; }   Entityのキャッシュを保持。自動更新される
+ *         ObservableCollection<TEntity>  dbSet.Local { get; }   
+ *             ・Entityのキャッシュを保持。自動更新される
+ *             ・ObservableCollection<TEntity>
  *         TEntity               dbSet.Add(TEntity entity)
  *         IEnumerable<TEntity>  dbSet.AddRange(IEnumerable<TEntity> entities)
  *         TEntity               dbSet.Attach(TEntity entity)
@@ -249,9 +251,9 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
 {
     class MainDbContextSample
     {
-        [STAThread]
-        static void Main()
-        //public void Main()
+        //[STAThread]
+        //static void Main()
+        public void Main()
         {
             Console.WriteLine("new FormDbContextSample()");
 

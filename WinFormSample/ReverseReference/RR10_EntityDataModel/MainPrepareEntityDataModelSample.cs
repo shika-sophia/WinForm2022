@@ -77,8 +77,26 @@
  *                providerName="System.Data.EntityClient" />
  *         </ connectionStrings >
  *                :
- *
- *@NOTE【Problem】DataGrid.ItemsSource
+ *                
+ *@subject new EntityDataModelRRSetting();
+ *         ・EDM: EntityDataModel 作成時に自動作成されるクラス
+ *         ・各Table の DbSet<T>をプロパティに持つ
+ *         ・new時に DB内の 全Tableの DbSet<T>のインスタンスを生成するので、少し重い
+ *         ・利用する Tableだけを読み込むなら、DbContext派生クラスを利用すべき
+ *           =>〔MainDbContextEntitySample.cs〕
+ *           
+ *@subject new SubDbContextEntitySample() : DbContext
+ *         ・DbContext派生クラス
+ *         ・DbSet<PersonRR> PersonRR { get; }  プロパティに 利用する Table名の DbSet<T>を記述
+ *         ・PersonRRクラスは、同名Tableの 全Columnをプロパティとするクラスを用意する
+ *         ・DbConnection をコンストラクタの引数とするか、内部化しておく
+ *         ・このままだと列名の Headerだけ表示される
+ *         ・DbSet<T>.Load() で DBに対して「SELECT * FROM PersonRR;」を発行する
+ *           実行結果は 各行のデータを読み込み、DbSet<T>.Localにキャッシュを保持する
+ *           
+ *          =>〔MainDbContextEntitySample.cs〕
+ *          
+ *@NOTE【Problem】DataGrid.ItemsSource 
  *      Compiler Error【CS1061】:
  *          'type' does not contain a definition for 'name' and no accessible extension method 'name'
  *          accepting a first argument of type 'type' could be found
@@ -104,6 +122,9 @@
  *       スクロールできるグリッドに ADO.NET データを表示します。
  *       このクラスは .NET Core 3.1 以降のバージョンでは利用できません。
  *       代わりにコントロールを DataGridView 使用し、コントロールを置き換えて拡張 DataGrid します。
+ *       
+ *       RR[279]-[314] p500- サンプルコードは 旧式のため そのままではコンパイルエラー
+ *       => DataGridViewを利用すべき
  *       
  *@see ImagePrepareEntityDataModelSample.jpg
  *@see 

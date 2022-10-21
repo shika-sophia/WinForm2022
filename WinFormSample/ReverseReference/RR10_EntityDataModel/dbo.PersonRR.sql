@@ -11,10 +11,10 @@ CREATE TABLE [dbo].[PersonRR] (
 */
 /*
 SET IDENTITY_INSERT [dbo].[PersonRR] ON
-INSERT INTO [dbo].[PersonRR] ([Id], [Name], [Address], [Tel], [Email], [CreateDate]) VALUES (1, N'Sophia', N'Osaka', NULL, NULL, N'2022-10-17')
+INSERT INTO [dbo].[PersonRR] ([Id], [Name], [Address], [Tel], [Email], [CreateDate]) VALUES (1, N'Sophia', N'Berlin', NULL, NULL, N'2022-10-21')
 INSERT INTO [dbo].[PersonRR] ([Id], [Name], [Address], [Tel], [Email], [CreateDate]) VALUES (2, N'Shika', N'Yokohama', NULL, NULL, N'2022-10-17')
 INSERT INTO [dbo].[PersonRR] ([Id], [Name], [Address], [Tel], [Email], [CreateDate]) VALUES (3, N'Lily', N'New York', NULL, NULL, N'2022-10-17')
-INSERT INTO [dbo].[PersonRR] ([Id], [Name], [Address], [Tel], [Email], [CreateDate]) VALUES (4, N'Yuri', N'Berlin', NULL, NULL, N'2022-10-17')
+INSERT INTO [dbo].[PersonRR] ([Id], [Name], [Address], [Tel], [Email], [CreateDate]) VALUES (4, N'Yuri', N'Osaka', NULL, NULL, N'2022-10-21')
 INSERT INTO [dbo].[PersonRR] ([Id], [Name], [Address], [Tel], [Email], [CreateDate]) VALUES (5, N'TeriChan', N'Georgia Tbilisi', NULL, NULL, N'2022-10-17')
 SET IDENTITY_INSERT [dbo].[PersonRR] OFF
 */
