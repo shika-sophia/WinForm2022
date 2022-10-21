@@ -11,7 +11,8 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
 {
     using System;
     using System.Collections.Generic;
-    
+    using System.Text;
+
     public partial class PersonRR
     {
         public int Id { get; set; }
@@ -19,6 +20,19 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
         public string Address { get; set; }
         public string Tel { get; set; }
         public string Email { get; set; }
-        public Nullable<System.DateTime> CreateDate { get; set; }
-    }
+        public DateTime CreateDate { get; set; } = DateTime.Today;
+
+        public override string ToString()
+        {
+            StringBuilder bld = new StringBuilder();
+            bld.Append("Id: (Auto Increment)\n");
+            bld.Append($"Name: {Name}\n");
+            bld.Append($"Address: {Address}\n");
+            bld.Append($"Tel: {Tel}\n");
+            bld.Append($"Email: {Email}\n");
+            bld.Append("CreateDate: Today (as Auto)\n");
+
+            return bld.ToString();
+        }//ToString()
+    }//class
 }

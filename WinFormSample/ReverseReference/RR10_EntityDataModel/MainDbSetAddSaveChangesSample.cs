@@ -1,8 +1,8 @@
 ﻿/** 
- *@title WinFormGUI / WinFormSample / 
+ *@title WinFormGUI / WinFormSample / ReverseReference / RR10_EntityDataModel
  *@class MainDbSetAddSaveChangesSample.cs
  *@class   └ new FormDbSetAddSaveChangesSample() : Form
- *@class       └ new SubDbContextEntitySample() : DbContext
+ *@class       └ new SubDbContextEntityPersonRR() : DbContext
  *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
  *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
@@ -28,6 +28,9 @@ using System.ComponentModel;
 using System.Data.Entity;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
@@ -65,7 +68,6 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
         private readonly Button buttonDelete;
         private readonly Button buttonUpdate;
         
-
         public FormDbSetAddSaveChangesSample()
         {
             this.Text = "FormDbSetAddSaveChangesSample";
@@ -222,8 +224,6 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
             buttonUpdate.Click += new EventHandler(ButtonUpdate_Click);
             table.Controls.Add(buttonUpdate, 2, 5);
 
-
-
             this.Controls.AddRange(new Control[]
             {
                 table,
@@ -247,13 +247,138 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
 
         private void ButtonInsert_Click(object sender, EventArgs e)
         {
-            
-        }//Button_Click()
+            bool canInsert = ValidateInput();
+            if(!canInsert) { return; }
+
+            //---- Insert Row ----
+            PersonRR person = new PersonRR()
+            {
+                Name = textBoxName.Text,
+                Address = textBoxAddress.Text,
+                Tel = textBoxTel.Text,
+                Email = textBoxTel.Text,
+            };
+
+            DialogResult result = MessageBox.Show(
+                person.ToString(),
+                "Confirm to Insert DB",
+                MessageBoxButtons.OKCancel,
+                MessageBoxIcon.Question);
+
+            if (result == DialogResult.Cancel) { return; }
+            else if (result == DialogResult.OK)
+            {
+                entity.PersonRR.Add(person);
+                entity.SaveChanges();
+                entity.PersonRR.Load();
+                grid.DataSource = entity.PersonRR.Local;
+                this.Invalidate();
+            }
+        }//ButtonInsert_Click()
+
+        private bool ValidateInput()
+        {
+            StringBuilder bld = new StringBuilder();
+
+            //---- Valdate input ----
+            if (textBoxName.Text.Trim().Length == 0)
+            {
+                bld.Append("<！> Name is required.\n");
+            }
+
+            if (textBoxName.Text.Trim().Length > 50)
+            {
+                bld.Append("<！> Name should discribe in 50 characters.\n");
+            }
+
+            if (textBoxAddress.Text.Trim().Length == 0)
+            {
+                bld.Append("<！> Address is required.\n");
+            }
+
+            if (textBoxTel.Text.Trim().Length > 50)
+            {
+                bld.Append("<！> Tel should discribe in 50 characters.\n");
+            }
+
+            if (!textBoxTel.Text.Trim()
+                .ToCharArray()
+                .All(c => Char.IsDigit(c)))
+            {
+                bld.Append("<！> Tel should discribe by Number ONLY.\n");
+            }
+
+            if (textBoxEmail.Text != "" && !Regex.IsMatch(textBoxEmail.Text.Trim(),
+                @"\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*", //Email〔NT27〕
+                RegexOptions.IgnoreCase))
+            {
+                bld.Append("<！> Email should discribe within the Format.\n");
+            }
+
+            //---- against SQL Ingection ----
+            string[] textAry = new string[]
+            {
+                textBoxName.Text, textBoxAddress.Text,
+                textBoxTel.Text, textBoxEmail.Text,
+            };
+
+            foreach (string text in textAry)
+            {
+                if (Regex.IsMatch(text.Trim(), "[<>&;=]+") || Regex.IsMatch(text.Trim(), "[-]{2}"))
+                {
+                    bld.Append("<！> Invalidate input !\n");
+                }
+            }//foreach
+
+            //---- Show Error Massage ----
+            if (bld.Length > 0)
+            {
+                MessageBox.Show(
+                    bld.ToString(),
+                    "Input Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return false;
+            }
+
+            return true;
+        }//ValidateInput()
 
         private void ButtonDelete_Click(object sender, EventArgs e)
         {
+            var rowCollextion = grid.Rows;
+            var rowIndex = grid.CurrentCell.RowIndex;
 
-        }//Button_Click()
+            var cellCollection = rowCollextion[rowIndex].Cells;
+
+            StringBuilder bld = new StringBuilder();
+            foreach(DataGridViewCell cell in cellCollection)
+            {
+                bld.Append($"{cell.Value},\n");
+            }
+
+            DialogResult result = MessageBox.Show(
+                bld.ToString(),
+                "Confirm to Delete Row",
+                MessageBoxButtons.OKCancel,
+                MessageBoxIcon.Question);
+
+            //@NOTE【Problem】
+            //・Cell.Valueで Idの値は取れているが、
+            //  DBを DELETE するのは、最終行を削除してしまう。
+            //・LINQ内で (int), Int32.Parse(string)は利用付加
+            //
+            //if(result == DialogResult.Cancel) { return; }
+            //else if(result == DialogResult.OK)
+            //{
+            //    int id = (int)cellCollection[0].Value;
+            //    PersonRR deletePersonRR = entity.PersonRR.Single(
+            //        person => person.Id == id);
+            //    entity.PersonRR.Remove(deletePersonRR);
+            //    entity.SaveChanges();
+            //}
+            
+        }//ButtonDelete_Click()
 
         private void ButtonUpdate_Click(object sender, EventArgs e)
         {

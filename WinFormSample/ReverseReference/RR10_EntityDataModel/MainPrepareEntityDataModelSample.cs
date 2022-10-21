@@ -53,29 +53,26 @@
  *         
  *         〔~/App.config〕内
  *         <configuration>
- *         <configSections>
- *            //<!ーー For more information on Entity Framework configuration, visit http://go.microsoft.com/fwlink/?LinkID=237468 ーー>
- *            <section name="entityFramework" type="System.Data.Entity.Internal.ConfigFile.EntityFrameworkSection,
- *              EntityFramework, Version=6.0.0.0, 
- *              Culture=neutral, PublicKeyToken=xxxxxxxxxxxxx"
- *              requirePermission="false" />
- *         </configSections>
- *         <startup>
- *            <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.8" />
- *         </startup>
- *         <connectionStrings>
- *             <add name="EntityDataModelRRSetting" 
- *                connectionString="metadata=res://*／WinFormSample.ReverseReference.RR10_EntityDataModel.EntitiDataModelRR.csdl
- *                | res://*／WinFormSample.ReverseReference.RR10_EntityDataModel.EntitiDataModelRR.ssdl
- *                | res://*／WinFormSample.ReverseReference.RR10_EntityDataModel.EntitiDataModelRR.msl;
- *                provider=System.Data.SqlClient; 
- *                provider connection string="data source=(LocalDB)\MSSQLLocalDB;
- *                    initial catalog=ASPState;
- *                    integrated security=True;
- *                    MultipleActiveResultSets=True;
- *                    App=EntityFramework" 
- *                providerName="System.Data.EntityClient" />
- *         </ connectionStrings >
+ *           <configSections>
+ *              <!ーー For more information on Entity Framework configuration, visit http://go.microsoft.com/fwlink/?LinkID=237468 ーー>
+ *              <section name="entityFramework"
+ *                  type="System.Data.Entity.Internal.ConfigFile.EntityFrameworkSection, 
+ *                      EntityFramework, Version=6.0.0.0, Culture=neutral,
+ *                      PublicKeyToken=xxxxxxxxxxxxxxxx" requirePermission="false" />
+ *           </configSections>
+ *           <connectionStrings>
+ *               <add name="EntityDataModelRRSetting" 
+ *               connectionString="metadata=res:／／*／WinFormSample.ReverseReference.RR10_EntityDataModel.EntityDataModelRR.csdl
+ *                   | res:／／*／WinFormSample.ReverseReference.RR10_EntityDataModel.EntityDataModelRR.ssdl
+ *                   | res:／／*／WinFormSample.ReverseReference.RR10_EntityDataModel.EntityDataModelRR.msl;
+ *               provider=System.Data.SqlClient;
+ *               provider connection string="data source=(LocalDB)\MSSQLLocalDB;
+ *                   initial catalog=ASPState;
+ *                   integrated security=True;
+ *                   MultipleActiveResultSets=True;
+ *                   App=EntityFramework&quot;"
+ *               providerName="System.Data.EntityClient" />
+ *           </ connectionStrings >
  *                :
  *                
  *@subject new EntityDataModelRRSetting();

@@ -327,9 +327,9 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
             entityBld.Provider = "System.Data.SqlClient";
             entityBld.ProviderConnectionString = connectionString;
             entityBld.Metadata =
-                "res://*/WinFormSample.ReverseReference.RR10_EntityDataModel.EntitiDataModelRR.csdl | " +
-                "res://*/WinFormSample.ReverseReference.RR10_EntityDataModel.EntitiDataModelRR.ssdl | " +
-                "res://*/WinFormSample.ReverseReference.RR10_EntityDataModel.EntitiDataModelRR.msl";
+                "res://*/WinFormSample.ReverseReference.RR10_EntityDataModel.EntityDataModelRR.csdl | " +
+                "res://*/WinFormSample.ReverseReference.RR10_EntityDataModel.EntityDataModelRR.ssdl | " +
+                "res://*/WinFormSample.ReverseReference.RR10_EntityDataModel.EntityDataModelRR.msl";
 
             var conn = new EntityConnection(entityBld.ToString());
             using (var entity = new SubDbContextEntitySample(conn)) 
