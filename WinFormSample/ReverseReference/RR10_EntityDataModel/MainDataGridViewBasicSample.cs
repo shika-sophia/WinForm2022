@@ -32,6 +32,7 @@
  */
 using System;
 using System.Drawing;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -58,16 +59,37 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
         private readonly TableLayoutPanel table;
         private readonly DataGridView grid;
         private readonly Label[] labelAry;
-        private readonly TextBox[] textBoxAry;
+        private readonly Control[] inputControlAry;
         private readonly Button[] buttonAry;
+        private NumericUpDown numNumber;
+        private TextBox textBoxName;
+        private TextBox textBoxNation;
+        private FlowLayoutPanel flowRole;
+        private FlowLayoutPanel flowBirth;
+        private NumericUpDown numYear;
+        private NumericUpDown numMonth;
+        private NumericUpDown numDay;
         private readonly Padding padding = new Padding(10);
+
         private readonly string[] columnTextAry = new string[]
         {
             "id","number", "name", "nationality", "role", "position", "birthday", "age"
         };
+
+        private readonly string[] roleTextAry = new string[]
+        {
+            "Fielder", "Director", "Staff", "Others"
+        };
+
+        private readonly string[] positionTextAry = new string[]
+        {
+            "Pitcher", "Catcher", "First", "Second", "Third",
+            "Short", "Left", "Center", "Right", "None",
+        };
+
         private readonly string[] buttonTextAry = new string[]
         {
-            "Insert Row", "Update Row", "Delete Row",
+            "Insert Row", "Update Row", "Delete Row", "Delete All"
         };
 
         public FormDataGridViewBasicSample()
@@ -83,7 +105,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
             table = new TableLayoutPanel()
             {
                 ColumnCount = buttonTextAry.Length,
-                RowCount = columnTextAry.Length,
+                RowCount = 5,
                 Padding = padding,
                 Dock = DockStyle.Fill,
                 AutoSize = true,
@@ -97,10 +119,10 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
             }//for ColumnStyle
 
             table.RowStyles.Add(new RowStyle(SizeType.Percent, 40f));
-            for (int i = 0; i < table.RowCount - 1; i++)
-            {
-                table.RowStyles.Add(new RowStyle(SizeType.Percent, 10f));
-            }//for RowStyle
+            table.RowStyles.Add(new RowStyle(SizeType.Percent, 15f));
+            table.RowStyles.Add(new RowStyle(SizeType.Percent, 15f));
+            table.RowStyles.Add(new RowStyle(SizeType.Percent, 15f));
+            table.RowStyles.Add(new RowStyle(SizeType.Percent, 15f));
 
             //---- DataGridView ----
             grid = new DataGridView()
@@ -124,7 +146,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
 
             //---- Component ----
             labelAry = new Label[columnTextAry.Length - 2];
-            textBoxAry = new TextBox[columnTextAry.Length - 2];
+            inputControlAry = new Control[columnTextAry.Length - 2];
             buttonAry = new Button[buttonTextAry.Length];
             InitialComponent();
 
@@ -221,34 +243,142 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
 
         private void InitialComponent()
         {
-            //---- Label, TextBox ----
+            //==== Label ====
             for(int i = 0; i < labelAry.Length; i++)
             {
                 labelAry[i] = new Label()
                 {
                     Text = grid.Columns[i + 1].HeaderText + ": ",
                     TextAlign = ContentAlignment.TopRight,
-                    Padding = padding,
+                    Margin = padding,
                     Dock = DockStyle.Fill,
                     AutoSize = true,
                 };
-                table.Controls.Add(labelAry[i], 1, i + 1);
+
+                int x = -1, y = -1;                    // Control Location in Column Count: 4 
+                if (i < 3)      { x = 0; y = i + 1; }  // Culumn 0: Number, Name, Natuonality
+                else if (3 <= i) { x = 2; y = i - 2; } // Culumn 2: Role, Position, Birthday
+                table.Controls.Add(labelAry[i], x, y);
             }//for Label
 
-            for (int i = 0; i < textBoxAry.Length; i++)
+            //==== Control[] inputControlAry ====
+            //---- Number: inputControlAry[0] ----
+            numNumber = new NumericUpDown()
             {
-                textBoxAry[i] = new TextBox()
-                {
-                    Margin = padding,
-                    Multiline = false,
-                    Dock = DockStyle.Fill,
-                    AutoSize = true,
-                };
-                table.Controls.Add(textBoxAry[i], 2, i + 1);
-            }//for TextBox
+                Maximum = 9999,
+                Minimum = 0,
+                TextAlign = HorizontalAlignment.Center,
+                Margin = padding,
+                Width = 100,
+            };
+            table.Controls.Add(numNumber, 1, 1);
+            inputControlAry[0] = numNumber;
 
-            //---- Button ----
-            for(int i = 0; i < buttonAry.Length; i++)
+            //---- Name: inputControlAry[1] ----
+            textBoxName = new TextBox()
+            {
+                Margin = padding,
+                Multiline = false,
+                Dock = DockStyle.Fill,
+                AutoSize = true,
+            };
+            table.Controls.Add(textBoxName, 1, 2);
+            inputControlAry[1] = textBoxName;
+
+            //---- Nationality: inputControlAry[2] ----
+            textBoxNation = new TextBox()
+            {
+                Margin = padding,
+                Multiline = false,
+                Dock = DockStyle.Fill,
+                AutoSize = true,
+            };
+            table.Controls.Add(textBoxNation, 1, 3);
+            inputControlAry[2] = textBoxNation;
+
+            //---- Role: inputControlAry[3] ----
+            flowRole = new FlowLayoutPanel()
+            {
+                Margin = padding,
+                FlowDirection = FlowDirection.LeftToRight,
+                Dock = DockStyle.Fill,
+                AutoSize = true,
+            };
+            table.Controls.Add(flowRole, 3, 1);
+            inputControlAry[3] = flowRole;
+            
+            RadioButton[] roleRadioAry = new RadioButton[roleTextAry.Length];
+            
+            for (int i = 0; i < roleTextAry.Length; i++)
+            {
+                roleRadioAry[i] = new RadioButton()
+                {
+                    Text = roleTextAry[i],
+                    Font = new Font(this.Font.FontFamily, 10, this.Font.Style),
+                };
+
+                if(i == 0)
+                {
+                    roleRadioAry[i].Checked = true;
+                }
+            }//for
+            flowRole.Controls.AddRange(roleRadioAry);
+
+            //---- Position: inputControlAry[4] ----
+            ComboBox comboPosition = new ComboBox()
+            {
+                SelectedText = "(Select Position)",
+                Margin = padding,
+                DropDownStyle = ComboBoxStyle.DropDown,
+                Dock = DockStyle.Fill,
+                AutoSize = true,
+            };
+            comboPosition.Items.AddRange(positionTextAry);
+            table.Controls.Add(comboPosition, 3, 2);
+            inputControlAry[4] = comboPosition;
+
+            //---- Birth: inputControlAry[5] ----
+            flowBirth = new FlowLayoutPanel()
+            {
+                FlowDirection = FlowDirection.LeftToRight,
+                Dock = DockStyle.Fill,
+                AutoSize = true,
+            };
+            table.Controls.Add(flowBirth, 3, 3);
+            inputControlAry[5] = flowBirth;
+
+            numYear = new NumericUpDown()
+            {
+                Maximum = 3000,
+                Minimum = 1000,
+                Value = 2000,
+                TextAlign = HorizontalAlignment.Center,
+                Width = 80,
+            };
+            flowBirth.Controls.Add(numYear);
+
+            numMonth = new NumericUpDown()
+            {
+                Maximum = 12,
+                Minimum = 1,
+                Value = 01,
+                TextAlign = HorizontalAlignment.Center,
+                Width = 60,
+            };
+            flowBirth.Controls.Add(numMonth);
+
+            numDay = new NumericUpDown()
+            {
+                Maximum = 31,
+                Minimum = 1,
+                Value = 01,
+                TextAlign = HorizontalAlignment.Center,
+                Width = 60,
+            };
+            flowBirth.Controls.Add(numDay);
+
+            //==== Button ====
+            for (int i = 0; i < buttonAry.Length; i++)
             {
                 buttonAry[i] = new Button()
                 {
@@ -265,11 +395,43 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
         private void Grid_SelectionChanged(object sender, EventArgs e)
         {
             var row = grid.Rows[grid.CurrentCell.RowIndex];
+            var cellCollection = row.Cells;
+
+            //---- Number: inputControl[0] ----
+            inputControlAry[0].Text = cellCollection[1].Value?.ToString() ?? "";
+
+            //---- Name: inputControlAry[1] ----
+            inputControlAry[1].Text = cellCollection[2].Value?.ToString() ?? "";
+
+            //---- Nationality: inputControlAry[2] ----
+            inputControlAry[2].Text = cellCollection[3].Value?.ToString() ?? "";
+
+            //---- Role: inputControlAry[3] ----
+            string roleStr = cellCollection[4].Value?.ToString() ?? ""; 
             
-            for (int i = 0; i < textBoxAry.Length; i++)
+            foreach (RadioButton radio in 
+                (inputControlAry[3] as FlowLayoutPanel).Controls)
             {
-                textBoxAry[i].Text = row.Cells[i + 1].Value?.ToString() ?? "";
-            }
+                if (radio.Text == roleStr)
+                {
+                    radio.Checked = true;
+                }
+                else
+                {
+                    radio.Checked = false;
+                }
+            }//foreach
+
+            //---- Position: inputControlAry[4] ----
+            inputControlAry[4].Text = cellCollection[5].Value?.ToString() ?? "None";
+
+            //---- Birthday: inputControlAry[5] ----
+            var numYear = (inputControlAry[5] as FlowLayoutPanel).Controls[0];
+            var numMonth = (inputControlAry[5] as FlowLayoutPanel).Controls[1];
+            var numDay = (inputControlAry[5] as FlowLayoutPanel).Controls[2];
+            numYear.Text = cellCollection[6].Value?.ToString().Substring(0, 4) ?? "";
+            numMonth.Text = cellCollection[6].Value?.ToString().Substring(5, 2) ?? "";
+            numDay.Text = cellCollection[6].Value?.ToString().Substring(8, 2) ?? "";
         }//Grid_SelectionChanged()
 
         private void Button_Click(object sender, EventArgs e)
@@ -285,44 +447,74 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
                 case "Delete Row":
                     //
                     break;
+                case "Delete All":
+                    //
+                    break;
             }//switch
         }//Button_Click()
 
         private void InsertRow()
         {
+            //==== Validate Input ====
             bool canInsert = ValidateInput();
 
-            if(!canInsert) { return; }
+            if (!canInsert) { return; }
 
+            //==== newData[] ====
+            //---- Id: newData[0] ---
             string[] newData = new string[columnTextAry.Length];
             newData[0] = $"{grid.Rows.Count}";
 
-            for(int i = 0; i < textBoxAry.Length; i++)
-            {
-                newData[i + 1] = textBoxAry[i].Text;
-            }//for
+            //---- Number: newData[1], inputControlAry[0] ----
+            newData[1] = (inputControlAry[0] as NumericUpDown).Value.ToString();
 
+            //---- Name: newData[2], inputControlAry[1] ----
+            newData[2] = (inputControlAry[1] as TextBox).Text;
+
+            //---- Nationality: newData[3], inputControlAry[2] ----
+            newData[3] = (inputControlAry[2] as TextBox).Text;
+
+            //---- Role: newData[4], inputControlAry[3] ----
+            string selectedRole = null;
+
+            foreach (RadioButton radio in
+                (inputControlAry[3] as FlowLayoutPanel).Controls)
+            {
+                if (radio.Checked)
+                {
+                    selectedRole = radio.Text;
+                    break;
+                }
+            }//foreach
+            newData[4] = selectedRole;
+
+            //---- Position: newData[5], inputControlAry[4] ----
+            newData[5] = (inputControlAry[4] as ComboBox).SelectedItem.ToString();
+
+            //---- Birthday: newData[6], inputControlAry[5] ----
+            newData[6] = BuildInputBirth();
+
+            //---- Age: newData[7] ----
             newData[newData.Length - 1] = "age";
             int age = CalcAge(newData);
             newData[newData.Length - 1] = age.ToString();
 
+            //==== Confirm to Insert ====
             StringBuilder bld = new StringBuilder();
+            bld.Append("The below data will insert into Database, OK?\n\n");
+
             for (int i = 0; i < newData.Length; i++)
             {
                 bld.Append($"{grid.Columns[i].HeaderText}: {newData[i]}\n");
             }//for
-            
+
             string messageTitle = "Confirm to Insert Row";
             DialogResult insertResult = ShowConfirmMessageBox(bld.ToString(), messageTitle);
 
             if (insertResult == DialogResult.Cancel) { return; }
             else if (insertResult == DialogResult.OK)
             {
-                grid.Rows.Add(newData);
-                foreach(var textBox in textBoxAry)
-                {
-                    textBox.Text = "";
-                }
+                grid.Rows.Add(newData);             
             }
         }//InsertRow()
 
@@ -330,45 +522,68 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
         {
             StringBuilder errorMessageBuilder = new StringBuilder();
 
-            //---- Valdate input ----
-            //Number
-            foreach(DataGridViewRow row in grid.Rows)
+            //==== Valdate input ====
+            //---- Number: inputControlAry[0] ----
+            foreach (DataGridViewRow row in grid.Rows)
             {
-                if (textBoxAry[0].Text == row.Cells[1].Value?.ToString())
+                Decimal.TryParse(row.Cells[1].Value?.ToString(), out decimal num);
+
+                if ((inputControlAry[0] as NumericUpDown).Value == num)
                 {
-                    errorMessageBuilder.Append("<！> Number need be unique value.\n");
-                }                
+                    errorMessageBuilder.Append("<！> Number need be unique numeric value.\n");
+                }
             }//foreach
 
-            //Name
-            if (textBoxAry[1].Text.Trim().Length == 0) 
+            //---- Name: inputControlAry[1] ----
+            if ((inputControlAry[1] as TextBox).Text.Trim().Length == 0)
             {
                 errorMessageBuilder.Append("<！> Name is required.\n");
             }
 
-            if (textBoxAry[1].Text.Trim().Length > 50)
+            if ((inputControlAry[1] as TextBox).Text.Trim().Length > 50)
             {
                 errorMessageBuilder.Append("<！> Name should discribe in 50 characters.\n");
             }
 
-            //Birthday
-            if (!DateTime.TryParse(textBoxAry[5].Text.Trim(), out DateTime birth))
+            //---- Nationality: inputControlAry[2] ----
+            if ((inputControlAry[2] as TextBox).Text.Trim().Length > 50)
+            {
+                errorMessageBuilder.Append("<！> Nationality should discribe in 50 characters.\n");
+            }
+
+            //---- Position: inputControlAry[4] ----
+            string selected = (inputControlAry[4] as ComboBox).SelectedItem?.ToString() ?? "";
+            bool isPosition = positionTextAry.Any(p => (selected == p));
+
+            if (!isPosition)
+            {
+                errorMessageBuilder.Append("<！> Position need be selected anything or None.\n");
+            }
+
+            //---- Birthday: inputControlAry[5] ----
+            string inputBirth = BuildInputBirth();
+
+            if (!DateTime.TryParse(inputBirth.Trim(), out DateTime birth))
             {
                 errorMessageBuilder.Append("<！> Birthday should discribe with form [YYYY/MM/DD].\n");
             }
 
-            //---- against SQL Injection ----
-            foreach (TextBox textbox in textBoxAry)
+            //==== against SQL Injection ====
+            string[] inputTextAry = new string[]
             {
-                string text = textbox.Text;
+                (inputControlAry[1] as TextBox).Text,
+                (inputControlAry[2] as TextBox).Text,
+            };
 
+            foreach (string text in inputTextAry)
+            {
                 if (Regex.IsMatch(text.Trim(), "[<>&;=]+") || Regex.IsMatch(text.Trim(), "[-]{2}"))
                 {
                     errorMessageBuilder.Append("<！> Invalidate input !\n");
                 }
             }//foreach
 
-            //---- Show Error Massage ----
+            //==== Show Error Massage ====
             if (errorMessageBuilder.Length > 0)
             {
                 MessageBox.Show(
@@ -381,6 +596,14 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
 
             return true;
         }//ValidateInput()
+
+        private string BuildInputBirth()
+        {
+            string format = "00";
+            return $"{(inputControlAry[5].Controls[0] as NumericUpDown).Value.ToString()}/" +
+                   $"{(inputControlAry[5].Controls[1] as NumericUpDown).Value.ToString(format)}/" +
+                   $"{(inputControlAry[5].Controls[2] as NumericUpDown).Value.ToString(format)}";
+        }
 
         private DialogResult ShowConfirmMessageBox(string message, string messageTitle)
         {
