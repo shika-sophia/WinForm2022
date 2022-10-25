@@ -161,78 +161,9 @@
  *                 Load(): DbSet<T>, ObjectSet<T>, ObjectQuery<T>などのサーバー クエリを対象に、
  *                         クエリの結果がクライアント上の関連付けられた DbContext, ObjectContextなどのキャッシュに読み込まれるように、
  *                         クエリを列挙します。これは ToList() を呼び出してから、実際にリストを作成するオーバーヘッドなしでリストを破棄する場合と同じです。
- *         
- *@subject ◆DataGridView : Control, ISupportInitialize -- System.Windows.Forms
- *         DataGridView   new DataGridView()
- *         
- *         (Mainly Members)  dataGridView.Xxxx
- *         
- *         ＊Indexer
- *         DataGridViewCell this[string columnName, int rowIndex] { get; set; }
- *         DataGridViewCell this[int columnIndex, int rowIndex]   { get; set; }
- *         
- *         ＊Property
- *         string Text { get; set; }
- *         object DataSource { get; set; }
- *         string DataMember { get; set; }
- *         bool AutoGenerateColumns { get; set; }
- *         DataGridViewColumnCollection Columns { get; }
- *         DataGridViewRowCollection Rows { get; }
- *         
- *         int ColumnCount { get; set; }
- *         int RowCount { get; set; }
- *         int ColumnHeadersHeight { get; set; }
- *         int RowHeadersWidth { get; set; }
- *         Size DefaultSize { get; }
- *         DataGridViewAutoSizeRowsMode AutoSizeRowsMode { get; set; }
- *         DataGridViewAutoSizeColumnsMode AutoSizeColumnsMode { get; set; }
- *         DataGridViewRowHeadersWidthSizeMode RowHeadersWidthSizeMode { get; set; }
- *         
- *         bool MultiSelect { get; set; }
- *         DataGridViewColumn SortedColumn { get; }
- *         DataGridViewRow CurrentRow { get; }
- *         DataGridViewCell CurrentCell { get; set; }
- *               
- *         bool EnableHeadersVisualStyles { get; set; }
- *         DataGridViewCellStyle RowsDefaultCellStyle { get; set; }
- *         DataGridViewCellStyle RowHeadersDefaultCellStyle { get; set; }
- *         DataGridViewCellStyle AlternatingRowsDefaultCellStyle { get; set; }
- *         DataGridViewHeaderBorderStyle RowHeadersBorderStyle { get; set; }
- *         
- *         SortOrder SortOrder { get; }
- *           └ enum SortOrder
- *         DataGridViewSelectionMode SelectionMode { get; set; }
- *           └ enum DataGridViewSelectionMode
- *         
- *         DataGridViewSelectedColumnCollection SelectedColumns { get; }
- *         DataGridViewSelectedRowCollection    SelectedRows { get; }
- *         DataGridViewSelectedCellCollection   SelectedCells { get; }
- *         
- *         Panel EditingPanel { get; }
- *         Control EditingControl { get; }
- *         DataGridViewEditMode EditMode { get; set; }
- *           └ enum DataGridViewEditMode
- *           
- *         ＊Method
- *         AutoResizeColumn(int columnIndex, [DataGridViewAutoSizeColumnMode]);
- *         void AutoResizeColumns([DataGridViewAutoSizeColumnsMode]);
- *         void AutoResizeColumnHeadersHeight([int columnIndex]);
- *         void AutoResizeRow(int rowIndex, [DataGridViewAutoSizeRowMode]);
- *         void AutoResizeRowHeadersWidth(int rowIndex, [DataGridViewRowHeadersWidthSizeMode]);
- *         void AutoResizeRows(DataGridViewAutoSizeRowsMode autoSizeRowsMode);
- *         
- *         bool BeginEdit(bool selectAll);
- *         bool EndEdit(DataGridViewDataErrorContexts context);
- *         bool CommitEdit(DataGridViewDataErrorContexts);
- *         bool CancelEdit();
- *         bool RefreshEdit();
- *         
- *         void UpdateCellValue(int columnIndex, int rowIndex);
- *         void SelectAll();
- *         void ClearSelection();
- *         
- *         void Sort(DataGridViewColumn dataGridViewColumn, ListSortDirection direction);
- *         void Sort(IComparer comparer);
+ *    
+ *@subject ◆DataGridView  =>〔MainDataGridViewBasicSample.cs〕
+ *
  */
 #endregion 
 /*

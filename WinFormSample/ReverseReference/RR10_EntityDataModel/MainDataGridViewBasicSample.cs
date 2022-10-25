@@ -15,22 +15,197 @@
  *              =>〔~\Reference\Article_EntityFrameworkCodeFirst〕
  *                  
  *@content MB DataGridView / Columns, Rows
+ *         DataGridView コントロールの基本
+ *         DB接続を行わず、プログラムからテーブルデータを表示。
+ *         (追加 / 修正 / 削除 / 整順 などの加工内容は １回きりで保存されない)
+ */
+#region -> DataGridView Reference
+/*
+ *@subject ◆DataGridView : Control, ISupportInitialize -- System.Windows.Forms
+ *         DataGridView   new DataGridView()
+ *        
+ *         ＊Indexer
+ *         DataGridViewCell this[string columnName, int rowIndex] { get; set; }
+ *         DataGridViewCell this[int columnIndex, int rowIndex]   { get; set; }
+ *         
+ *         ＊Property
+ *         string   dataGridView.Text { get; set; }
+ *         object   dataGridView.DataSource { get; set; }
+ *         string   dataGridView.DataMember { get; set; }
+ *         bool     dataGridView.AutoGenerateColumns { get; set; }
+ *         DataGridViewColumnCollection  dataGridView.Columns { get; }
+ *         DataGridViewRowCollection     dataGridView.Rows { get; }
+ *         
+ *         int      dataGridView.ColumnCount { get; set; }
+ *         int      dataGridView.RowCount { get; set; }
+ *         int      dataGridView.ColumnHeadersHeight { get; set; }
+ *         int      dataGridView.RowHeadersWidth { get; set; }
+ *         Size     dataGridView.DefaultSize { get; }
+ *         DataGridViewAutoSizeColumnsMode      dataGridView.AutoSizeColumnsMode { get; set; }    自動で画面幅に調整。各列も均等になり、Column幅の自己定義は無視される
+ *            └ enum DataGridViewAutoSizeColumnsMode
+ *              {
+ *                 None = 1,
+ *                 ColumnHeader = 2,
+ *                 AllCellsExceptHeader = 4,
+ *                 AllCells = 6,
+ *                 DisplayedCellsExceptHeader = 8,
+ *                 DisplayedCells = 10,
+ *                 Fill = 16,
+ *              }
+ *              
+ *         DataGridViewAutoSizeRowsMode         dataGridView.AutoSizeRowsMode { get; set; }
+ *           └ enum DataGridViewAutoSizeRowsMode
+ *             {
+ *                None = 0,
+ *                AllHeaders = 5,
+ *                AllCellsExceptHeaders = 6,
+ *                AllCells = 7,
+ *                DisplayedHeaders = 9,
+ *                DisplayedCellsExceptHeaders = 10,
+ *                DisplayedCells = 11,
+ *              }
+ *              
+ *         DataGridViewRowHeadersWidthSizeMode  dataGridView.RowHeadersWidthSizeMode { get; set; }
+ *           └ enum DataGridViewRowHeadersWidthSizeMode
+ *             {
+ *                EnableResizing = 0,
+ *                DisableResizing = 1,
+ *                AutoSizeToAllHeaders = 2,
+ *                AutoSizeToDisplayedHeaders = 3,
+ *                AutoSizeToFirstHeader = 4,
+ *             }
+ *             
+ *         bool                dataGridView.MultiSelect { get; set; }
+ *         DataGridViewColumn  dataGridView.SortedColumn { get; }
+ *         DataGridViewRow     dataGridView.CurrentRow   { get; }
+ *         DataGridViewCell    dataGridView.CurrentCell { get; set; }
+ *               
+ *         bool                    dataGridView.EnableHeadersVisualStyles { get; set; }
+ *         DataGridViewCellStyle   dataGridView.RowsDefaultCellStyle { get; set; }
+ *         DataGridViewCellStyle   dataGridView.RowHeadersDefaultCellStyle { get; set; }
+ *         DataGridViewCellStyle   dataGridView.AlternatingRowsDefaultCellStyle { get; set; }
+ *           └ class DataGridViewCellStyle 〔下記〕
+ *           
+ *         DataGridViewHeaderBorderStyle  dataGridView.RowHeadersBorderStyle { get; set; }
+ *           └ enum DataGridViewHeaderBorderStyle
+ *             {
+ *                Custom = 0,
+ *                Single = 1,
+ *                Raised = 2,
+ *                Sunken = 3,
+ *                None = 4,
+ *             }
+ *             
+ *         SortOrder dataGridView.SortOrder { get; }
+ *           └ enum SortOrder
+ *             {
+ *                None = 0,
+ *                Ascending = 1,
+ *                Descending = 2,
+ *             }
+ *             
+ *         DataGridViewSelectionMode  dataGridView.SelectionMode { get; set; }
+ *           └ enum DataGridViewSelectionMode
+ *             {
+ *                CellSelect = 0,
+ *                FullRowSelect = 1,
+ *                FullColumnSelect = 2,
+ *                RowHeaderSelect = 3,
+ *                ColumnHeaderSelect = 4,
+ *             }
+ *         
+ *         DataGridViewSelectedColumnCollection dataGridView.SelectedColumns { get; }
+ *         DataGridViewSelectedRowCollection    dataGridView.SelectedRows { get; }
+ *         DataGridViewSelectedCellCollection   dataGridView.SelectedCells { get; }
+ *         
+ *         Panel    dataGridView.EditingPanel { get; }
+ *         Control  dataGridView.EditingControl { get; }
+ *         DataGridViewEditMode  dataGridView.EditMode { get; set; }
+ *           └ enum DataGridViewEditMode
+ *             {
+ *                EditOnEnter = 0,
+ *                EditOnKeystroke = 1,
+ *                EditOnKeystrokeOrF2 = 2,
+ *                EditOnF2 = 3,
+ *                EditProgrammatically = 4,
+ *             }
+ *           
+ *         ＊Method
+ *         void     dataGridView.AutoResizeColumn(int columnIndex, [DataGridViewAutoSizeColumnMode]);
+ *         void     dataGridView.AutoResizeColumns([DataGridViewAutoSizeColumnsMode]);
+ *         void     dataGridView.AutoResizeColumnHeadersHeight([int columnIndex]);
+ *         void     dataGridView.AutoResizeRow(int rowIndex, [DataGridViewAutoSizeRowMode]);
+ *         void     dataGridView.AutoResizeRowHeadersWidth(int rowIndex, [DataGridViewRowHeadersWidthSizeMode]);
+ *         void     dataGridView.AutoResizeRows(DataGridViewAutoSizeRowsMode autoSizeRowsMode);
+ *         
+ *         bool     dataGridView.BeginEdit(bool selectAll);
+ *         bool     dataGridView.EndEdit(DataGridViewDataErrorContexts context);
+ *         bool     dataGridView.CommitEdit(DataGridViewDataErrorContexts);
+ *         bool     dataGridView.CancelEdit();
+ *         bool     dataGridView.RefreshEdit();
+ *         
+ *         void     dataGridView.UpdateCellValue(int columnIndex, int rowIndex);
+ *         void     dataGridView.SelectAll();
+ *         void     dataGridView.ClearSelection();
+ *         
+ *         void     dataGridView.Sort(IComparer comparer)
+ *         void     dataGridView.Sort(DataGridViewColumn, ListSortDirection direction);
+ *           └ enum ListSortDirection
+ *             {
+ *                Ascending = 0,
+ *                Descending = 1,
+ *             }
+ *             
  *@subject ◆DataGridViewColumn
  *
- *         string  dataGridViewColumn.Name     列を識別する為の名前です。大文字・小文字は区別されません。
- *         string  dataGridViewColumn.HeaderText            列のヘッダーセルの見出しの文字列です。
- *         int     dataGridViewColumn.Width                         列の幅を設定します。既定値は100です。
+ *         string  dataGridViewColumn.Name          列を識別する為の名前です。大文字・小文字は区別されません。
+ *         string  dataGridViewColumn.HeaderText    列のヘッダーセルの見出しの文字列です。
+ *         int     dataGridViewColumn.Width         列の幅を設定します。既定値は100です。
  *         int     dataGridViewColumn.DividerWidth  区分線の幅を設定します。既定値は 0 です。
- *         dataGridViewColumn.CellTemplate  セルのタイプを設定します。セルにテキストボックスを表示したり、
- *                       チェックボックス、コンボボックス等を表示することが可能です。
+ *         dataGridViewColumn.CellTemplate          セルのタイプを設定します。セルにテキストボックスを表示したり、
+ *                                                  チェックボックス、コンボボックス等を表示することが可能です。
  *         int     dataGridViewColumn.Index         DataGridView内での相対位置を取得します。
  *
+ *@subject ◆DataGridViewRow
+ *
+ *@subject ◆DataGridViewCell
+ *
+ *@subject ◆DataGridViewCellStyle
+ *
+ *@subject 行の追加 / 挿入
+ *         void    dataGridView.Rows.Add(params object[])  行データを追加
+ *         void    dataGridView.Rows.Add()                 空行を追加
+ *         int     dataGridView.Rows.Count                 行数を指定 (空行を追加)。
+ *         void    dataGridView.Rows.Insert(int index, params object[])  指定行に行データを挿入
+ *         
+ *@subject セルに値を追加
+ *         dataGridView.Rows[i].Cells[i].Value = value
+ *         
+ *@subject ソート
+ *         void  dataGridView.Sort(IComparer)
+ *         void  dataGridView.Sort(DataGridViewColumn, ListSortDirection)
+ *                 引数: enum ListSortDirection
+ *                       {
+ *                           Ascending   昇順
+ *                           Descending  降順
+ *                       }
+ *
+ *         例 dataGridView.Sort(
+ *              dataGridView1.Columns["Age"], 
+ *              ListSortDirection.Descending
+ *            );
+ *            
+ */
+#endregion
+/*
  *@see ImageDataGridViewBasicSample.jpg
  *@see 
  *@author shika
  *@date 2022-10-23
  */
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -41,9 +216,9 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
 {
     class MainDataGridViewBasicSample
     {
-        [STAThread]
-        static void Main()
-        //public void Main()
+        //[STAThread]
+        //static void Main()
+        public void Main()
         {
             Console.WriteLine("new FormDataGridViewBasicSample()");
 
@@ -361,7 +536,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
             {
                 Maximum = 12,
                 Minimum = 1,
-                Value = 01,
+                Value = 1,
                 TextAlign = HorizontalAlignment.Center,
                 Width = 60,
             };
@@ -371,7 +546,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
             {
                 Maximum = 31,
                 Minimum = 1,
-                Value = 01,
+                Value = 1,
                 TextAlign = HorizontalAlignment.Center,
                 Width = 60,
             };
@@ -442,13 +617,13 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
                     InsertRow();
                     break;
                 case "Update Row":
-                    //
+                    UpdateRow();
                     break;
                 case "Delete Row":
-                    //
+                    DeleteRow();
                     break;
                 case "Delete All":
-                    //
+                    DeleteAll();
                     break;
             }//switch
         }//Button_Click()
@@ -460,10 +635,36 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
 
             if (!canInsert) { return; }
 
+            string[] newData = BuildNewData();
+
+            //==== Confirm to Insert ====
+            StringBuilder bld = new StringBuilder();
+            bld.Append("The below data will be inserted into Database, OK?\n\n");
+
+            for (int i = 0; i < newData.Length; i++)
+            {
+                bld.Append($"{grid.Columns[i].HeaderText}: {newData[i]}\n");
+            }//for
+
+            string messageTitle = "Confirm to Insert Row";
+            DialogResult insertResult = ShowConfirmMessageBox(bld.ToString(), messageTitle);
+
+            if (insertResult == DialogResult.Cancel) { return; }
+            else if (insertResult == DialogResult.OK)
+            {
+                grid.Rows.Add(newData);
+            }
+
+            grid.Sort(grid.Columns["id"], ListSortDirection.Ascending);
+        }//InsertRow()
+
+        private string[] BuildNewData()
+        {
             //==== newData[] ====
-            //---- Id: newData[0] ---
             string[] newData = new string[columnTextAry.Length];
-            newData[0] = $"{grid.Rows.Count}";
+
+            //---- Id: newData[0] ---
+            newData[0] = AlgoAutoIncrement().ToString();
 
             //---- Number: newData[1], inputControlAry[0] ----
             newData[1] = (inputControlAry[0] as NumericUpDown).Value.ToString();
@@ -498,41 +699,168 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
             newData[newData.Length - 1] = "age";
             int age = CalcAge(newData);
             newData[newData.Length - 1] = age.ToString();
+            return newData;
+        }
 
-            //==== Confirm to Insert ====
-            StringBuilder bld = new StringBuilder();
-            bld.Append("The below data will insert into Database, OK?\n\n");
-
-            for (int i = 0; i < newData.Length; i++)
+        private int AlgoAutoIncrement()
+        {
+            List<int> idList = new List<int>();
+            foreach(DataGridViewRow row in grid.Rows)
             {
-                bld.Append($"{grid.Columns[i].HeaderText}: {newData[i]}\n");
+                string idStr = row.Cells[0].Value?.ToString() ?? "";
+
+                if (idStr == "") { continue; }
+
+                idList.Add(Int32.Parse(idStr));
+            }//foreach
+
+            if(idList.Count == 0)
+            {
+                return 1;
+            }
+
+            int maxId = idList.Max();
+            
+            if (maxId == grid.Rows.Count - 1) //空行が１行ある
+            {
+                return grid.Rows.Count;
+            }
+
+            int findBlank = -1;
+            for (int i = 0; i < idList.Count; i++)
+            {
+                if(i + 1 != idList[i])
+                {
+                    findBlank = i + 1;
+                    break;
+                }
             }//for
 
-            string messageTitle = "Confirm to Insert Row";
-            DialogResult insertResult = ShowConfirmMessageBox(bld.ToString(), messageTitle);
+            return findBlank;
+        }//AlgoAutoIncrement()
 
-            if (insertResult == DialogResult.Cancel) { return; }
-            else if (insertResult == DialogResult.OK)
+        private void UpdateRow()
+        {
+            //---- Validate Input ----
+            bool canUpdate = ValidateInput(isUpdate: true);
+
+            if(!canUpdate) { return; }
+
+            //---- Find Changed Value ----
+            int rowIndex = grid.CurrentCell.RowIndex;
+            var row = grid.Rows[rowIndex];
+
+            if (row.Cells[0].Value == null || row.Cells[0].Value.ToString() == "")  //if selected empty row
             {
-                grid.Rows.Add(newData);             
+                string messageTitle = "Notation";
+                string message = "<！> New Row cannot be updated.\n =>  Please use 'Insert Row'.\n\n";
+                ShowConfirmMessageBox(message, messageTitle);
+                return;
             }
-        }//InsertRow()
 
-        private bool ValidateInput()
+            string[] newData = BuildNewData();
+            List<string> olderValueList = new List<string>();
+            List<string> changedValueList = new List<string>();
+            List<DataGridViewCell> changedCellList = new List<DataGridViewCell>();
+
+            for (int i = 1; i < newData.Length - 1; i++)   // Cells[0]: Id
+            {                                              // Cells[newData.Length - 1]: Age
+                DataGridViewCell cell = row.Cells[i];      
+                string olderValue = cell.Value.ToString();
+
+                if(newData[i] != olderValue) 
+                {
+                    olderValueList.Add(olderValue);
+                    changedValueList.Add(newData[i]);
+                    changedCellList.Add(cell);
+                }
+            }//foreach
+
+            if(changedCellList.Count == 0)
+            {
+                string message = "<！> No changed value.";
+                string messageTitle = "Notation";
+                ShowConfirmMessageBox(message, messageTitle);
+                return;
+            }
+
+            //---- Confirm to Update ----
+            var updateBld = new StringBuilder();
+            updateBld.Append("Update to Database. OK ?\n\n");
+            updateBld.Append("[ Older Value ] => [ New Value ]\n");
+
+            for(int i = 0; i < changedCellList.Count; i++)
+            {
+                updateBld.Append($"{olderValueList[i]} => {changedValueList[i]}\n");
+            }//for
+
+            DialogResult updateResult = ShowConfirmMessageBox(
+                updateBld.ToString(), "Confirm to Update Database");
+            if(updateResult == DialogResult.Cancel) { return; }
+            else if(updateResult == DialogResult.OK)
+            {
+                for(int i = 0; i < changedCellList.Count; i++)
+                {
+                    row.Cells[changedCellList[i].ColumnIndex].Value
+                        = changedValueList[i];
+                }//for
+            }
+        }//UpdateRow()
+
+        private void DeleteRow()
+        {
+            int rowIndex = grid.CurrentCell.RowIndex;
+            var row = grid.Rows[rowIndex];
+
+            var bld = new StringBuilder();
+            bld.Append("The below row will be deleted from Database, OK ?\n\n");
+            
+            for(int i = 0; i < row.Cells.Count; i++)
+            {
+                bld.Append(
+                    $"{grid.Columns[i].HeaderText}: " +
+                    $"{row.Cells[i].Value?.ToString() ?? ""}\n"
+                );
+            }//foreach
+
+            string messageTitle = "Confirm to Delete Row";
+            DialogResult deleteResult = ShowConfirmMessageBox(bld.ToString(), messageTitle);
+            if(deleteResult == DialogResult.Cancel) { return; }
+            else if(deleteResult == DialogResult.OK)
+            {
+                grid.Rows.Remove(row);
+            }
+        }//DeleteRow()
+
+        private void DeleteAll()
+        {
+            DialogResult deleteAllResult = ShowConfirmMessageBox(
+                "DELETE All, OK ?", "Confirm to Delete All");
+            if(deleteAllResult == DialogResult.Cancel) { return; }
+            else if (deleteAllResult == DialogResult.OK)
+            {
+                grid.Rows.Clear();
+            }
+        }//DeleteAll()
+
+        private bool ValidateInput(bool isUpdate = false)
         {
             StringBuilder errorMessageBuilder = new StringBuilder();
 
             //==== Valdate input ====
             //---- Number: inputControlAry[0] ----
-            foreach (DataGridViewRow row in grid.Rows)
+            if (!isUpdate)
             {
-                Decimal.TryParse(row.Cells[1].Value?.ToString(), out decimal num);
-
-                if ((inputControlAry[0] as NumericUpDown).Value == num)
+                foreach (DataGridViewRow row in grid.Rows)
                 {
-                    errorMessageBuilder.Append("<！> Number need be unique numeric value.\n");
-                }
-            }//foreach
+                    Decimal.TryParse(row.Cells[1].Value?.ToString(), out decimal num);
+
+                    if ((inputControlAry[0] as NumericUpDown).Value == num)
+                    {
+                        errorMessageBuilder.Append("<！> Number need be unique numeric value.\n");
+                    }
+                }//foreach
+            }
 
             //---- Name: inputControlAry[1] ----
             if ((inputControlAry[1] as TextBox).Text.Trim().Length == 0)
