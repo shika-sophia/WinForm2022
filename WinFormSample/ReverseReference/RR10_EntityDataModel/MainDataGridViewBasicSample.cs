@@ -96,6 +96,23 @@
  *                None = 4,
  *             }
  *             
+ *         DataGridViewAdvancedBorderStyle   dataGridView.AdvancedRowHeadersBorderStyle { get; }
+ *         DataGridViewAdvancedBorderStyle   dataGridView.AdvancedColumnHeadersBorderStyle { get; }
+ *         DataGridViewAdvancedBorderStyle   dataGridView.AdvancedCellBorderStyle { get; }
+ *         DataGridViewAdvancedBorderStyle   dataGridView.AdjustedTopLeftHeaderBorderStyle { get; }
+ *           └ class DataGridViewAdvancedBorderStyle
+ *               └ enum DataGridViewAdvancedCellBorderStyle
+ *                 {
+ *                    NotSet = 0,
+ *                    None = 1,
+ *                    Single = 2,
+ *                    Inset = 3,
+ *                    InsetDouble = 4,
+ *                    Outset = 5,
+ *                    OutsetDouble = 6,
+ *                    OutsetPartial = 7,
+ *                 }
+ *                 
  *         SortOrder dataGridView.SortOrder { get; }
  *           └ enum SortOrder
  *             {
