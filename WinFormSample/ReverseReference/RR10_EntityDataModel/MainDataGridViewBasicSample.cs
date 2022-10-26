@@ -2,7 +2,7 @@
  *@title WinFormGUI / WinFormSample / ReverseReference / RR10_EntityDataModel
  *@class MainDataGridViewBasicSample.cs
  *@class   └ new FormDataGridViewBasicSample() : Form
- *@class
+ *@class       └ new DataGridView() : Control, ISupportInitialize 
  *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
  *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
@@ -14,7 +14,7 @@
  *              https://densan-labs.net/tech/codefirst/index.html
  *              =>〔~\Reference\Article_EntityFrameworkCodeFirst〕
  *                  
- *@content MB DataGridView / Columns, Rows
+ *@content MB DataGridView / DataGridViewColumn, DataGridViewRow, DataGridViewCell
  *         DataGridView コントロールの基本
  *         DB接続を行わず、プログラムからテーブルデータを表示。
  *         (追加 / 修正 / 削除 / 整順 などの加工内容は １回きりで保存されない)
@@ -231,26 +231,42 @@
  *                      
  *@subject ◆DataGridViewColumn : DataGridViewBand, IComponent, IDisposable
  *              -- System.Windows.Forms.
+ *         + DataGridViewColumn  new ColumnDataGridViewColumn()
  *         + DataGridViewColumn  new ColumnDataGridViewColumn(DataGridViewCell cellTemplate)
+ *             └ class DataGridViewTextBoxColumn  : DataGridViewColumn   //column.CellTemplate = new DataGridViewTextBoxCell()
+ *             └ class DataGridViewButtonColumn   : DataGridViewColumn
+ *             └ class DataGridViewCheckBoxColumn : DataGridViewColumn
+ *             └ class DataGridViewComboBoxColumn : DataGridViewColumn
+ *             └ class DataGridViewImageColumn    : DataGridViewColumn
+ *             └ class DataGridViewLinkColumn     : DataGridViewColumn
  *         + DataGridViewColumn  dataGridView.SortedColumn
- *
- *         string  column.Name  { get; set; }  列を識別する為の名前です。大文字・小文字は区別されません。
- *         string  column.HeaderText  { get; set; }  列のヘッダーセルの見出しの文字列です。
- *         string DataPropertyName { get; set; }     バインドされている、データ ソース プロパティの名前またはデータベースの列の名前を取得または設定します。
- *         int     column.Width  { get; set; }       列の幅を設定します。既定値は100です。
- *         int MinimumWidth { get; set; }
- *         int     column.DividerWidth  区分線の幅を設定します。既定値は 0 です。
+ *              
+ *         string  column.Name  { get; set; }            列を識別する為の名前です。大文字・小文字は区別されません。
+ *         string  column.HeaderText  { get; set; }      列のヘッダーセルの見出しの文字列です。
+ *         string  column.DataPropertyName { get; set; } バインドされている、データ ソース プロパティの名前またはデータベースの列の名前を取得または設定します。
+ *         int     column.Width  { get; set; }           列の幅を設定します。既定値は100です。
+ *         int     column.MinimumWidth { get; set; }
+ *         int     column.DividerWidth                   区分線の幅を設定します。既定値は 0 です。
+ *         DataGridViewColumnHeaderCell  column.HeaderCell { get; set; }
  *         
- *         DataGridViewCell  column.CellTemplate          セルのタイプを設定します。セルにテキストボックスを表示したり、
- *                                                  チェックボックス、コンボボックス等を表示することが可能です。
- *         int     dataGridViewColumn.Index         DataGridView内での相対位置を取得します。
- *         bool IsDataBound { get; }
- *         bool Visible { get; set; }
- *         bool ReadOnly { get; set; }
- *         bool Frozen { get; set; }
- *         DataGridViewAutoSizeColumnMode AutoSizeMode 
- *         DataGridViewColumnSortMode SortMode { get; set; }
- *         DataGridViewCellStyle DefaultCellStyle { get; set; }
+ *         DataGridViewCell  column.CellTemplate   セルのタイプを設定。下記 クラスを new する。
+ *              |                                  TextBox, Button, CheckBox, ComboBox, Image, Link
+ *              └ class DataGridViewColumnHeaderCell : DataGridViewHeaderCell
+ *              └ class DataGridViewTextBoxCell  : DataGridViewCell
+ *              └ class DataGridViewButtonCell   : DataGridViewCell
+ *              └ class DataGridViewCheckBoxCell : DataGridViewCell, IDataGridViewEditingCell
+ *              └ class DataGridViewComboBoxCell : DataGridViewCell
+ *              └ class DataGridViewImageCell    : DataGridViewCell
+ *              └ class DataGridViewLinkCell     : DataGridViewCell 
+ *              
+ *         int     column.Index         DataGridView内での相対位置を取得します。
+ *         bool    column.IsDataBound { get; }
+ *         bool    column.Visible { get; set; }
+ *         bool    column.ReadOnly { get; set; }
+ *         bool    column.Frozen { get; set; }
+ *         DataGridViewAutoSizeColumnMode  column.AutoSizeMode 
+ *         DataGridViewColumnSortMode      column.SortMode { get; set; }
+ *         DataGridViewCellStyle           column. DefaultCellStyle { get; set; }
  *         
  *@subject ◆DataGridViewRow : DataGridViewBand -- System.Windows.Forms.
  *         + DataGridViewRow   new DataGridViewRow()
@@ -289,7 +305,8 @@
  *         bool   row.SetValues(params object[] values)
  *         DataGridViewCellCollection  row.CreateCellsInstance()
  *         
- *@subject ◆DataGridViewCell : Control, ISupportInitialize
+ *@subject ◆abstract class DataGridViewCell : DataGridViewElement, ICloneable, IDisposable
+ *@subject ◆class          DataGridViewCell : Control, ISupportInitialize
  *              -- System.Windows.Forms.
  *         # DataGridViewCell  new DataGridViewCell()
  *         + DataGridViewCell  dataGridView.this[string columnName, int rowIndex]
@@ -297,7 +314,15 @@
  *         + DataGridViewCell  dataGridView.Rows[i].Cells[i]
  *         + DataGrodViewCell  dataGridView.CurrentCell
  *         + DataGridViewCell  dataGridView.FirstDisplayedCell
- *         
+ *         + DataGridViewCell  dataGridView.CellTemplate
+ *              └ class DataGridViewColumnHeaderCell : DataGridViewHeaderCell
+ *              └ class DataGridViewTextBoxCell  : DataGridViewCell
+ *              └ class DataGridViewButtonCell   : DataGridViewCell
+ *              └ class DataGridViewCheckBoxCell : DataGridViewCell, IDataGridViewEditingCell
+ *              └ class DataGridViewComboBoxCell : DataGridViewCell
+ *              └ class DataGridViewImageCell    : DataGridViewCell
+ *              └ class DataGridViewLinkCell     : DataGridViewCell
+ *              
  *         object  cell.Value { get; set; }
  *         bool    cell.Selected { get; set; }
  *         int     cell.ColumnIndex { get; }
@@ -544,7 +569,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
                     columnTextAry[i].Substring(0, 1).ToUpper() +
                     columnTextAry[i].Substring(1);
                 viewColumn.CellTemplate = new DataGridViewTextBoxCell();
-
+                
                 //---- Cell Alignment ----
                 if (i == 2 || i == 3) 
                 {
