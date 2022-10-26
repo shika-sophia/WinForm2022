@@ -20,6 +20,7 @@
  *@date 2022-06-26
  */
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Globalization;
@@ -35,10 +36,10 @@ namespace WinFormGUI.CsharpCode
         private readonly Type enumType;
 
         //==== Test Main() as Console Application ====
-        //static void Main()
-        public void Main()
+        static void Main()
+        //public void Main()
         {
-            var here = new ShowEnumValue(typeof(FileMode));
+            var here = new ShowEnumValue(typeof(DataGridViewElementStates));
             string content = here.BuildEnumContent(here.enumType, subject: true);
             Console.WriteLine(content);
         }//Main()
