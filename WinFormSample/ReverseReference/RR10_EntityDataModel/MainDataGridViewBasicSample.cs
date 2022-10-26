@@ -29,18 +29,48 @@
  *         DataGridViewCell this[int columnIndex, int rowIndex]   { get; set; }
  *         
  *         ＊Property
+ *         ・Basic
  *         string   dataGridView.Text { get; set; }
  *         object   dataGridView.DataSource { get; set; }
  *         string   dataGridView.DataMember { get; set; }
- *         bool     dataGridView.AutoGenerateColumns { get; set; }
- *         DataGridViewColumnCollection  dataGridView.Columns { get; }
- *         DataGridViewRowCollection     dataGridView.Rows { get; }
- *         
  *         int      dataGridView.ColumnCount { get; set; }
  *         int      dataGridView.RowCount { get; set; }
+ *         int      dataGridView.NewRowIndex { get; }
+ *         bool     dataGridView.ReadOnly { get; set; }
+ *         bool     dataGridView.MultiSelect { get; set; }
+ *         bool     dataGridView.AutoGenerateColumns { get; set; }    //DataSourceを元に自動で列,行を生成
+ *         DataGridViewColumn  dataGridView.SortedColumn { get; }
+ *         DataGridViewRow     dataGridView.CurrentRow   { get; }
+ *         DataGridViewCell    dataGridView.CurrentCell { get; set; }
+ *         DataGridViewCell    dataGridView.FirstDisplayedCell { get; set; }
+ *         
+ *         ・Collection
+ *         DataGridViewColumnCollection  dataGridView.Columns { get; }
+ *         DataGridViewRowCollection     dataGridView.Rows { get; }
+ *         DataGridViewSelectedColumnCollection dataGridView.SelectedColumns { get; }
+ *         DataGridViewSelectedRowCollection    dataGridView.SelectedRows { get; }
+ *         DataGridViewSelectedCellCollection   dataGridView.SelectedCells { get; }
+ *         
+ *         ・Size / AutoSize
+ *         bool     dataGridView.ColumnHeadersVisible { get; set; }
+ *         bool     dataGridView.RowHeadersVisible { get; set; }
  *         int      dataGridView.ColumnHeadersHeight { get; set; }
- *         int      dataGridView.RowHeadersWidth { get; set; }
+ *         int      dataGridView.RowHeadersWidth { get; set; } 
  *         Size     dataGridView.DefaultSize { get; }
+ *         bool     dataGridView.AllowUserToResizeRows { get; set; }
+ *         bool     dataGridView.AllowUserToResizeColumns { get; set; }
+ *         bool     dataGridView.AllowUserToOrderColumns { get; set; }
+ *         bool     dataGridView.AllowUserToDeleteRows { get; set; }
+ *         bool     dataGridView.AllowUserToAddRows { get; set; }
+ *         
+ *         DataGridViewColumnHeadersHeightSizeMode  dataGridView.ColumnHeadersHeightSizeMode { get; set; }
+ *           └ enum DataGridViewColumnHeadersHeightSizeMode
+ *             {
+ *                EnableResizing = 0,
+ *                DisableResizing = 1,
+ *                AutoSize = 2,
+ *             }
+ *             
  *         DataGridViewAutoSizeColumnsMode      dataGridView.AutoSizeColumnsMode { get; set; }    自動で画面幅に調整。各列も均等になり、Column幅の自己定義は無視される
  *            └ enum DataGridViewAutoSizeColumnsMode
  *              {
@@ -50,19 +80,8 @@
  *                 AllCells = 6,
  *                 DisplayedCellsExceptHeader = 8,
  *                 DisplayedCells = 10,
- *                 Fill = 16,
- *              }
- *              
- *         DataGridViewAutoSizeRowsMode         dataGridView.AutoSizeRowsMode { get; set; }
- *           └ enum DataGridViewAutoSizeRowsMode
- *             {
- *                None = 0,
- *                AllHeaders = 5,
- *                AllCellsExceptHeaders = 6,
- *                AllCells = 7,
- *                DisplayedHeaders = 9,
- *                DisplayedCellsExceptHeaders = 10,
- *                DisplayedCells = 11,
+ *                 Fill = 16,                       親コントロールの Sizeに合わせて 列幅, 行幅を均等配置
+ *                                                  (自己設定した 列幅, 行幅は無視され、自動設定される)
  *              }
  *              
  *         DataGridViewRowHeadersWidthSizeMode  dataGridView.RowHeadersWidthSizeMode { get; set; }
@@ -75,17 +94,29 @@
  *                AutoSizeToFirstHeader = 4,
  *             }
  *             
- *         bool                dataGridView.MultiSelect { get; set; }
- *         DataGridViewColumn  dataGridView.SortedColumn { get; }
- *         DataGridViewRow     dataGridView.CurrentRow   { get; }
- *         DataGridViewCell    dataGridView.CurrentCell { get; set; }
- *               
+ *         DataGridViewAutoSizeRowsMode         dataGridView.AutoSizeRowsMode { get; set; }
+ *           └ enum DataGridViewAutoSizeRowsMode
+ *             {
+ *                None = 0,
+ *                AllHeaders = 5,
+ *                AllCellsExceptHeaders = 6,
+ *                AllCells = 7,
+ *                DisplayedHeaders = 9,
+ *                DisplayedCellsExceptHeaders = 10,
+ *                DisplayedCells = 11,
+ *              }
+ *          
+ *         ・CellStyle / BorderStyle
  *         bool                    dataGridView.EnableHeadersVisualStyles { get; set; }
- *         DataGridViewCellStyle   dataGridView.RowsDefaultCellStyle { get; set; }
+ *         DataGridViewCellStyle   dataGridView.ColumnHeadersDefaultCellStyle { get; set; }
  *         DataGridViewCellStyle   dataGridView.RowHeadersDefaultCellStyle { get; set; }
- *         DataGridViewCellStyle   dataGridView.AlternatingRowsDefaultCellStyle { get; set; }
+ *         DataGridViewCellStyle   dataGridView.RowsDefaultCellStyle { get; set; }
+ *         DataGridViewCellStyle   dataGridView.DefaultCellStyle { get; set; }
+ *         DataGridViewCellStyle   dataGridView.AlternatingRowsDefaultCellStyle { get; set; }   交互に色などを変える場合
  *           └ class DataGridViewCellStyle 〔下記〕
  *           
+ *         Color                          dataGridView.GridColor { get; set; }
+ *         DataGridViewHeaderBorderStyle  dataGridView.ColumnHeadersBorderStyle { get; set; }
  *         DataGridViewHeaderBorderStyle  dataGridView.RowHeadersBorderStyle { get; set; }
  *           └ enum DataGridViewHeaderBorderStyle
  *             {
@@ -94,6 +125,22 @@
  *                Raised = 2,
  *                Sunken = 3,
  *                None = 4,
+ *             }
+ *         
+ *         DataGridViewCellBorderStyle       dataGridView.CellBorderStyle { get; set; }
+ *           └ enum DataGridViewCellBorderStyle
+ *             {
+ *                Custom = 0,
+ *                Single = 1,
+ *                Raised = 2,
+ *                Sunken = 3,
+ *                None = 4,
+ *                SingleVertical = 5,
+ *                RaisedVertical = 6,
+ *                SunkenVertical = 7,
+ *                SingleHorizontal = 8,
+ *                RaisedHorizontal = 9,
+ *                SunkenHorizontal = 10,
  *             }
  *             
  *         DataGridViewAdvancedBorderStyle   dataGridView.AdvancedRowHeadersBorderStyle { get; }
@@ -130,11 +177,7 @@
  *                RowHeaderSelect = 3,
  *                ColumnHeaderSelect = 4,
  *             }
- *         
- *         DataGridViewSelectedColumnCollection dataGridView.SelectedColumns { get; }
- *         DataGridViewSelectedRowCollection    dataGridView.SelectedRows { get; }
- *         DataGridViewSelectedCellCollection   dataGridView.SelectedCells { get; }
- *         
+ *  
  *         Panel    dataGridView.EditingPanel { get; }
  *         Control  dataGridView.EditingControl { get; }
  *         DataGridViewEditMode  dataGridView.EditMode { get; set; }
@@ -173,22 +216,123 @@
  *                Descending = 1,
  *             }
  *             
- *@subject ◆DataGridViewColumn
+ *         ＊Event
+ *         event EventHandler  dataGridView.Sorted
+ *         evrnt EventHandler  dataGridView.SelectionChanged
+ *         event EventHandler  dataGridView.CurrentCellChanged
+ *         event DataGridViewCellEventHandler  dataGridView.CellClick   ボタンクリック時？
+ *                 └ 引数: DataGridViewCellEventArgs : EventArgs        引数にセル情報を含む
+ *                      int   e.ColumnIndex
+ *                      int   e.RowIndex
+ *         event DataGridViewCellMouseEventHandler  dataGridView.ColumnHeaderMouseClick   マウスクリック時
+ *                 └ 引数: DataGridViewCellMouseClickEventArgs : MouseEventArgs           引数にセル情報を含む
+ *                      int   e.ColumnIndex
+ *                      int   e.RowIndex
+ *                      
+ *@subject ◆DataGridViewColumn : DataGridViewBand, IComponent, IDisposable
+ *              -- System.Windows.Forms.
+ *         + DataGridViewColumn  new ColumnDataGridViewColumn(DataGridViewCell cellTemplate)
+ *         + DataGridViewColumn  dataGridView.SortedColumn
  *
- *         string  dataGridViewColumn.Name          列を識別する為の名前です。大文字・小文字は区別されません。
- *         string  dataGridViewColumn.HeaderText    列のヘッダーセルの見出しの文字列です。
- *         int     dataGridViewColumn.Width         列の幅を設定します。既定値は100です。
- *         int     dataGridViewColumn.DividerWidth  区分線の幅を設定します。既定値は 0 です。
- *         dataGridViewColumn.CellTemplate          セルのタイプを設定します。セルにテキストボックスを表示したり、
+ *         string  column.Name  { get; set; }  列を識別する為の名前です。大文字・小文字は区別されません。
+ *         string  column.HeaderText  { get; set; }  列のヘッダーセルの見出しの文字列です。
+ *         string DataPropertyName { get; set; }     バインドされている、データ ソース プロパティの名前またはデータベースの列の名前を取得または設定します。
+ *         int     column.Width  { get; set; }       列の幅を設定します。既定値は100です。
+ *         int MinimumWidth { get; set; }
+ *         int     column.DividerWidth  区分線の幅を設定します。既定値は 0 です。
+ *         
+ *         DataGridViewCell  column.CellTemplate          セルのタイプを設定します。セルにテキストボックスを表示したり、
  *                                                  チェックボックス、コンボボックス等を表示することが可能です。
  *         int     dataGridViewColumn.Index         DataGridView内での相対位置を取得します。
+ *         bool IsDataBound { get; }
+ *         bool Visible { get; set; }
+ *         bool ReadOnly { get; set; }
+ *         bool Frozen { get; set; }
+ *         DataGridViewAutoSizeColumnMode AutoSizeMode 
+ *         DataGridViewColumnSortMode SortMode { get; set; }
+ *         DataGridViewCellStyle DefaultCellStyle { get; set; }
+ *         
+ *@subject ◆DataGridViewRow : DataGridViewBand -- System.Windows.Forms.
+ *         + DataGridViewRow   new DataGridViewRow()
+ *         + DataGridViewRow   dataGridView.Rows[i]
+ *         + DataGrodViewRow   dataGridView.CurrentRow
+ *         + DataGridViewRow   dataGridView.RowTemplate { get; set; }
+ *         
+ *         DataGridViewCellCollection  row.Cells { get; }
+ *         object  row.DataBoundItem { get; }   データバインド時のオブジェクトを取得
+ *         int     row.Height { get; set; }
+ *         int     row.MinimumHeight { get; set; }
+ *         int     row.DividerHeight { get; set; }  行の区分線の高さ
+ *         bool    row.Visible { get; set; }
+ *         bool    row.Displayed { get; }
+ *         bool    row.ReadOnly { get; set; }
+ *         bool    row.Selected { get; set; }
+ *         bool    row.Frozen { get; set; }        行が固定された状態か
+ *         bool    row.IsNewRow { get; }
+ *         DataGridViewElementStates  row.State { get; }
+ *            └ enum DataGridViewElementStates  行の状態
+ *              {
+ *                 None = 0,
+ *                 Displayed = 1,
+ *                 Frozen = 2,
+ *                 ReadOnly = 4,
+ *                 Resizable = 8,
+ *                 ResizableSet = 16,
+ *                 Selected = 32,
+ *                 Visible = 64,
+ *              }
+ *              
+ *         DataGridViewRowHeaderCell  row.HeaderCell { get; set; }
+ *         DataGridViewCellStyle      row.DefaultCellStyle { get; set; }
+ *         
+ *         void   row.CreateCells(DataGridView dataGridView, params object[] values);
+ *         bool   row.SetValues(params object[] values)
+ *         DataGridViewCellCollection  row.CreateCellsInstance()
+ *         
+ *@subject ◆DataGridViewCell : Control, ISupportInitialize
+ *              -- System.Windows.Forms.
+ *         # DataGridViewCell  new DataGridViewCell()
+ *         + DataGridViewCell  dataGridView.this[string columnName, int rowIndex]
+ *         + DataGridViewCell  dataGridView.this[int columnName, int rowIndex]
+ *         + DataGridViewCell  dataGridView.Rows[i].Cells[i]
+ *         + DataGrodViewCell  dataGridView.CurrentCell
+ *         + DataGridViewCell  dataGridView.FirstDisplayedCell
+ *         
+ *         object  cell.Value { get; set; }
+ *         bool    cell.Selected { get; set; }
+ *         int     cell.ColumnIndex { get; }
+ *         int     cell.RowIndex { get; }
+ *         object  cell.GetValue(int rowIndex)
+ *         bool    cell.SetValue(int rowIndex, object value);
+ *         DataGridViewColumn   cell.OwningColumn { get; }    このセルを格納している列
+ *         DataGridViewRow      cell.OwningRow { get; }       このセルを格納している行
  *
- *@subject ◆DataGridViewRow
- *
- *@subject ◆DataGridViewCell
- *
- *@subject ◆DataGridViewCellStyle
- *
+ *@subject ◆DataGridViewCellStyle : ICloneable  -- System.Windows.Forms.
+ *         + DataGridViewCellStyle   new DataGridViewCellStyle([DataGridViewCellStyle])
+ *         
+ *         ＊Property  DataGridViewCellStyle.Xxxx
+ *         DataGridViewContentAlignment  Alignment { get; set; }
+ *           └ enum DataGridViewContentAlignment
+ *             {
+ *                NotSet = 0,
+ *                TopLeft = 1,
+ *                TopCenter = 2,
+ *                TopRight = 4,
+ *                MiddleLeft = 16,
+ *                MiddleCenter = 32,
+ *                MiddleRight = 64,
+ *                BottomLeft = 256,
+ *                BottomCenter = 512,
+ *                BottomRight = 1024,
+ *             }
+ *             
+ *         Color ForeColor { get; set; }
+ *         Color BackColor { get; set; }
+ *         Color SelectionForeColor { get; set; }
+ *         Color SelectionBackColor { get; set; }
+ *         Font Font { get; set; }
+ *         string Format { get; set; }
+ *         
  *@subject 行の追加 / 挿入
  *         void    dataGridView.Rows.Add(params object[])  行データを追加
  *         void    dataGridView.Rows.Add()                 空行を追加
@@ -198,20 +342,50 @@
  *@subject セルに値を追加
  *         dataGridView.Rows[i].Cells[i].Value = value
  *         
- *@subject ソート
+ *@subject ソート機能
+ *         ・ColumnHeaderクリック時のイベントハンドラー内や、追加の後などにソート
+ *         
+ *         grid.ColumnHeaderMouseClick += 
+ *             new DataGridViewCellMouseEventHandler(
+ *                 object sender, DataGridViewCellMouseClickEventArgs e);
+ *                    └ 引数: DataGridViewCellMouseClickEventArgs : MouseEventArgs
+ *                      int   e.ColumnIndex
+ *                      int   e.RowIndex
+ *                      
+ *         SortOrder dataGridView.SortOrder { get; }
+ *           └ enum SortOrder
+ *             {
+ *                None = 0,
+ *                Ascending = 1,
+ *                Descending = 2,
+ *             }
+ *             
  *         void  dataGridView.Sort(IComparer)
  *         void  dataGridView.Sort(DataGridViewColumn, ListSortDirection)
- *                 引数: enum ListSortDirection
- *                       {
- *                           Ascending   昇順
- *                           Descending  降順
- *                       }
- *
+ *                 └ 引数: enum ListSortDirection
+ *                         {
+ *                             Ascending   昇順
+ *                             Descending  降順
+ *                         }
+ *                       
  *         例 dataGridView.Sort(
- *              dataGridView1.Columns["Age"], 
- *              ListSortDirection.Descending
- *            );
+ *              dataGridView1.Columns["Id"], 
+ *              ListSortDirection.Ascending
+ *            );  
  *            
+ *         例 Grid_ColumnHeaderMouseClick(
+ *              object sender, DataGridViewCellMouseClickEventArgs e)内
+ *         
+ *         int columnIndex = e.ColumnIndex;
+ *         
+ *         if (grid.SortOrder == SortOrder.None 
+ *             || grid.SortOrder == SortOrder.Descending)
+ *         {
+ *             dataGridView.Sort(
+ *                 dataGridView1.Columns["columnIndex"], 
+ *                 ListSortDirection.Ascending
+ *             );   
+ *         }
  */
 #endregion
 /*
@@ -333,6 +507,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
             };
             InitialDataGridView();
             grid.SelectionChanged += new EventHandler(Grid_SelectionChanged);
+            grid.ColumnHeaderMouseClick += new DataGridViewCellMouseEventHandler(Grid_ColumnHeaderMouseClick);
             table.Controls.Add(grid, 0, 0);
             table.SetColumnSpan(grid, table.ColumnCount);
 
@@ -625,6 +800,21 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
             numMonth.Text = cellCollection[6].Value?.ToString().Substring(5, 2) ?? "";
             numDay.Text = cellCollection[6].Value?.ToString().Substring(8, 2) ?? "";
         }//Grid_SelectionChanged()
+
+        private void Grid_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            int columnIndex = e.ColumnIndex;
+            
+            if (grid.SortOrder == SortOrder.None 
+                || grid.SortOrder == SortOrder.Descending)
+            {
+                grid.Sort(grid.Columns[columnIndex], ListSortDirection.Ascending);
+            }
+            else
+            {
+                grid.Sort(grid.Columns[columnIndex], ListSortDirection.Descending);
+            }
+        }//Grid_ColumnHeaderMouseClick()
 
         private void Button_Click(object sender, EventArgs e)
         {
