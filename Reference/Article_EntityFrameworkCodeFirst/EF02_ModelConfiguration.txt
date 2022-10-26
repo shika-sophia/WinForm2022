@@ -11,7 +11,8 @@ Table Of Contents
 
 
 2.1. モデルの変更
-前章で作成したプログラムを動かして，あらかじめデータベースを 作成しておきましょう．前節で紹介したProductクラスは以下のようなものでした。
+前章で作成したプログラムを動かして，あらかじめデータベースを 作成しておきましょう．
+前節で紹介したProductクラスは以下のようなものでした。
 
 using System;
 using System.Collections.Generic;
@@ -27,7 +28,9 @@ namespace CodeFirstTest01
         public int Price { get; set; }
     }
 }
-このクラスを元にDBを生成した後、新たに商品の在庫を格納する新しいプロパティを 追加してみます．
+
+このクラスを元にDBを生成した後、
+新たに商品の在庫を格納する新しいプロパティを 追加してみます．
 
 using System;
 using System.Collections.Generic;
@@ -46,21 +49,27 @@ namespace CodeFirstTest01
         public int Stock { get; set; }
     }
 }
-新しくStockというプロパティを追加しました． このまま前章のプログラムを実行させてみましょう． 図 invalid_operation_exception のようなエラーが発生します．
+
+新しくStockというプロパティを追加しました．
+このまま前章のプログラムを実行させてみましょう．
+図 invalid_operation_exception のようなエラーが発生します．
 
 ../../_images/invaliderror.JPG
 図: Invalid Operation Exception
 
-EFは前回起動したときのProductクラスを元にデータベーステーブルを 作成してしまっています． EFは，最初に作成されたProductクラスの内容を記憶しています． Productクラスの中身が書き換えられると，前回とクラスの内容が異なっていると判断され， DBにアクセスできなくなってしまいます．
+EF は前回起動したときの Product クラスを元にデータベーステーブルを作成してしまっています．
+EFは，最初に作成されたProductクラスの内容を記憶しています．
+Product クラスの中身が書き換えられると，前回とクラスの内容が異なっていると判断され，
+DBにアクセスできなくなってしまいます．
 
-この問題を解決する方法として，以下の3通りが考えられます．
+この問題を解決する方法として，以下の 3通りが考えられます．
 
-データベースを手動で削除する
-モデルクラスに変更があった場合に，自動的にデータベースを削除するようにする
-データベースマイグレーションを行う
+・データベースを手動で削除する
+・モデルクラスに変更があった場合に，自動的にデータベースを削除するようにする
+・データベース マイグレーションを行う
+
 選択肢1は最も単純な方法です．
-
-選択肢2は，DatabaseのInitializerというものを変更することで実現できます．
+選択肢2は，Database の Initializer というものを変更することで実現できます．
 
 using System;
 using System.Collections.Generic;
@@ -76,28 +85,40 @@ namespace CodeFirstTest01
         {
             Database.SetInitializer(
                 new DropCreateDatabaseIfModelChanges<ShoppingContext>());
+
             var product = new Product()
             {
                 Name = "TestItem",
                 Price = 100
             };
+
             using (var context = new ShoppingContext())
             {
                 context.Products.Add(product);
                 context.SaveChanges();
-            }
-        }
-    }
+            }//using
+        }//Main()
+    }//class
 }
-上記のように，InitializerにDropCreateDatabaseIfModelChangesを設定すると， モデルとなるクラスが変更されていた場合に自動的にデータベースを 破棄して作り直します．
 
-デフォルトでは，このInitializerにCreateDatabaseIfNotExistsが設定されています． 名前の通り，テーブルが存在しない場合にデータベースを作るものです．
+上記のように，Initializer に DropCreateDatabaseIfModelChanges を設定すると，
+モデルとなるクラスが変更されていた場合に自動的にデータベースを破棄して作り直します．
 
-そのほか，DropCreateDatabaseAlwaysという，モデルの変更にかかわらず常にデータベース を作り直すオプションをつけることもできます．
+デフォルトでは，この Initializer に CreateDatabaseIfNotExists が設定されています．
+名前の通り，テーブルが存在しない場合にデータベースを作るものです．
 
-選択肢1,2 の方法を取った場合、データベースに保存されている内容をすべて破棄することになってしまいます。 これらは開発初期の段階では良いのかもしれませんが、システム運用が始まった後に気軽にスキーマの変更ができないといった問題がでてきます。 これらの問題を回避する方法として、データベースマイグレーションを使うという選択肢があります。 これが最も現実的な方法であると思います． マイグレーションについては データベースマイグレーション で詳しく取り上げます。
+そのほか，DropCreateDatabaseAlways という，モデルの変更にかかわらず常にデータベースを作り直すオプションをつけることもできます．
 
-2.2. Annotation及びFluent APIを用いた自動生成テーブルの制御
+選択肢1,2 の方法を取った場合、
+データベースに保存されている内容をすべて破棄することになってしまいます。
+これらは開発初期の段階では良いのかもしれませんが、
+システム運用が始まった後に気軽にスキーマの変更ができないといった問題が出てきます。
+これらの問題を回避する方法として、データベース マイグレーションを使うという選択肢があります。
+これが最も現実的な方法であると思います．
+マイグレーションについては データベース マイグレーション で詳しく取り上げます。
+
+
+2.2. Annotation　及び　Fluent API　を用いた自動生成テーブルの制御
 今までは以下のようなクラスからテーブルデータを作成していました．
 
 using System;
@@ -115,23 +136,30 @@ namespace CodeFirstTest01
         public int Stock { get; set; }
     }
 }
+
 生成されたテーブルデータは以下のようなものです．
 
 ../../_images/entity_pic023.JPG
 図:自動生成されたテーブルデータ
 
-NameプロパティはNullを許容していますが，もしこのカラムのデータを必須としたい 場合はどうしたらよいでしょうか．
+Name プロパティは Null を許容していますが，
+もしこのカラムのデータを必須としたい場合はどうしたらよいでしょうか．
 
-生成されるデータベースの情報の設定を行う場合，Annotationを使う方法と Fluent APIと呼ばれるものを使う方法との2通りがあります．
+生成されるデータベースの情報の設定を行う場合，
+Annotation を使う方法と Fluent API と呼ばれるものを使う方法との 2通りがあります．
 
-AnnotationとFluent APIとの関係は，LINQでの拡張構文とメソッドチェーンの関係に似ています．
+Annotation と Fluent API との関係は，
+LINQでの拡張構文とメソッドチェーンの関係に似ています．
 
 まずは，Annotationを使った方法を見ていくこととします．
 
-2.2.1. Annotationを用いたテーブルの設定
-Annotationは.NET4 で導入された機能であり， ASP.NET MVC等を使っている方にはお馴染みかと思います．
 
-ProductのNameプロパティへのデータ設定を必須にするためには， Required Annotationを利用します．
+2.2.1. Annotationを用いたテーブルの設定
+Annotationは .NET 4 で導入された機能であり，
+ASP.NET MVC 等を使っている方にはお馴染みかと思います．
+
+ProductのNameプロパティへのデータ設定を必須にするためには，
+[Required] Annotation を利用します．
 
 using System;
 using System.Collections.Generic;
@@ -151,16 +179,24 @@ namespace CodeFirstTest01
         public int Stock { get; set; }
     }
 }
-Annotation機能を利用するためには，System.ComponentModel.DataAnnotationsを usingしておく必要があります．
 
-上記のようにProductクラスを変更した後，プログラムを実行し，データベースを作成してみましょう． 前回利用したデータベースを消す処理を追加するのを忘れないようにしてください (InvalidOperationExceptionが発生してしまいます）．
+Annotation機能を利用するためには，
+System.ComponentModel.DataAnnotations を usingしておく必要があります．
 
-プログラム修正後，実行して生成されたテーブル情報を確認してください． NameプロパティがNull以外を許可するように変更されているかと思います．
+上記のように Productクラスを変更した後，
+プログラムを実行し，データベースを作成してみましょう． 
+前回利用したデータベースを消す処理を追加するのを忘れないようにしてください
+(InvalidOperationExceptionが発生してしまいます）．
+
+プログラム修正後，実行して生成されたテーブル情報を確認してください．
+Name プロパティが Null 以外を許可するように変更されているかと思います．
 
 ../../_images/entity_pic024.JPG
 図:NameプロパティをRequiredにした場合
 
-Annotationによるテーブル情報制御の例をもう一つお見せします． 今度はNameプロパティの文字列の長さを200文字にしてみましょう． 文字列の長さを制御するには，MaxLength Annotationを用います．
+Annotation によるテーブル情報制御の例をもう一つお見せします．
+今度は Name プロパティの文字列の長さを200文字にしてみましょう．
+文字列の長さを制御するには，[MaxLength(int)] Annotationを用います．
 
 using System;
 using System.Collections.Generic;
@@ -181,15 +217,25 @@ namespace CodeFirstTest01
         public int Stock { get; set; }
     }
 }
-プログラムを実行して，SQL Management Studio等でデータベースの値を 確認してください．下図のようにNameカラムの文字列長が200に設定されているかと思います．
+プログラムを実行して，
+SQL Management Studio等でデータベースの値を 確認してください．
+下図のように Name カラムの文字列長が 200 に設定されているかと思います．
 
 ../../_images/entity_pic025.JPG
 図:Nameプロパティの文字列長を200とした場合
 
-2.2.2. Fluent APIを用いたテーブルの設定
-Annotationを使って設定したRequiredとMaxLengthは，Fluent API と呼ばれるものを用いて設定が可能です． Fluent APIはLINQのチェーンメソッドのように，複数の関数をチェーンのように つなげてテーブルの制御・定義を行うものです．
 
-Annotationを使って設定したRequiredとMaxLengthに相当するものを,Fluent APIで 実装すると，以下のようになります．注意しなければならないことは， 今回はProductクラスに修正を加えるのではなく，ShoppingContextに手を加える という点です．
+2.2.2. Fluent API を用いたテーブルの設定
+Annotation を使って設定した [Required] と [MaxLength] は，
+Fluent API と呼ばれるものを用いて設定が可能です． 
+Fluent API は LINQ のチェーンメソッドのように，
+複数の関数をチェーンのように つなげてテーブルの制御・定義を行うものです．
+
+Annotation を使って設定した[Required]と[MaxLength]に相当するものを,
+Fluent APIで 実装すると，以下のようになります．
+注意しなければならないことは，
+今回はProductクラスに修正を加えるのではなく，
+ShoppingContext に手を加える という点です．
 
 using System;
 using System.Collections.Generic;
@@ -210,13 +256,26 @@ namespace CodeFirstTest01
             modelBuilder.Entity<Product>()
                 .Property(d => d.Name).HasMaxLength(200);
         }
-    }
+    }//class
 }
-Fluent APIを使うためには，まずDbContextを継承したContextクラスに OnModelCreatingメソッドをオーバーライドして定義する必要があります． modelBuilderを用いてProductのEntityを取得し， Property関数で設定したいカラムを選択します． 今回はNameプロパティに修正を加えたいので，Property(d => d.Name)としています．
 
-Annotationで行ったRequiredに相当するものは，Fluent APIではIsRequired関数になります． また，AnnotationのMaxLengthに相当するものは，HasMaxLength関数となります． Annotationを使う場合とFluent APIを使う場合とで関数名が異なることに注意してください．
+Fluent API を使うためには，
+まず DbContext を継承した Context クラスに
+OnModelCreatingメソッドをオーバーライドして定義する必要があります．
+modelBuilder を用いて Product の Entity を取得し， 
+Property関数で設定したいカラムを選択します．
 
-Fluent APIでは，LINQのメソッドチェーンのように，複数の関数を組み合わせて定義することができます． 例えば上記のOnModelCreating関数内の定義は，以下の1ステップにまとめることができます．
+今回は Name プロパティに修正を加えたいので，Property(d => d.Name)としています．
+
+Annotation で行った[Required]に相当するものは，
+Fluent APIではIsRequired関数になります． 
+また，Annotationの[MaxLength]に相当するものは，HasMaxLength関数となります．
+
+Annotation を使う場合と Fluent API を使う場合とで関数名が異なることに注意してください．
+
+Fluent API では，LINQ のメソッドチェーンのように，
+複数の関数を組み合わせて定義することができます．
+例えば上記の OnModelCreating関数内の定義は，以下の 1ステップにまとめることができます．
 
 modelBuilder.Entity<Product>()
   .Property(d => d.Name)
@@ -224,4 +283,5 @@ modelBuilder.Entity<Product>()
   .HasMaxLength(200);
  
  
-COPYRIGHT (C) 2011- DENSAN-LABS.NET. ALL RIGHTS RESERVED. DESIGN BY FREE CSS TEMPLATES. CREATED USING SPHINX
+COPYRIGHT (C) 2011- DENSAN-LABS.NET. ALL RIGHTS RESERVED. 
+DESIGN BY FREE CSS TEMPLATES. CREATED USING SPHINX

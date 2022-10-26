@@ -1,5 +1,5 @@
 ■ densanlabs
-3. データベースマイグレーション
+3. データベース マイグレーション
 https://densan-labs.net/tech/codefirst/migration.html
 
 Table Of Contents
@@ -17,10 +17,16 @@ Table Of Contents
 
 
 3.1. マイグレーションについて
-データベースを削除してから作り直すと，DBに保存されている情報が全て削除されてしまいます． こういった事態を回避する方法として、データベースマイグレーションを行う方法があります。 マイグレーションとは、DBに保存されているデータを保持したまま、テーブルの作成やカラムの変更などを行うための機能です。
+データベースを削除してから作り直すと，
+DBに保存されている情報が全て削除されてしまいます．
+こういった事態を回避する方法として、データベース マイグレーションを行う方法があります。
+
+マイグレーションとは、DBに保存されているデータを保持したまま、テーブルの作成やカラムの変更などを行うための機能です。
+
 
 3.2. マイグレーションの準備
-まずは簡単なデータベースマイグレーションを行うことにしましょう． あらかじめ，次のようなProductクラスを作成しておきます。
+まずは簡単なデータベース マイグレーションを行うことにしましょう．
+あらかじめ，次のような Productクラスを作成しておきます。
 
 public class Product
 {
@@ -28,39 +34,61 @@ public class Product
   public string Name { get; set; }
   public int Price { get; set; }
 }
-また、このProductクラスにアクセスするためのContextである、ShoppingContextも作っておきましょう。
+
+また、このProductクラスにアクセスするための Contextである、ShoppingContextも作っておきましょう。
 
 public class ShoppingContext : DbContext
 {
   public DbSet<Product> Products { get; set; }
 }
-次にデータベースマイグレーションの準備を行います． まず， メニューバーのツール，Library Package Manager内にある NuGetのPackage Manager Consoleを起動してください．
+
+次にデータベースマイグレーションの準備を行います．
+まず， メニューバーの[ツール]，
+[Library Package Manager]内にある
+[NuGet]の[Package Manager Console]を起動してください．
 
 その後，以下のコマンドを入力してマイグレーションの準備をします．
 
 PM> Enable-Migrations
-../../_images/entity_pic013.JPG
-図: Package Manager Consoleを用いたMigrationの準備
 
-無事に成功すると，プロジェクト内にMigrationsというディレクトリと， 設定用のクラスファイルが自動的に作成されていると思います．
+../../_images/entity_pic013.JPG
+図: Package Manager Console を用いた Migration の準備
+
+無事に成功すると，プロジェクト内に Migrations というディレクトリと，
+設定用のクラスファイルが自動的に作成されていると思います．
 
 ../../_images/migration01.png
 図: 自動生成されたマイグレーション設定クラス
 
 これでマイグレーションのための準備が整いました。
 
+
 3.3. テーブルの新規作成
-マイグレーションの機能を使って、Productsテーブルを生成しましょう。 EntityFrameworkには、Productクラスの中身を参照し、テーブル作成のためのクラスを自動生成してくれる機能が備わっています。 次のコマンドをPackage Manager Consoleに入力してください．
+マイグレーションの機能を使って、Productsテーブルを生成しましょう。
+EntityFrameworkには、Product クラスの中身を参照し、
+テーブル作成のためのクラスを自動生成してくれる機能が備わっています。 
+次のコマンドを Package Manager Console に入力してください．
 
 PM> Add-Migration InitialModels
-InitialModelsの部分は、マイグレーションファイルのクラス名となります。できるだけ分かりやすい名前を付けましょう。
 
-もし、ソリューション内に複数プロジェクトが存在する場合は、ProjectName とStartUpProjectName を指定する必要があります。 例えば、プロジェクト名がCodeFirstMigrationの場合は、次のように指定します。
+InitialModels の部分は、マイグレーションファイルのクラス名となります。
+できるだけ分かりやすい名前を付けましょう。
 
-PM> Add-Migration InitialModels -ProjectName CodeFirstMigration -StartUpProjectName CodeFirstMigration
-ProjectNameは、生成したいテーブルのDbContextを含んでいるプロジェクト名を指定します。 StartUpProjectNameには、App.config等でDBへのConnectionStringsの設定がされているプロジェクト名を指定します。
+もし、ソリューション内に複数プロジェクトが存在する場合は、
+ProjectName と StartUpProjectName を指定する必要があります。
+例えば、プロジェクト名が CodeFirstMigration の場合は、次のように指定します。
 
-Add-Migrationコマンドの発行に成功すると、Migrationsディレクトリ化に、作成日時 + _InitialModels.cs というファイルが生成されるはずです。 InitialModels.cs の中身は以下のようになります。
+PM> Add-Migration InitialModels
+      -ProjectName CodeFirstMigration 
+      -StartUpProjectName CodeFirstMigration
+
+ProjectName は、生成したいテーブルの DbContext を含んでいるプロジェクト名を指定します。
+StartUpProjectName には、[App.config]等で
+DBへの ConnectionStrings の設定がされているプロジェクト名を指定します。
+
+Add-Migration コマンドの発行に成功すると、
+Migrationsディレクトリ化に、作成日時 + _InitialModels.cs というファイルが生成されるはずです。
+InitialModels.cs の中身は以下のようになります。
 
 namespace CodeFirstMigration.Migrations
 {
@@ -79,38 +107,59 @@ namespace CodeFirstMigration.Migrations
                         Price = c.Int(nullable: false),
                     })
                 .PrimaryKey(t => t.ProductId);
-
-        }
+        }//Up()
 
         public override void Down()
         {
             DropTable("Products");
-        }
-    }
+        }//Down()
+    }//class
 }
-マイグレーションクラスには、UpとDownという二つの関数が存在します。 Upにはこれから変更したいDBへの変更を書きます。Downは反対に、変更を取り消したい場合に利用します。
+マイグレーションクラスには、Up() と Down() という二つの関数が存在します。
+Upにはこれから変更したいDBへの変更を書きます。
+Downは反対に、変更を取り消したい場合に利用します。
 
-Up関数内にあるCreateTable関数は、第一引数にこれから生成するテーブルの名前を、第2引数にはテーブルの定義を記述します。 Entity Frameworkでは、基本的にPrimaryKeyは必須のため、PrimaryKey関数を使ってPrimaryKeyの指定も行っています。
+Up()関数内にある CreateTable()関数は、
+第一引数にこれから生成するテーブルの名前を、
+第2引数にはテーブルの定義を記述します。
 
-テーブル生成のためのクラスが作成されていることを確認したので、次はDBへマイグレートを行います。
+Entity Frameworkでは、基本的に PrimaryKey は必須のため、
+PrimaryKey()関数を使って PrimaryKey の指定も行っています。
 
-Package Manager Consoleから次のコマンドを入力します。
+テーブル生成のためのクラスが作成されていることを確認したので、
+次はDBへマイグレートを行います。
+
+Package Manager Console から次のコマンドを入力します。
 
 PM> Update-Database -Verbose
-Verboseコマンドはつける必要はありませんが、この引数を指定することによって、どのようなSqlがDBに発行されているのかを確認することができます。
 
-複数プロジェクトがソリューション内に存在する場合は、Add-Migrationの時と同様に、ProjectNameとStartUpProjectNameの指定を行う必要があります。
+Verboseコマンドはつける必要はありませんが、
+この引数を指定することによって、
+どのような Sql がDBに発行されているのかを確認することができます。
 
-PM> Update-Database -ProjectName CodeFirstMigration -StartUpProjectName CodeFirstMigration -Verbose
-無事コマンド発行が成功すると、DBにProductsテーブルが生成されているはずです。 SQL SMSなどを使って確認してみましょう。
+複数プロジェクトがソリューション内に存在する場合は、
+Add-Migrationの時と同様に、
+ProjectName と StartUpProjectName の指定を行う必要があります。
+
+PM> Update-Database
+      -ProjectName CodeFirstMigration
+      -StartUpProjectName CodeFirstMigration
+      -Verbose
+
+無事コマンド発行が成功すると、DBにProductsテーブルが生成されているはずです。
+SQL SMS などを使って確認してみましょう。
 
 ../../_images/migration02.png
 図: Productsテーブルの生成
 
-3.4. テーブルの構成変更
-次に、前節で作成したProductクラスに、新しく在庫情報を管理するためのプロパティ、Stockを追加してみましょう。 DBマイグレーションの機能を使うと、データを保持したまま、テーブルの構成を簡単に変更できます。
 
-まずは、以下のようにProductクラスにStockプロパティを追加します。
+3.4. テーブルの構成変更
+次に、前節で作成したProductクラスに、
+新しく在庫情報を管理するためのプロパティ、Stockを追加してみましょう。
+DBマイグレーションの機能を使うと、
+データを保持したまま、テーブルの構成を簡単に変更できます。
+
+まずは、以下のように Product クラスに Stockプロパティを追加します。
 
 namespace CodeFirstMigration
 {
@@ -122,10 +171,14 @@ namespace CodeFirstMigration
         public int Stock { get; set; }
     }
 }
-次のコマンドをPackage Manager Consoleに入力してください．
+
+次のコマンドを Package Manager Console に入力してください．
 
 PM> Add-Migration AddProductsStock
-マイグレーションファイルの名前は何でも構いませんが、特に理由のない場合は、Add + 変更したいクラスの複数形の名前+変更したプロパティ名 としましょう． 実行後，以下のようなAddProductsStockクラスが自動生成されていると思います．
+
+マイグレーションファイルの名前は何でも構いませんが、
+特に理由のない場合は、Add + 変更したいクラスの複数形の名前+変更したプロパティ名 としましょう．
+実行後，以下のような AddProductsStockクラスが自動生成されていると思います．
 
 namespace CodeFirstMigration.Migrations
 {
@@ -142,18 +195,28 @@ namespace CodeFirstMigration.Migrations
         {
             DropColumn("Products", "Stock");
         }
-    }
+    }//class
 }
-コードを見ればなんとなくわかるとは思いますが、Up関数内のAddColumn関数の第1引数は追加するテーブル名を、 第2引数には作成したいカラム名を、第3引数には作成したい型の情報を入力します。
+
+コードを見ればなんとなくわかるとは思いますが、
+Up関数内の AddColumn関数の 
+第1引数は追加するテーブル名を、
+第2引数には作成したいカラム名を、
+第3引数には作成したい型の情報を入力します。
 
 では，以下のコマンドを入力してマイグレーションを実行してみましょう．
 
 PM> Update-Database -Verbose
-SQL Management Studio等を用いてテーブルの定義、中身を確認してみましょう． 前回挿入したデータが消えていなければ成功です．
 
-モデルの変更とコンフィギュレーション で説明したAnnotation機能を使えば、作成するカラムにさまざまな制約をつけることができます。
+SQL Management Studio等を用いてテーブルの定義、中身を確認してみましょう．
+前回挿入したデータが消えていなければ成功です．
 
-例えば、Nameクラスを入力必須にし、MaxLengthを200文字としたい場合は、Productクラスを次のように変更します。
+
+モデルの変更とコンフィギュレーション で説明したAnnotation機能を使えば、
+作成するカラムにさまざまな制約をつけることができます。
+
+例えば、Nameクラスを入力必須にし、
+MaxLengthを200文字としたい場合は、Productクラスを次のように変更します。
 
 namespace CodeFirstMigration
 {
@@ -167,9 +230,11 @@ namespace CodeFirstMigration
         public int Stock { get; set; }
     }
 }
+
 この変更を適用するためのマイグレーションクラスを作成します。
 
 PM> Add-Migration AddRequiredMaxLengthAttributesToName
+
 作成されたマイグレーションクラスは次の通りです。
 
 namespace CodeFirstMigration.Migrations
@@ -180,28 +245,42 @@ namespace CodeFirstMigration.Migrations
     {
         public override void Up()
         {
-            AlterColumn("Products", "Name", c => c.String(nullable: false, maxLength: 200));
+            AlterColumn("Products", "Name",
+                c => c.String(nullable: false, maxLength: 200));
         }
 
         public override void Down()
         {
             AlterColumn("Products", "Name", c => c.String());
         }
-    }
+    }//class
 }
-nullable falseで必須項目とし、maxLengthで文字数の指定をしています。 期待したマイグレーションクラスが作成されたら、Update-Database を発行し、DBの状態を確認してみましょう。 次のようなテーブルが作成されていたら成功です。
+nullable falseで必須項目とし、maxLengthで文字数の指定をしています。
+期待したマイグレーションクラスが作成されたら、
+Update-Database を発行し、DBの状態を確認してみましょう。
+次のようなテーブルが作成されていたら成功です。
+
+PM> Update-Database
 
 ../../_images/migration03.jpg
 図: 構成変更後のテーブル定義
 
+
 3.5. マイグレーションクラスの手動作成
-Productクラスの構成を変更し、Add-Migrationコマンドを発行することで、マイグレーションのためのクラスが自動生成されることを前節で確認しました。 しかし、一部機能を利用するためには、手動でマイグレーションクラスを作成する必要があります。
+Productクラスの構成を変更し、Add-Migrationコマンドを発行することで、
+マイグレーションのためのクラスが自動生成されることを前節で確認しました。
+しかし、一部機能を利用するためには、手動でマイグレーションクラスを作成する必要があります。
 
 3.5.1. インデックスの作成
-インデックスを張りたい場合は、直接マイグレーションクラスを記述する必要があります。 まずは、Productテーブルをいじらず、次のコマンドを発行しましょう。
+インデックスを張りたい場合は、直接マイグレーションクラスを記述する必要があります。
+まずは、Productテーブルをいじらず、次のコマンドを発行しましょう。
 
 PM> Add-Migration AddNameIndexToProduct
-空のマイグレーションが作成されたと思います。 作成されたクラスのUp関数にはIndexを張るための記述を、DownにはIndexを捨てるための記述を行います。 Indexを張るにはCreateIndex関数を、捨てる場合はDropIndex関数を利用します。
+
+空のマイグレーションが作成されたと思います。 
+作成されたクラスの Up関数には Index を張るための記述を、
+Downには Index を捨てるための記述を行います。
+Index を張るには CreateIndex関数を、捨てる場合はDropIndex関数を利用します。
 
 namespace CodeFirstMigration.Migrations
 {
@@ -218,21 +297,32 @@ namespace CodeFirstMigration.Migrations
         {
             DropIndex("Products", "Name");
         }
-    }
+    }//class
 }
-作成したら、Update-Databaseを発行し、NameカラムにIndexが張られていることを確認しましょう。
+
+作成したら、Update-Database を発行し、
+Name カラムに Index が張られていることを確認しましょう。
+
+PM> Update-Database
 
 ../../_images/migration04.png
 図: NameカラムへのIndexの追加
 
-複合Indexを張りたい場合は、次のように指定します。
+複合Index を張りたい場合は、次のように指定します。
 
-CreateIndex("Products", new[] { "Name", "ProductId" })
-また、UNIQUE指定をつけたい場合は、次のような記述を行います。
+CreateIndex("Products", new[] { "Name", "ProductId" });
 
-CreateIndex("Products", "Name", unique: true)
+また、UNIQUE 指定をつけたい場合は、次のような記述を行います。
+
+CreateIndex("Products", "Name", unique: true);
+
+
 3.5.2. Sql文の直接発行
-Entity FrameworkというORマッパーを利用していても、時には直接Sql文を発行したい場合もあるかとおもいます。 例えば、あらかじめ指定したデータをDBに投入しておきたい場合などは、マイグレーションクラス内に直接データInsert文を書いてしまう方法もあります。 直接Sqlを発行するには、Sql関数をUp,Down内に記述します。
+Entity Frameworkという OR マッパーを利用していても、
+時には直接 Sql 文を発行したい場合もあるかとおもいます。
+例えば、あらかじめ指定したデータをDBに投入しておきたい場合などは、
+マイグレーションクラス内に直接データ Insert 文を書いてしまう方法もあります。
+直接 Sql を発行するには、Sql関数を Up(), Down()内に記述します。
 
 namespace CodeFirstMigration.Migrations
 {
@@ -249,31 +339,61 @@ namespace CodeFirstMigration.Migrations
         {
             Sql("DELETE FROM Products WHERE Name = N'テスト商品'");
         }
-    }
+    }//class
 }
+
+
 3.6. マイグレーションヒストリー
-EFは、いままでデータベースに対して、どのようなマイグレーションを行ってきたかという情報 を、システムテーブル内の_MigrationHistoryテーブル内で管理しています。
+EFは、今までデータベースに対して、
+どのようなマイグレーションを行ってきたかという情報を、
+システムテーブル内の _MigrationHistory テーブル内で管理しています。
 
 ../../_images/migration_history.png
 図:マイグレーションヒストリー
 
-上図の場合は、DBに対してInitialCreateとAddProductsStockというマイグレーションが実行された ことを表しています。 このマイグレーションヒストリーがなんらかの原因で壊れてしまうと、うまくデータベースの アップデート及びマイグレーションができなくなってしまいます。 そうなってしまった場合、データベース自体を削除しなければならない事態となりますので、 十分に注意してください。
+上図の場合は、DBに対して InitialCreate と
+AddProductsStock というマイグレーションが実行されたことを表しています。
+
+このマイグレーション ヒストリーがなんらかの原因で壊れてしまうと、
+うまくデータベースの アップデート及びマイグレーションができなくなってしまいます。
+そうなってしまった場合、データベース自体を削除しなければならない事態となりますので、
+十分に注意してください。
+
 
 3.7. ダウングレード
-マイグレーションクラス内では、Up関数とDown関数という二つの関数が定義されていました。 Up関数内の処理はスキーマのアップグレード等に使いますが、Down関数内で定義されている処理は 反対にDB内のスキーマのダウングレードを行う時に使います。
+マイグレーションクラス内では、Up関数とDown関数という二つの関数が定義されていました。
+Up関数内の処理はスキーマのアップグレード等に使いますが、
+Down関数内で定義されている処理は 反対にDB内のスキーマのダウングレードを行う時に使います。
 
-例えば、InitialCreateというマイグレーションとAddProductsStockというマイグレーション が既に適用されたDBが存在するとします。 ここで、一番最後に適用したAddProductsStockというマイグレーションを取り消したい場合、 つまり、一つ前のマイグレーション(InitialCreate)を行った状態に戻りたい場合は、次のような コマンドを実行します。
+例えば、InitialCreate というマイグレーションと
+AddProductsStock というマイグレーション が既に適用されたDBが存在するとします。
+
+ここで、一番最後に適用した AddProductsStock というマイグレーションを取り消したい場合、
+つまり、一つ前のマイグレーション(InitialCreate)を行った状態に戻りたい場合は、
+次のような コマンドを実行します。
 
 PM> Update-Database -TargetMigration:InitialCreate
-ダウングレードした場合、いままで保存されていたデータの一部が消えてしまう場合が あるので、十分に注意して実行してください。
+
+ダウングレードした場合、
+いままで保存されていたデータの一部が消えてしまう場合があるので、
+十分に注意して実行してください。
+
 
 3.8. マイグレーションのタイムアウト
-Entity Framework 4.3.1の段階では、大量のデータがDBに存在している状態で Package Manager Console内からUpdate-Databaseを行うと、 途中でTimeoutという例外が発生し、マイグレーションを行えない場合があります。 この場合は面倒ではありますが、マイグレーション用のスクリプトを作成し、 自分でSQL Server等に対して命令を発行するしかありません。
+Entity Framework 4.3.1の段階では、大量のデータがDBに存在している状態で
+Package Manager Console内から Update-Databaseを行うと、
+途中で Timeout という例外が発生し、マイグレーションを行えない場合があります。
+この場合は面倒ではありますが、マイグレーション用のスクリプトを作成し、
+自分で SQL Server等に対して命令を発行するしかありません。
 
 マイグレーション用スクリプトを作成するには、以下のコマンドを実行します。
 
 PM> Update-Database -Script
-コマンド発行後は、マイグレーションは行われず、マイグレーション用のスクリプトだけが生成されます。 このスクリプトをSQL Server等に対して手動で発行してください。
+
+コマンド発行後は、マイグレーションは行われず、
+マイグレーション用のスクリプトだけが生成されます。
+このスクリプトをSQL Server等に対して手動で発行してください。
 
 
-COPYRIGHT (C) 2011- DENSAN-LABS.NET. ALL RIGHTS RESERVED. DESIGN BY FREE CSS TEMPLATES. CREATED USING SPHINX
+COPYRIGHT (C) 2011- DENSAN-LABS.NET. ALL RIGHTS RESERVED. 
+DESIGN BY FREE CSS TEMPLATES. CREATED USING SPHINX

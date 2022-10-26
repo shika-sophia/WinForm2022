@@ -19,12 +19,15 @@ Table Of Contents
 
 
 5.1. リレーションシップの作成
-リレーションを使うことで、あるテーブルの特定の行と、ほかのテーブルの行を関連付けることができます。 今回は、EntityFramework Code Firstにてリレーションを作成する方法を説明します。
+リレーションを使うことで、あるテーブルの特定の行と、
+ほかのテーブルの行を関連付けることができます。
+今回は、EntityFramework Code Firstにてリレーションを作成する方法を説明します。
 
 5.1.1. 1対1リレーションの作成
 今回のサンプルで用いるクラス一覧を提示します．
 
-今回は、商品情報を格納しておくテーブルProductsと、商品のカテゴリ情報を格納しておく テーブルであるProductCategoriesを作成することとします。
+今回は、商品情報を格納しておくテーブル Productsと、
+商品のカテゴリ情報を格納しておく テーブルである ProductCategories を作成することとします。
 
 public class Product
 {
@@ -40,7 +43,11 @@ public class ProductCategory
     public int ProductCategoryId { get; set; }
     public string Name { get; set; }
 }
-この二つのテーブル間でリレーションを作成することとします。 Productクラス内には、Categoryプロパティを入れておきます。 このCategoryプロパティは，ナビゲーションプロパティと呼ばれます． このようにすることで、ProductとProductCategory間のリレーションを作成することができます。
+
+この二つのテーブル間でリレーションを作成することとします。
+Productクラス内には、Categoryプロパティを入れておきます。
+このCategoryプロパティは，ナビゲーションプロパティと呼ばれます．
+このようにすることで、ProductとProductCategory間のリレーションを作成することができます。
 
 以下のようなDbContextも作成しておきます。
 
@@ -49,15 +56,26 @@ public class ShoppingContext : DbContext
     public DbSet<Product> Products { get; set; }
     public DbSet<ProductCategory> ProductCategories { get; set; }
 }
-これでクラスの作成は完了です。 DBマイグレーションを行って、テーブルを作成してみてください。 図 entity_pic002 のようにProductsテーブルとProductCategoriesテーブルが生成されたでしょうか．
+
+これでクラスの作成は完了です。 
+DBマイグレーションを行って、テーブルを作成してみてください。
+図 entity_pic002 のように
+ProductsテーブルとProductCategoriesテーブルが生成されたでしょうか．
 
 ../../_images/entity_pic002.JPG
 図:ProductsテーブルとProductCategoriesテーブルの確認
 
-生成されたテーブルを確認すると，Productsテーブルには 自動的にCategory_ProductCategoryIdというカラムが生成されています． これは，ProductStocksテーブルへのForeign Keyとして自動的に設定されます． EF Code Firstでは、外部キープロパティ無しにリレーションシップを定義できません。
+生成されたテーブルを確認すると，
+Productsテーブルには 
+自動的にCategory_ProductCategoryIdというカラムが生成されています．
+これは，ProductStocksテーブルへの Foreign Key として自動的に設定されます． 
+EF Code First では、外部キープロパティ無しにリレーションシップを定義できません。
+
 
 5.1.2. 1対多リレーションの作成
-1対多のリレーションも、CodeFirstでは直感的に作成できます。 例えば、1つのProductに対して複数のProductCategoryを関連付ける場合は、以下のようなクラスを作成します。
+1対多 のリレーションも、CodeFirstでは直感的に作成できます。
+例えば、1つのProductに対して複数のProductCategoryを関連付ける場合は、
+以下のようなクラスを作成します。
 
 public class Product
 {
@@ -73,19 +91,29 @@ public class ProductCategory
     public int ProductCategoryId { get; set; }
     public string Name { get; set; }
 }
-1対1リレーションの場合と違うのは、CategoriesプロパティがICollection<ProductCategory>として定義されている点だけです。 DBマイグレーションを行ってテーブルを作成してみてください。
+
+1対1リレーションの場合と違うのは、
+Categoriesプロパティが ICollection<ProductCategory> として定義されている点だけです。
+DBマイグレーションを行ってテーブルを作成してみてください。
 
 ../../_images/entity_one_to_many.png
 図: 1対多リレーションを持ったテーブル
 
-ProductCategoriesテーブルに、Productテーブルへの外部キーが追加されていることがわかります。
+ProductCategoriesテーブルに、Productテーブルへの 外部キー が追加されていることがわかります。
+
 
 5.1.3. 外部キーのカラム名変更
-外部キーのカラム名は、特に設定しない限り、ナビゲーションプロパティ名 + 関連先クラスのキーの名前 といったような名前になります。 例えば、1対1リレーションの作成の節で説明したコードですと、Productsテーブルが保持しているProductCategoriesテーブルへの外部キーのカラム名は、Category_ProductCategoryIdとなります。
+外部キーのカラム名は、特に設定しない限り、
+ナビゲーションプロパティ名 + 関連先クラスのキーの名前 といったような名前になります。
+例えば、1対1リレーションの作成の節で説明したコードですと、
+Productsテーブルが保持しているProductCategoriesテーブルへの外部キーのカラム名は、
+Category_ProductCategoryIdとなります。
 
-このカラム名はやや冗長であるため、自分で独自にカラム名をつけたいですね。 こういった場合に利用するのが、ForeignKeyアノテーションです。
+このカラム名はやや冗長であるため、自分で独自にカラム名をつけたいですね。
+こういった場合に利用するのが、[ForeignKey(string)]アノテーションです。
 
-例えば、ProductCategoriesテーブルへの外部キーを保持するカラム名をCategoryIdとしたい場合は、以下のようなアノテーションを設定します。
+例えば、ProductCategoriesテーブルへの外部キーを保持するカラム名を
+CategoryIdとしたい場合は、以下のようなアノテーションを設定します。
 
 public class Product
 {
@@ -98,9 +126,14 @@ public class Product
     [ForeignKey("CategoryId")]
     public ProductCategory Category { get; set; }
 }
-キーを保持するためのプロパティ、CategoryIdを追加しています。 そして、いままであったCategoryプロパティの上にForeignKeyアノテーションを記述します。 ForeignKeyの引数には、どのプロパティがCategoryの外部キー保持カラムになるのかを指定します。
 
-外部キーとなるCategoryIdプロパティの上に、ナビゲーションプロパティ（以下のクラスの場合は、Categoryの事を指す)のプロパティ名を記述することもできます。 すなわち、下記のコードは、上記のコードと全く同じものです。
+キーを保持するためのプロパティ、CategoryIdを追加しています。
+そして、いままであったCategoryプロパティの上にForeignKeyアノテーションを記述します。
+ForeignKey の引数には、どのプロパティが Category の外部キー保持カラムになるのかを指定します。
+
+外部キーとなる CategoryId プロパティの上に、ナビゲーションプロパティ
+（以下のクラスの場合は、Categoryの事を指す)のプロパティ名を記述することもできます。
+すなわち、下記のコードは、上記のコードと全く同じものです。
 
 public class Product
 {
@@ -113,13 +146,17 @@ public class Product
     public int CategoryId { get; set; }
     public ProductCategory Category { get; set; }
 }
-DBマイグレーションを行って、作成されたテーブルを見てみましょう。以下のように名前がカラム名が変更されているはずです。
+
+DBマイグレーションを行って、作成されたテーブルを見てみましょう。
+以下のように名前がカラム名が変更されているはずです。
 
 ../../_images/entity_foreignkey.png
 図:外部キーのカラム名変更
 
+
 5.2. リレーションを持ったテーブルへのデータ挿入
-リレーションを持ったテーブルへのデータの挿入も直感的に行うことができます． いままでと同じように，単にデータをAddするだけです．
+リレーションを持ったテーブルへのデータの挿入も直感的に行うことができます．
+いままでと同じように，単にデータを Add() するだけです．
 
 using (var context = new ShoppingContext())
 {
@@ -135,21 +172,26 @@ using (var context = new ShoppingContext())
     });
     context.SaveChanges();
 }
-上記のコードを実行すると，以下のようなSQL文が発行されます．
+
+上記のコードを実行すると，以下のような SQL文が発行されます．
 
 insert [dbo].[ProductCategories]([Name])
-values (@0)
-select [ProductCategoryId]
-from [dbo].[ProductCategories]
-where @@ROWCOUNT > 0 and [ProductCategoryId] = scope_identity()
+  values (@0)
+    select [ProductCategoryId]
+      from [dbo].[ProductCategories]
+      where @@ROWCOUNT > 0 and [ProductCategoryId] = scope_identity()
 
 insert [dbo].[Products]([Name], [Price], [Stock], [CategoryId])
-values (@0, @1, @2, @3)
-select [ProductId]
-from [dbo].[Products]
-where @@ROWCOUNT > 0 and [ProductId] = scope_identity()
+  values (@0, @1, @2, @3)
+    select [ProductId]
+      from [dbo].[Products]
+      where @@ROWCOUNT > 0 and [ProductId] = scope_identity()
+
+
 5.3. リレーションデータの読み込み
-関連データを読み出すのは直感的には行えません。 次のような商品情報を格納しておくテーブルProductsと、 商品カテゴリ情報を格納しておくProductCategoriesテーブルを作成したとします。
+関連データを読み出すのは直感的には行えません。
+次のような商品情報を格納しておくテーブルProductsと、
+商品カテゴリ情報を格納しておくProductCategoriesテーブルを作成したとします。
 
 public class Product
 {
@@ -165,9 +207,12 @@ public class ProductCategory
     public int ProductCategoryId { get; set; }
     public string Name { get; set; }
 }
-ProductsテーブルとProductCategoriesテーブルにはあらかじめデータを挿入しておきましょう。
 
-Productクラス内のCategoryプロパティを使ってデータを読み出したいので、以下のようなサンプル コードを書きました。
+ProductsテーブルとProductCategoriesテーブルには
+あらかじめデータを挿入しておきましょう。
+
+Productクラス内の Categoryプロパティを使ってデータを読み出したいので、
+以下のようなサンプル コードを書きました。
 
 using (var context = new ShoppingContext())
 {
@@ -177,17 +222,29 @@ using (var context = new ShoppingContext())
         Console.WriteLine(product.Category.Name);
     }
 }
-しかし、上記のコードはproduct.CategoryでNullReferenceExceptionが発生 してしまい、データを読み出すことができません。 関連データを読み出すのは、以下の3通りの方法を使う必要があります。
 
-Explicit Loading(明示的な読み込み)
-Eager Loading
-Lazy Loading(遅延読み込み)
+しかし、上記のコードは product.Category で NullReferenceException が発生してしまい、
+データを読み出すことができません。 
+関連データを読み出すのは、以下の 3通りの方法を使う必要があります。
+
+・Explicit Loading (明示的な読み込み)
+・Eager Loading    (一括読み出し)
+・Lazy Loading     (遅延読み込み)
+
 これら3つの読み込み方法について説明します。
 
-5.3.1. Explicit Loading
-関連を持ったデータを明示的に呼び出すには、Reference関数、またはCollection関数を利用します。 1対1リレーションのデータを読み出す場合はReferenceを、1対多データを読み出す場合はCollectionを 利用します。
 
-明示的に読み出す方法は、いつどのタイミングで読み出しクエリがDBに対して発行されてるのか が理解しやすいといった利点があります。 反面、読み出しを忘れるとNullReferenceExceptionが発生してしまうので注意しましょう。 明示的に関連データを読み出すコードは以下の通りです。
+5.3.1. Explicit Loading (明示的な読み込み)
+関連を持ったデータを明示的に呼び出すには、
+Reference関数、または Collection関数を利用します。
+1対1リレーションのデータを読み出す場合は Reference() を、
+1対多データを読み出す場合は Collection() を 利用します。
+
+明示的に読み出す方法は、
+いつ どのタイミングで読み出しクエリがDBに対して発行されてるのか 
+が理解しやすいといった利点があります。
+反面、読み出しを忘れると NullReferenceException が発生してしまうので注意しましょう。
+明示的に関連データを読み出すコードは以下の通りです。
 
 using (var context = new ShoppingContext())
 {
@@ -201,19 +258,39 @@ using (var context = new ShoppingContext())
         Console.WriteLine(product.Category.Name);
     }
 }
-Reference関数で読み出したい関連データのプロパティを指定します。 そして、Load関数を呼び出すことで、指定したproductの関連データであるCategoryを読み込むSqlを DBに対して発行します。
 
-Reference(p => p.Category) は Reference("Category") と書いても同じです。 少し前のEFであったら後者の書き方しかできませんでした。しかし、文字列で読み込みたいプロパティ名 を書くと、プロパティ名を書き換えてもコンパイラのチェックにひっかからず、 実行時にエラーが発覚する場合があります。 できるだけラムダ式を使うReferenceメソッドを使うようにしましょう。
+Reference関数で読み出したい関連データのプロパティを指定します。
+そして、Load関数を呼び出すことで、
+指定した product の関連データである Category を読み込む Sqlを DBに対して発行します。
 
-1対多のデータを読み出す際は、Reference関数ではなくCollection関数を使うことに注意しましょう。 例えば、ProductクラスがICollection<ProductCategory> Categories というナビゲーションプロパティ を持っていた場合は、以下のようなコードで関連データを読み出します。
+Reference(p => p.Category) は Reference("Category") と書いても同じです。
+少し前のEFであったら後者の書き方しかできませんでした。
+しかし、文字列で読み込みたいプロパティ名 を書くと、
+プロパティ名を書き換えてもコンパイラのチェックに ひっかからず、
+実行時にエラーが発覚する場合があります。 
+できるだけラムダ式を使う Reference()メソッドを使うようにしましょう。
+
+1対多のデータを読み出す際は、
+Reference関数ではなくCollection関数を使うことに注意しましょう。
+例えば、Productクラスが 
+ICollection<ProductCategory> Categories というナビゲーションプロパティ を持っていた場合は、
+以下のようなコードで関連データを読み出します。
 
 context.Entry(product)
     .Collection(p => p.Categories)
     .Load();
-5.3.2. Eager Loading
-Explicit Loading で取り上げたReference,またはCollectionを使う方法は、 一つのエントリーに対して明示的な読み込みを行いました。 しかし、この方法では、エントリーが大量にある場合は、大量のSQLをDBに発行することになってしまいます。
 
-Eager Loadingは、一つのクエリだけで関連するデータを読み出すことができる機能です。 この機能を使うことで、発行するクエリを抑えることができます。 Eager Loadingを行うには、Include関数を使います。たとえば、以下のようなコードとなります。
+
+5.3.2. Eager Loading (一括読み出し)
+Explicit Loading で取り上げた Reference(),または Collection()を使う方法は、 
+一つのエントリーに対して明示的な読み込みを行いました。
+しかし、この方法では、エントリーが大量にある場合は、
+大量のSQLをDBに発行することになってしまいます。
+
+Eager Loading は、一つのクエリだけで関連するデータを読み出すことができる機能です。
+この機能を使うことで、発行するクエリを抑えることができます。
+Eager Loading を行うには、Include関数を使います。
+たとえば、以下のようなコードとなります。
 
 using (var context = new ShoppingContext())
 {
@@ -226,37 +303,59 @@ using (var context = new ShoppingContext())
         Console.WriteLine(product.Category.Name);
     }
 }
-productsを実体化した時点で、関連するCategoryテーブルの内容も一緒に読み込まれます。 実際は、以下のようなJOIN句を使ったクエリがDBに対して発行されています。
+
+productsを実体化した時点で、
+関連するCategoryテーブルの内容も一緒に読み込まれます。
+実際は、以下のような JOIN句 を使ったクエリがDBに対して発行されています。
 
 SELECT
-[Extent1].[ProductId] AS [ProductId],
-[Extent1].[Name] AS [Name],
-[Extent1].[Price] AS [Price],
-[Extent1].[Stock] AS [Stock],
-[Extent2].[ProductCategoryId] AS [ProductCategoryId],
-[Extent2].[Name] AS [Name1]
+  [Extent1].[ProductId] AS [ProductId],
+  [Extent1].[Name] AS [Name],
+  [Extent1].[Price] AS [Price],
+  [Extent1].[Stock] AS [Stock],
+  [Extent2].[ProductCategoryId] AS [ProductCategoryId],
+  [Extent2].[Name] AS [Name1]
 FROM  [dbo].[Products] AS [Extent1]
 LEFT OUTER JOIN [dbo].[ProductCategories] AS [Extent2]
  ON [Extent1].[Category_ProductCategoryId] = [Extent2].[ProductCategoryId]
-Includeはいくつでも重ねることができます。たとえば、Productクラスが、Categoryと Shopという二つのナビゲーションプロパティを持っていたとします。 これらの関連データを1回のクエリで取得したい場合は、以下のように記述します。
+
+Include() はいくつでも重ねることができます。
+たとえば、Productクラスが、
+Categoryと Shopという二つのナビゲーションプロパティを持っていたとします。
+これらの関連データを 1回のクエリで取得したい場合は、以下のように記述します。
 
 var products = context.Products
      .Include(p => p.Category)
      .Include(p => p.Shop)
      .ToArray();
-Includeを使うことによって、一つのクエリで指定した関連データすべてを読み出すことができます。 ただし、あまりIncludeを重ねすぎるととても複雑なクエリが生成されてしまい、 パフォーマンスが悪化する可能性がありますので注意してください。
 
-5.3.3. Lazy Loading
-遅延読み込みを行うためには、作成したPOCOクラス(サンプルの場合はProductクラス)に手を加える必要 があります。 Entity Frameworkでは、遅延読み込みを動的プロキシを使って実現しています。 動的プロキシ(Dynamic Proxy)は、実行時にもとのPOCOクラスと同じインターフェースを持つProxyクラスを作成します。 何か処理を呼び出す際は、このProxyを経由して呼び出すことになります。 このように実装することで、処理呼び出し時にフックをかけることができるわけです。
+Include() を使うことによって、一つのクエリで指定した関連データすべてを読み出すことができます。
+ただし、あまり Include() を重ねすぎると とても複雑なクエリが生成されてしまい、
+パフォーマンスが悪化する可能性がありますので注意してください。
 
-例えば、ナビゲーションプロパティであるCategoryプロパティを呼び出した際に、もしまだデータが呼び出されて いなかったら、DBにアクセスしてデータを持ってくる等のフックをかけます。 このようにして遅延読み込みを実現しています。
 
-動的プロキシを作成できるようにするためには、以下のようなPOCOクラスを作成しなければなりません。
+5.3.3. Lazy Loading (遅延読み出し)
+遅延読み込みを行うためには、
+作成した POCOクラス(サンプルの場合は Product クラス)に手を加える必要があります。
+Entity Framework では、遅延読み込みを動的プロキシを使って実現しています。
+動的プロキシ(Dynamic Proxy)は、
+実行時にもとのPOCOクラスと同じインターフェースを持つProxyクラスを作成します。
+何か処理を呼び出す際は、このProxyを経由して呼び出すことになります。
+このように実装することで、処理呼び出し時にフックをかけることができるわけです。
 
-作成したPOCOクラスはpublicであること
-作成したPOCOクラスにsealedがついていないこと
-ナビゲーションプロパティにvirtual指定がついていること
-上記の条件を満たしていない場合、動的プロキシを作成することができず、遅延読み込みは実現できません。
+例えば、ナビゲーションプロパティであるCategoryプロパティを呼び出した際に、
+もし まだデータが呼び出されていなかったら、
+DBにアクセスしてデータを持ってくる等のフックをかけます。
+このようにして遅延読み込みを実現しています。
+
+動的プロキシを作成できるようにするためには、
+以下のようなPOCOクラスを作成しなければなりません。
+
+作成したPOCOクラスは publicであること
+作成したPOCOクラスに sealedがついていないこと
+ナビゲーションプロパティに virtual指定がついていること
+上記の条件を満たしていない場合、動的プロキシを作成することができず、
+遅延読み込みは実現できません。
 
 例えば、以下のようなPOCOクラスを作成すれば、遅延読み込みを行うことができます。
 
@@ -274,7 +373,11 @@ public class ProductCategory
     public int ProductCategoryId { get; set; }
     public string Name { get; set; }
 }
-重要なのは、Productクラスがpublic, not sealedであることと、ナビゲーションプロパティである Categoryがvirtual指定されていることです。 このように実装することで、以下のようなコードを書いたとしても、正しく関連データを読み込む ことができます。
+
+重要なのは、Productクラスが public, not sealed であることと、
+ナビゲーションプロパティである Categoryが virtual指定されていることです。
+このように実装することで、以下のようなコードを書いたとしても、
+正しく関連データを読み込むことができます。
 
 using (var context = new ShoppingContext())
 {
@@ -286,17 +389,25 @@ using (var context = new ShoppingContext())
         Console.WriteLine(product.Category.Name);
     }
 }
-遅延読み込みなとても便利な機能ですが、いつどのタイミングで クエリをDBに発行しているのかが分かりにくいといった問題があります。 また、気を付けてコードを書かないと、無駄に何回もクエリを発行してパフォーマンスが 悪化してしまう可能性もあります。 もし、遅延読み込みを行いたくない場合は、
+
+遅延読み込みは とても便利な機能ですが、
+いつどのタイミングで クエリを DBに発行しているのかが分かりにくいといった問題があります。
+また、気を付けてコードを書かないと、
+無駄に何回もクエリを発行してパフォーマンスが悪化してしまう可能性もあります。
+もし、遅延読み込みを行いたくない場合は、
 
 context.Configuration.LazyLoadingEnabled = false;
+
 などと記述することで、遅延読み込みを切ることもできます。
 
+
 5.4. リレーションデータの削除
-リレーションデータの削除は、罠にはまりそうな箇所がいくつもあります。
+リレーションデータの削除は、罠に はまりそうな箇所がいくつもあります。
 
 5.4.1. データの削除
-1対1リレーションの作成 で取り上げたProductCategoryのデータを、DBから削除する方法について説明します。 Productsテーブルは、ProductCategoriesテーブルと1対1の関連を持っているとします。
-
+1対1リレーションの作成で取り上げたProductCategoryのデータを、
+DBから削除する方法について説明します。
+Productsテーブルは、ProductCategoriesテーブルと1対1の関連を持っているとします。
 ProductCategoriesのデータを削除するために、以下のようなコードを書いてみました。
 
 using (var context = new ShoppingContext())
@@ -324,19 +435,31 @@ using (var context = new ShoppingContext())
     }
     context.SaveChanges();
 }
-このコードを実行すると、残念ながら以下のような例外が発生し、SaveChangesを 行うことができます。
 
-ハンドルされていない例外: System.Data.Entity.Infrastructure.DbUpdateException:
-エントリを更新中にエラーが発生しました。詳細については、内部例外を参照してくださ
-い。 ---> System.Data.UpdateException: エントリを更新中にエラーが発生しました。
-詳細については、内部例外を参照してください。 ---> System.Data.SqlClient.SqlExcep
-tion: DELETE ステートメントは REFERENCE 制約 "FK_Products_ProductCategories_Cate
-gory_ProductCategoryId" と競合しています。競合が発生したのは、データベース "Enti
-tyFrameworkTest.ShoppingContext"、テーブル "dbo.Products", column 'Category_Prod
-uctCategoryId' です。
-Productsテーブルのデータは、ProductCategoriesテーブルへの関連を持っています。 よって、ProductCategoriesテーブルのデータを削除する際は、関連するProductsテーブルの データも削除する必要があるわけです。 しかし、ShopppingContextは、関連するデータをDBから読み出してきていないため、 どのデータを削除すればよいのか判断できず、SaveChangesで失敗してしまいます。
+このコードを実行すると、残念ながら以下のような例外が発生し、
+SaveChanges() を 行うことができません。
 
-この問題を解決するためには、以下のようにしてShoppingContext内に関連するデータを読み込む 必要があります。
+ハンドルされていない例外: 
+System.Data.Entity.Infrastructure.DbUpdateException:
+エントリを更新中にエラーが発生しました。
+詳細については、内部例外を参照してください。
+  ---> System.Data.UpdateException: エントリを更新中にエラーが発生しました。
+詳細については、内部例外を参照してください。
+  ---> System.Data.SqlClient.SqlException: 
+         DELETE ステートメントは 
+         REFERENCE 制約 "FK_Products_ProductCategories_Category_ProductCategoryId"
+         と競合しています。
+         競合が発生したのは、データベース "EntityFrameworkTest.ShoppingContext"、
+         テーブル "dbo.Products", column 'Category_ProductCategoryId' です。
+
+Productsテーブルのデータは、ProductCategoriesテーブルへの関連を持っています。
+よって、ProductCategoriesテーブルのデータを削除する際は、
+関連するProductsテーブルの データも削除する必要があるわけです。
+しかし、ShopppingContextは、関連するデータをDBから読み出してきていないため、
+どの データを削除すればよいのか判断できず、SaveChanges() で失敗してしまいます。
+
+この問題を解決するためには、
+以下のようにして ShoppingContext 内に関連するデータを読み込む必要があります。
 
 using (var context = new ShoppingContext())
 {
@@ -354,9 +477,11 @@ using (var context = new ShoppingContext())
     }
     context.SaveChanges();
 }
-LINQの遅延評価には注意してください。ToArray関数を使って結果を確定しなければ、 context内にデータは読み込まれません。
 
-上記のコードを実行すると、次のようなSQLが発行されます。
+LINQの遅延評価には注意してください。
+ToArray関数を使って結果を確定しなければ、context内にデータは読み込まれません。
+
+上記のコードを実行すると、次のような SQLが発行されます。
 
 update [dbo].[Products]
 set [Category_ProductCategoryId] = null
@@ -364,9 +489,14 @@ where (([ProductId] = @0) and ([Category_ProductCategoryId] = @1))
 
 delete [dbo].[ProductCategories]
 where ([ProductCategoryId] = @0)
-Productsテーブルが持っているProductCategoryへの外部キーはNULLを許容するものなので、 上記のようにProductsテーブルへのUpdate文が発行されます。
 
-Product内のナビゲーションプロパティに、以下のようなRequire指定が付いている場合は、 外部キーのNull許容ができないため、update文の代わりにdelete文が発行されて該当するProductsのデータが 削除されます。
+Productsテーブルが持っている ProductCategory への外部キーは
+NULL を許容するものなので、
+上記のように Productsテーブルへの Update文が発行されます。
+
+Product内のナビゲーションプロパティに、
+以下のような[Require]指定が付いている場合は、外部キーの Null許容ができないため、
+update 文の代わりに delete 文が発行されて該当するProductsのデータが削除されます。
 
 public class Product
 {
@@ -378,12 +508,16 @@ public class Product
     [Required]
     public ProductCategory Category { get; set; }
 }
-}
+
 
 5.4.2. カスケードデリート
-カスケードデリートは、ある関連データを持つテーブルの更新を行うと、 それと関連するテーブルのデータも一緒に削除される機能です。
+カスケードデリートは、ある関連データを持つテーブルの更新を行うと、
+それと関連するテーブルのデータも一緒に削除される機能です。
 
-カスケードデリートの指定は、DBマイグレーション時に行う必要があります。 例えば、Productsテーブルが持っているProductCategoriesへの外部キーの項目に カスケードデリート指定したい場合は、以下のようなマイグレーションファイルを書く必要があります。
+カスケードデリートの指定は、DBマイグレーション時に行う必要があります。
+例えば、Productsテーブルが持っている ProductCategories への外部キーの項目に
+カスケードデリート指定したい場合は、
+以下のようなマイグレーションファイルを書く必要があります。
 
 public partial class AddRequiredCategory : DbMigration
 {
@@ -406,9 +540,13 @@ public partial class AddRequiredCategory : DbMigration
         // 省略
     }
 }
-重要なのは、AddForeignKeyを行う際に、cascadeDeleteをtrueとすることです。
+重要なのは、AddForeignKey()を行う際に、cascadeDelete を true とすることです。
 
-上記のようなカスケードデリート指定があり、Category_ProductCategoryIdがNULL許容 をしない場合は、ProductCategoryのデータ削除の際、 データの削除 のコード のように、わざわざ関連するデータを明示的に 読み出す必要はありません。 以下のようなコードを記述しても、うまく動作してくれます。
+上記のようなカスケードデリート指定があり、
+Category_ProductCategoryId が NULL許容をしない場合は、
+ProductCategoryのデータ削除の際、データの削除 のコード のように、
+わざわざ関連するデータを明示的に読み出す必要はありません。
+以下のようなコードを記述しても、うまく動作してくれます。
 
 using (var context = new ShoppingContext())
 {
@@ -424,4 +562,5 @@ using (var context = new ShoppingContext())
 }
  
 
-COPYRIGHT (C) 2011- DENSAN-LABS.NET. ALL RIGHTS RESERVED. DESIGN BY FREE CSS TEMPLATES. CREATED USING SPHINX
+COPYRIGHT (C) 2011- DENSAN-LABS.NET. ALL RIGHTS RESERVED. 
+DESIGN BY FREE CSS TEMPLATES. CREATED USING SPHINX

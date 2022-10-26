@@ -15,28 +15,43 @@ Table Of Contents
 
 
 1.1. Entity Frameworkのインストール
-まず初めにEntity Framework(EF)のインストールを行いましょう． 今回利用するEFのバージョンは4.3.1です．
+まず初めにEntity Framework(EF)のインストールを行いましょう．
+今回利用するEFのバージョンは4.3.1です．
 
-EFをインストールするためには， あらかじめNuGet Package Managerをインストールしておく必要があります． NuGet Package Managerはメニューバーのツール内にある拡張機能マネージャ から簡単にインストールできます(図 nuget_install)．
+EFをインストールするためには，
+あらかじめNuGet Package Managerをインストールしておく必要があります．
+NuGet Package Managerはメニューバーのツール内にある拡張機能マネージャから
+簡単にインストールできます(図 nuget_install)．
 
 ../../_images/entity_pic008.JPG
 図:NuGetのインストール
 
-NuGetのインストールが完了したら，次にEFのインストールを行います． EFはプロジェクト毎にインストールを行いますので，あらかじめプロジェクトを作成 しておいてください．次にメニューバーのツール，Library Package Manager，Manage NuGet Packages for Solutionを 選択し，Entity Frameworkをインストールしてください．
+NuGetのインストールが完了したら，次にEFのインストールを行います．
+EFはプロジェクト毎にインストールを行いますので，
+あらかじめプロジェクトを作成 しておいてください．
+次にメニューバーのツール，Library Package Manager，
+Manage NuGet Packages for Solutionを 選択し，
+Entity Frameworkをインストールしてください．
 
 ../../_images/entity_pic001.JPG
 図:Entity Frameworkのインストール
 
-Entity FrameworkはNuGetのPackage Manager Consoleからもインストールできます． その場合は，以下のコマンドを入力してインストールしてください．
+Entity FrameworkはNuGetのPackage Manager Consoleからもインストールできます．
+その場合は，以下のコマンドを入力してインストールしてください．
 
 PM> Install-Package EntityFramework
-プロジェクトの参照設定にEntityFrameworkがインストールされているかを確認してください． 以上でEFのインストールは完了です．
+プロジェクトの参照設定にEntityFrameworkがインストールされているかを確認してください．
+以上でEFのインストールは完了です．
 
 1.2. Code Firstによるデータベース作成
-Code Firstを用いてデータベースを作成してみましょう． Code Firstという名前が示す通り，Code Firstではまず先にソースコードを先に書き， そのソースを元にEFが自動的にデータベースを作り出すようになっています．
+Code Firstを用いてデータベースを作成してみましょう． 
+Code Firstという名前が示す通り，Code Firstではまず先にソースコードを先に書き，
+そのソースを元にEFが自動的にデータベースを作り出すようになっています．
 
 1.2.1. モデルとなるクラスの作成
-今回はショッピングサイトの商品を保存するクラスを作成することとします． 空のコンソールプロジェクト(プロジェクト名はCodeFirstTest01)を作り， 以下のクラス(Product.cs)を作成します．
+今回はショッピングサイトの商品を保存するクラスを作成することとします．
+空のコンソールプロジェクト(プロジェクト名はCodeFirstTest01)を作り，
+以下のクラス(Product.cs)を作成します．
 
 using System;
 using System.Collections.Generic;
@@ -52,14 +67,29 @@ namespace CodeFirstTest01
         public int Price { get; set; }
     }
 }
-Product.csは商品の名前，値段を格納するクラスです． 今回はこのクラスを元にDBテーブルを自動生成することとします．
 
-ここで重要なことが2点あります．一つ目は， テーブルのKeyとなるプロパティを 作成しなければならない [1] ということです. 2つ目は， プロパティの名前の付け方には決まりがある ということです．
+Product.csは商品の名前，値段を格納するクラスです． 
+今回はこのクラスを元にDBテーブルを自動生成することとします．
 
-Product.csの場合，KeyとしてProductIdというものを定義しています． また，Keyはクラス名 + Idという名前にしなければなりません [2] ． 例えば，クラスItemの場合は，ItemIdとなるわけです．
+ここで重要なことが2点あります．
+一つ目は， テーブルのKeyとなるプロパティを 作成しなければならない [1] ということです. 
+2つ目は， プロパティの名前の付け方には決まりがある ということです．
+
+Product.csの場合，KeyとしてProductIdというものを定義しています．
+また，Keyはクラス名 + Idという名前にしなければなりません [2] ．
+例えば，クラスItemの場合は，ItemIdとなるわけです．
+
+脚注
+[1]	ComplexType と呼ばれるクラスを定義する場合には，
+    Keyを作成する必要がありませんが，ここでは詳しくは説明しません．
+[2]	もちろん，Key Annotation と呼ばれるものを用いることで，
+    このメンバの名前を変えることができます．
+
 
 1.2.2. Contextクラスの作成
-DBにデータを更新、取得するためのインターフェースとして，Entity Framework Contextというものを 作成します．今回はShoppingContextというクラスを作成します．
+DBにデータを更新、取得するためのインターフェースとして，
+Entity Framework Context というものを 作成します．
+今回は ShoppingContext というクラスを作成します．
 
 using System;
 using System.Collections.Generic;
@@ -74,14 +104,28 @@ namespace CodeFirstTest01
         public DbSet<Product> Products { get; set; }
     }
 }
-Contextクラスでは，ObjectContextかDbContextのどちらかを継承します． ObjectContextは初期のEFで定義されたクラスなので，あまり使うことはありません． 今回はDbContextを継承することとします．
 
-次に，DBと作成したProductクラスを接続するために，DbSet型のプロパティを定義します． DbSetでは，特定の型（今回の場合はProductクラス）をDBと結び付ける役割を担っています． また，DbSetを定義することによって，EFにProductというモデルが存在することを通知する 役割も担っています．DbSetを定義することによって，EF側は作成したProductクラス のDBテーブルを作成しなければならないことを知るわけです．
+Context クラスでは，ObjectContext か DbContext のどちらかを継承します．
+ObjectContext は初期のEFで定義されたクラスなので，あまり使うことはありません．
+今回は DbContext を継承することとします．
 
-DbSetプロパティの名前の付け方に決まりはありませんが， 基本的に モデル（例ではProduct)クラスの複数形 にしてください． ProductであったらProductsに，ItemであったらItemsに， PersonであったらPeopleと名付けるようにしましょう．
+次に，DBと作成した Product クラスを接続するために，
+DbSet 型のプロパティを定義します． DbSet では，
+特定の型（今回の場合は Product クラス）をDBと結び付ける役割を担っています．
+また，DbSetを定義することによって，
+EFにProductというモデルが存在することを通知する 役割も担っています．
+DbSetを定義することによって，
+EF側は作成した Product クラス のDBテーブルを作成しなければならないことを知るわけです．
+
+DbSetプロパティの名前の付け方に決まりはありませんが，
+基本的に モデル（例ではProduct)クラスの複数形 にしてください．
+ProductであったらProductsに，ItemであったらItemsに，
+PersonであったらPeopleと名付けるようにしましょう．
+
 
 1.2.3. データベースの生成とデータの追加
-次に，DB及びテーブルを自動生成し，値を追加するメソッドを書きます． 今回はMainメソッド内にこれらの処理を定義します．
+次に，DB及びテーブルを自動生成し，値を追加するメソッドを書きます．
+今回は Mainメソッド内に これらの処理を定義します．
 
 using System;
 using System.Collections.Generic;
@@ -100,17 +144,26 @@ namespace CodeFirstTest01
                 Name = "TestItem",
                 Price = 100
             };
+
             using (var context = new ShoppingContext())
             {
                 context.Products.Add(product);
                 context.SaveChanges();
-            }
-        }
-    }
+            }//using
+        }//Main()
+    }//class
 }
-特に複雑な処理はありません．先ほど定義したShoppingContextを作成し， Productsに値を入れます．その後，SaveChanges関数を実行することで， DB作成，テーブル作成，そして値の代入というDBの更新作業をEFが行います．
 
-ここで注意しなければならないことがあります． ProductクラスのProductIdプロパティは，テーブルのPrimary Keyが EFにより自動的に割り当てられます． よって，ProductIdプロパティにどんな値を設定したとしても，DBには反映され ません．たとえば，以下のようなデータを作成します．
+特に複雑な処理はありません．
+先ほど定義したShoppingContextを作成し， Productsに値を入れます．
+その後，SaveChanges関数を実行することで，
+DB作成，テーブル作成，そして値の代入というDBの更新作業を EF が行います．
+
+ここで注意しなければならないことがあります．
+ProductクラスのProductIdプロパティは，
+テーブルの Primary Key が EF により自動的に割り当てられます．
+よって，ProductId プロパティにどんな値を設定したとしても，DBには反映されません．
+たとえば，以下のようなデータを作成します．
 
 var product = new Product()
 {
@@ -118,10 +171,16 @@ var product = new Product()
   Name = "TestItem",
   Price = 100
 };
-しかし，上記のProductIdの項目は無視されますので注意してください [4] ．
+
+しかし，上記の ProductId の項目は無視されますので注意してください [3] ．
+
+脚注
+[3]	もし自分の好きな値を挿入したい場合は DatabaseGenerated アノテーション を使って，
+    自動生成を切ることができます．
+
 
 1.2.4. データベース接続文字列の設定
-DBに接続するためのConnectionStringはApp.config内に定義します．
+DBに接続するためのConnectionStringは [App.config] 内に定義します．
 
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
@@ -136,49 +195,77 @@ DBに接続するためのConnectionStringはApp.config内に定義します．
   <connectionStrings>
     <add name="ShoppingContext" 
       providerName="System.Data.SqlClient"
-      connectionString="Server=.\SQLEXPRESS;Database=CodeFirstShopping;Trusted_Connection=true" />
+      connectionString="Server=.\SQLEXPRESS;
+        Database=CodeFirstShopping;
+        Trusted_Connection=true" />
   </connectionStrings>
   <entityFramework>
-    <defaultConnectionFactory type="System.Data.Entity.Infrastructure.SqlConnectionFactory,
-                              EntityFramework">
+    <defaultConnectionFactory 
+      type="System.Data.Entity.Infrastructure.SqlConnectionFactory,
+        EntityFramework">
       <parameters>
         <parameter value="Data Source=(localdb)\v11.0; 
-                   Integrated Security=True; MultipleActiveResultSets=True" />
+                   Integrated Security=True;
+                   MultipleActiveResultSets=True" />
       </parameters>
     </defaultConnectionFactory>
   </entityFramework>
 </configuration>
-ConnectionStringsで囲まれた要素を新たに作成しました． 他の部分はEFインストールによって自動生成されていることと思います．
 
-変更を加えたのはConnectionStringsの部分です． ここでも重要なことがあります． ConnectionStringのnameは 作成したContextと同じ名前にする 必要があります [3] ． 今回はShoppingContextクラスをDbContextとしたので，ConnectionStringの名前もShoppingContextとする必要があります．
+ConnectionStringsで囲まれた要素を新たに作成しました．
+他の部分はEFインストールによって自動生成されていることと思います．
 
-SERVER=に続くところは，ご自身のSQL Serverの宛先を書いてください． 今回はSQLExpressを使っていますが、例えばSQL ServerにTESTSQLという名前がすでについている場合は、 サーバ名を以下のようにTESTSQLに変えてください。
+変更を加えたのはConnectionStringsの部分です． ここでも重要なことがあります．
+ConnectionString の name は 作成した Context と同じ名前にする 必要があります [4] ．
+今回はShoppingContextクラスをDbContextとしたので，
+ConnectionString の名前も ShoppingContext とする必要があります．
+
+[4]	connectionString の name を変更する方法もあります．
+    ShoppingContext クラスのコンストラクタを，
+    public ShoppingContext() : base(nameOrConnectionString: "name=好きな名前") {} 
+    と定義することで変更が可能です．
+
+SERVER= に続くところは，ご自身のSQL Serverの宛先を書いてください．
+今回はSQLExpressを使っていますが、
+例えば SQL Server に TESTSQL という名前がすでについている場合は、
+サーバ名を以下のように TESTSQL に変えてください。
 
 <connectionStrings>
   <add name="ShoppingContext" providerName="System.Data.SqlClient"
    connectionString="Server=.\\TESTSQL;Database=CodeFirstShopping;Trusted_Connection=true" />
 </connectionStrings>
-Database=の後には，作成したいデータベース名を書いてください． 今回はCodeFirstShoppingというデータベースを作成することとしました．
+
+Database=の後には，作成したいデータベース名を書いてください．
+今回は CodeFirstShopping というデータベースを作成することとしました．
+
 
 1.2.5. DBの自動生成
-以上で完成です．プログラムを実行し，正常に処理が終了するかどうかを確認してください．
+以上で完成です．プログラムを実行し，
+正常に処理が終了するかどうかを確認してください．
 
 SQL Management Studioを使い，DBが正しく作成されているかどうかを確認しましょう．
 
 ../../_images/entity_pic004.JPG
 図:SQL Server Management Studioでのデータベース確認
 
-ただしく作成されていれば，図 dbcheck のように表示されるはずです． 値も正しくInsertされていることが確認できます．
+正しく作成されていれば，図 dbcheck のように表示されるはずです．
+値も正しく Insert されていることが確認できます．
 
-プログラムを修正せずに ，もう一度実行してみましょう． ProductIdの値が自動的に作成されていると思います．
+プログラムを修正せずに ，もう一度 実行してみましょう．
+ProductId の値が自動的に作成されていると思います．
 
 ../../_images/entity_pic006.JPG
 図:ProductIdが自動的に作成されているかを確認
 
-モデルクラスに何か新しいメンバを追加したりすると，InvalidOperationException というエラーが表示され，うまくいかなくなると思います． その場合は，DBを一度削除してから実行してください． この問題の解決方法については，次章以降に説明していきます．
+モデルクラスに何か新しいメンバを追加したりすると，
+InvalidOperationException というエラーが表示され，うまく いかなくなると思います．
+その場合は，DBを一度削除してから実行してください．
+この問題の解決方法については，次章以降に説明していきます．
+
 
 1.3. データベースからの情報の取得
-Contextクラスを利用することで，データベースから値を取得することも可能です． Mainメソッドを次のように書き換えてみましょう．
+Contextクラスを利用することで，データベースから値を取得することも可能です．
+Mainメソッドを次のように書き換えてみましょう．
 
 static void Main(string[] args)
 {
@@ -187,6 +274,7 @@ static void Main(string[] args)
         Name = "TestItem",
         Price = 100
     };
+
     using (var context = new ShoppingContext())
     {
         context.Products.Add(product);
@@ -196,19 +284,29 @@ static void Main(string[] args)
         {
             Console.WriteLine(p.ProductId + " " + p.Name + " " + p.Price);
         }
-    }
-}
-context.Productsにアクセスすることで，データベースから値を取得することが 可能です． 実行すると，例えば下図のような情報が取得できます（プログラムを実行した回数に よって，出力されるデータは異なります）．
+    }//using
+}//Main()
+
+context.Productsにアクセスすることで，
+データベースから値を取得することが 可能です．
+実行すると，例えば下図のような情報が取得できます
+（プログラムを実行した回数に よって，出力されるデータは異なります）．
 
 ../../_images/entity_pic026.JPG
 図:データへのアクセス
 
-脚注
 
-[1]	ComplexTypeと呼ばれるクラスを定義する場合には，Keyを作成する必要がありませんが，ここでは詳しくは説明しません．
-[2]	もちろん，Key Annotationと呼ばれるものを用いることで，このメンバの名前を変えることができます．
-[3]	connectionStringのnameを変更する方法もあります．ShoppingContextクラスのコンストラクタを， public ShoppingContext() : base(nameOrConnectionString: "name=好きな名前") {} と定義することで変更が可能です．
-[4]	もし自分の好きな値を挿入したい場合はDatabaseGeneratedアノテーション を使って，自動生成を切ることができます．
+脚注
+[1]	ComplexTypeと呼ばれるクラスを定義する場合には，
+    Keyを作成する必要がありませんが，ここでは詳しくは説明しません．
+[2]	もちろん，Key Annotationと呼ばれるものを用いることで，
+    このメンバの名前を変えることができます．
+[3]	もし自分の好きな値を挿入したい場合は DatabaseGenerated アノテーションを使って，
+    自動生成を切ることができます．
+[4]	connectionStringのnameを変更する方法もあります．
+    ShoppingContextクラスのコンストラクタを，
+    public ShoppingContext() : base(nameOrConnectionString: "name=好きな名前") {} 
+    と定義することで変更が可能です．
  
 
 COPYRIGHT (C) 2011- DENSAN-LABS.NET. ALL RIGHTS RESERVED. DESIGN BY FREE CSS TEMPLATES. CREATED USING SPHINX

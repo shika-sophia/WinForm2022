@@ -3,7 +3,11 @@
 https://densan-labs.net/tech/codefirst/index.html
 最終更新日 2012年09月27日
 
-Microsoft社製のオープンソースORMであるEntity Frameworkに関して，CodeFirstに焦点をしぼった解説を書きました． サンプルプログラムはEntity Framework4.3.1 で動作させています． 2012年9月4日現在，Entity Frameworkのバージョンは5.0となっています． 現在の最新バージョンとは記述方法が異なる場合があります．
+Microsoft社製のオープンソースORMであるEntity Frameworkに関して，
+CodeFirstに焦点をしぼった解説を書きました．
+サンプルプログラムはEntity Framework4.3.1 で動作させています．
+2012年9月4日現在，Entity Frameworkのバージョンは5.0となっています．
+現在の最新バージョンとは記述方法が異なる場合があります．
 
 キーワード: Entity Framework, CodeFirst, エンティティフレームワーク, コードファースト
 
@@ -17,11 +21,13 @@ Microsoft社製のオープンソースORMであるEntity Frameworkに関して�
 1.2.4. データベース接続文字列の設定
 1.2.5. DBの自動生成
 1.3. データベースからの情報の取得
+
 2. モデルの変更とコンフィギュレーション
 2.1. モデルの変更
 2.2. Annotation及びFluent APIを用いた自動生成テーブルの制御
 2.2.1. Annotationを用いたテーブルの設定
 2.2.2. Fluent APIを用いたテーブルの設定
+
 3. データベースマイグレーション
 3.1. マイグレーションについて
 3.2. マイグレーションの準備
@@ -33,6 +39,7 @@ Microsoft社製のオープンソースORMであるEntity Frameworkに関して�
 3.6. マイグレーションヒストリー
 3.7. ダウングレード
 3.8. マイグレーションのタイムアウト
+
 4. データの挿入、読み出し、更新、削除
 4.1. DbContextとエンティティの状態
 4.2. データの挿入
@@ -45,6 +52,7 @@ Microsoft社製のオープンソースORMであるEntity Frameworkに関して�
 4.4. データの更新
 4.5. データの削除
 4.6. SaveChangesの動作
+
 5. リレーション
 5.1. リレーションシップの作成
 5.1.1. 1対1リレーションの作成
@@ -58,7 +66,10 @@ Microsoft社製のオープンソースORMであるEntity Frameworkに関して�
 5.4. リレーションデータの削除
 5.4.1. データの削除
 5.4.2. カスケードデリート
+
 6. マッピング
+(No Article)
+
 7. 高度な話題
 7.1. Entity Framework Power Toolsを用いたER図の確認
 7.1.1. Entity Framework Power Toolsのインストール
@@ -93,4 +104,5 @@ Toden Power Information
 Nisel BBS
 Solomon
 
-COPYRIGHT (C) 2011- DENSAN-LABS.NET. ALL RIGHTS RESERVED. DESIGN BY FREE CSS TEMPLATES. CREATED USING SPHINX
+COPYRIGHT (C) 2011- DENSAN-LABS.NET. ALL RIGHTS RESERVED. 
+DESIGN BY FREE CSS TEMPLATES. CREATED USING SPHINX
