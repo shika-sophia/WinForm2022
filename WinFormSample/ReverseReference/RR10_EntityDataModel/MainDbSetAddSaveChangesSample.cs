@@ -75,7 +75,18 @@
  *@subject ◆class BindingList<T> : Collection<T>, IBindingList, IList, ICollection, IEnumerable, ICancelAddNew, IRaiseItemChangedEvents
  *                    -- System.ComponentModel
  *         データ バインディングをサポートするジェネリック コレクション
- *                    
+ *
+ *@NOTE【Problem】grid.Rows.Add(person);
+ *      -> System.InvalidOperationException:
+ *         コントロールがデータバインドされているとき、
+ *         DataGridView の行コレクションにプログラムで行を追加することはできません。
+ *         
+ *      => 行の追加は表示される。その後に上記の例外となる。
+ *      
+ *      => grid.DataSource = entity.PersonRR.Local から
+ *         grid.DataSource = entity.PersonRR.Local.ToBindingList() に変更すると
+ *         「grid.Rows.Add(person);」をしなくても表示に反映する。削除も ちゃんとできる。
+ *      
  *@NOTE【Problem】
  *      ・Cell.Valueで Idの値は取れているが、
  *        DBを DELETE するのは、指定行の index を削除してしまう。
@@ -83,6 +94,16 @@
  *      ・おそらく、Remove(PersonRR)内で、
  *        引数の行と一致する rowIndexを調べ、その行を DELETEしているのでは？
  *        
+ *      => grid.DataSource = entity.PersonRR.Local から
+ *         grid.DataSource = entity.PersonRR.Local.ToBindingList() に変更すると
+ *         削除も ちゃんとできる。
+ *
+ *@NOTE【Problem】grid.CurrentRow.Cells[0].Value?.ToString();
+ *      空行の Id は 直前の行の Id の値になっているときと、0になっているときがある。
+ *      
+ *      bool  String.IsNullOrEmpty(string) では空行を識別できない。
+ *      bool  cellCollection[0].Value.ToString() == "0"; でも識別できない。
+ *      
  *@see ImageDbSetAddSaveChangesSample.jpg
  *@see 
  *@author shika
@@ -103,9 +124,9 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
 {
     class MainDbSetAddSaveChangesSample
     {
-        //[STAThread]
-        //static void Main()
-        public void Main()
+        [STAThread]
+        static void Main()
+        //public void Main()
         {
             Console.WriteLine("new FormDbSetAddSaveChangesSample()");
 
@@ -126,6 +147,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
         private readonly Label labelAddress;
         private readonly Label labelTel;
         private readonly Label labelEmail;
+        private readonly TextBox[] textBoxAry;
         private readonly TextBox textBoxName;
         private readonly TextBox textBoxAddress;
         private readonly TextBox textBoxTel;
@@ -222,13 +244,15 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
             table.Controls.Add(labelEmail, 0, 4);
 
             //---- TextBox ----
+            textBoxAry = new TextBox[4];
+
             textBoxName = new TextBox()
             {
                 Padding = padding,
                 Dock = DockStyle.Fill,
                 AutoSize = true,
             };
-            
+            textBoxAry[0] = textBoxName;
             table.Controls.Add(textBoxName, 1, 1);
             table.SetColumnSpan(textBoxName, 2);
 
@@ -238,6 +262,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
                 Dock = DockStyle.Fill,
                 AutoSize = true,
             };
+            textBoxAry[1] = textBoxAddress;
             table.Controls.Add(textBoxAddress, 1, 2);
             table.SetColumnSpan(textBoxAddress, 2);
 
@@ -247,6 +272,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
                 Dock = DockStyle.Fill,
                 AutoSize = true,
             };
+            textBoxAry[2] = textBoxTel;
             table.Controls.Add(textBoxTel, 1, 3);
             table.SetColumnSpan(textBoxTel, 2);
 
@@ -256,6 +282,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
                 Dock = DockStyle.Fill,
                 AutoSize = true,
             };
+            textBoxAry[3] = textBoxEmail;
             table.Controls.Add(textBoxEmail, 1, 4);
             table.SetColumnSpan(textBoxEmail, 2);
 
@@ -282,7 +309,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
 
             buttonUpdate = new Button()
             {
-                Text = "Update Cells",
+                Text = "Update Row",
                 TextAlign = ContentAlignment.MiddleCenter,
                 Dock = DockStyle.Fill,
                 AutoSize = true,
@@ -299,11 +326,9 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
         private void Grid_SelectionChanged(object sender, EventArgs e)
         {
             if(grid.CurrentCell == null) { return; }
-
-            var rowCollection = grid.Rows;
-            int rowIndex = grid.CurrentCell.RowIndex;
-
-            DataGridViewCellCollection cellCollection = rowCollection[rowIndex].Cells;
+            
+            var row = grid.CurrentRow;
+            DataGridViewCellCollection cellCollection = row.Cells;
          
             textBoxName.Text = cellCollection["Name"].Value?.ToString() ?? "";
             textBoxAddress.Text = cellCollection["Address"].Value?.ToString() ?? "";
@@ -319,7 +344,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
             //---- Insert Row ----
             string messageTitle = "Confirm to Insert DB";
 
-            PersonRR person = new PersonRR()
+            PersonRR insertPerson = new PersonRR()
             {
                 Name = textBoxName.Text,
                 Address = textBoxAddress.Text,
@@ -327,22 +352,22 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
                 Email = textBoxTel.Text,
             };
 
-            DialogResult result = ShowConfirmMessageBox(person.ToString(), messageTitle);
+            DialogResult result = ShowConfirmMessageBox(
+                insertPerson.ToString(), messageTitle);
 
             if (result == DialogResult.Cancel) { return; }
             else if (result == DialogResult.OK)
             {
-                entity.PersonRR.Add(person);
+                entity.PersonRR.Add(insertPerson);
                 entity.SaveChanges();
+                grid.Refresh();
             }
         }//ButtonInsert_Click()
 
         private void ButtonDelete_Click(object sender, EventArgs e)
         {
-            var rowCollextion = grid.Rows;
-            var rowIndex = grid.CurrentCell.RowIndex;
-
-            var cellCollection = rowCollextion[rowIndex].Cells;
+            var row = grid.CurrentRow;
+            var cellCollection = row.Cells;
 
             StringBuilder bld = new StringBuilder();
             foreach(DataGridViewCell cell in cellCollection)
@@ -355,40 +380,76 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
                 "Confirm to Delete Row",
                 MessageBoxButtons.OKCancel,
                 MessageBoxIcon.Question);
-            
-            //if (result == DialogResult.Cancel) { return; }
-            //else if (result == DialogResult.OK)
-            //{
-            //    int id = (int)cellCollection[0].Value;
-            //    PersonRR deletePersonRR = entity.PersonRR.Single(
-            //        person => person.Id == id);
-            //    Console.WriteLine(deletePersonRR.Id);
-            //    entity.PersonRR.Remove(deletePersonRR);
-            //    //entity.SaveChanges();
-            //}
 
+            if (result == DialogResult.Cancel) { return; }
+            else if (result == DialogResult.OK)
+            {
+                int id = (int)cellCollection[0].Value;
+                PersonRR deletePersonRR = entity.PersonRR.Single(
+                    person => person.Id == id);
+                Console.WriteLine(deletePersonRR.Id);
+                entity.PersonRR.Remove(deletePersonRR);
+                entity.SaveChanges();
+                grid.Refresh();
+            }
         }//ButtonDelete_Click()
 
         private void ButtonUpdate_Click(object sender, EventArgs e)
         {
-            bool canUpdate = ValidateInput();
+            var row = grid.CurrentRow;
+            var cellCollection = row.Cells;
 
+            bool canUpdate = ValidateInput();
             if (!canUpdate) { return; }
 
-            //---- Update Cells ----
-            string messageTitle = "Confirm to Update DB";
-            string message = "Save the whole changes to Database, OK ?";
-            
-            //whole changes -> entity
-            //(Editing...)
+            //---- Update Row ----
+            List<string> olderValueList = new List<string>();
+            List<string> changedValueList = new List<string>();
+            List<int> updateCellIndex = new List<int>();
+            StringBuilder updateBld = new StringBuilder();
+            updateBld.Append("The below value changes will update to Database, OK ?\n\n");
+            updateBld.Append("[Older Value]  =>  [Changed Value]\n");
 
+            for (int i = 0; i < textBoxAry.Length; i++)
+            {
+                string olderValue = cellCollection[i + 1].Value?.ToString() ?? "";
+                string changedValue = textBoxAry[i].Text;
+
+                if(olderValue != changedValue)
+                {
+                    olderValueList.Add(olderValue);
+                    changedValueList.Add(changedValue);
+                    updateCellIndex.Add(i);
+                    updateBld.Append($"{olderValue} => {changedValue}\n");
+                }
+            }//for
+            string message = null;
+
+            if(changedValueList.Count == 0)
+            {
+                message = "(No Changed)";
+            }
+            else
+            {
+                message = updateBld.ToString();
+            }
+            string messageTitle = "Confirm to Update Database";
             DialogResult result = ShowConfirmMessageBox(message, messageTitle);
 
             if (result == DialogResult.Cancel) { return; }
             else if (result == DialogResult.OK)
             {
-                //entity.PersonRR.Add(person);
-                //entity.SaveChanges();
+                Int32.TryParse(cellCollection[0].Value.ToString(), out int id);
+                PersonRR updatePersonRR = entity.PersonRR
+                    .Single(person => person.Id == id);
+
+                updatePersonRR.Name = textBoxName.Text;
+                updatePersonRR.Address = textBoxAddress.Text;
+                updatePersonRR.Tel = textBoxTel.Text;
+                updatePersonRR.Email = textBoxEmail.Text;
+                
+                entity.SaveChanges();
+                grid.Refresh();
             }
 
         }//ButtonUpdate_Click()
