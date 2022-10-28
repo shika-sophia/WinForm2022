@@ -36,8 +36,8 @@ namespace WinFormGUI.CsharpCode
         private readonly Type enumType;
 
         //==== Test Main() as Console Application ====
-        static void Main()
-        //public void Main()
+        //static void Main()
+        public void Main()
         {
             var here = new ShowEnumValue(typeof(DataGridViewElementStates));
             string content = here.BuildEnumContent(here.enumType, subject: true);
