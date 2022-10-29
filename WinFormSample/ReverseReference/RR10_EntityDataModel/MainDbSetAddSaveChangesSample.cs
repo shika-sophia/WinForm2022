@@ -16,40 +16,25 @@
  *              
  *@content RR[282][283] p506 DbSet Add(), SaveChanges()
  *         
- *        《Uncompleted》未完成
- *         (I should more study about Entity Data Model, to try again.)
+ *@subject DbContext
+ *         =>〔MainDbContextSample.cs〕
+ *         
+ *@subject SubDbContextPersonRR
+ *         ・DB接続情報を保持し、new によって DB接続を実行
+ *         ・DBのテーブル情報を DbSet<PersonRR> オブジェクトで保持
+ *         
+ *         DbSet<TEntity>  DbContext.PersonRR
+ *         =>〔MainDbContextSample.cs〕
+ *         
+ *@subject ObservableCollection<TEntity>  dbSet.Load()    //DBのテーブル情報をキャッシュとして保持
+ *         object  dataGridView.DataSource = dbSet.Local  //DataGridViewの DataSource に DbSetのキャッシュを代入
+ *         bool    dataGridView.AutoGenerateColumns       //DataSourceを元に 自動で列,行を生成
  *
- *@subject DbSet<TEntity>  DbContext.PersonRR
- *         
- *@subject カーソルのある Cell から その Row を特定し、各列の値を取得
- *         DataGridViewRowCollection   dataGridView.Rows
- *         int                         dataGridView.CurrentCell.RowIndex
- *         DataGridViewRow             dataGridViewRowCollection[int]
- *         DataGridViewCellCollection  dataGridViewRow.Cells
- *         DataGridViewCell            dataGridViewCellCollection[string]
- *         object                      dataGridViewCell.Value
- *         
- *         例 var rowCollection = grid.Rows;
- *            int rowIndex = grid.CurrentCell.RowIndex;
- *            DataGridViewCellCollection cellCollection = rowCollection[rowIndex].Cells;
- *            textBoxName.Text = cellCollection["Name"].Value?.ToString() ?? ""; 
- *            
- *@subject  ＊[C#6-] null条件演算子「オブジェクト?.メンバー」〔CS 8〕
- *          ・「オブジェクト?.メンバー」 
- *                <=>  if (オブジェクト != null) { メンバー処理 } else { null }と同義
- *          ・オブジェクトが 非nullのときのみ、そのメンバーにアクセス
- *          ・null時は nullを返す
- *          ・NullReferenceExceptionの発生を防ぐ。nullチェックの簡易記法
- *          
- *          ＊null合体演算子「式１ ?? 式2」 〔CS 12〕
- *         ・「式１ ?? 式2」        
- *               <=>  if (式1 != null) { 式1 } else { 式2 } と同義
- *         ・式1が 非nullなら、式1を返す。null時は 式2を返す
- *         ・変数に null が代入されることを防ぐ
- *         ・null許容型の数値型も利用可
- *               
  *@subject BindingList<TEntity>  ObservalCollection<TEntity>.ToBindingList<TEntity>()
- *         ・項目が追加または削除されたとき、あるいはリスト全体が更新されたときに通知を行う動的なデータ コレクション
+ *         ・項目が追加または削除されたとき、
+ *           あるいはリスト全体が更新されたときに通知を行う動的なデータ コレクション
+ *           (grid.DataSource = entity.PersonRR.Local; のままだと、更新情報を表示できない)
+ *         ・DBへの変更内容を BindingListに保持し、grid.SaveChanges()で DBに反映
  *         
  *         例 grid.DataSource = entity.PersonRR.Local.ToBindingList();
  *
@@ -75,6 +60,43 @@
  *@subject ◆class BindingList<T> : Collection<T>, IBindingList, IList, ICollection, IEnumerable, ICancelAddNew, IRaiseItemChangedEvents
  *                    -- System.ComponentModel
  *         データ バインディングをサポートするジェネリック コレクション
+ *       
+ *@subject Grid_SelectionChanged()
+ *         カーソルのある Cell から その Row を特定し、各列の値を取得
+ *         DataGridViewRowCollection   dataGridView.Rows
+ *         int                         dataGridView.CurrentCell.RowIndex
+ *         DataGridViewRow             dataGridViewRowCollection[int]
+ *         DataGridViewCellCollection  dataGridViewRow.Cells
+ *         DataGridViewCell            dataGridViewCellCollection[string]
+ *         object                      dataGridViewCell.Value
+ *         
+ *         例 var rowCollection = grid.Rows;
+ *            int rowIndex = grid.CurrentCell.RowIndex;
+ *            DataGridViewCellCollection cellCollection = rowCollection[rowIndex].Cells;
+ *            textBoxName.Text = cellCollection["Name"].Value?.ToString() ?? ""; 
+ *             
+ *@subject  ＊[C#6-] null条件演算子「オブジェクト?.メンバー」〔CS 8〕
+ *          ・「オブジェクト?.メンバー」 
+ *                <=>  if (オブジェクト != null) { メンバー処理 } else { null }と同義
+ *          ・オブジェクトが 非nullのときのみ、そのメンバーにアクセス
+ *          ・null時は nullを返す
+ *          ・NullReferenceExceptionの発生を防ぐ。nullチェックの簡易記法
+ *          
+ *          ＊null合体演算子「式１ ?? 式2」 〔CS 12〕
+ *         ・「式１ ?? 式2」        
+ *               <=>  if (式1 != null) { 式1 } else { 式2 } と同義
+ *         ・式1が 非nullなら、式1を返す。null時は 式2を返す
+ *         ・変数に null が代入されることを防ぐ
+ *         ・null許容型の数値型も利用可
+ *         
+ *@subject dataGridView.Refresh()   
+ *         ・いったん DataGridViewオブジェクトを破棄し再描画
+ *         ・InsertRow(), DeleteRow()は grid.SaveChanges()で表示にも反映するが
+ *           UpdateRow()時は 更新表示されないので、grid.Refresh(); が必要。
+ *           
+ *@subject bool  IEnumerable<T>.SequenceEqual(IEnumerable<T>);
+ *         ・Listなどコレクションの要素どうしが同じであるか
+ *         ・<T>は 対象オブジェクトと、引数のオブジェクトで同じ型にしないとコンパイルエラー
  *
  *@NOTE【Problem】grid.Rows.Add(person);
  *      -> System.InvalidOperationException:
@@ -104,6 +126,15 @@
  *      bool  String.IsNullOrEmpty(string) では空行を識別できない。
  *      bool  cellCollection[0].Value.ToString() == "0"; でも識別できない。
  *      
+ *      => 表示のための BingingList と、DbSet.Localのデータが異なる様子
+ *         BindingList()時の 空行は、実際には 空行ではなく、
+ *         表示するために挿入されたもの。
+ *         空行の RowIndex は、最終レコードと同じになる。
+ *         空行の row.Cells[rowIndex].Value は　最終行のデータが入っている
+ *         
+ *      => 空行の判定は Grid_SelectionChanged()で null -> ""に置換した
+ *         TextBox.Text が "" であるかどうかで判定すると解決
+ *         
  *@see ImageDbSetAddSaveChangesSample.jpg
  *@see 
  *@author shika
@@ -111,10 +142,8 @@
  */
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data.Entity;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -124,9 +153,9 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
 {
     class MainDbSetAddSaveChangesSample
     {
-        [STAThread]
-        static void Main()
-        //public void Main()
+        //[STAThread]
+        //static void Main()
+        public void Main()
         {
             Console.WriteLine("new FormDbSetAddSaveChangesSample()");
 
@@ -338,6 +367,8 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
 
         private void ButtonInsert_Click(object sender, EventArgs e)
         {
+            bool isDuplicateRow = JudgeDuplicateRow();
+            if (isDuplicateRow) { return; }
             bool canInsert = ValidateInput();
             if (!canInsert) { return; }
 
@@ -353,7 +384,9 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
             };
 
             DialogResult result = ShowConfirmMessageBox(
-                insertPerson.ToString(), messageTitle);
+                "This record will be insert new row into Database, OK ?\n\n" + 
+                insertPerson.ToString(), 
+                messageTitle);
 
             if (result == DialogResult.Cancel) { return; }
             else if (result == DialogResult.OK)
@@ -366,17 +399,22 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
 
         private void ButtonDelete_Click(object sender, EventArgs e)
         {
+            bool isEmptyRow = JudgeEmptyRow();
+            if (isEmptyRow) { return; }
+
             var row = grid.CurrentRow;
             var cellCollection = row.Cells;
 
-            StringBuilder bld = new StringBuilder();
+            StringBuilder deleteBld = new StringBuilder();
+            deleteBld.Append("This record will be removed from Database, really OK ?\n\n");
+
             foreach(DataGridViewCell cell in cellCollection)
             {
-                bld.Append($"{cell.Value},\n");
+                deleteBld.Append($"{cell.Value},\n");
             }
 
             DialogResult result = MessageBox.Show(
-                bld.ToString(),
+                deleteBld.ToString(),
                 "Confirm to Delete Row",
                 MessageBoxButtons.OKCancel,
                 MessageBoxIcon.Question);
@@ -393,9 +431,12 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
                 grid.Refresh();
             }
         }//ButtonDelete_Click()
-
+        
         private void ButtonUpdate_Click(object sender, EventArgs e)
         {
+            bool isEmptyRow = JudgeEmptyRow();
+            if (isEmptyRow) { return; }
+
             var row = grid.CurrentRow;
             var cellCollection = row.Cells;
 
@@ -407,7 +448,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
             List<string> changedValueList = new List<string>();
             List<int> updateCellIndex = new List<int>();
             StringBuilder updateBld = new StringBuilder();
-            updateBld.Append("The below value changes will update to Database, OK ?\n\n");
+            updateBld.Append("The below value changes will be updated to Database, OK ?\n\n");
             updateBld.Append("[Older Value]  =>  [Changed Value]\n");
 
             for (int i = 0; i < textBoxAry.Length; i++)
@@ -451,8 +492,78 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
                 entity.SaveChanges();
                 grid.Refresh();
             }
-
         }//ButtonUpdate_Click()
+
+        private bool JudgeEmptyRow()  //空行であるかを判定
+        {
+            //---- inputList ----
+            List<string> inputList = new List<string>();
+
+            foreach (TextBox textBox in textBoxAry)
+            {
+                inputList.Add(textBox.Text);
+            }//foreach
+
+            //---- Judge Empty ----
+            bool isEmptyRow = inputList.All(value => value == "");
+
+            //---- Test Print ----
+            //Console.WriteLine("inputList: ");
+            //inputList.ForEach(value => Console.Write($"{value}, "));
+            //Console.WriteLine();
+            //Console.WriteLine($"IsEmptyRow: {isEmptyRow}");
+
+            //---- MessageBox ----
+            if (isEmptyRow)
+            {
+                MessageBox.Show("(Empty Row)", "Notation");
+            }
+
+            return isEmptyRow;
+        }//JudgeEmptyRow()
+
+        private bool JudgeDuplicateRow()  //重複行であるかを判定
+        {
+            //---- inputList ----
+            List<string> inputList = new List<string>();
+
+            foreach (TextBox textBox in textBoxAry)
+            {
+                inputList.Add(textBox.Text);
+            }//foreach
+
+            //---- cellValueList ----
+            var row = grid.CurrentRow;
+            var cellCollection = row.Cells;
+
+            List<string> cellValueList = new List<string>();
+            for (int i = 1; i < cellCollection.Count - 1; i++)
+            {
+                cellValueList.Add(cellCollection[i].Value?.ToString() ?? "");
+            }//for
+
+            //---- Judge Duplicate ----
+            bool isDuplicateRow = inputList.SequenceEqual(cellValueList);
+
+            //---- Test Print ----
+            //Console.WriteLine("inputList: ");
+            //inputList.ForEach(value => Console.Write($"{value}, "));
+            //Console.WriteLine();
+            //Console.WriteLine("cellValueList: ");
+            //cellValueList.ForEach(value => Console.Write($"{value}, "));
+            //Console.WriteLine();
+            //Console.WriteLine($"IsDuplicateRow: {isDuplicateRow}");
+
+            //---- MessageBox ----
+            if (isDuplicateRow)
+            {
+                MessageBox.Show(
+                    "(Duplicate Row)\nThis record already has been in Database.",
+                    "Notation");
+            }
+
+            return isDuplicateRow;
+        }//JudgeDuplicateRow()
 
         private bool ValidateInput()
         {
@@ -466,7 +577,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
 
             if (textBoxName.Text.Trim().Length > 50)
             {
-                bld.Append("<！> Name should discribe in 50 characters.\n");
+                bld.Append("<！> Name should be discribed in 50 characters.\n");
             }
 
             if (textBoxAddress.Text.Trim().Length == 0)
@@ -476,21 +587,21 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
 
             if (textBoxTel.Text.Trim().Length > 50)
             {
-                bld.Append("<！> Tel should discribe in 50 characters.\n");
+                bld.Append("<！> Tel should be discribed in 50 characters.\n");
             }
 
             if (!textBoxTel.Text.Trim()
                 .ToCharArray()
                 .All(c => Char.IsDigit(c)))
             {
-                bld.Append("<！> Tel should discribe by Number ONLY.\n");
+                bld.Append("<！> Tel should be discribed by Number ONLY.\n");
             }
 
             if (textBoxEmail.Text != "" && !Regex.IsMatch(textBoxEmail.Text.Trim(),
                 @"\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*", //Email〔NT27〕
                 RegexOptions.IgnoreCase))
             {
-                bld.Append("<！> Email should discribe within the Format.\n");
+                bld.Append("<！> Email should be discribed within the Format.\n");
             }
 
             //---- against SQL Injection ----
