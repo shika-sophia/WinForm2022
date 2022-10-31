@@ -419,7 +419,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
             if (db.CurrentTransaction == null) { return; }
 
             DialogResult rollbackAnswer = ShowConfirmMessageBox(
-                "The current state is disappeared,\nand turn back before all changes.\n\nRollback OK ?\n",
+                "The current state will be disappeared,\nand turn back before all changes.\n\nRollback OK ?\n",
                 "Confirm to Rollback");
             if(rollbackAnswer == DialogResult.Cancel) { return; }
             else if(rollbackAnswer == DialogResult.OK)
