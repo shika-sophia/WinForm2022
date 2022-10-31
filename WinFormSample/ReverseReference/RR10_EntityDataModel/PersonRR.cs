@@ -24,13 +24,15 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
 
         public override string ToString()
         {
+            string idString = (Id == 0) ? "(Auto Increment)" : Id.ToString(); 
+
             StringBuilder bld = new StringBuilder();
-            bld.Append("Id: (Auto Increment)\n");
+            bld.Append($"Id: {idString}\n");
             bld.Append($"Name: {Name}\n");
             bld.Append($"Address: {Address}\n");
             bld.Append($"Tel: {Tel}\n");
             bld.Append($"Email: {Email}\n");
-            bld.Append("CreateDate: Today (as Auto)\n");
+            bld.Append($"CreateDate: {CreateDate}\n");
 
             return bld.ToString();
         }//ToString()

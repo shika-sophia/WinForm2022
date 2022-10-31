@@ -52,6 +52,22 @@
  *@subject ◆class DbContextTransaction : IDisposable -- System.Data.Entity
  *
  *
+ *@NOTE【Problem】Rollback()
+ *      context内の SaveChanges()した処理を元に戻すだけで、
+ *      BindingListで表示されている部分は 変更した値のままになっている。
+ *      
+ *      => 初期の状態を保存して、
+ *           tempState = new  ObservableCollection<PersonRR>();
+ *           tempState = grid.PersonRR.Local;
+ *         Rollback()で代入しても元に戻らない
+ *           grid.DataSource = initalLocal.ToBindingList();
+ *           
+ *      => 現在の値を保存して、Rollback()で代入しようと思ったが
+ *         データバインドしている場合は grid.Rows().Add()は InvalidOperationException
+ *         grid.Rows, row.Cellsは { get; } 読取専用のため、この方法では解決しない。
+ *      
+ *      => RollBack()内で context を 再 new して、DBから 再 Load()すると、元に戻る。
+ *      
  *@NOTE【】ColumnHeaderChangedイベント
  *        明示的に設定していないのに、なぜかソート機能が備わっている・・
  *        
@@ -62,18 +78,22 @@
  * -->
  */
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data.Entity;
 using System.Drawing;
-using System.Drawing.Drawing2D;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
 {
     class MainDbContextTransactionSample
     {
-        [STAThread]
-        static void Main()
-        //public void Main()
+        //[STAThread]
+        //static void Main()
+        public void Main()
         {
             Console.WriteLine("new FormDbContextTransactionSample()");
 
@@ -92,7 +112,11 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
         private readonly TextBox[] textBoxAry;
         private readonly Button[] buttonAry;
         private readonly Padding padding = new Padding(10);
-
+        private readonly Color tempColor = Color.Lavender;
+        private SubDbContextEntityPersonRR context;
+        private Database db;
+        private DbContextTransaction transaction;
+        
         private readonly string[] labelTextAry = new string[]
         {
             "Name", "Address", "Tel", "Email",
@@ -100,7 +124,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
 
         private readonly string[] buttonTextAry = new string[]
         {
-            "Insert", "Update", "Delete", "Rollback",
+            "Insert", "Update", "Delete","Commit", "Rollback",
         };
 
         public FormDbContextTransactionSample()
@@ -115,7 +139,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
             //---- TableLayoutPanel ----
             table = new TableLayoutPanel()
             {
-                ColumnCount = 4,
+                ColumnCount = 5,
                 RowCount = 5,
                 ClientSize = this.ClientSize,
                 Margin = padding,
@@ -137,8 +161,8 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
             table.RowStyles.Add(new RowStyle(SizeType.Percent, 10f));
 
             //---- DataGridView ----
-            var context = new SubDbContextEntityPersonRR();
-            var db = context.Database;
+            context = new SubDbContextEntityPersonRR();
+            db = context.Database;
 
             grid = new DataGridView()
             {
@@ -152,7 +176,6 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
                 AutoGenerateColumns = true,
             };
             grid.SelectionChanged += new EventHandler(Grid_SelectionChanged);
-            
             table.Controls.Add(grid, 0, 0);
             table.SetColumnSpan(grid, table.ColumnCount);
 
@@ -191,6 +214,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
                     AutoSize = true,
                 };
                 table.Controls.Add(textBoxAry[i], 2, i + 1);
+                table.SetColumnSpan(textBoxAry[i], 2);
             }//for Label, TextBox
 
             //---- Button ----
@@ -224,7 +248,342 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel
 
         private void Button_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
-        }
+            string buttonText = (sender as Button).Text;
+            switch (buttonText)
+            {
+                case "Insert":
+                    InsertRow();
+                    break;
+                case "Update":
+                    UpdateRow();
+                    break;
+                case "Delete":
+                    DeleteRow();
+                    break;
+                case "Commit":
+                    CommitDatabase();
+                    break;
+                case "Rollback":
+                    RollbackChanges();
+                    break;
+            }//switch
+        }//Button_Click()
+
+        private void InsertRow()
+        {
+            bool isEmptyRow = JudgeEmptyRow();
+            if(isEmptyRow) { return; }
+            bool isDuplicateRow = JudgeDuplicateRow();
+            if(isDuplicateRow) { return; }
+            bool canInsert = ValidateInput();
+            if(!canInsert) { return; }
+
+            //---- Insert ----
+            if (db.CurrentTransaction == null)
+            {
+                transaction = db.BeginTransaction();
+            }
+
+            var insertPerson = new PersonRR()
+            {
+                Name = textBoxAry[0].Text,
+                Address = textBoxAry[1].Text,
+                Tel = textBoxAry[2].Text,
+                Email = textBoxAry[3].Text,
+            };
+
+            var insertBld = new StringBuilder();
+            insertBld.Append("The below values will be inserted temporarilly.\n");
+            insertBld.Append("If reflect actually into Database, Please Push 'Commit' Button.\n");
+            insertBld.Append("If cancel, Please Push 'Rollback' Button.\n\n");
+            insertBld.Append(insertPerson.ToString());
+
+            DialogResult insertAnswer = ShowConfirmMessageBox(
+                insertBld.ToString(), "Confirm to Insert");
+            if(insertAnswer == DialogResult.Cancel) { return; }
+            else if(insertAnswer == DialogResult.OK)
+            {
+                context.PersonRR.Add(insertPerson);
+                context.SaveChanges();
+                grid.Rows[grid.NewRowIndex - 1]              //空行の分を -1
+                    .DefaultCellStyle.BackColor = tempColor; //未Commintの色
+                grid.Refresh();
+            }
+        }//InsertRow()
+
+        private void UpdateRow()
+        {
+            bool isEmptyRow = JudgeEmptyRow();
+            if (isEmptyRow) { return; }
+            bool isDuplicateRow = JudgeDuplicateRow();
+            if (isDuplicateRow) { return; }
+            bool canInsert = ValidateInput();
+            if (!canInsert) { return; }
+
+            //---- Update ----
+            if (db.CurrentTransaction == null)
+            {
+                transaction = db.BeginTransaction();
+            }
+
+            var row = grid.CurrentRow;
+            var cellCollection = row.Cells;
+
+            var updateBld = new StringBuilder();
+            updateBld.Append("The below values will be updated temporarilly.\n");
+            updateBld.Append("If update actually into Database, Please Push 'Commit' Button.\n");
+            updateBld.Append("If cancel, Please Push 'Rollback' Button.\n\n");
+            updateBld.Append("[Older Value]  =>  [New Value]\n");
+
+            for (int i = 0; i < textBoxAry.Length; i++)
+            {
+                string olderValue = cellCollection[i + 1].Value.ToString();
+                string changedValue = textBoxAry[i].Text;
+                
+                if(olderValue != changedValue)
+                {
+                    updateBld.Append($"{olderValue} => {changedValue}\n");
+                }
+
+                cellCollection[i + 1].Value = textBoxAry[i].Text;
+            }//for
+
+            DialogResult updateAnswer = ShowConfirmMessageBox(
+                updateBld.ToString(), "Confirm to Update");
+            if(updateAnswer == DialogResult.Cancel) { return; }
+            else if (updateAnswer == DialogResult.OK)
+            {
+                context.SaveChanges();
+                row.DefaultCellStyle.BackColor = tempColor; //未Commintの色
+                grid.Refresh();
+            }
+        }//UpdateRow()
+
+        private void DeleteRow()
+        {
+            bool isEmptyRow = JudgeEmptyRow();
+            if (isEmptyRow) { return; }
+
+            //---- Delete ----
+            if (db.CurrentTransaction == null)
+            {
+                transaction = db.BeginTransaction();
+            }
+
+            var row = grid.CurrentRow;
+            var cellCollection = row.Cells;
+            int id = (int)cellCollection[0].Value;
+            PersonRR deletePerson = context.PersonRR
+                .Single(person => person.Id == id);
+                
+           var deleteBld = new StringBuilder();
+            deleteBld.Append("The below values will be deleted temporarilly.\n");
+            deleteBld.Append("If delete actually from Database, Please Push 'Commit' Button.\n");
+            deleteBld.Append("If cancel, Please Push 'Rollback' Button.\n\n");
+            deleteBld.Append(deletePerson);
+
+            DialogResult deleteAnswer = ShowConfirmMessageBox(
+                deleteBld.ToString(), "Confirm to Delete");
+            if(deleteAnswer == DialogResult.Cancel) { return; }
+            else if (deleteAnswer == DialogResult.OK)
+            {
+                context.PersonRR.Remove(deletePerson);
+                context.SaveChanges();
+                grid.Refresh();
+            }            
+        }//DeleteRow()
+
+        private void CommitDatabase()
+        {
+            if(db.CurrentTransaction == null) { return; }
+
+            DialogResult commitAnswer = ShowConfirmMessageBox(
+                "All Temporary changes will commit into Database, OK ?",
+                "Confirm to Commit");
+            if(commitAnswer == DialogResult.Cancel) { return; }
+            else if (commitAnswer == DialogResult.OK)
+            {
+                transaction.Commit();
+                
+                foreach (DataGridViewRow row in grid.Rows)
+                {
+                    row.DefaultCellStyle.BackColor = this.BackColor;
+                }//foreach
+
+                grid.Refresh();
+            }
+        }//CommitDatabase()
+
+        private void RollbackChanges()
+        {
+            if (db.CurrentTransaction == null) { return; }
+
+            DialogResult rollbackAnswer = ShowConfirmMessageBox(
+                "The current state is disappeared,\nand turn back before all changes.\n\nRollback OK ?\n",
+                "Confirm to Rollback");
+            if(rollbackAnswer == DialogResult.Cancel) { return; }
+            else if(rollbackAnswer == DialogResult.OK)
+            {
+                transaction.Rollback();
+                context = new SubDbContextEntityPersonRR();
+                db = context.Database;
+                grid.DataSource = context.PersonRR.Local.ToBindingList();
+                grid.Refresh();
+            }
+        }//RollbackChanges()
+
+        private bool JudgeEmptyRow()  //空行であるかを判定
+        {
+            //---- inputList ----
+            List<string> inputList = new List<string>();
+
+            foreach (TextBox textBox in textBoxAry)
+            {
+                inputList.Add(textBox.Text);
+            }//foreach
+
+            //---- Judge Empty ----
+            bool isEmptyRow = inputList.All(value => value == "");
+
+            //---- Test Print ----
+            //Console.WriteLine("inputList: ");
+            //inputList.ForEach(value => Console.Write($"{value}, "));
+            //Console.WriteLine();
+            //Console.WriteLine($"IsEmptyRow: {isEmptyRow}");
+
+            //---- MessageBox ----
+            if (isEmptyRow)
+            {
+                MessageBox.Show("(Empty Row)", "Notation");
+            }
+
+            return isEmptyRow;
+        }//JudgeEmptyRow()
+
+        private bool JudgeDuplicateRow()  //重複行であるかを判定
+        {
+            //---- inputList ----
+            List<string> inputList = new List<string>();
+
+            foreach (TextBox textBox in textBoxAry)
+            {
+                inputList.Add(textBox.Text);
+            }//foreach
+
+            //---- cellValueList ----
+            var row = grid.CurrentRow;
+            var cellCollection = row.Cells;
+
+            List<string> cellValueList = new List<string>();
+            for (int i = 1; i < cellCollection.Count - 1; i++)
+            {
+                cellValueList.Add(cellCollection[i].Value?.ToString() ?? "");
+            }//for
+
+            //---- Judge Duplicate ----
+            bool isDuplicateRow = inputList.SequenceEqual(cellValueList);
+
+            //---- Test Print ----
+            //Console.WriteLine("inputList: ");
+            //inputList.ForEach(value => Console.Write($"{value}, "));
+            //Console.WriteLine();
+            //Console.WriteLine("cellValueList: ");
+            //cellValueList.ForEach(value => Console.Write($"{value}, "));
+            //Console.WriteLine();
+            //Console.WriteLine($"IsDuplicateRow: {isDuplicateRow}");
+
+            //---- MessageBox ----
+            if (isDuplicateRow)
+            {
+                MessageBox.Show(
+                    "(Duplicate Row)\nThis record already has been in Database.",
+                    "Notation");
+            }
+
+            return isDuplicateRow;
+        }//JudgeDuplicateRow()
+
+        private bool ValidateInput()
+        {
+            StringBuilder errorMessageBld = new StringBuilder();
+
+            //==== Valdate input ====
+            //---- Name: textBoxAry[0] ----
+            if (textBoxAry[0].Text.Trim().Length == 0)
+            {
+                errorMessageBld.Append("<！> Name is required.\n");
+            }
+
+            if (textBoxAry[0].Text.Trim().Length > 50)
+            {
+                errorMessageBld.Append("<！> Name should be discribed in 50 characters.\n");
+            }
+
+            //---- Address: textBoxAry[1] ----
+            if (textBoxAry[1].Text.Trim().Length == 0)
+            {
+                errorMessageBld.Append("<！> Address is required.\n");
+            }
+
+            //---- Tel: textBoxAry[2] ----
+            if (textBoxAry[2].Text.Trim().Length > 50)
+            {
+                errorMessageBld.Append("<！> Tel should be discribed in 50 characters.\n");
+            }
+
+            if (!textBoxAry[2].Text.Trim()
+                .ToCharArray()
+                .All(c => Char.IsDigit(c)))
+            {
+                errorMessageBld.Append("<！> Tel should be discribed by Number ONLY.\n");
+            }
+
+            //---- Email: textBoxAry[3] ----
+            if (textBoxAry[3].Text != "" && !Regex.IsMatch(textBoxAry[3].Text.Trim(),
+                @"\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*", //Email〔NT27〕
+                RegexOptions.IgnoreCase))
+            {
+                errorMessageBld.Append("<！> Email should be discribed within the Format.\n");
+            }
+
+            //---- against SQL Injection ----
+            string[] textAry = new string[]
+            {
+                textBoxAry[0].Text, textBoxAry[1].Text,
+                textBoxAry[2].Text, textBoxAry[3].Text,
+            };
+
+            foreach (string text in textAry)
+            {
+                if (Regex.IsMatch(text.Trim(), "[<>&;=]+") || Regex.IsMatch(text.Trim(), "[-]{2}"))
+                {
+                    errorMessageBld.Append("<！> Invalidate input !\n");
+                }
+            }//foreach
+
+            //---- Show Error Massage ----
+            if (errorMessageBld.Length > 0)
+            {
+                MessageBox.Show(
+                    errorMessageBld.ToString(),
+                    "Input Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return false;
+            }
+
+            return true;
+        }//ValidateInput()
+
+        private DialogResult ShowConfirmMessageBox(string message, string messageTitle)
+        {
+            DialogResult answer = MessageBox.Show(
+                message,
+                messageTitle,
+                MessageBoxButtons.OKCancel,
+                MessageBoxIcon.Question);
+
+            return answer;
+        }//ShowConfirmMessageBox()
     }//class
 }
