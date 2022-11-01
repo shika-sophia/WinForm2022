@@ -34,7 +34,7 @@
  *                           指定文字列を接続先のデータベース名前または接続文字列として使用する新しいDbContextインスタンスを生成
  *                           指定されたモデルで そのインスタンスを初期化
  *                           引数 nameOrConnectionString:  データベース名または接続文字列。
- *                                model:  コンテキストをサポートするモデル。
+ *                                DbCompiledModel  model:  コンテキストをサポートするモデル。〔下記〕
  *                                
  *         + DbContext   new DbContext(DbConnection existingConnection, [DbCompiledModel model], bool contextOwnsConnection)
  *                           既存の接続を使用してデータベースに接続する新しいDbContextインスタンスを生成
@@ -43,12 +43,18 @@
  *                                                              false: 呼び出し元が接続を破棄する必要がある。
  *         + DbContext   new DbContext(ObjectContext objectContext, bool dbContextOwnsObjectContext)
  *
- *         Database       dbContext.Database { get; }
+ *         Database         dbContext.Database { get; }
+ *           └ class Database  => 〔MainDbContextTransactionSample.cs〕
+ *         DbChangeTracker  dbContext.ChangeTracker { get; }
+ *           └ class DbChangeTracker => 〔下記〕
+ *         DbContextConfiguration  dbContext.Configuration { get; }
+ *           └ class DbContextConfiguration => 〔下記〕
  *         
  *         DbEntityEntry  dbContext.Entry(object entity)
  *         DbEntityEntry<TEntity>  dbContext.Entry<TEntity>(TEntity) where TEntity : class
  *                         エンティティに関する情報にアクセスし、エンティティに対してアクションを実行できる、
- *         
+ *           └ class DbEntityEntry => 〔下記〕
+ *           
  *         int        dbContext.SaveChanges()       dbContextでの変更を DBに同期的に反映する
  *         Task<int>  dbContext.SaveChangesAsync()  dbContextでの変更を DBに非同期的に反映する
  *         Task<int>  dbContext.SaveChangesAsync(CancellationToken)
@@ -57,8 +63,13 @@
  *         DbSet      dbContext.Set(Type entityType)
  *         DbSet<TEntity>   dbContext.Set<TEntity>() where TEntity : class;
  *                       コンテキストの特定の型のエンティティと基になるストアにアクセスするための DbSetインスタンスを返します。
- *                       
- *         void      dbContext.Dispose()
+ *           └ class DbSet => 〔下記〕
+ *           
+ *       # bool      dbContext.ShouldValidateEntity(DbEntityEntry entityEntry);
+ *       + IEnumerable<DbEntityValidationResult>  dbContext.GetValidationErrors();
+ *       # DbEntityValidationResult               dbContext.ValidateEntity(DbEntityEntry, IDictionary<object, object> items);
+ *       # void      dbContext.OnModelCreating(DbModelBuilder);
+ *       + void      dbContext.Dispose()
  *       # void      dbContext.Dispose(bool disposing)
  *                       引数 disposing:  true: マネージ リソースとアンマネージ リソースの両方を解放
  *                                        false: アンマネージ リソースだけを解放
@@ -134,6 +145,92 @@
  *         bool    entityBld.Remove(string keyword)
  *         void    entityBld.Clear()
  *
+ *@subject ◆class DbChangeTracker -- System.Data.Entity.Infrastructure.
+ *         DbChangeTracker  dbContext.ChangeTracker { get; }
+ *         ([×] 'new' is not available.)
+ *         
+ *         IEnumerable<DbEntityEntry>           dbChangeTracker.Entries()
+ *         IEnumerable<DbEntityEntry<TEntity>>  dbChangeTracker.Entries<TEntity>() where TEntity : class;
+ *         bool  dbChangeTracker.HasChanges();
+ *                   dbContext.SaveChanges() が呼び出されたときにDBに送信される変更を
+ *                   DbContext が追跡しているかどうか
+ *       
+ *         void  dbChangeTracker.DetectChanges();
+ *                   POCO Entityのプロパティとリレーションシップに加えられた変更を検出します。
+ *                   TEntityの型によっては (System.Data.Entity.Core.Objects.DataClasses.EntityObjectから派生する変更追跡プロキシやエンティティなど)、
+ *                   変更が自動的に報告され、これらの型のエンティティに対する DetectChanges の呼び出しは通常必要ないことに注意してください。
+ *                   また、通常 DetectChanges は、DbContext のメソッドとそれに関連するクラスによって自動的に呼び出されるので、
+ *                   このメソッドを明示的に呼び出す必要があるのは ほとんどないです。
+ *                   ただし、一般的にはパフォーマンス上の理由から、
+ *                   DbContext.Configuration から AutoDetectChangesEnabled フラグを使って
+ *                   DetectChanges の自動呼び出しをオフにした方がよい場合があります。
+ *
+ *@subject ◆class DbContextConfiguration -- System.Data.Entity.Infrastructure
+ *         DbContextConfiguration Configuration { get; }
+ *         ([×] 'new' is not available.)
+ *         
+ *         bool  dbConfig.EnsureTransactionsForFunctionsAndCommands { get; set; }
+ *                 SQL の関数とコマンドが常にトランザクション内で実行されるかどうか
+ *         bool  dbConfig.LazyLoadingEnabled { get; set; }
+ *                 リレーションシップの遅延読み込みが有効になっているかどうか。default: true
+ *         bool  dbConfig.ProxyCreationEnabled { get; set; }                       default: true
+ *                 Entity型のインスタンスが作成されるたびに、動的に生成されたProxyクラスのインスタンスがフレームワークによって作成されるかどうか
+ *                 このフラグによって Proxy の作成が有効になっていても、エンティティ型がプロキシ扱いの要件を満足しなければ
+ *                 Proxyインスタンスは作成されないことに注意してください。
+ *         bool  dbConfig.UseDatabaseNullSemantics { get; set; }                    default: false
+ *                 null になる可能性のある 2 つのオペランドを比較する際、
+ *                 データベースの null セマンティクスを使用するかどうか
+ *                 例 (operand1 == operand2) は次のように変換されます。
+ *                 UseDatabaseNullSemantics = true:   (operand1 = operand2)。
+ *                 UseDatabaseNullSemantics = false:  それぞれ 
+ *                    (((operand1 = operand2) AND (NOT (operand1 IS NULL 
+ *                    OR operand2 IS NULL))) OR ((operand1 IS NULL) 
+ *                    AND (operand2 IS NULL)))
+ *         bool  dbConfig.AutoDetectChangesEnabled { get; set; }                default: true
+ *                    dbChangeTracker.DetectChanges()を 
+ *                    DbContext と関連クラスのメソッドによって自動的に呼び出すかどうか
+ *         bool  dbConfig.ValidateOnSaveEnabled { get; set; }                   default: true
+ *                    dbContext.SaveChanges() 時、追跡されているエンティティが自動的に検証されるかどうか
+ *                    
+ *@subject ◆class DbEntityEntry  -- System.Data.Entity.Infrastructure
+ *         DbEntityEntry           dbContext.Entry(object entity)
+ *         DbEntityEntry<TEntity>  dbContext.Entry<TEntity>(TEntity) where TEntity : class
+ *         ([×] 'new' is not available.)
+ *
+ *         object            dbEntityEntry.Entity { get; }
+ *         DbPropertyValues  dbEntityEntry.OriginalValues { get; }
+ *         DbPropertyValues  dbEntityEntry.CurrentValues { get; }
+ *            └ class DbPropertyValues
+ *         EntityState       dbEntityEntry.State { get; set; }
+ *            └ enum EntityState
+ *              {
+ *                 Detached = 1,   エンティティは、コンテキストによって追跡されていません。
+ *                                 エンティティが new 演算子 または dbSet.Create() によって作成されると、直ちに この状態になります。
+ *                 Unchanged = 2,  エンティティはコンテキストによって追跡されていて、データベースに存在します。
+ *                                 また、プロパティ値はデータベースの値から変更されていません。
+ *                 Added = 4,      エンティティはコンテキストによって追跡されていますが、
+ *                                 データベースにまだ存在していません。
+ *                 Deleted = 8,    エンティティはコンテキストによって追跡されていて、
+ *                                 データベース内に存在していますが、
+ *                                 SaveChanges() が次回呼び出されたときにデータベースから削除するようにマークが付けられています。
+ *                 Modified = 16   エンティティはコンテキストによって追跡されていて、
+ *                                 データベースに存在します。
+ *                                 また、一部またはすべてのプロパティ値が変更されています。
+ *             }
+ *             
+ *         DbPropertyEntry          dbEntityEntry.Property(string propertyName);
+ *         DbComplexPropertyEntry   dbEntityEntry.ComplexProperty(string propertyName);
+ *         DbMemberEntry            dbEntityEntry.Member(string propertyName);
+ *         DbReferenceEntry         dbEntityEntry.Reference(string navigationProperty);
+ *         DbCollectionEntry        dbEntityEntry.Collection(string navigationProperty);
+ *         DbEntityEntry<TEntity>   dbEntityEntry.Cast<TEntity>() where TEntity : class;
+ *         
+ *         DbPropertyValues         dbEntityEntry.GetDatabaseValues();
+ *         Task<DbPropertyValues>   dbEntityEntry.GetDatabaseValuesAsync([CancellationToken]);
+ *         DbEntityValidationResult dbEntityEntry.GetValidationResult();
+ *         void                     dbEntityEntry.Reload();
+ *         Task                     dbEntityEntry.ReloadAsync([CancellationToken]);
+ *
  *@subject ◆class DbSet<TEntity> : DbQuery<TEntity>, IDbSet<TEntity>, IQueryable<TEntity>, IEnumerable<TEntity>, IQueryable, IEnumerable, IInternalSetAdapter where TEntity : class
  *                   -- System.Data.Entity
  *         # DbSet<TEntity>      new DbSet<TEntity>()  where TEntity : class;
@@ -154,7 +251,7 @@
  *         IEnumerable<TEntity>  dbSet.RemoveRange(IEnumerable<TEntity> entities)
  *         DbSqlQuery<TEntity>   dbSet.SqlQuery(string sql, params object[] parameters)
  *         
- *@subject interface IQueryable : IEnumerable
+ *@subject ◆interface IQueryable : IEnumerable
  *@subject ◆static class QueryableExtensions -- System.Data.Entity
  *         void  DbSet<T>.Load(this IQueryable source)  
  *                 拡張メソッド: 第１引数 this のクラスにこのメソッドを追加
@@ -163,7 +260,6 @@
  *                         クエリを列挙します。これは ToList() を呼び出してから、実際にリストを作成するオーバーヘッドなしでリストを破棄する場合と同じです。
  *    
  *@subject ◆DataGridView  =>〔MainDataGridViewBasicSample.cs〕
- *
  */
 #endregion 
 /*
