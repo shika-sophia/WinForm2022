@@ -11,6 +11,9 @@
  *           =>〔~/Reference/Article_KaiteiNet/WinForm_.txt〕
  *           
  *@content DbContext.Database / Transaction
+ *         ・複数ユーザーからの DBアクセス (= マルチスレッド)などで、
+ *           DBデータの競合による不整合を防ぐために 
+ *           Commit, Rollbackの仕組みを作って DBアクセスする
  *
  *@subject ◆class Database -- System.Data.Entity
  *         ・DbContextクラスのプロパティ。DBの管理、Transaction処理に利用する
@@ -18,13 +21,13 @@
  *         Database  dbContext.Database
  *         ([×] 'new' is not available.)
  *         
- *         Action<string> Log { get; set; }   DbContextで生成された SQL文のログをデリゲートに記録
- *         DbConnection Connection { get; }
- *         DbContextTransaction CurrentTransaction { get; }
- *         int? CommandTimeout { get; set; }
+ *         Action<string>        database.Log { get; set; }   DbContextで生成された SQL文のログをデリゲートに記録
+ *         DbConnection          database.Connection { get; }
+ *         DbContextTransaction  database.CurrentTransaction { get; }
+ *         int?                  database.CommandTimeout { get; set; }
  *
- *         static void SetInitializer<TContext>(IDatabaseInitializer<TContext> strategy) where TContext : DbContext;
- *           └ 引数 interface IDatabaseInitializer<in TContext> where TContext : DbContext
+ *         static void   database.SetInitializer<TContext>(IDatabaseInitializer<TContext> strategy) where TContext : DbContext;
+ *           └ 引数 interface IDatabaseInitializer<in TContext> where TContext : DbContext -- System.Data.Entity.
  *                  DbContext 派生クラスのインスタンスが初めて使われた場合、このインターフェイスの実装が基になるデータベースの初期化に使用されます。
  *                  この初期化では、条件に基づいて、データベースの作成やデータベースへのデータのシードを行うことができます。
  *                  使用する方法は Database クラスの静的な InitializationStrategy プロパティを使用して設定されます。
@@ -32,12 +35,20 @@
  *                  System.Data.Entity.DropCreateDatabaseAlways`1、
  *                  System.Data.Entity.CreateDatabaseIfNotExists`1  の実装が提供されます。
  *                  
- *         bool Exists();
- *         void Create();
- *         bool CreateIfNotExists();
- *         bool Delete();
- *         DbContextTransaction BeginTransaction()
- *         DbContextTransaction BeginTransaction(IsolationLevel)
+ *         void  database.Initialize(bool force);
+ *                  このコンテキストで、登録された IDatabaseInitializer を実行します。
+ *                  このメソッドは、通常、操作がトランザクションの一部である場合など、
+ *                  限定的に実行すると問題が発生する操作を開始する前にデータベースが作成されてシードされていることを確認する必要があるときに使用されます。
+ *                  引数 force:  true:   以前に実行したことがあるかどうかに関係なく、初期化子が実行されます。
+ *                                       これは、アプリケーションの実行中にデータベースが削除され、初期化が必要になった場合に役立ちます。
+ *                               false:  初期化子は、このアプリケーション ドメインの
+ *                                       このコンテキスト、モデル、および接続に対して まだ実行されていない場合のみ実行されます。
+ *         bool  database.Exists();
+ *         void  database.Create();
+ *         bool  database.CreateIfNotExists();
+ *         bool  database.Delete();
+ *         DbContextTransaction  database.BeginTransaction()
+ *         DbContextTransaction  database.BeginTransaction(IsolationLevel)
  *           └ 引数 enum IsolationLevel  分離レベル
  *                 {
  *                     Unspecified = -1,       //指定した分離レベルとは異なる分離レベルが使用されていますが、レベルを確認できません。
@@ -48,10 +59,64 @@
  *                     Serializable = 1048576, //System.Data.DataSet にレンジ ロックがかけられ、トランザクションが完了するまで、他のユーザーは行を更新したりデータセットに行を挿入できません。
  *                     Snapshot = 16777216     //あるアプリケーションで変更中のデータを他のアプリケーションから読み取ることができるように、そのデータのバージョンを保存して、ブロッキングを減らします。 この場合、クエリを再実行しても、あるトランザクションで加えられた変更を、他のトランザクションで表示できません。
  *                 }
+ *                 
+ *         void  database.UseTransaction(DbTransaction);
+ *           └ 引数 class DbTransaction  外部トランザクション
+ *                  Entity Framework で外部トランザクション内でコマンドを実行する必要がある場合、
+ *                  ユーザーは、Databaseオブジェクトの外部で作成されたデータベース トランザクションを渡すことができます。
+ *                  または、null を渡して、フレームワークのそのトランザクションの情報をクリアします。
+ *                  
+ *         int  database.ExecuteSqlCommand(string sql, params object[] parameters);
+ *         int  database.ExecuteSqlCommand(TransactionalBehavior, string sql, params object[] parameters);
+ *         Task<int>  database.ExecuteSqlCommandAsync(TransactionalBehavior, string sql, params object[] parameters);
+ *         Task<int>  database.ExecuteSqlCommandAsync(string sql, CancellationToken, params object[] parameters);
+ *         Task<int>  database.ExecuteSqlCommandAsync(TransactionalBehavior, string sql, CancellationToken, params object[] parameters);
+ *            └ 引数 enum TransactionalBehavior
+ *                  {
+ *                      EnsureTransaction = 0,      //トランザクションが存在しない場合、この操作のために新しいトランザクションが使用されます。
+ *                      DoNotEnsureTransaction = 1  //既存のトランザクションがある場合、それが使用されます。それ以外の場合は、トランザクションなしでコマンドまたはクエリが実行されます。
+ *                  }
+ *         DbRawSqlQuery            database.SqlQuery(Type elementType, string sql, params object[] parameters);
+ *         DbRawSqlQuery<TElement>  database.SqlQuery<TElement>(string sql, params object[] parameters);
+ *           └ class DbRawSqlQuery
  *
- *@subject ◆class DbContextTransaction : IDisposable -- System.Data.Entity
+ *@subject ◆abstract class DbTransaction : MarshalByRefObject, IDbTransaction, IDisposable
+ *             -- System.Data.Common
+ *         # DbTransaction  DbTransaction()
+ *         
+ *         +          DbConnection Connection { get; }
+ *         + abstract IsolationLevel IsolationLevel { get; }
+ *         # abstract DbConnection DbConnection { get; }
+ *         
+ *         + abstract void Commit();
+ *         + abstract void Rollback();
+ *         + void Dispose();
+ *         # virtual void Dispose(bool disposing);
+ *         
+ *@subject ◆class DbContextTransaction : IDisposable 
+ *             -- System.Data.Entity
+ *         + DbContextTransaction  database.CurrentTransaction { get; }
+ *         + DbContextTransaction  database.BeginTransaction()
+ *           ([×] 'new' is not available.)
+ *         
+ *         + DbTransaction  UnderlyingTransaction { get; }
+ *         + void Commit();
+ *         + void Rollback();
+ *         + void Dispose();
+ *         # virtual void Dispose(bool disposing);
  *
- *
+ *@subject ◆class DbRawSqlQuery : IEnumerable, IListSource, IDbAsyncEnumerable
+ *              -- System.Data.Entity.Infrastructure.
+ *         DbSqlQuery               dbSet.SqlQuery(string sql, params object[] parameters);
+ *         DbRawSqlQuery            database.SqlQuery(Type elementType, string sql, params object[] parameters);
+ *         DbRawSqlQuery<TElement>  database.SqlQuery<TElement>(string sql, params object[] parameters);
+ *         DbRawSqlQuery  AsStreaming();  [非推奨] バッファリングの代わりに結果をストリームする新しいクエリを返します。
+ *         ([×] 'new' is not available.)
+ *         
+ *         IEnumerator        dbRawSqlQuery.GetEnumerator();
+ *         Task               dbRawSqlQuery.ForEachAsync(Action<object> action, [CancellationToken]);
+ *         Task<List<object>> dbRawSqlQuery.ToListAsync([CancellationToken]);
+ *         
  *@NOTE【Problem】Rollback()
  *      context内の SaveChanges()した処理を元に戻すだけで、
  *      BindingListで表示されている部分は 変更した値のままになっている。
