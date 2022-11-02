@@ -28,12 +28,19 @@
  *
  *         static void   database.SetInitializer<TContext>(IDatabaseInitializer<TContext> strategy) where TContext : DbContext;
  *           └ 引数 interface IDatabaseInitializer<in TContext> where TContext : DbContext -- System.Data.Entity.
+ *                    └ class CreateDatabaseIfNotExists <TContext>
+ *                              : IDatabaseInitializer<TContext> where TContext : DbContext
+ *                                  DBが存在しない場合に DBを新規作成
+ *                    └ class DropCreateDatabaseIfModelChanges
+ *                              : IDatabaseInitializer<TContext> where TContext : DbContext
+ *                                  DBの元になる Modelクラスが変更された場合に 旧 DBを破棄し、新規作成
+ *                    └ class DropCreateDatabaseAlway
+ *                              : IDatabaseInitializer<TContext> where TContext : DbContext
+ *                                  常に DBを新規作成
+ *                                  
  *                  DbContext 派生クラスのインスタンスが初めて使われた場合、このインターフェイスの実装が基になるデータベースの初期化に使用されます。
  *                  この初期化では、条件に基づいて、データベースの作成やデータベースへのデータのシードを行うことができます。
  *                  使用する方法は Database クラスの静的な InitializationStrategy プロパティを使用して設定されます。
- *                  System.Data.Entity.DropCreateDatabaseIfModelChanges`1、
- *                  System.Data.Entity.DropCreateDatabaseAlways`1、
- *                  System.Data.Entity.CreateDatabaseIfNotExists`1  の実装が提供されます。
  *                  
  *         void  database.Initialize(bool force);
  *                  このコンテキストで、登録された IDatabaseInitializer を実行します。

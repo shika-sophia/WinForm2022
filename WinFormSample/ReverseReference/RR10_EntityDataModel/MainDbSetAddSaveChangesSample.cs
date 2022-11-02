@@ -60,7 +60,20 @@
  *@subject ◆class BindingList<T> : Collection<T>, IBindingList, IList, ICollection, IEnumerable, ICancelAddNew, IRaiseItemChangedEvents
  *                    -- System.ComponentModel
  *         データ バインディングをサポートするジェネリック コレクション
- *       
+ *
+ *@subject ◆class DbSqlQuery<T> : DbRawSqlQuery -- System.Data.Entity.Infrastructure
+ *         # DbSqlQuery  DbSqlQuery()
+ *         + DbSqlQuery<TEntity>  dbSet.SqlQuery(string sql, params object[] parameters);
+
+ *         virtual DbSqlQuery AsNoTracking()  
+ *             DbContext によってクエリ結果が追跡されない場合に新しいクエリを返します。
+ *         virtual DbSqlQuery AsStreaming();  
+ *              バッファリングの代わりに結果をストリームする新しいクエリを返します。
+ *             [非推奨] 現在はデフォルトで Streaming を利用しているので、
+ *                      どの ExecutionStrategy を使うかに関わらず、この Methodを呼び出しても何の効果も得られない
+ *             [Obsolete("Queries are now streaming by default unless a retrying ExecutionStrategy is used. 
+ *                        Calling this method will have no effect.")]
+ *                        
  *@subject Grid_SelectionChanged()
  *         カーソルのある Cell から その Row を特定し、各列の値を取得
  *         DataGridViewRowCollection   dataGridView.Rows
