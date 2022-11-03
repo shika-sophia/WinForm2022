@@ -14,7 +14,12 @@
  *              https://densan-labs.net/tech/codefirst/index.html
  *              =>〔~\Reference\Article_EntityFrameworkCodeFirst〕
  *                    
- *@content EF CodeFirstProductDbContextSample
+ *@content EF Code First 
+ *         Model: Product, 
+ *         Context: SubDbContextProductRR : DbContext
+ */
+#region -> subjects
+/*
  *@subject Database.SetInitializer(IDatabaseInitializer<TContext>)  
  *           └ 引数 interface IDatabaseInitializer<in TContext> where TContext : DbContext -- System.Data.Entity.
  *                    └ class CreateDatabaseIfNotExists <TContext>
@@ -27,6 +32,113 @@
  *                              : IDatabaseInitializer<TContext> where TContext : DbContext
  *                                  常に DBを新規作成
  *               
+ *@subject ◆abstract class DbMigration : IDbMigration
+ *             -- System.Data.Entity.Migrations
+ *             
+ *         # DbMigration  DbMigration();  //from inherit class ONLY 
+ *         ([×] 'new' is not available.)
+ *         
+ *         + abstract void Up();
+ *         + virtual void Down();
+ *         
+ *         # TableBuilder<TColumns> CreateTable<TColumns>(
+ *             string name,
+ *             Func<ColumnBuilder, TColumns> columnsAction, 
+ *             [IDictionary<string, object> annotations],
+ *             object anonymousArguments = null);
+ *             
+ *         # void AlterTableAnnotations<TColumns>(
+ *             string name, 
+ *             Func<ColumnBuilder, TColumns> columnsAction, 
+ *             IDictionary<string, AnnotationValues> annotations, 
+ *             object anonymousArguments = null);
+ *             
+ *         # void MoveTable(string name, string newSchema, 
+ *             object anonymousArguments = null);
+ *             
+ *         # RenameTable(string name, string newName,
+ *             object anonymousArguments = null);
+ *             
+ *         # void DropTable(string name, 
+ *             [IDictionary<string, object> removedAnnotations], 
+ *             [IDictionary<string, IDictionary<string, object>> removedColumnAnnotations],
+ *             object anonymousArguments = null);
+ *             
+ *         # void AddPrimaryKey(
+ *             string table, string[] columns, string name = null, 
+ *             bool clustered = true, object anonymousArguments = null);
+ *             
+ *         # DropPrimaryKey(string table, string name,
+ *             object anonymousArguments = null);
+ *             
+ *         # void AddForeignKey(
+ *             string dependentTable, string[] dependentColumns, 
+ *             string principalTable, string[] principalColumns = null,
+ *             bool cascadeDelete = false, string name = null, 
+ *             object anonymousArguments = null);
+ *             
+ *         # void DropForeignKey(
+ *             string dependentTable, string dependentColumn, 
+ *             string principalTable, string principalColumn, 
+ *             object anonymousArguments = null);
+ *             
+ *         # void CreateIndex(
+ *             string table, string[] columns, bool unique = false,
+ *             string name = null, bool clustered = false,
+ *             object anonymousArguments = null);
+ *         
+ *         # void RenameIndex(string table, string name, string newName,
+ *             object anonymousArguments = null);
+ *             
+ *         # void DropIndex(string table, string[] columns, 
+ *             object anonymousArguments = null);
+ *             
+ *         # void AddColumn(string table, string name,
+ *             Func<ColumnBuilder, ColumnModel> columnAction, 
+ *             object anonymousArguments = null);
+ *             
+ *         # void AlterColumn(string table, string name,
+ *             Func<ColumnBuilder, ColumnModel> columnAction,
+ *             object anonymousArguments = null);
+ *             
+ *         # void RenameColumn(string table, string name,
+ *             string newName, object anonymousArguments = null);
+ *             
+ *         # void DropColumn(string table, string name,
+ *             [IDictionary<string, object> removedAnnotations], 
+ *             object anonymousArguments = null);
+ *                         
+ *         + void CreateStoredProcedure<TParameters>(
+ *             string name, 
+ *             [Func<ParameterBuilder, TParameters> parametersAction],
+ *             string body,
+ *             object anonymousArguments = null);
+ *             
+ *         + void AlterStoredProcedure<TParameters>(
+ *             string name, 
+ *             [Func<ParameterBuilder, TParameters> parametersAction], 
+ *             string body,
+ *             object anonymousArguments = null);  
+ *             
+ *         # void MoveStoredProcedure(string name, string newSchema, 
+ *             object anonymousArguments = null);
+ *             
+ *         # void RenameStoredProcedure(string name, string newName, 
+ *             object anonymousArguments = null);
+ *             
+ *         + void DropStoredProcedure(string name, object anonymousArguments = null);
+ *         
+ *         # void Sql(string sql, bool suppressTransaction = false,
+ *             object anonymousArguments = null);
+ *             
+ *         # void SqlFile(string sqlFile, bool suppressTransaction = false,
+ *             object anonymousArguments = null);
+ *             
+ *         # void SqlResource(string sqlResource, 
+ *             Assembly resourceAssembly = null, 
+ *             bool suppressTransaction = false, 
+ *             object anonymousArguments = null);
+    }
  *@subject モデル変更
  *         System.InvalidOperationException:
  *           データベースの作成後、
@@ -37,7 +149,8 @@
  *      Database.SetInitializer(
  *         new DropCreateDatabaseIfModelChanges<SubDbContextEntityPersonRR>());
  *         
- *      => Migrationを行うしかなさそう
+ *      => Migrationを行う => モデル変更を Migration => 解決
+ *      => 〔ProductMigration.txt〕
  *
  *@NOTE【】Code First
  *      Model -> DB を作成する開発方法だが、
@@ -57,7 +170,9 @@
  *      ＊SELECT * FROM ProductModelRR; で確認可能
  *      => 〔文末 Result〕
  *      => 〔PoductModelRRs_tb.sql〕
- *      
+ */
+#endregion
+/*
  *@see ImageCodeFirstProductDbContextSample.jpg
  *@see 
  *@author shika
@@ -74,9 +189,9 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel.EF_Code
 {
     class MainCodeFirstProductDbContextSample
     {
-        [STAThread]
-        static void Main()
-        //public void Main()
+        //[STAThread]
+        //static void Main()
+        public void Main()
         {
             Console.WriteLine("new FormCodeFirstProductDbContextSample()");
 
@@ -89,7 +204,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel.EF_Code
 
     class FormCodeFirstProductDbContextSample : Form
     {
-        //private readonly DataGridView grid;
+        private readonly DataGridView grid;
 
         public FormCodeFirstProductDbContextSample()
         {
@@ -100,43 +215,46 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel.EF_Code
             //this.AutoSize = true;
             this.BackColor = SystemColors.Window;
 
-            ProductModelRR[] productAry = new ProductModelRR[]
-            {
-                new ProductModelRR() { Name = "Pzk-III", Price = 300, },
-                new ProductModelRR() { Name = "Pzk-IV-H", Price = 800, },
-                new ProductModelRR() { Name = "Pzk-V Tiger", Price = 1700, },
-                new ProductModelRR() { Name = "Pzk-VI-A PanterA", Price = 1600 },
-            };
+            //【初回のみ】次回以降は行レコードが重複することになる。
+            //ProductModelRR[] productAry = new ProductModelRR[]
+            //{
+            //    new ProductModelRR() { Name = "Pzk-III", Price = 300, },
+            //    new ProductModelRR() { Name = "Pzk-IV-H", Price = 800, },
+            //    new ProductModelRR() { Name = "Pzk-V Tiger", Price = 1700, },
+            //    new ProductModelRR() { Name = "Pzk-VI-A PanterA", Price = 1600 },
+            //};
 
             Database.SetInitializer(
                 new DropCreateDatabaseIfModelChanges<SubDbContextEntityPersonRR>());
 
             using (var context = new SubDbContextEntityProductRR())
             {
-                context.Products.AddRange(productAry);
-                context.SaveChanges();
-                
-                foreach (ProductModelRR product in context.Products)
+                //context.Products.AddRange(productAry);
+                //context.SaveChanges();
+                context.Products.Load();
+
+                foreach (ProductModelRR product in context.Products.Local)
                 {
                     Console.WriteLine(product.Name);
                 }//foreach
 
+                grid = new DataGridView()
+                {
+                    DataSource = context.Products.Local,
+                    MultiSelect = false,
+                    AutoGenerateColumns = true,
+
+                    ClientSize = this.ClientSize,
+                    AutoSizeColumnsMode = 
+                        DataGridViewAutoSizeColumnsMode.Fill,
+                };
+
+                this.Controls.AddRange(new Control[]
+                {
+                    grid,
+                });
                 context.Dispose();
             }//using
-
-            //grid = new DataGridView()
-            //{
-            //    DataSource = context.Products.Local,
-            //    MultiSelect = false,
-            //    AutoGenerateColumns = true,
-            //    AutoSizeColumnsMode =DataGridViewAutoSizeColumnsMode.Fill,
-            //    AutoSize = true,
-            //};
-
-            this.Controls.AddRange(new Control[]
-            {
-                //grid,
-            });
         }//constructor
     }//class
 }

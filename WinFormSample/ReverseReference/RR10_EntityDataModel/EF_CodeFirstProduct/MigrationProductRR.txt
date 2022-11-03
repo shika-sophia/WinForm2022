@@ -1,0 +1,148 @@
+/*
+ * VS [Menu] -> [tool] -> [Library Package Manager] -> [NuGet] ->
+ * [PackageManagerConsole]
+ */
+
+PM> Enable-Migrations
+
+アセンブリ 'WinFormGUI' で複数のコンテキスト型が見つかりました。
+'WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel.
+EntityDataModelRRSetting' の移行を有効にするには、
+Enable-Migrations -ContextTypeName WinFormGUI.WinFormSample.ReverseReference.
+RR10_EntityDataModel.EntityDataModelRRSetting を使用します。
+
+'WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel.
+SubDbContextEntitySample' の移行を有効にするには、
+Enable-Migrations -ContextTypeName WinFormGUI.WinFormSample.ReverseReference.
+RR10_EntityDataModel.SubDbContextEntitySample を使用します。
+
+'WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel.
+SubDbContextEntityPersonRR' の移行を有効にするには、
+Enable-Migrations -ContextTypeName WinFormGUI.WinFormSample.ReverseReference.
+RR10_EntityDataModel.SubDbContextEntityPersonRR を使用します。
+
+'WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel.
+EF_CodeFirstProduct.SubDbContextEntityProductRR' の移行を有効にするには、
+Enable-Migrations -ContextTypeName WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel.EF_CodeFirstProduct.SubDbContextEntityProductRR を使用します。
+
+
+PM> Add-Migration ProductModelRRMigration
+
+アセンブリ 'WinFormGUI' で移行構成型が見つかりませんでした
+ (Visual Studio では、Package Manager Console の Enable-Migrations コマンドを使用して、移行構成を追加できます)。 
+ 
+ 
+PM> RR10_EntityDataModel.EF_CodeFirstProduct.SubDbContextEntityProductRR
+RR10_EntityDataModel.EF_CodeFirstProduct.SubDbContextEntityProductRR : 用語 'RR10
+_EntityDataModel.EF_CodeFirstProduct.SubDbContextEntityProductRR' は、コマンドレット、関数、
+スクリプト ファイル、または操作可能なプログラムの名前として認識されません。名前が正しく記述されていることを確認し、パスが含まれている場合はそのパスが正しいこ
+とを確認してから、再試行してください。
+発生場所 行:1 文字:1
++ RR10_EntityDataModel.EF_CodeFirstProduct.SubDbContextEntityProductRR
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (RR10_EntityData...EntityProduct 
+   RR:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+ 
+ 
+ PM>  Enable-Migrations -ContextTypeName WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel.EF_CodeFirstProduct.SubDbContextEntityProductRR
+ 
+コンテキストが既存のデータベースを対象にしているかをチェックしています...
+データベース初期化子で作成されたデータベースが検出されました。既存のデータベースに対応する移行 '202211020043324_InitialCreate' がスキャフォールディングされました。
+
+代わりに自動移行を使用するには、Migrations フォルダーを削除し、
+-EnableAutomaticMigrations パラメーターを指定して Enable-Migrations を再実行します。
+
+Code First Migrations がプロジェクト WinFormGUI で有効になりました。
+
+PM> Add-Migration ProductModelRRMigration
+移行 'ProductModelRRMigration' をスキャフォールディングしています。
+
+この移行ファイルのデザイン コードには、現在の Code First モデルのスナップショットが含まれています。
+このスナップショットは次の移行をスキャフォールディングする際、モデルに対する変更の計算に使用されます。
+モデルに追加の変更を行い、この移行に含める場合は、'Add-Migration ProductModelRRMigration' を再実行して再度スキャフォールディングできます。
+
+PM> Update-Database -Verbose
+Using StartUp project 'WinFormGUI'.
+Using NuGet project 'WinFormGUI'.
+ターゲット データベースに適用されている SQL ステートメントを表示するには、'-Verbose' フラグを指定します。
+ターゲット データベースは 'WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel.EF_CodeFirstProduct.SubDbContextEntityProductRR' (データ ソース: (localdb)\mssqllocaldb、プロバイダー: System.Data.SqlClient、原点: Convention) です。
+明示的な移行を適用しています: [202211020230481_ProductModelRRMigration]。
+明示的な移行を適用しています: 202211020230481_ProductModelRRMigration。
+ALTER TABLE [dbo].[ProductModelRRs] ADD [Stock] [int] NOT NULL DEFAULT 0
+System.Data.SqlClient.SqlException (0x80131904): Cannot find the object "dbo.ProductModelRRs" because it does not exist or you do not have permissions.
+   場所 System.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   場所 System.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   場所 System.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   場所 System.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   場所 System.Data.SqlClient.SqlCommand.RunExecuteNonQueryTds(String methodName, Boolean async, Int32 timeout, Boolean asyncWrite)
+   場所 System.Data.SqlClient.SqlCommand.InternalExecuteNonQuery(TaskCompletionSource`1 completion, String methodName, Boolean sendToPipe, Int32 timeout, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry)
+   場所 System.Data.SqlClient.SqlCommand.ExecuteNonQuery()
+   場所 System.Data.Entity.Infrastructure.Interception.DbCommandDispatcher.<NonQuery>b__0(DbCommand t, DbCommandInterceptionContext`1 c)
+   場所 System.Data.Entity.Infrastructure.Interception.InternalDispatcher`1.Dispatch[TTarget,TInterceptionContext,TResult](TTarget target, Func`3 operation, TInterceptionContext interceptionContext, Action`3 executing, Action`3 executed)
+   場所 System.Data.Entity.Infrastructure.Interception.DbCommandDispatcher.NonQuery(DbCommand command, DbCommandInterceptionContext interceptionContext)
+   場所 System.Data.Entity.Internal.InterceptableDbCommand.ExecuteNonQuery()
+   場所 System.Data.Entity.Migrations.DbMigrator.ExecuteSql(MigrationStatement migrationStatement, DbConnection connection, DbTransaction transaction, DbInterceptionContext interceptionContext)
+   場所 System.Data.Entity.Migrations.Infrastructure.MigratorLoggingDecorator.ExecuteSql(MigrationStatement migrationStatement, DbConnection connection, DbTransaction transaction, DbInterceptionContext interceptionContext)
+   場所 System.Data.Entity.Migrations.DbMigrator.ExecuteStatementsInternal(IEnumerable`1 migrationStatements, DbConnection connection, DbTransaction transaction, DbInterceptionContext interceptionContext)
+   場所 System.Data.Entity.Migrations.DbMigrator.ExecuteStatementsWithinTransaction(IEnumerable`1 migrationStatements, DbTransaction transaction, DbInterceptionContext interceptionContext)
+   場所 System.Data.Entity.Migrations.DbMigrator.ExecuteStatementsWithinNewTransaction(IEnumerable`1 migrationStatements, DbConnection connection, DbInterceptionContext interceptionContext)
+   場所 System.Data.Entity.Migrations.DbMigrator.ExecuteStatementsInternal(IEnumerable`1 migrationStatements, DbConnection connection, DbInterceptionContext interceptionContext)
+   場所 System.Data.Entity.Migrations.DbMigrator.ExecuteStatementsInternal(IEnumerable`1 migrationStatements, DbConnection connection)
+   場所 System.Data.Entity.Migrations.DbMigrator.<>c__DisplayClass32.<ExecuteStatements>b__30()
+   場所 System.Data.Entity.SqlServer.DefaultSqlExecutionStrategy.<>c__DisplayClass1.<Execute>b__0()
+   場所 System.Data.Entity.SqlServer.DefaultSqlExecutionStrategy.Execute[TResult](Func`1 operation)
+   場所 System.Data.Entity.SqlServer.DefaultSqlExecutionStrategy.Execute(Action operation)
+   場所 System.Data.Entity.Migrations.DbMigrator.ExecuteStatements(IEnumerable`1 migrationStatements, DbTransaction existingTransaction)
+   場所 System.Data.Entity.Migrations.DbMigrator.ExecuteStatements(IEnumerable`1 migrationStatements)
+   場所 System.Data.Entity.Migrations.Infrastructure.MigratorBase.ExecuteStatements(IEnumerable`1 migrationStatements)
+   場所 System.Data.Entity.Migrations.DbMigrator.ExecuteOperations(String migrationId, VersionedModel targetModel, IEnumerable`1 operations, IEnumerable`1 systemOperations, Boolean downgrading, Boolean auto)
+   場所 System.Data.Entity.Migrations.DbMigrator.ApplyMigration(DbMigration migration, DbMigration lastMigration)
+   場所 System.Data.Entity.Migrations.Infrastructure.MigratorLoggingDecorator.ApplyMigration(DbMigration migration, DbMigration lastMigration)
+   場所 System.Data.Entity.Migrations.DbMigrator.Upgrade(IEnumerable`1 pendingMigrations, String targetMigrationId, String lastMigrationId)
+   場所 System.Data.Entity.Migrations.Infrastructure.MigratorLoggingDecorator.Upgrade(IEnumerable`1 pendingMigrations, String targetMigrationId, String lastMigrationId)
+   場所 System.Data.Entity.Migrations.DbMigrator.UpdateInternal(String targetMigration)
+   場所 System.Data.Entity.Migrations.DbMigrator.<>c__DisplayClasse.<Update>b__d()
+   場所 System.Data.Entity.Migrations.DbMigrator.EnsureDatabaseExists(Action mustSucceedToKeepDatabase)
+   場所 System.Data.Entity.Migrations.Infrastructure.MigratorBase.EnsureDatabaseExists(Action mustSucceedToKeepDatabase)
+   場所 System.Data.Entity.Migrations.DbMigrator.Update(String targetMigration)
+   場所 System.Data.Entity.Migrations.Infrastructure.MigratorBase.Update(String targetMigration)
+   場所 System.Data.Entity.Migrations.Design.ToolingFacade.UpdateRunner.RunCore()
+   場所 System.Data.Entity.Migrations.Design.ToolingFacade.BaseRunner.Run()
+ClientConnectionId:a2995866-951e-4608-a864-09ba0368ded2
+Error Number: 4902、State: 1、Class: 16
+Cannot find the object "dbo.ProductModelRRs" because it does not exist or you do not have permissions.
+〔Table dbo.ProductModelRRsを削除してしまったので、このエラーとなる〕
+
+=>旧 Tableを DBに [SQL] CREATE TABLE を実行し復元
+/*
+CREATE TABLE [dbo].[ProductModelRRs] (
+ [ProductId] INT IDENTITY(1,1) NOT NULL,
+ [Name] NVARCHAR(200) NOT NULL,
+ [Price] INT ,
+ PRIMARY KEY CLUSTERED ([ProductId] ASC)
+ );
+ */
+
+=> 再び Migration適用してみると、モデル変更 成功
+
+PM> UPDATE-DATABASE -Verbose
+Using StartUp project 'WinFormGUI'.
+Using NuGet project 'WinFormGUI'.
+ターゲット データベースに適用されている SQL ステートメントを表示するには、
+'-Verbose' フラグを指定します。
+ターゲット データベースは 
+'WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel.
+EF_CodeFirstProduct.SubDbContextEntityProductRR'
+(データ ソース: (localdb)\mssqllocaldb、
+プロバイダー: System.Data.SqlClient、原点: Convention) です。
+
+明示的な移行を適用しています: [202211020230481_ProductModelRRMigration]。
+明示的な移行を適用しています: 202211020230481_ProductModelRRMigration。
+
+ALTER TABLE [dbo].[ProductModelRRs] ADD [Stock] [int] NOT NULL DEFAULT 0
+
+INSERT [dbo].[__MigrationHistory]([MigrationId], [ContextKey], [Model], [ProductVersion])
+  VALUES (N'202211020230481_ProductModelRRMigration', N'WinFormGUI.WinFormSample.ReverseReference.RR10_EntityDataModel.EF_CodeFirstProduct.SubDbContextEntityProductRR',  0x1F8B0800000000000400CD57DB6EE336107D2FD07F20F89C15EDE4A50DE45DA476BC30BA4E022BD93E2E6869EC104B512A4905F1B7ED433FA9BFD0A1AE96E46BB68B1601028B9A393373E646FDFDED2FFFC36B2CC90B68231235A2436F4009A83089845A8F686657EF7EA11FDEFFFC937F1BC5AFE4732577E5E4505399117DB636BD66CC84CF1073E3C522D4894956D60B9398F128619783C1AF6C3864801014B108F11799B22286FC011FC7890A21B51997F3240269CA737C13E4A8E48EC760521EC288FE21D434D1F1C7A79957FE0C789C4AF016E0C28005AC40630878B0180EBEDCA221BB9970CB7368EF76FA658C3FA6421BFBA093280B2D253752708C2400B9A2842B95586E31CEEB270381D5895A07291E70F9B84901E5565C1A28E3BF6EC44FA56270E9A8608D62051566C626F19980C3AB925BD6557F538668CD3DB25F90E7A2CE3330A2256339958B05255D93D763A99DF88F4893D7367E411A131775656201BBBF0B32CEA4CD348C1464567379411EB2A514E1EFB0794CBE821AA94CCAED58315A7CD73AC023349982B61BF4B6CDC02CA284B5D55957BFD6EEAB161CCD94BDBAA4E40E5DE14B0975616DF119D844C34750A0B985E8815B0B1AEB6216414E58CF898E49F7BFB286958C4D4DC99CBF7E02B5B6CF238A79A7642A5E21AA4E4A0F9E94C019804A5667B0C3C3C3561FB408E15890872130EEF0EB39103E6B8AB55FC238602C17C862059F2D274B7708AFB6902893B3B3A8710C94756D4A46DABE170801D876A20D258D4FC574F1BA0DB42B84DAD9660CB2620E56F392ED1998FE9CA72926796B8096272428A6E7F85D70FE58880B0C169A1DD3A1F6B6B68425CBD7D0798BA6AB7E765DBEE42E81E328EE891D4ACD1EDA2BCB1DF6BBCDDC24A35270BF0BA51F3EAEBADE34A999225B31B6734E1CD441F5866D0F205F8F5C72BD7FCE8C1399C5EAC8E43A84550C906D98E2E474847218B43DC98F4EC728A7C1364679D4C7F05987D76E19B05E1D74E678B7AE0EB56857A4B65EB76AA725FDB23D8E5F747AFD52885082E4BC8828EF958DB1107B4EC00BFE94632930DE4660CE955881B1C5C6C3693FBCECDC75FE3FF70E664C24CFBA7CFCC7CB5B38A68FAEE733D7DEF6BE562F5C87CF5CF737F6F7ACE3DCEDEF59C6C701CE5BC5FDB570D272AD37E8D1155BB4CD8846CB046328BC6ECB9837EFE17E33FB6CFBDBC69F8011EB06C27DE928085D9734A095CC4CAD928A798C77DBA34AA4939839581E216D37DA8A150FDDEA09C198FC9AF799CB0C456EE3254433759FD934B337C640BC94AD6BA3CF0EDBCF2F1B6D9FFDFBD43D997F23047453600870AF7ECB848C6ABFA73BEA6A0F84ABA0B207D12BBCE622DC7A5323DD25EA44A092BE09A4A05C073F025E0110CCDCAB80BFC05B7CC3ABE32758F37053CDE4FD20C713D1A6DD9F08BED63C362546A3EFBED799FB607FFF0F2C37D3AEE20F0000 , N'6.2.0-61023')
+
+Seed メソッドを実行しています。
