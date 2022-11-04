@@ -2,7 +2,7 @@
  *@title WinFormGUI / WinFormSample / ReverseReference / RR15_Network
  *@class MainDnsSample.cs
  *@class   └ new FormDnsSample() : Form
- *@class       └ new 
+ *@class       └ static System.Net.Dns 
  *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
  *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
@@ -56,7 +56,22 @@
  *         IPAddress  new IPAddress(byte[] address, long scopeid)
  *  static IPAddress  IPAddress.Parse(string ipString);
  *  static bool       IPAddress.TryParse(string ipString, out IPAddress address);
- *  
+ *         
+ *         ＊static readonly Field
+ *         static readonly IPAddress  IPAddress.Any;       //Server が すべてのNetwork interfaceで Client によるネットワーク利用を待機する必要がある IPAddress
+ *         static readonly IPAddress  IPAddress.Loopback;  //IP ループバック アドレス
+ *         static readonly IPAddress  IPAddress.Broadcast; //IP ブロードキャスト アドレス
+ *         static readonly IPAddress  IPAddress.None;      //IP アドレスを提供し、ネットワーク インターフェイスを使用しないことを示す。
+ *         static readonly IPAddress  IPAddress.IPv6Any;   
+ *                 //System.Net.Sockets.Socket.Bind(System.Net.EndPoint) は、
+ *                 //System.Net.IPAddress.IPv6Any フィールドを使用して、
+ *                 //System.Net.Sockets.Socket が、すべてのネットワーク インターフェイスでクライアントによるネットワーク利用を待機する必要があることを示します。
+ *         static readonly IPAddress  IPAddress.IPv6Loopback;    //IPv6 の IP ループバック アドレス
+ *         static readonly IPAddress  IPAddress.IPv6None;        //IPv6 の IP アドレスを提供し、ネットワーク インターフェイスを使用しないことを示す。
+
+ *         ＊Property
+ *         long       ipAddress.Address { get; set; }
+ *         long       ipAddress.ScopeId { get; set; }
  *         bool       ipAddress.IsIPv6SiteLocal { get; }
  *         bool       ipAddress.IsIPv6LinkLocal { get; }
  *         bool       ipAddress.IsIPv6Multicast { get; }
@@ -64,6 +79,10 @@
  *         bool       ipAddress.IsIPv4MappedToIPv6 { get; }
  *         IPAddress  ipAddress.MapToIPv4();
  *         IPAddress  ipAddress.MapToIPv6();
+ *         
+ *         static T    IpAddress.HostToNetworkOrder(T host);    T: 数値型
+ *         static bool IpAddress.IsLoopback(IPAddress address);
+ *         byte[]      ipAddress.GetAddressBytes();
  *         
  *         AddressFamily  ipAddress.AddressFamily { get; }
  *           └ enum AddressFamily -- System.Net.Sockets
@@ -112,7 +131,6 @@
  */
 using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
