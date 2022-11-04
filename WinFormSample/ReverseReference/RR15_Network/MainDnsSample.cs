@@ -54,6 +54,8 @@
  *         IPAddress  new IPAddress(long newAddress)
  *         IPAddress  new IPAddress(byte[] address)
  *         IPAddress  new IPAddress(byte[] address, long scopeid)
+ *         IPAddress  ipAddress.MapToIPv4();
+ *         IPAddress  ipAddress.MapToIPv6();
  *  static IPAddress  IPAddress.Parse(string ipString);
  *  static bool       IPAddress.TryParse(string ipString, out IPAddress address);
  *         
@@ -77,9 +79,8 @@
  *         bool       ipAddress.IsIPv6Multicast { get; }
  *         bool       ipAddress.IsIPv6Teredo { get; }
  *         bool       ipAddress.IsIPv4MappedToIPv6 { get; }
- *         IPAddress  ipAddress.MapToIPv4();
- *         IPAddress  ipAddress.MapToIPv6();
  *         
+ *         ＊Method
  *         static T    IpAddress.HostToNetworkOrder(T host);    T: 数値型
  *         static bool IpAddress.IsLoopback(IPAddress address);
  *         byte[]      ipAddress.GetAddressBytes();
@@ -124,7 +125,7 @@
  *         IP Address: 192.168.xxx.xxx  (IPv4)
  *         IP Address: 複数の IPv6      (ipAry)
  *         
- *@see (No Image for security) [×] ImageDnsSample.jpg
+ *@see (No Image for security)  [×] ImageDnsSample.jpg
  *@see 
  *@author shika
  *@date 2022-11-04
