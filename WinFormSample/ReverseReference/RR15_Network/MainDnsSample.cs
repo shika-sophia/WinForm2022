@@ -10,6 +10,7 @@
  *@content RR 第15章 Network / RR[419][420] p710
  *         Dnsクラス
  *        ・PCの HostName, IP Addressを取得するクラス
+ *        ・互換性のために残されているメンバーを含む
  *        ・引数 hostNameは 255 文字以内 
  *          -> 超えると ArgumentOutOfRangeException
  *        
@@ -17,7 +18,9 @@
  *        ・[英] DNS: Dimain Name Server   (as usual)
  *        ・[英] Dns: Dimain Name Solution ?
  *        ・[英] IP:  Internet Protocol
- *         
+ */
+#region -> Dns, IPHostEntry, IPAddress
+/*
  *@subject ◆static class Dns -- System.Net.
  *         [×] 'new' is not avaliable, because of static class.
  *         
@@ -70,7 +73,7 @@
  *                 //System.Net.Sockets.Socket が、すべてのネットワーク インターフェイスでクライアントによるネットワーク利用を待機する必要があることを示します。
  *         static readonly IPAddress  IPAddress.IPv6Loopback;    //IPv6 の IP ループバック アドレス
  *         static readonly IPAddress  IPAddress.IPv6None;        //IPv6 の IP アドレスを提供し、ネットワーク インターフェイスを使用しないことを示す。
-
+ *
  *         ＊Property
  *         long       ipAddress.Address { get; set; }
  *         long       ipAddress.ScopeId { get; set; }
@@ -124,7 +127,9 @@
  *@result  Host Name:  LAPTOP-*********
  *         IP Address: 192.168.xxx.xxx  (IPv4)
  *         IP Address: 複数の IPv6      (ipAry)
- *         
+ */
+#endregion
+/*
  *@see (No Image for security)  [×] ImageDnsSample.jpg
  *@see 
  *@author shika
