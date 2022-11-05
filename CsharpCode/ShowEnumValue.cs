@@ -2,20 +2,30 @@
  *@title WinFormGUI / CsharpCode / ShowEnumValue.cs
  *@content enumの 全列挙定数を表示する
  *
- *@subject foreach (object value in Enum.GetValues(enumType))
- *         object[]     Enum.GetValues(Type)
- *         string value       //value名の文字列表現
- *         int    (int) value //valueの数値表現
- *
+ *@subject 
+ *         string[]  Enum.GetNames(Type)
+ *         Array     Enum.GetValues(Type)
+ *           enum   value       //value名 = enum型
+ *           int    (int) value //valueの数値表現 
+ *           T      array.GetValue(int index)
+ *           object Array.GetValue(T[], int index)
+ *         
+ *           
  *@subject Type typeof(Xxxx) //Xxxxは変数不可
  *         Type xxxx.GetType()
  *         string type.Name    クラス名
  *         
- *@subject 
- *
  *@NOTE【実行】WinForm2022のプロパティ -> [アプリケーション]タブ
  *            -> 出力の種類: [コンソールアプリケーション]に変更
- *            
+ *
+ *@NOTE【Problem】名前の重複
+ *      enumの数値が同一で複数の名前がある場合
+ *      Array  Enum.GetValues(Type) -> value, (int) value で 出力すると、
+ *      同一値の名前が重複してしまう問題
+ *      
+ *      => string[]  Enum.GetNames(Type)で名前を取得し、
+ *          Array  Enum.GetValues(Type) -> array.GetValue(int index)で 数値を取得すると解決
+ *          
  *@author shika
  *@date 2022-06-26
  */
@@ -25,6 +35,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.IO;
+using System.Net.Sockets;
 using System.Text;
 using System.Windows.Forms;
 
@@ -39,8 +50,8 @@ namespace WinFormGUI.CsharpCode
         //static void Main()
         public void Main()
         {
-            var here = new ShowEnumValue(typeof(DataGridViewElementStates));
-            string content = here.BuildEnumContent(here.enumType, subject: true);
+            var here = new ShowEnumValue(typeof(ProtocolType));
+            string content = here.BuildEnumContent(here.enumType, isSubject: true);
             Console.WriteLine(content);
         }//Main()
 
@@ -73,31 +84,36 @@ namespace WinFormGUI.CsharpCode
             }
         }
 
-        private string BuildEnumContent(Type enumType, bool subject = true)
+        private string BuildEnumContent(Type enumType, bool isSubject = true)
         {
-            int length = Enum.GetNames(enumType).Length * 20;
+            Array valueAry = Enum.GetValues(enumType);
+            string[] nameAry = Enum.GetNames(enumType);
+            int length = nameAry.Length * 20;
 
             var bld = new StringBuilder(length);
-            if(subject)
+            if(isSubject)
             {
                 bld.Append("/*\n");
                 bld.Append(" *@subject "); 
             }
             bld.Append($"enum {enumName}\n");
 
-            if (subject) { bld.Append(" *         "); }
+            if (isSubject) { bld.Append(" *         "); }
             bld.Append("{\n");
 
-            foreach (var value in Enum.GetValues(enumType))
+            for(int i = 0; i < nameAry.Length; i++)
             {
-                if (subject) { bld.Append(" *         "); }
-                bld.Append($"    {value} = {(int)value},\n");
-            }//foreach
+                string name = nameAry[i];
+                int value = (int) valueAry.GetValue(i);
+                    
+                if (isSubject) { bld.Append(" *         "); }
+                bld.Append($"    {name} = {value},\n");
+            }//for
 
-            if (subject) { bld.Append(" *         "); }
+            if (isSubject) { bld.Append(" *         "); }
             bld.Append("}\n");
 
-            if (subject) { bld.Append(" */\n"); }
+            if (isSubject) { bld.Append(" */\n"); }
 
             //Console.WriteLine($"length:{length}");
             //Console.WriteLine($"bld.Length:{bld.Length}");
