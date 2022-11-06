@@ -1,5 +1,5 @@
 ﻿/** <!--
- *@title WinFormGUI / WinFormSample / 
+ *@title WinFormGUI / WinFormSample / ReverseReference / RR10_EntityDataModel / EF_CodeFirstProduct
  *@class MainCodeFirstProductDbContextSample.cs
  *@class   └ new FormCodeFirstProductDbContextSample() : Form
  *@class       └ new 
@@ -138,7 +138,7 @@
  *             Assembly resourceAssembly = null, 
  *             bool suppressTransaction = false, 
  *             object anonymousArguments = null);
-    }
+ *   
  *@subject モデル変更
  *         System.InvalidOperationException:
  *           データベースの作成後、
@@ -174,7 +174,7 @@
 #endregion
 /*
  *@see ImageCodeFirstProductDbContextSample.jpg
- *@see 
+ *@see copyTo WinFormGUI / WinFormSample / DbContextReference.txt
  *@author shika
  *@date 2022-11-02
  * -->
