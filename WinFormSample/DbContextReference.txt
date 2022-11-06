@@ -1,0 +1,897 @@
+﻿/**
+ *@title WinFormGUI / WinFormSample / DbContextReference.txt
+ *@content DbContext, DbSet, Database, DbGridView
+ *@directory WinFormGUI / WinFormSample / ReverseReference / RR10_EntityDataModel
+ *@copyFrom MainDbContextSample.cs
+ *@copyFrom MainDbSetAddSaveChangesSample.cs
+ *@copyFrom MainDbContextTransactionSample.cs
+ *@copyFrom MainDataGridViewBasicSample.cs
+ *@copyFrom EF_CodeFirstProduct / MainCodeFirstProductDbContextSample.cs
+ *@copyFrom 
+ *@author shika
+ *@date 2022-11-06
+ */
+
+ /** 
+ *@title WinFormGUI / WinFormSample / ReverseReference / RR10_EntityDataModel
+ *@class MainDbContextSample.cs
+ *@subject ◆class DbContext : IDisposable, IObjectContextAdapter
+ *                   -- System.Data.Entity.
+ *         DbContext インスタンスは、データベースに照会してすべての変更をグループ化し、
+ *         1 つの単位としてストアに書き戻すことができるような、
+ *         作業単位パターンとリポジトリパターンの組み合わせを表します。
+ *         DbContext は ObjectContext と概念的に似ています。
+ *         
+ *         [ + public / # protected ]
+ *         # DbContext   new DbContext();
+ *         # DbContext   new DbContext(DbCompiledModel model);
+ *         + DbContext   new DbContext(string nameOrConnectionString)
+ *         + DbContext   new DbContext(string nameOrConnectionString, [DbCompiledModel model])
+ *                           指定文字列を接続先のデータベース名前または接続文字列として使用する新しいDbContextインスタンスを生成
+ *                           指定されたモデルで そのインスタンスを初期化
+ *                           引数 nameOrConnectionString:  データベース名または接続文字列。
+ *                                DbCompiledModel  model:  コンテキストをサポートするモデル。〔下記〕
+ *                                
+ *         + DbContext   new DbContext(DbConnection existingConnection, [DbCompiledModel model], bool contextOwnsConnection)
+ *                           既存の接続を使用してデータベースに接続する新しいDbContextインスタンスを生成
+ *                           引数 DbConnection  existingConnection:    新しいコンテキストに使用する既存の接続。
+ *                                bool  contextOwnsConnection:  true:  DbContext が破棄されたときに接続も破棄。
+ *                                                              false: 呼び出し元が接続を破棄する必要がある。
+ *         + DbContext   new DbContext(ObjectContext objectContext, bool dbContextOwnsObjectContext)
+ *
+ *         Database         dbContext.Database { get; }
+ *           └ class Database  => 〔MainDbContextTransactionSample.cs〕
+ *         DbChangeTracker  dbContext.ChangeTracker { get; }
+ *           └ class DbChangeTracker => 〔下記〕
+ *         DbContextConfiguration  dbContext.Configuration { get; }
+ *           └ class DbContextConfiguration => 〔下記〕
+ *         
+ *         DbEntityEntry  dbContext.Entry(object entity)
+ *         DbEntityEntry<TEntity>  dbContext.Entry<TEntity>(TEntity) where TEntity : class
+ *                         エンティティに関する情報にアクセスし、エンティティに対してアクションを実行できる、
+ *           └ class DbEntityEntry => 〔下記〕
+ *           
+ *         int        dbContext.SaveChanges()       dbContextでの変更を DBに同期的に反映する
+ *         Task<int>  dbContext.SaveChangesAsync()  dbContextでの変更を DBに非同期的に反映する
+ *         Task<int>  dbContext.SaveChangesAsync(CancellationToken)
+ *                       引数 cancellationToken: Task完了を監視する Token
+ *                       
+ *         DbSet      dbContext.Set(Type entityType)
+ *         DbSet<TEntity>   dbContext.Set<TEntity>() where TEntity : class;
+ *                       コンテキストの特定の型のエンティティと基になるストアにアクセスするための DbSetインスタンスを返します。
+ *           └ class DbSet => 〔下記〕
+ *           
+ *       # bool      dbContext.ShouldValidateEntity(DbEntityEntry entityEntry);
+ *       + IEnumerable<DbEntityValidationResult>  dbContext.GetValidationErrors();
+ *       # DbEntityValidationResult               dbContext.ValidateEntity(DbEntityEntry, IDictionary<object, object> items);
+ *       # void      dbContext.OnModelCreating(DbModelBuilder);
+ *       + void      dbContext.Dispose()
+ *       # void      dbContext.Dispose(bool disposing)
+ *                       引数 disposing:  true: マネージ リソースとアンマネージ リソースの両方を解放
+ *                                        false: アンマネージ リソースだけを解放
+ *                                        
+ *@subject ◆class DbCompiledModel -- System.Data.Entity.Infrastructure
+ *                System.Data.Entity.Core.Objects.ObjectContext の作成に使用できる、
+ *                または System.Data.Entity.DbContextのコンストラクターに渡すことのできる
+ *                Entity Data Model (EDM) モデルの不変表記。
+ *                パフォーマンスを向上させるには、
+ *                この型のインスタンスをキャッシュしてコンテキストの作成に再使用する必要があります。
+ *
+ *      + TContext  CreateObjectContext<TContext>(DbConnection existingConnection)
+ *                      where TContext : ObjectContext
+ *                      (where: 型パラメータ <T> の制約:  TContext を ObjectContext に限定)
+ *                  ObjectContext のインスタンスまたは ObjectContext から派生したクラスを作成します。
+ *                  代わりに適切な DbContext コンストラクターを使用することによって
+ *                  DbContext のインスタンスを作成できることに注意してください。
+ *                  派生 ObjectContext を使用する場合は、単独の EntityConnectionパラメーターを持つ public コンストラクターが必要です。
+ *                  渡された接続は作成された ObjectContext によって使用されますが、
+ *                  そのコンテキストに所有されることはありません。
+ *                  コンテキストが破棄された後、その接続は呼び出し側で破棄する必要があります。
+ *                  
+ *@subject ◆abstract class DbConnection : Component, IDbConnection, IDisposable
+ *             -- System.Data.Common.
+ *          # DbConnection  new DbConnection()
+ *
+ *         abstract string  dbConnection.Database      { get; }
+ *         abstract string  dbConnection.DataSource    { get; }
+ *         abstract string  dbConnection.ServerVersion { get; }
+ *         abstract string  dbConnection.ConnectionString  { get; set; }
+ *         abstract ConnectionState  dbConnection.State { get; }
+ *         virtual  int     dbConnection.ConnectionTimeout { get; }
+ *         
+ *         abstract void    dbConnection.Open()              ConnectionString で指定した設定を使用して、データベース接続を開きます。
+ *                  Task    dbConnection.Open()OpenAsync();　上記の非同期バージョン。 CancellationToken.None
+ *                  Task    dbConnection.OpenAsync(CancellationToken) 
+ *                             上記の非同期バージョン。
+ *                             引数 cancellationToken: Task完了を監視する Token
+ *         abstract void    dbConnection.Close();
+ *         
+ *         abstract void       dbConnection.ChangeDatabase(string databaseName);
+ *         abstract DbCommand  dbConnection.CreateDbCommand();
+ *                  DbCommand  dbConnection.CreateCommand()  
+ *                  DataTable  dbConnection.GetSchema()     データ ソースのスキーマ情報を返します
+ *                  DataTable  dbConnection.GetSchema(string collectionName)  スキーマ名のデータ ソース情報を返します
+ *                  DataTable  dbConnection.GetSchema(string collectionName, string[] restrictionValues);
+ *                                 スキーマ名に指定した文字列と制限値に指定した文字列配列でデータ ソースのスキーマ情報を返します
+ *                                 
+ *@subject ◆EntityConnection : DbConnection -- System.Data.Entity.Core.EntityClient.
+ *         EntityConnection  new EntityConnection()
+ *         EntityConnection  new EntityConnection(string connectionString)
+ *         EntityConnection  new EntityConnection(MetadataWorkspace, DbConnection)
+ *         EntityConnection  new EntityConnection(
+ *             MetadataWorkspace, DbConnection, bool entityConnectionOwnsStoreConnection)
+ *         
+ *         (メンバーは DbConnectionと共通)
+ *         
+ *@subject ◆EntityConnectionStringBuilder  : DbConnectionStringBuilder
+ *             -- System.Data.Entity.Core.EntityClient.
+ *         EntityConnectionStringBuilder  new EntityConnectionStringBuilder()
+ *         EntityConnectionStringBuilder  new EntityConnectionStringBuilder(string connectionString)
+ *         
+ *         object  this[string keyword]  { get; set; }  インデクサー
+ *         string  entityBld.Name     { get; set; }
+ *         string  entityBld.Provider { get; set; }
+ *         string  entityBld.ProviderConnectionString  { get; set; }
+ *         string  entityBld.Metadata { get; set; }
+ *         string  entityBld.ToString()
+ *         ICollection  entityBld.Keys { get; }
+ *         
+ *         bool    entityBld.ContainsKey(string keyword)
+ *         bool    entityBld.TryGetValue(string keyword, out object value);
+ *         bool    entityBld.Remove(string keyword)
+ *         void    entityBld.Clear()
+ *
+ *@subject ◆class DbChangeTracker -- System.Data.Entity.Infrastructure.
+ *         DbChangeTracker  dbContext.ChangeTracker { get; }
+ *         ([×] 'new' is not available.)
+ *         
+ *         IEnumerable<DbEntityEntry>           dbChangeTracker.Entries()
+ *         IEnumerable<DbEntityEntry<TEntity>>  dbChangeTracker.Entries<TEntity>() where TEntity : class;
+ *         bool  dbChangeTracker.HasChanges();
+ *                   dbContext.SaveChanges() が呼び出されたときにDBに送信される変更を
+ *                   DbContext が追跡しているかどうか
+ *       
+ *         void  dbChangeTracker.DetectChanges();
+ *                   POCO Entityのプロパティとリレーションシップに加えられた変更を検出します。
+ *                   TEntityの型によっては (System.Data.Entity.Core.Objects.DataClasses.EntityObjectから派生する変更追跡プロキシやエンティティなど)、
+ *                   変更が自動的に報告され、これらの型のエンティティに対する DetectChanges の呼び出しは通常必要ないことに注意してください。
+ *                   また、通常 DetectChanges は、DbContext のメソッドとそれに関連するクラスによって自動的に呼び出されるので、
+ *                   このメソッドを明示的に呼び出す必要があるのは ほとんどないです。
+ *                   ただし、一般的にはパフォーマンス上の理由から、
+ *                   DbContext.Configuration から AutoDetectChangesEnabled フラグを使って
+ *                   DetectChanges の自動呼び出しをオフにした方がよい場合があります。
+ *
+ *@subject ◆class DbContextConfiguration -- System.Data.Entity.Infrastructure
+ *         DbContextConfiguration Configuration { get; }
+ *         ([×] 'new' is not available.)
+ *         
+ *         bool  dbConfig.EnsureTransactionsForFunctionsAndCommands { get; set; }
+ *                 SQL の関数とコマンドが常にトランザクション内で実行されるかどうか
+ *         bool  dbConfig.LazyLoadingEnabled { get; set; }
+ *                 リレーションシップの遅延読み込みが有効になっているかどうか。default: true
+ *         bool  dbConfig.ProxyCreationEnabled { get; set; }                       default: true
+ *                 Entity型のインスタンスが作成されるたびに、動的に生成されたProxyクラスのインスタンスがフレームワークによって作成されるかどうか
+ *                 このフラグによって Proxy の作成が有効になっていても、エンティティ型がプロキシ扱いの要件を満足しなければ
+ *                 Proxyインスタンスは作成されないことに注意してください。
+ *         bool  dbConfig.UseDatabaseNullSemantics { get; set; }                    default: false
+ *                 null になる可能性のある 2 つのオペランドを比較する際、
+ *                 データベースの null セマンティクスを使用するかどうか
+ *                 例 (operand1 == operand2) は次のように変換されます。
+ *                 UseDatabaseNullSemantics = true:   (operand1 = operand2)。
+ *                 UseDatabaseNullSemantics = false:  それぞれ 
+ *                    (((operand1 = operand2) AND (NOT (operand1 IS NULL 
+ *                    OR operand2 IS NULL))) OR ((operand1 IS NULL) 
+ *                    AND (operand2 IS NULL)))
+ *         bool  dbConfig.AutoDetectChangesEnabled { get; set; }                default: true
+ *                    dbChangeTracker.DetectChanges()を 
+ *                    DbContext と関連クラスのメソッドによって自動的に呼び出すかどうか
+ *         bool  dbConfig.ValidateOnSaveEnabled { get; set; }                   default: true
+ *                    dbContext.SaveChanges() 時、追跡されているエンティティが自動的に検証されるかどうか
+ *                    
+ *@subject ◆class DbEntityEntry  -- System.Data.Entity.Infrastructure
+ *         DbEntityEntry           dbContext.Entry(object entity)
+ *         DbEntityEntry<TEntity>  dbContext.Entry<TEntity>(TEntity) where TEntity : class
+ *         ([×] 'new' is not available.)
+ *
+ *         object            dbEntityEntry.Entity { get; }
+ *         DbPropertyValues  dbEntityEntry.OriginalValues { get; }
+ *         DbPropertyValues  dbEntityEntry.CurrentValues { get; }
+ *            └ class DbPropertyValues
+ *         EntityState       dbEntityEntry.State { get; set; }
+ *            └ enum EntityState
+ *              {
+ *                 Detached = 1,   エンティティは、コンテキストによって追跡されていません。
+ *                                 エンティティが new 演算子 または dbSet.Create() によって作成されると、直ちに この状態になります。
+ *                 Unchanged = 2,  エンティティはコンテキストによって追跡されていて、データベースに存在します。
+ *                                 また、プロパティ値はデータベースの値から変更されていません。
+ *                 Added = 4,      エンティティはコンテキストによって追跡されていますが、
+ *                                 データベースにまだ存在していません。
+ *                 Deleted = 8,    エンティティはコンテキストによって追跡されていて、
+ *                                 データベース内に存在していますが、
+ *                                 SaveChanges() が次回呼び出されたときにデータベースから削除するようにマークが付けられています。
+ *                 Modified = 16   エンティティはコンテキストによって追跡されていて、
+ *                                 データベースに存在します。
+ *                                 また、一部またはすべてのプロパティ値が変更されています。
+ *             }
+ *             
+ *         DbPropertyEntry          dbEntityEntry.Property(string propertyName);
+ *         DbComplexPropertyEntry   dbEntityEntry.ComplexProperty(string propertyName);
+ *         DbMemberEntry            dbEntityEntry.Member(string propertyName);
+ *         DbReferenceEntry         dbEntityEntry.Reference(string navigationProperty);
+ *         DbCollectionEntry        dbEntityEntry.Collection(string navigationProperty);
+ *         DbEntityEntry<TEntity>   dbEntityEntry.Cast<TEntity>() where TEntity : class;
+ *         
+ *         DbPropertyValues         dbEntityEntry.GetDatabaseValues();
+ *         Task<DbPropertyValues>   dbEntityEntry.GetDatabaseValuesAsync([CancellationToken]);
+ *         DbEntityValidationResult dbEntityEntry.GetValidationResult();
+ *         void                     dbEntityEntry.Reload();
+ *         Task                     dbEntityEntry.ReloadAsync([CancellationToken]);
+ *
+ *@subject ◆class DbSet<TEntity> : DbQuery<TEntity>, IDbSet<TEntity>, IQueryable<TEntity>, IEnumerable<TEntity>, IQueryable, IEnumerable, IInternalSetAdapter where TEntity : class
+ *                   -- System.Data.Entity
+ *         # DbSet<TEntity>      new DbSet<TEntity>()  where TEntity : class;
+ *         DbSet<TEntity>        DbContext派生クラス.[テーブルクラス]  <- プロパティに「DbSet<T> テーブル名」を記述
+ *         
+ *         ObservableCollection<TEntity>  dbSet.Local { get; }   
+ *             ・Entityのキャッシュを保持。自動更新される
+ *             ・ObservableCollection<TEntity>
+ *         TEntity               dbSet.Add(TEntity entity)
+ *         IEnumerable<TEntity>  dbSet.AddRange(IEnumerable<TEntity> entities)
+ *         TEntity               dbSet.Attach(TEntity entity)
+ *         TEntity               dbSet.Create()
+ *         TDerivedEntity        dbSet.Create<TDerivedEntity>() where TDerivedEntity : class, TEntity;
+ *         TEntity               dbSet.Find(params object[] keyValues);
+ *         Task<TEntity>         dbSet.FindAsync(CancellationToken cancellationToken, params object[] keyValues);
+ *         Task<TEntity>         dbSet.FindAsync(params object[] keyValues);
+ *         TEntity               dbSet.Remove(TEntity entity)
+ *         IEnumerable<TEntity>  dbSet.RemoveRange(IEnumerable<TEntity> entities)
+ *         DbSqlQuery<TEntity>   dbSet.SqlQuery(string sql, params object[] parameters)
+ *         
+ *@subject ◆interface IQueryable : IEnumerable
+ *@subject ◆static class QueryableExtensions -- System.Data.Entity
+ *         void  DbSet<T>.Load(this IQueryable source)  
+ *                 拡張メソッド: 第１引数 this のクラスにこのメソッドを追加
+ *                 Load(): DbSet<T>, ObjectSet<T>, ObjectQuery<T>などのサーバー クエリを対象に、
+ *                         クエリの結果がクライアント上の関連付けられた DbContext, ObjectContextなどのキャッシュに読み込まれるように、
+ *                         クエリを列挙します。これは ToList() を呼び出してから、実際にリストを作成するオーバーヘッドなしでリストを破棄する場合と同じです。
+ *
+ *@subject ◆class DbQuery<TResult> : IOrderedQueryable<TResult>, IQueryable<TResult>, IEnumerable<TResult>, IOrderedQueryable, IQueryable, IEnumerable, IListSource, IInternalQueryAdapter, IDbAsyncEnumerable<TResult>, IDbAsyncEnumerable
+ *                   -- System.Data.Entity.Infrastructure
+ *         (DbSetの base)
+ *         [×] 'new' is not available.
+ *         
+ *         string  dbQuery.Sql { get; }
+ *         DbQuery<TResult>  dbQuery.AsNoTracking()
+ *         DbQuery<TResult>  dbQuery.AsStreaming()
+ *         DbQuery<TResult>  dbQuery.Include(string path)  クエリ結果に含める関連オブジェクトを指定
+ */
+ 
+ /** 
+ *@title WinFormGUI / WinFormSample / ReverseReference / RR10_EntityDataModel
+ *@class MainDbSetAddSaveChangesSample.cs
+ *         
+ *@subject ObservableCollection<TEntity>  dbSet.Load()    //DBのテーブル情報をキャッシュとして保持
+ *         object  dataGridView.DataSource = dbSet.Local  //DataGridViewの DataSource に DbSetのキャッシュを代入
+ *         bool    dataGridView.AutoGenerateColumns       //DataSourceを元に 自動で列,行を生成
+ *
+ *@subject BindingList<TEntity>  ObservalCollection<TEntity>.ToBindingList<TEntity>()
+ *         ・項目が追加または削除されたとき、
+ *           あるいはリスト全体が更新されたときに通知を行う動的なデータ コレクション
+ *           (grid.DataSource = entity.PersonRR.Local; のままだと、更新情報を表示できない)
+ *         ・DBへの変更内容を BindingListに保持し、grid.SaveChanges()で DBに反映
+ *         
+ *         例 grid.DataSource = entity.PersonRR.Local.ToBindingList();
+ *
+ *@subject ◆class ObservableCollection<T> : Collection<T>, INotifyCollectionChanged, INotifyPropertyChanged
+ *                   -- System.Collections.ObjectModel
+ *         ObservableCollection<Object>   new ObservableCollection()
+ *         ObservableCollection<T>        new ObservableCollection(List<T>)
+ *         ObservableCollection<T>        new ObservableCollection(IEnumerable<T>)
+ *         
+ *         [+: public, #: protected]
+ *         # void SetItem(int index, T item)
+ *         # void InsertItem(int index, T item)
+ *         + void Move(int oldIndex, int newIndex)
+ *         # void MoveItem(int oldIndex, int newIndex)
+ *         # void RemoveItem(int index)
+ *         # void ClearItems()
+ *         + event NotifyCollectionChangedEventHandler CollectionChanged
+ *         # event PropertyChangedEventHandler PropertyChanged
+ *         
+ *@subject static class ObservableCollectionExtensions -- System.Data.Entity
+ *         + static BindingList<T>  ObservableCollection.ToBindingList<T>(this ObservableCollection<T> source) where T : class;
+ *         
+ *@subject ◆class BindingList<T> : Collection<T>, IBindingList, IList, ICollection, IEnumerable, ICancelAddNew, IRaiseItemChangedEvents
+ *                    -- System.ComponentModel
+ *         データ バインディングをサポートするジェネリック コレクション
+ *
+ *@subject ◆class DbRawSqlQuery : IEnumerable, IListSource, IDbAsyncEnumerable
+ *              -- System.Data.Entity.Infrastructure.
+ *         DbRawSqlQuery            database.SqlQuery(Type elementType, string sql, params object[] parameters);
+ *         DbRawSqlQuery<TElement>  database.SqlQuery<TElement>(string sql, params object[] parameters);
+ *         DbRawSqlQuery  AsStreaming();  [非推奨] バッファリングの代わりに結果をストリームする新しいクエリを返します。
+ *         ([×] 'new' is not available.)
+ *         
+ *         IEnumerator        dbRawSqlQuery.GetEnumerator();
+ *         Task               dbRawSqlQuery.ForEachAsync(Action<object> action, [CancellationToken]);
+ *         Task<List<object>> dbRawSqlQuery.ToListAsync([CancellationToken]);
+ *
+ *@subject ◆class DbSqlQuery<T> : DbRawSqlQuery -- System.Data.Entity.Infrastructure
+ *         # DbSqlQuery  DbSqlQuery()
+ *         + DbSqlQuery<TEntity>  dbSet.SqlQuery(string sql, params object[] parameters);
+ *
+ *         virtual DbSqlQuery AsNoTracking()  
+ *             DbContext によってクエリ結果が追跡されない場合に新しいクエリを返します。
+ *         virtual DbSqlQuery AsStreaming();  
+ *              バッファリングの代わりに結果をストリームする新しいクエリを返します。
+ *             [非推奨] 現在はデフォルトで Streaming を利用しているので、
+ *                      どの ExecutionStrategy を使うかに関わらず、この Methodを呼び出しても何の効果も得られない
+ *             [Obsolete("Queries are now streaming by default unless a retrying ExecutionStrategy is used. 
+ *                        Calling this method will have no effect.")]
+ */
+ /** <!--
+ *@title WinFormGUI / WinFormSample / ReverseReference / RR10_EntityDataModel
+ *@class MainDbContextTransactionSample.cs
+ *
+ *@subject ◆class Database -- System.Data.Entity
+ *         ・DbContextクラスのプロパティ。DBの管理、Transaction処理に利用する
+ *         
+ *         Database  dbContext.Database
+ *         ([×] 'new' is not available.)
+ *         
+ *         Action<string>        database.Log { get; set; }   DbContextで生成された SQL文のログをデリゲートに記録
+ *         DbConnection          database.Connection { get; }
+ *         DbContextTransaction  database.CurrentTransaction { get; }
+ *         int?                  database.CommandTimeout { get; set; }
+ *
+ *         static void   database.SetInitializer<TContext>(IDatabaseInitializer<TContext> strategy) where TContext : DbContext;
+ *           └ 引数 interface IDatabaseInitializer<in TContext> where TContext : DbContext -- System.Data.Entity.
+ *                    └ class CreateDatabaseIfNotExists <TContext>
+ *                              : IDatabaseInitializer<TContext> where TContext : DbContext
+ *                                  DBが存在しない場合に DBを新規作成
+ *                    └ class DropCreateDatabaseIfModelChanges
+ *                              : IDatabaseInitializer<TContext> where TContext : DbContext
+ *                                  DBの元になる Modelクラスが変更された場合に 旧 DBを破棄し、新規作成
+ *                    └ class DropCreateDatabaseAlway
+ *                              : IDatabaseInitializer<TContext> where TContext : DbContext
+ *                                  常に DBを新規作成
+ *                                  
+ *                  DbContext 派生クラスのインスタンスが初めて使われた場合、このインターフェイスの実装が基になるデータベースの初期化に使用されます。
+ *                  この初期化では、条件に基づいて、データベースの作成やデータベースへのデータのシードを行うことができます。
+ *                  使用する方法は Database クラスの静的な InitializationStrategy プロパティを使用して設定されます。
+ *                  
+ *         void  database.Initialize(bool force);
+ *                  このコンテキストで、登録された IDatabaseInitializer を実行します。
+ *                  このメソッドは、通常、操作がトランザクションの一部である場合など、
+ *                  限定的に実行すると問題が発生する操作を開始する前にデータベースが作成されてシードされていることを確認する必要があるときに使用されます。
+ *                  引数 force:  true:   以前に実行したことがあるかどうかに関係なく、初期化子が実行されます。
+ *                                       これは、アプリケーションの実行中にデータベースが削除され、初期化が必要になった場合に役立ちます。
+ *                               false:  初期化子は、このアプリケーション ドメインの
+ *                                       このコンテキスト、モデル、および接続に対して まだ実行されていない場合のみ実行されます。
+ *         bool  database.Exists();
+ *         void  database.Create();
+ *         bool  database.CreateIfNotExists();
+ *         bool  database.Delete();
+ *         DbContextTransaction  database.BeginTransaction()
+ *         DbContextTransaction  database.BeginTransaction(IsolationLevel)
+ *           └ 引数 enum IsolationLevel  分離レベル
+ *                 {
+ *                     Unspecified = -1,       //指定した分離レベルとは異なる分離レベルが使用されていますが、レベルを確認できません。
+ *                     Chaos = 16,             //これより分離性の高いトランザクションからの保留中の変更に対しては上書きできません。
+ *                     ReadUncommitted = 256,  //ダーティ読み込みができます。つまり、共有ロックが発行されておらず、排他ロックが有効ではありません。
+ *                     ReadCommitted = 4096,   //データが読み込まれている間、ダーティ読み込みを防ぐために共有ロックが保持されますが、トランザクションが終了する前にデータを変更できます。このため、読み込みは繰り返されません。また実際には存在しないデータを生成できます。
+ *                     RepeatableRead = 65536, //他のユーザーがデータを更新できないようにするために、クエリで使用するすべてのデータをロックします。 繰り返し不能読み込みはできませんが、実際には存在しない行を生成できます。
+ *                     Serializable = 1048576, //System.Data.DataSet にレンジ ロックがかけられ、トランザクションが完了するまで、他のユーザーは行を更新したりデータセットに行を挿入できません。
+ *                     Snapshot = 16777216     //あるアプリケーションで変更中のデータを他のアプリケーションから読み取ることができるように、そのデータのバージョンを保存して、ブロッキングを減らします。 この場合、クエリを再実行しても、あるトランザクションで加えられた変更を、他のトランザクションで表示できません。
+ *                 }
+ *                 
+ *         void  database.UseTransaction(DbTransaction);
+ *           └ 引数 class DbTransaction  外部トランザクション
+ *                  Entity Framework で外部トランザクション内でコマンドを実行する必要がある場合、
+ *                  ユーザーは、Databaseオブジェクトの外部で作成されたデータベース トランザクションを渡すことができます。
+ *                  または、null を渡して、フレームワークのそのトランザクションの情報をクリアします。
+ *                  
+ *         int  database.ExecuteSqlCommand(string sql, params object[] parameters);
+ *         int  database.ExecuteSqlCommand(TransactionalBehavior, string sql, params object[] parameters);
+ *         Task<int>  database.ExecuteSqlCommandAsync(TransactionalBehavior, string sql, params object[] parameters);
+ *         Task<int>  database.ExecuteSqlCommandAsync(string sql, CancellationToken, params object[] parameters);
+ *         Task<int>  database.ExecuteSqlCommandAsync(TransactionalBehavior, string sql, CancellationToken, params object[] parameters);
+ *            └ 引数 enum TransactionalBehavior
+ *                  {
+ *                      EnsureTransaction = 0,      //トランザクションが存在しない場合、この操作のために新しいトランザクションが使用されます。
+ *                      DoNotEnsureTransaction = 1  //既存のトランザクションがある場合、それが使用されます。それ以外の場合は、トランザクションなしでコマンドまたはクエリが実行されます。
+ *                  }
+ *         DbRawSqlQuery            database.SqlQuery(Type elementType, string sql, params object[] parameters);
+ *         DbRawSqlQuery<TElement>  database.SqlQuery<TElement>(string sql, params object[] parameters);
+ *           └ class DbRawSqlQuery
+ *
+ *@subject ◆abstract class DbTransaction : MarshalByRefObject, IDbTransaction, IDisposable
+ *             -- System.Data.Common
+ *         # DbTransaction  DbTransaction()
+ *         
+ *         +          DbConnection Connection { get; }
+ *         + abstract IsolationLevel IsolationLevel { get; }
+ *         # abstract DbConnection DbConnection { get; }
+ *         
+ *         + abstract void Commit();
+ *         + abstract void Rollback();
+ *         + void Dispose();
+ *         # virtual void Dispose(bool disposing);
+ *         
+ *@subject ◆class DbContextTransaction : IDisposable 
+ *             -- System.Data.Entity
+ *         + DbContextTransaction  database.CurrentTransaction { get; }
+ *         + DbContextTransaction  database.BeginTransaction()
+ *           ([×] 'new' is not available.)
+ *         
+ *         + DbTransaction  UnderlyingTransaction { get; }
+ *         + void Commit();
+ *         + void Rollback();
+ *         + void Dispose();
+ *         # virtual void Dispose(bool disposing);
+ *
+ */
+ /** 
+ *@title WinFormGUI / WinFormSample / ReverseReference / RR10_EntityDataModel
+ *@class MainDataGridViewBasicSample.cs
+ *
+ *@subject ◆DataGridView : Control, ISupportInitialize -- System.Windows.Forms
+ *         DataGridView   new DataGridView()
+ *        
+ *         ＊Indexer
+ *         DataGridViewCell this[string columnName, int rowIndex] { get; set; }
+ *         DataGridViewCell this[int columnIndex, int rowIndex]   { get; set; }
+ *         
+ *         ＊Property
+ *         ・Basic
+ *         string   dataGridView.Text { get; set; }
+ *         object   dataGridView.DataSource { get; set; }
+ *         string   dataGridView.DataMember { get; set; }
+ *         int      dataGridView.ColumnCount { get; set; }
+ *         int      dataGridView.RowCount { get; set; }
+ *         int      dataGridView.NewRowIndex { get; }
+ *         bool     dataGridView.ReadOnly { get; set; }
+ *         bool     dataGridView.MultiSelect { get; set; }
+ *         bool     dataGridView.AutoGenerateColumns { get; set; }    //DataSourceを元に自動で列,行を生成
+ *         DataGridViewColumn  dataGridView.SortedColumn { get; }
+ *         DataGridViewRow     dataGridView.CurrentRow   { get; }
+ *         DataGridViewCell    dataGridView.CurrentCell { get; set; }
+ *         DataGridViewCell    dataGridView.FirstDisplayedCell { get; set; }
+ *         
+ *         ・Collection
+ *         DataGridViewColumnCollection  dataGridView.Columns { get; }
+ *         DataGridViewRowCollection     dataGridView.Rows { get; }
+ *         DataGridViewSelectedColumnCollection dataGridView.SelectedColumns { get; }
+ *         DataGridViewSelectedRowCollection    dataGridView.SelectedRows { get; }
+ *         DataGridViewSelectedCellCollection   dataGridView.SelectedCells { get; }
+ *         
+ *         ・Size / AutoSize
+ *         bool     dataGridView.ColumnHeadersVisible { get; set; }
+ *         bool     dataGridView.RowHeadersVisible { get; set; }
+ *         int      dataGridView.ColumnHeadersHeight { get; set; }
+ *         int      dataGridView.RowHeadersWidth { get; set; } 
+ *         Size     dataGridView.DefaultSize { get; }
+ *         bool     dataGridView.AllowUserToResizeRows { get; set; }
+ *         bool     dataGridView.AllowUserToResizeColumns { get; set; }
+ *         bool     dataGridView.AllowUserToOrderColumns { get; set; }
+ *         bool     dataGridView.AllowUserToDeleteRows { get; set; }
+ *         bool     dataGridView.AllowUserToAddRows { get; set; }
+ *         
+ *         DataGridViewColumnHeadersHeightSizeMode  dataGridView.ColumnHeadersHeightSizeMode { get; set; }
+ *           └ enum DataGridViewColumnHeadersHeightSizeMode
+ *             {
+ *                EnableResizing = 0,
+ *                DisableResizing = 1,
+ *                AutoSize = 2,
+ *             }
+ *             
+ *         DataGridViewAutoSizeColumnsMode      dataGridView.AutoSizeColumnsMode { get; set; }    自動で画面幅に調整。各列も均等になり、Column幅の自己定義は無視される
+ *            └ enum DataGridViewAutoSizeColumnsMode
+ *              {
+ *                 None = 1,
+ *                 ColumnHeader = 2,
+ *                 AllCellsExceptHeader = 4,
+ *                 AllCells = 6,
+ *                 DisplayedCellsExceptHeader = 8,
+ *                 DisplayedCells = 10,
+ *                 Fill = 16,                       親コントロールの Sizeに合わせて 列幅, 行幅を均等配置
+ *                                                  (自己設定した 列幅, 行幅は無視され、自動設定される)
+ *              }
+ *              
+ *         DataGridViewRowHeadersWidthSizeMode  dataGridView.RowHeadersWidthSizeMode { get; set; }
+ *           └ enum DataGridViewRowHeadersWidthSizeMode
+ *             {
+ *                EnableResizing = 0,
+ *                DisableResizing = 1,
+ *                AutoSizeToAllHeaders = 2,
+ *                AutoSizeToDisplayedHeaders = 3,
+ *                AutoSizeToFirstHeader = 4,
+ *             }
+ *             
+ *         DataGridViewAutoSizeRowsMode         dataGridView.AutoSizeRowsMode { get; set; }
+ *           └ enum DataGridViewAutoSizeRowsMode
+ *             {
+ *                None = 0,
+ *                AllHeaders = 5,
+ *                AllCellsExceptHeaders = 6,
+ *                AllCells = 7,
+ *                DisplayedHeaders = 9,
+ *                DisplayedCellsExceptHeaders = 10,
+ *                DisplayedCells = 11,
+ *              }
+ *          
+ *         ・CellStyle / BorderStyle
+ *         bool                    dataGridView.EnableHeadersVisualStyles { get; set; }
+ *         DataGridViewCellStyle   dataGridView.ColumnHeadersDefaultCellStyle { get; set; }
+ *         DataGridViewCellStyle   dataGridView.RowHeadersDefaultCellStyle { get; set; }
+ *         DataGridViewCellStyle   dataGridView.RowsDefaultCellStyle { get; set; }
+ *         DataGridViewCellStyle   dataGridView.DefaultCellStyle { get; set; }
+ *         DataGridViewCellStyle   dataGridView.AlternatingRowsDefaultCellStyle { get; set; }   交互に色などを変える場合
+ *           └ class DataGridViewCellStyle 〔下記〕
+ *           
+ *         Color                          dataGridView.GridColor { get; set; }
+ *         DataGridViewHeaderBorderStyle  dataGridView.ColumnHeadersBorderStyle { get; set; }
+ *         DataGridViewHeaderBorderStyle  dataGridView.RowHeadersBorderStyle { get; set; }
+ *           └ enum DataGridViewHeaderBorderStyle
+ *             {
+ *                Custom = 0,
+ *                Single = 1,
+ *                Raised = 2,
+ *                Sunken = 3,
+ *                None = 4,
+ *             }
+ *         
+ *         DataGridViewCellBorderStyle       dataGridView.CellBorderStyle { get; set; }
+ *           └ enum DataGridViewCellBorderStyle
+ *             {
+ *                Custom = 0,
+ *                Single = 1,
+ *                Raised = 2,
+ *                Sunken = 3,
+ *                None = 4,
+ *                SingleVertical = 5,
+ *                RaisedVertical = 6,
+ *                SunkenVertical = 7,
+ *                SingleHorizontal = 8,
+ *                RaisedHorizontal = 9,
+ *                SunkenHorizontal = 10,
+ *             }
+ *             
+ *         DataGridViewAdvancedBorderStyle   dataGridView.AdvancedRowHeadersBorderStyle { get; }
+ *         DataGridViewAdvancedBorderStyle   dataGridView.AdvancedColumnHeadersBorderStyle { get; }
+ *         DataGridViewAdvancedBorderStyle   dataGridView.AdvancedCellBorderStyle { get; }
+ *         DataGridViewAdvancedBorderStyle   dataGridView.AdjustedTopLeftHeaderBorderStyle { get; }
+ *           └ class DataGridViewAdvancedBorderStyle
+ *               └ enum DataGridViewAdvancedCellBorderStyle
+ *                 {
+ *                    NotSet = 0,
+ *                    None = 1,
+ *                    Single = 2,
+ *                    Inset = 3,
+ *                    InsetDouble = 4,
+ *                    Outset = 5,
+ *                    OutsetDouble = 6,
+ *                    OutsetPartial = 7,
+ *                 }
+ *                 
+ *         SortOrder dataGridView.SortOrder { get; }
+ *           └ enum SortOrder
+ *             {
+ *                None = 0,
+ *                Ascending = 1,
+ *                Descending = 2,
+ *             }
+ *             
+ *         DataGridViewSelectionMode  dataGridView.SelectionMode { get; set; }
+ *           └ enum DataGridViewSelectionMode
+ *             {
+ *                CellSelect = 0,
+ *                FullRowSelect = 1,
+ *                FullColumnSelect = 2,
+ *                RowHeaderSelect = 3,
+ *                ColumnHeaderSelect = 4,
+ *             }
+ *  
+ *         Panel    dataGridView.EditingPanel { get; }
+ *         Control  dataGridView.EditingControl { get; }
+ *         DataGridViewEditMode  dataGridView.EditMode { get; set; }
+ *           └ enum DataGridViewEditMode
+ *             {
+ *                EditOnEnter = 0,
+ *                EditOnKeystroke = 1,
+ *                EditOnKeystrokeOrF2 = 2,
+ *                EditOnF2 = 3,
+ *                EditProgrammatically = 4,
+ *             }
+ *           
+ *         ＊Method
+ *         void     dataGridView.AutoResizeColumn(int columnIndex, [DataGridViewAutoSizeColumnMode]);
+ *         void     dataGridView.AutoResizeColumns([DataGridViewAutoSizeColumnsMode]);
+ *         void     dataGridView.AutoResizeColumnHeadersHeight([int columnIndex]);
+ *         void     dataGridView.AutoResizeRow(int rowIndex, [DataGridViewAutoSizeRowMode]);
+ *         void     dataGridView.AutoResizeRowHeadersWidth(int rowIndex, [DataGridViewRowHeadersWidthSizeMode]);
+ *         void     dataGridView.AutoResizeRows(DataGridViewAutoSizeRowsMode autoSizeRowsMode);
+ *         
+ *         bool     dataGridView.BeginEdit(bool selectAll);
+ *         bool     dataGridView.EndEdit(DataGridViewDataErrorContexts context);
+ *         bool     dataGridView.CommitEdit(DataGridViewDataErrorContexts);
+ *         bool     dataGridView.CancelEdit();
+ *         bool     dataGridView.RefreshEdit();
+ *         
+ *         void     dataGridView.UpdateCellValue(int columnIndex, int rowIndex);
+ *         void     dataGridView.SelectAll();
+ *         void     dataGridView.ClearSelection();
+ *         
+ *         void     dataGridView.Sort(IComparer comparer)
+ *         void     dataGridView.Sort(DataGridViewColumn, ListSortDirection direction);
+ *           └ enum ListSortDirection
+ *             {
+ *                Ascending = 0,
+ *                Descending = 1,
+ *             }
+ *             
+ *         ＊Event
+ *         event EventHandler  dataGridView.Sorted
+ *         evrnt EventHandler  dataGridView.SelectionChanged
+ *         event EventHandler  dataGridView.CurrentCellChanged
+ *         event DataGridViewCellEventHandler  dataGridView.CellClick   ボタンクリック時？
+ *                 └ 引数: DataGridViewCellEventArgs : EventArgs        引数にセル情報を含む
+ *                      int   e.ColumnIndex
+ *                      int   e.RowIndex
+ *         event DataGridViewCellMouseEventHandler  dataGridView.ColumnHeaderMouseClick   マウスクリック時
+ *                 └ 引数: DataGridViewCellMouseClickEventArgs : MouseEventArgs           引数にセル情報を含む
+ *                      int   e.ColumnIndex
+ *                      int   e.RowIndex
+ *                      
+ *@subject ◆DataGridViewColumn : DataGridViewBand, IComponent, IDisposable
+ *              -- System.Windows.Forms.
+ *         + DataGridViewColumn  new ColumnDataGridViewColumn()
+ *         + DataGridViewColumn  new ColumnDataGridViewColumn(DataGridViewCell cellTemplate)
+ *             └ class DataGridViewTextBoxColumn  : DataGridViewColumn   //column.CellTemplate = new DataGridViewTextBoxCell()
+ *             └ class DataGridViewButtonColumn   : DataGridViewColumn
+ *             └ class DataGridViewCheckBoxColumn : DataGridViewColumn
+ *             └ class DataGridViewComboBoxColumn : DataGridViewColumn
+ *             └ class DataGridViewImageColumn    : DataGridViewColumn
+ *             └ class DataGridViewLinkColumn     : DataGridViewColumn
+ *         + DataGridViewColumn  dataGridView.SortedColumn
+ *              
+ *         string  column.Name  { get; set; }            列を識別する為の名前です。大文字・小文字は区別されません。
+ *         string  column.HeaderText  { get; set; }      列のヘッダーセルの見出しの文字列です。
+ *         string  column.DataPropertyName { get; set; } バインドされている、データ ソース プロパティの名前またはデータベースの列の名前を取得または設定します。
+ *         int     column.Width  { get; set; }           列の幅を設定します。既定値は100です。
+ *         int     column.MinimumWidth { get; set; }
+ *         int     column.DividerWidth                   区分線の幅を設定します。既定値は 0 です。
+ *         DataGridViewColumnHeaderCell  column.HeaderCell { get; set; }
+ *         
+ *         DataGridViewCell  column.CellTemplate   セルのタイプを設定。下記 クラスを new する。
+ *              |                                  TextBox, Button, CheckBox, ComboBox, Image, Link
+ *              └ class DataGridViewColumnHeaderCell : DataGridViewHeaderCell
+ *              └ class DataGridViewTextBoxCell  : DataGridViewCell
+ *              └ class DataGridViewButtonCell   : DataGridViewCell
+ *              └ class DataGridViewCheckBoxCell : DataGridViewCell, IDataGridViewEditingCell
+ *              └ class DataGridViewComboBoxCell : DataGridViewCell
+ *              └ class DataGridViewImageCell    : DataGridViewCell
+ *              └ class DataGridViewLinkCell     : DataGridViewCell 
+ *              
+ *         int     column.Index         DataGridView内での相対位置を取得します。
+ *         bool    column.IsDataBound { get; }
+ *         bool    column.Visible { get; set; }
+ *         bool    column.ReadOnly { get; set; }
+ *         bool    column.Frozen { get; set; }
+ *         DataGridViewAutoSizeColumnMode  column.AutoSizeMode 
+ *         DataGridViewColumnSortMode      column.SortMode { get; set; }
+ *         DataGridViewCellStyle           column. DefaultCellStyle { get; set; }
+ *         
+ *@subject ◆DataGridViewRow : DataGridViewBand -- System.Windows.Forms.
+ *         + DataGridViewRow   new DataGridViewRow()
+ *         + DataGridViewRow   dataGridView.Rows[i]
+ *         + DataGrodViewRow   dataGridView.CurrentRow
+ *         + DataGridViewRow   dataGridView.RowTemplate { get; set; }
+ *         
+ *         DataGridViewCellCollection  row.Cells { get; }
+ *         object  row.DataBoundItem { get; }   データバインド時のオブジェクトを取得
+ *         int     row.Height { get; set; }
+ *         int     row.MinimumHeight { get; set; }
+ *         int     row.DividerHeight { get; set; }  行の区分線の高さ
+ *         bool    row.Visible { get; set; }
+ *         bool    row.Displayed { get; }
+ *         bool    row.ReadOnly { get; set; }
+ *         bool    row.Selected { get; set; }
+ *         bool    row.Frozen { get; set; }        行が固定された状態か
+ *         bool    row.IsNewRow { get; }
+ *         DataGridViewElementStates  row.State { get; }
+ *            └ enum DataGridViewElementStates  行の状態
+ *              {
+ *                 None = 0,
+ *                 Displayed = 1,
+ *                 Frozen = 2,
+ *                 ReadOnly = 4,
+ *                 Resizable = 8,
+ *                 ResizableSet = 16,
+ *                 Selected = 32,
+ *                 Visible = 64,
+ *              }
+ *              
+ *         DataGridViewRowHeaderCell  row.HeaderCell { get; set; }
+ *         DataGridViewCellStyle      row.DefaultCellStyle { get; set; }
+ *         
+ *         void   row.CreateCells(DataGridView dataGridView, params object[] values);
+ *         bool   row.SetValues(params object[] values)
+ *         DataGridViewCellCollection  row.CreateCellsInstance()
+ *         
+ *@subject ◆abstract class DataGridViewCell : DataGridViewElement, ICloneable, IDisposable
+ *@subject ◆class          DataGridViewCell : Control, ISupportInitialize
+ *              -- System.Windows.Forms.
+ *         # DataGridViewCell  new DataGridViewCell()
+ *         + DataGridViewCell  dataGridView.this[string columnName, int rowIndex]
+ *         + DataGridViewCell  dataGridView.this[int columnName, int rowIndex]
+ *         + DataGridViewCell  dataGridView.Rows[i].Cells[i]
+ *         + DataGrodViewCell  dataGridView.CurrentCell
+ *         + DataGridViewCell  dataGridView.FirstDisplayedCell
+ *         + DataGridViewCell  dataGridView.CellTemplate
+ *              └ class DataGridViewColumnHeaderCell : DataGridViewHeaderCell
+ *              └ class DataGridViewTextBoxCell  : DataGridViewCell
+ *              └ class DataGridViewButtonCell   : DataGridViewCell
+ *              └ class DataGridViewCheckBoxCell : DataGridViewCell, IDataGridViewEditingCell
+ *              └ class DataGridViewComboBoxCell : DataGridViewCell
+ *              └ class DataGridViewImageCell    : DataGridViewCell
+ *              └ class DataGridViewLinkCell     : DataGridViewCell
+ *              
+ *         object  cell.Value { get; set; }
+ *         bool    cell.Selected { get; set; }
+ *         int     cell.ColumnIndex { get; }
+ *         int     cell.RowIndex { get; }
+ *         object  cell.GetValue(int rowIndex)
+ *         bool    cell.SetValue(int rowIndex, object value);
+ *         DataGridViewColumn   cell.OwningColumn { get; }    このセルを格納している列
+ *         DataGridViewRow      cell.OwningRow { get; }       このセルを格納している行
+ *
+ *@subject ◆DataGridViewCellStyle : ICloneable  -- System.Windows.Forms.
+ *         + DataGridViewCellStyle   new DataGridViewCellStyle([DataGridViewCellStyle])
+ *         
+ *         ＊Property  DataGridViewCellStyle.Xxxx
+ *         DataGridViewContentAlignment  Alignment { get; set; }
+ *           └ enum DataGridViewContentAlignment
+ *             {
+ *                NotSet = 0,
+ *                TopLeft = 1,
+ *                TopCenter = 2,
+ *                TopRight = 4,
+ *                MiddleLeft = 16,
+ *                MiddleCenter = 32,
+ *                MiddleRight = 64,
+ *                BottomLeft = 256,
+ *                BottomCenter = 512,
+ *                BottomRight = 1024,
+ *             }
+ *             
+ *         Color ForeColor { get; set; }
+ *         Color BackColor { get; set; }
+ *         Color SelectionForeColor { get; set; }
+ *         Color SelectionBackColor { get; set; }
+ *         Font Font { get; set; }
+ *         string Format { get; set; }
+ */
+ /** <!--
+ *@title WinFormGUI / WinFormSample / ReverseReference / RR10_EntityDataModel / EF_CodeFirstProduct
+ *@class MainCodeFirstProductDbContextSample.cs
+ *
+ *@subject Database.SetInitializer(IDatabaseInitializer<TContext>)  
+ *           └ 引数 interface IDatabaseInitializer<in TContext> where TContext : DbContext -- System.Data.Entity.
+ *                    └ class CreateDatabaseIfNotExists <TContext>
+ *                              : IDatabaseInitializer<TContext> where TContext : DbContext
+ *                                  DBが存在しない場合に DBを新規作成
+ *                    └ class DropCreateDatabaseIfModelChanges
+ *                              : IDatabaseInitializer<TContext> where TContext : DbContext
+ *                                  DBの元になる Modelクラスが変更された場合に 旧 DBを破棄し、新規作成
+ *                    └ class DropCreateDatabaseAlway
+ *                              : IDatabaseInitializer<TContext> where TContext : DbContext
+ *                                  常に DBを新規作成
+ *               
+ *@subject ◆abstract class DbMigration : IDbMigration
+ *             -- System.Data.Entity.Migrations
+ *             
+ *         # DbMigration  DbMigration();  //from inherit class ONLY 
+ *         ([×] 'new' is not available.)
+ *         
+ *         + abstract void Up();
+ *         + virtual void Down();
+ *         
+ *         # TableBuilder<TColumns> CreateTable<TColumns>(
+ *             string name,
+ *             Func<ColumnBuilder, TColumns> columnsAction, 
+ *             [IDictionary<string, object> annotations],
+ *             object anonymousArguments = null);
+ *             
+ *         # void AlterTableAnnotations<TColumns>(
+ *             string name, 
+ *             Func<ColumnBuilder, TColumns> columnsAction, 
+ *             IDictionary<string, AnnotationValues> annotations, 
+ *             object anonymousArguments = null);
+ *             
+ *         # void MoveTable(string name, string newSchema, 
+ *             object anonymousArguments = null);
+ *             
+ *         # RenameTable(string name, string newName,
+ *             object anonymousArguments = null);
+ *             
+ *         # void DropTable(string name, 
+ *             [IDictionary<string, object> removedAnnotations], 
+ *             [IDictionary<string, IDictionary<string, object>> removedColumnAnnotations],
+ *             object anonymousArguments = null);
+ *             
+ *         # void AddPrimaryKey(
+ *             string table, string[] columns, string name = null, 
+ *             bool clustered = true, object anonymousArguments = null);
+ *             
+ *         # DropPrimaryKey(string table, string name,
+ *             object anonymousArguments = null);
+ *             
+ *         # void AddForeignKey(
+ *             string dependentTable, string[] dependentColumns, 
+ *             string principalTable, string[] principalColumns = null,
+ *             bool cascadeDelete = false, string name = null, 
+ *             object anonymousArguments = null);
+ *             
+ *         # void DropForeignKey(
+ *             string dependentTable, string dependentColumn, 
+ *             string principalTable, string principalColumn, 
+ *             object anonymousArguments = null);
+ *             
+ *         # void CreateIndex(
+ *             string table, string[] columns, bool unique = false,
+ *             string name = null, bool clustered = false,
+ *             object anonymousArguments = null);
+ *         
+ *         # void RenameIndex(string table, string name, string newName,
+ *             object anonymousArguments = null);
+ *             
+ *         # void DropIndex(string table, string[] columns, 
+ *             object anonymousArguments = null);
+ *             
+ *         # void AddColumn(string table, string name,
+ *             Func<ColumnBuilder, ColumnModel> columnAction, 
+ *             object anonymousArguments = null);
+ *             
+ *         # void AlterColumn(string table, string name,
+ *             Func<ColumnBuilder, ColumnModel> columnAction,
+ *             object anonymousArguments = null);
+ *             
+ *         # void RenameColumn(string table, string name,
+ *             string newName, object anonymousArguments = null);
+ *             
+ *         # void DropColumn(string table, string name,
+ *             [IDictionary<string, object> removedAnnotations], 
+ *             object anonymousArguments = null);
+ *                         
+ *         + void CreateStoredProcedure<TParameters>(
+ *             string name, 
+ *             [Func<ParameterBuilder, TParameters> parametersAction],
+ *             string body,
+ *             object anonymousArguments = null);
+ *             
+ *         + void AlterStoredProcedure<TParameters>(
+ *             string name, 
+ *             [Func<ParameterBuilder, TParameters> parametersAction], 
+ *             string body,
+ *             object anonymousArguments = null);  
+ *             
+ *         # void MoveStoredProcedure(string name, string newSchema, 
+ *             object anonymousArguments = null);
+ *             
+ *         # void RenameStoredProcedure(string name, string newName, 
+ *             object anonymousArguments = null);
+ *             
+ *         + void DropStoredProcedure(string name, object anonymousArguments = null);
+ *         
+ *         # void Sql(string sql, bool suppressTransaction = false,
+ *             object anonymousArguments = null);
+ *             
+ *         # void SqlFile(string sqlFile, bool suppressTransaction = false,
+ *             object anonymousArguments = null);
+ *             
+ *         # void SqlResource(string sqlResource, 
+ *             Assembly resourceAssembly = null, 
+ *             bool suppressTransaction = false, 
+ *             object anonymousArguments = null);
+ */
