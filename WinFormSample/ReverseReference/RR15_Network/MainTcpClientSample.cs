@@ -2,7 +2,7 @@
  *@title WinFormGUI / WinFormSample / 
  *@class MainTcpClientSample.cs
  *@class   └ new FormTcpClientSample() : Form
- *@class       └ new 
+ *@class       └ new TcpClient()
  *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
  *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
@@ -154,19 +154,113 @@
  *         bool  socket.EnableBroadcast { get; set; }      ブロードキャスト パケットの送受信を許可するかどうか
  *         bool  socket.DualMode { get; set; }             IPv4 と IPv6 の両方に使用されるデュアル モード ソケットであるかどうか
  *         short socket.Ttl { get; set; }                  Socket によって送信されたインターネット プロトコル (IP) パケットの有効期間 (TTL) の値
+ *         IntPtr socket.Handle { get; }                   OS Handleを取得
  *          
  *         ＊Method
  *         static void  Socket.Select(IList checkRead, IList checkWrite, IList checkError, int microSeconds)
- *         void Bind(EndPoint localEP);
+ *         void Bind(EndPoint localEP)          ローカル EndPointと関連付ける
  *         void Connect(string host, int port)
  *         void Connect(EndPoint remoteEP)
  *         void Connect(IPAddress address, int port)
  *         void Connect(IPAddress[] addresses, int port);
  *         void Disconnect(bool reuseSocket);
+ *         void Listen(int backlog)  
+ *            Socket を新しい接続を待機する Listen 状態にします
+ *            Argument int backlog: 保留中の接続のキューの最大長
+ *            
+ *         bool Poll(int microSeconds, SelectMode mode); 
+ *            Socket の状態を確認します。
+ *            └ enum SelectMode  -- System.Net.Sockets
+ *              {
+ *                 SelectRead = 0,  読み取りステータス(=状態) モード。
+ *                 SelectWrite = 1, 書き込みステータス モード。
+ *                 SelectError = 2  エラー ステータス モード。
+ *              }
+ *              
+ *            戻り値  SelectModeに基づいた Socketの状態
+ *            true: 
+ *            ・socket.Listen()  接続が保留中 or データ読取可 or 接続が閉じている、リセットされている、終了している場合
+ *            ・socket.Connect() 接続に成功した or データを送信可 
+ *            ・SelectMode.SelectError ブロックしない socket.Connect() を処理し、接続に失敗した場合 or
+ *            ・SocketOptionName.OutOfBandInline が設定されておらず、帯域外データを使用できる場合
  *                
- *         SocketInformation DuplicateAndClose(int targetProcessId);
- *                :
- *                
+ *         int Receive(byte[] buffer, SocketFlags)  SocketFlags を使用し、バインドされた Socket からデータを受信して受信バッファーに格納。
+ *         int Receive(byte[] buffer, int size, SocketFlags)
+ *         int Receive(byte[] buffer, int offset, int size, SocketFlags)
+ *         int Receive(byte[] buffer, int offset, int size, SocketFlags, out SocketError)
+ *         int Receive(IList<ArraySegment<byte>> buffers)
+ *         int Receive(IList<ArraySegment<byte>> buffers, SocketFlags);
+ *         int Receive(IList<ArraySegment<byte>> buffers, SocketFlags, out SocketError)
+ *         int ReceiveFrom(byte[] buffer, ref EndPoint remoteEP)  データグラムを受信してデータバッファーに格納します。さらに、エンドポイントを格納します。
+ *         int ReceiveFrom(byte[] buffer, SocketFlags, ref EndPoint remoteEP)
+ *         int ReceiveFrom(byte[] buffer, int size, SocketFlags, ref EndPoint remoteEP)
+ *         int ReceiveFrom(byte[] buffer, int offset, int size, SocketFlags, ref EndPoint remoteEP)  
+ *         int ReceiveMessageFrom(byte[] buffer, int offset, int size, ref SocketFlags, ref EndPoint remoteEP, out IPPacketInformation)
+ *               戻り値: 受信されたバイト数
+ *               int size: 受信するバイト数
+ *               int offset: 受信データを格納する buffer内の開始点
+ *               enum SocketFlags
+ *               {
+ *                  None = 0,
+ *                  OutOfBand = 1,
+ *                  Peek = 2,
+ *                  DontRoute = 4,
+ *                  MaxIOVectorLength = 16,
+ *                  Truncated = 256,
+ *                  ControlDataTruncated = 512,
+ *                  Broadcast = 1024,
+ *                  Multicast = 2048,
+ *                  Partial = 32768,
+ *               }
+ *         
+ *               struct IPPacketInformation -- System.Net.Sockets
+ *               {  
+ *                  IPAddress Address { get; }
+ *                  int Interface { get; }
+ *               }
+ *               
+ *          int Send(byte[] buffer)       接続された Socketにデータを送信
+ *          int Send(byte[] buffer, SocketFlags)
+ *          int Send(byte[] buffer, int size, SocketFlags)
+ *          int Send(byte[] buffer, int offset, int size, SocketFlags)
+ *          int Send(byte[] buffer, int offset, int size, SocketFlags, out SocketError)
+ *          int Send(IList<ArraySegment<byte>> buffers)
+ *          int Send(IList<ArraySegment<byte>> buffers, SocketFlags)
+ *          int SendTo(byte[] buffer, EndPoint remoteEP)         指定したエンドポイントに送信
+ *          int SendTo(byte[] buffer, SocketFlags, EndPoint remoteEP)
+ *          int SendTo(byte[] buffer, int size, SocketFlags, EndPoint remoteEP)
+ *          int SendTo(byte[] buffer, int offset, int size, SocketFlags, EndPoint remoteEP)  
+ *          
+ *          void SendFile(string fileName)  接続された Socketに ファイルを送信
+ *          void SendFile(string fileName, byte[] preBuffer, byte[] postBuffer, TransmitFileOptions flags)
+ *             TransmitFileOptions 値を使用して、接続された Socketオブジェクトにファイル fileName およびデータのバッファーを送信。
+ *                └ enum TransmitFileOptions
+ *                  {
+ *                     UseDefaultWorkerThread = 0,
+ *                     Disconnect = 1,
+ *                     ReuseSocket = 2,
+ *                     WriteBehind = 4,
+ *                     UseSystemThread = 16,
+ *                     UseKernelApc = 32,
+ *                  }
+
+ *          SocketInformation DuplicateAndClose(int targetProcessId);
+ *            └ struct SocketInformation -- System.Net.Sockets
+ *                 Socket を複製するために必要な情報をカプセル化
+ *              {
+ *                 byte[] ProtocolInformation { get; set; }
+ *                 SocketInformationOptions Options { get; set; }
+ *              }
+ *              
+ *            └ enum SocketInformationOptions    Socket の状態
+ *                     -- System.Net.Sockets
+ *                   {
+ *                      NonBlocking = 1,  非ブロッキング状態
+ *                      Connected = 2, 接続状態
+ *                      Listening = 4,  新しい接続を待機
+ *                      UseOnlyOverlappedIO = 8  重複 I/O を使用
+ *                   }
+ *
  *         void Shutdown(SocketShutdown how);
  *           └ enum SocketShutdown
  *             {
@@ -178,68 +272,89 @@
  *         object GetSocketOption(SocketOptionLevel, SocketOptionName);
  *         byte[] GetSocketOption(SocketOptionLevel, SocketOptionName, int optionLength);
  *         void GetSocketOption(SocketOptionLevel, SocketOptionName, byte[] optionValue);
- *           └ Argument
- *               enum SocketOptionLevel
- *               {
- *                  IP = 0,
- *                  Tcp = 6,
- *                  Udp = 17,
- *                  IPv6 = 41,
- *                  Socket = 65535
- *               }
- *               
- *               enum SocketOptionName
- *               {
- *                  IPOptions = 1,
- *                  Debug = 1,
- *                  NoChecksum = 1,
- *                  NoDelay = 1,
- *                  HeaderIncluded = 2,
- *                  AcceptConnection = 2,
- *                  BsdUrgent = 2,
- *                  Expedited = 2,
- *                  TypeOfService = 3,
- *                  ReuseAddress = 4,
- *                  IpTimeToLive = 4,
- *                  KeepAlive = 8,
- *                  MulticastInterface = 9,
- *                  MulticastTimeToLive = 10,
- *                  MulticastLoopback = 11,
- *                  AddMembership = 12,
- *                  DropMembership = 13,
- *                  DontFragment = 14,
- *                  AddSourceMembership = 15,
- *                  DropSourceMembership = 16,
- *                  DontRoute = 16,
- *                  BlockSource = 17,
- *                  UnblockSource = 18,
- *                  PacketInformation = 19,
- *                  ChecksumCoverage = 20,
- *                  HopLimit = 21,
- *                  IPProtectionLevel = 23,
- *                  IPv6Only = 27,
- *                  Broadcast = 32,
- *                  UseLoopback = 64,
- *                  Linger = 128,
- *                  OutOfBandInline = 256,
- *                  SendBuffer = 4097,
- *                  ReceiveBuffer = 4098,
- *                  SendLowWater = 4099,
- *                  ReceiveLowWater = 4100,
- *                  SendTimeout = 4101,
- *                  ReceiveTimeout = 4102,
- *                  Error = 4103,
- *                  Type = 4104,
- *                  ReuseUnicastPort = 12295,
- *                  UpdateAcceptContext = 28683,
- *                  UpdateConnectContext = 28688,
- *                  MaxConnections = 2147483647,
- *                  DontLinger = -129,
- *                  ExclusiveAddressUse = -5,
- *              }
-    }
+ *         void SetIPProtectionLevel(IPProtectionLevel level)
+ *         void SetSocketOption(SocketOptionLevel, SocketOptionName, bool optionValue);
+ *         void SetSocketOption(SocketOptionLevel, SocketOptionName, object optionValue);
+ *         void SetSocketOption(SocketOptionLevel, SocketOptionName, byte[] optionValue);
  *         
- *         ＊Async 
+ *         └ Argument
+ *           ・enum IPProtectionLevel
+ *             {
+ *                Unspecified = -1,  IP 保護レベルは未指定 (Windows 7, Windows Server 2008 R2)
+ *                Unrestricted = 10,  IP 保護レベルは無制限
+ *                EdgeRestricted = 20,  IP 保護レベルはエッジ制限付き
+ *                Restricted = 30  IP 保護レベルは制限付き
+ *             }
+ *             
+ *             enum SocketOptionLevel
+ *             {
+ *                IP = 0,
+ *                Tcp = 6,
+ *                Udp = 17,
+ *                IPv6 = 41,
+ *                Socket = 65535
+ *             }
+ *               
+ *             enum SocketOptionName
+ *             {
+ *                IPOptions = 1,
+ *                Debug = 1,
+ *                NoChecksum = 1,
+ *                NoDelay = 1,
+ *                HeaderIncluded = 2,
+ *                AcceptConnection = 2,
+ *                BsdUrgent = 2,
+ *                Expedited = 2,
+ *                TypeOfService = 3,
+ *                ReuseAddress = 4,
+ *                IpTimeToLive = 4,
+ *                KeepAlive = 8,
+ *                MulticastInterface = 9,
+ *                MulticastTimeToLive = 10,
+ *                MulticastLoopback = 11,
+ *                AddMembership = 12,
+ *                DropMembership = 13,
+ *                DontFragment = 14,
+ *                AddSourceMembership = 15,
+ *                DropSourceMembership = 16,
+ *                DontRoute = 16,
+ *                BlockSource = 17,
+ *                UnblockSource = 18,
+ *                PacketInformation = 19,
+ *                ChecksumCoverage = 20,
+ *                HopLimit = 21,
+ *                IPProtectionLevel = 23,
+ *                IPv6Only = 27,
+ *                Broadcast = 32,
+ *                UseLoopback = 64,
+ *                Linger = 128,
+ *                OutOfBandInline = 256,
+ *                SendBuffer = 4097,
+ *                ReceiveBuffer = 4098,
+ *                SendLowWater = 4099,
+ *                ReceiveLowWater = 4100,
+ *                SendTimeout = 4101,
+ *                ReceiveTimeout = 4102,
+ *                Error = 4103,
+ *                Type = 4104,
+ *                ReuseUnicastPort = 12295,
+ *                UpdateAcceptContext = 28683,
+ *                UpdateConnectContext = 28688,
+ *                MaxConnections = 2147483647,
+ *                DontLinger = -129,
+ *                ExclusiveAddressUse = -5,
+ *            }
+ *         
+ *         int IOControl(IOControlCode, byte[] optionInValue, byte[] optionOutValue)      制御コードを指定し、Socketの下位操作モードを設定
+ *         int IOControl(int ioControlCode, byte[] optionInValue, byte[] optionOutValue)  数値制御コードを指定し、Socketの下位操作モードを設定
+ *               └ enum IOControlCode : long  { 略 } -- System.Net.Sockets
+ *               
+ *         ＊Async Method / 非同期メソッド
+ *            :
+ *         
+ *         bool ReceiveMessageFromAsync(SocketAsyncEventArgs e);
+          SocketFlags を使用し、指定されたバイト数のデータの非同期受信を開始して、データ
+        //     バッファー内の指定された場所に格納します。さらに、エンドポイントとパケットの情報を格納します。
  *         
  *@see ImageTcpClientSample.jpg
  *@see 
@@ -310,7 +425,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR15_Network
             };
             button.Click += new EventHandler(Button_Click);
             flow.Controls.Add(button);
-
+            
             this.Controls.AddRange(new Control[]
             {
                 flow,
