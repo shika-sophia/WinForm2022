@@ -7,11 +7,19 @@
  *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
  *           
- *@content RR[421][423] p712- / TcpClientSample
+ *@content RR[421] p712- / TcpClient
  *         TCP/IP: Transmission Control Protocol / Internet Protcol
  *                 4層の階層で定義した通信プロトコル階層
  *         OSI参照モデル: 7層で定義した通信プロトコル階層
- *
+ *         
+ *        【実行】実行前に Web Serverを起動しないと TCP/IP の Connectに失敗する
+ *         ・IIS 
+ *         ・Appache など
+ *         
+ *         port 80: Web Serverで利用しているポート番号
+ */
+#region -> TcpClient, Socket
+/*
  *@subject ◆class TcpClient : IDisposable -- System.Net.Sockets
  *         + TcpClient  new TcpClient()
  *         + TcpClient  new TcpClient(IPEndPoint localEP)
@@ -348,18 +356,99 @@
  *         int IOControl(IOControlCode, byte[] optionInValue, byte[] optionOutValue)      制御コードを指定し、Socketの下位操作モードを設定
  *         int IOControl(int ioControlCode, byte[] optionInValue, byte[] optionOutValue)  数値制御コードを指定し、Socketの下位操作モードを設定
  *               └ enum IOControlCode : long  { 略 } -- System.Net.Sockets
- *               
+ *         
+ *         void Close(int timeout)
+ *         void Close()
+ *         
  *         ＊Async Method / 非同期メソッド
- *            :
+ *         static bool ConnectAsync(SocketType, ProtocolType, SocketAsyncEventArgs e)     リモート ホストに接続する非同期要求を開始
+ *         static void CancelConnectAsync(SocketAsyncEventArgs e)
+ *         bool AcceptAsync(SocketAsyncEventArgs e)
+ *         bool ConnectAsync(SocketAsyncEventArgs e)
+ *         bool DisconnectAsync(SocketAsyncEventArgs e)
+ *         bool ReceiveAsync(SocketAsyncEventArgs e)
+ *         bool ReceiveFromAsync(SocketAsyncEventArgs e)
+ *         bool ReceiveMessageFromAsync(SocketAsyncEventArgs e)
+ *         bool SendAsync(SocketAsyncEventArgs e)
+ *         bool SendToAsync(SocketAsyncEventArgs e)
+ *         bool SendPacketsAsync(SocketAsyncEventArgs e)
+ *           └ 戻り値 bool:
+ *               I/O 操作が保留中の場合は true。操作の完了時に、SocketAsyncEventArgs.Completedイベントが発生します。
+ *               I/O 操作が同期的に完了した場合は false。 この場合、SocketAsyncEventArgs.Completedイベントは発生しません。
+ *               メソッド呼び出しから制御が戻った直後に、パラメーターとして渡された e オブジェクトを調べて操作の結果を取得できます。
+ *           └ 引数 class SocketAsyncEventArgs〔below〕
+ *           
+ *         IAsyncResult BeginAccept(AsyncCallback callback, object state)
+ *         IAsyncResult BeginAccept([int receiveSize], AsyncCallback callback, object state)
+ *         IAsyncResult BeginAccept([Socket acceptSocket], [int receiveSize], AsyncCallback callback, object state)
  *         
- *         bool ReceiveMessageFromAsync(SocketAsyncEventArgs e);
-          SocketFlags を使用し、指定されたバイト数のデータの非同期受信を開始して、データ
-        //     バッファー内の指定された場所に格納します。さらに、エンドポイントとパケットの情報を格納します。
+ *         IAsyncResult BeginConnect(EndPoint remoteEP, AsyncCallback callback, object state)
+ *         IAsyncResult BeginConnect(IPAddress address, int port, AsyncCallback requestCallback, object state)
+ *         IAsyncResult BeginConnect(string host, int port, AsyncCallback requestCallback, object state)
+ *         IAsyncResult BeginConnect(IPAddress[] addresses, int port, AsyncCallback requestCallback, object state)
+ *         IAsyncResult BeginDisconnect(bool reuseSocket, AsyncCallback callback, object state)
  *         
+ *         IAsyncResult BeginReceive(IList<ArraySegment<byte>> buffers, SocketFlags socketFlags, AsyncCallback callback, object state)
+ *         IAsyncResult BeginReceive(byte[] buffer, int offset, int size, SocketFlags socketFlags, AsyncCallback callback, object state)
+ *         IAsyncResult BeginReceive(byte[] buffer, int offset, int size, SocketFlags socketFlags, out SocketError errorCode, AsyncCallback callback, object state)
+ *         IAsyncResult BeginReceive(IList<ArraySegment<byte>> buffers, SocketFlags socketFlags, out SocketError errorCode, AsyncCallback callback, object state)
+ *         IAsyncResult BeginReceiveFrom(byte[] buffer, int offset, int size, SocketFlags socketFlags, ref EndPoint remoteEP, AsyncCallback callback, object state)
+ *         IAsyncResult BeginReceiveMessageFrom(byte[] buffer, int offset, int size, SocketFlags socketFlags, ref EndPoint remoteEP, AsyncCallback callback, object state)
+ *         
+ *         IAsyncResult BeginSend(byte[] buffer, int offset, int size, SocketFlags socketFlags, out SocketError errorCode, AsyncCallback callback, object state)
+ *         IAsyncResult BeginSend(byte[] buffer, int offset, int size, SocketFlags socketFlags, AsyncCallback callback, object state)
+ *         IAsyncResult BeginSend(IList<ArraySegment<byte>> buffers, SocketFlags socketFlags, out SocketError errorCode, AsyncCallback callback, object state)
+ *         IAsyncResult BeginSend(IList<ArraySegment<byte>> buffers, SocketFlags socketFlags, AsyncCallback callback, object state)
+ *         IAsyncResult BeginSendTo(byte[] buffer, int offset, int size, SocketFlags socketFlags, EndPoint remoteEP, AsyncCallback callback, object state)
+ *         IAsyncResult BeginSendFile(string fileName, AsyncCallback callback, object state)
+ *         IAsyncResult BeginSendFile(string fileName, byte[] preBuffer, byte[] postBuffer, TransmitFileOptions flags, AsyncCallback callback, object state)
+ *           
+ *         Socket EndAccept(out byte[] buffer, out int bytesTransferred, IAsyncResult asyncResult)
+ *         Socket EndAccept(out byte[] buffer, IAsyncResult asyncResult)
+ *         Socket EndAccept(IAsyncResult asyncResult)
+ *         void EndConnect(IAsyncResult asyncResult)
+ *         void EndDisconnect(IAsyncResult asyncResult)
+ *         int EndReceive(IAsyncResult asyncResult, out SocketError errorCode)
+ *         int EndReceive(IAsyncResult asyncResult)
+ *         int EndReceiveFrom(IAsyncResult asyncResult, ref EndPoint endPoint)
+ *         int EndSend(IAsyncResult asyncResult)
+ *         int EndSend(IAsyncResult asyncResult, out SocketError errorCode)
+ *         int EndSendTo(IAsyncResult asyncResult)
+ *         void EndSendFile(IAsyncResult asyncResult)
+ *         
+ *@subject ◆class SocketAsyncEventArgs : EventArgs, IDisposable
+ *                    -- System.Net.Sockets
+ *         SocketAsyncEventArgs  new SocketAsyncEventArgs()
+ *         
+ *         int     e.Count { get; }
+ *         int     e.Offset { get; }
+ *         int     e.BytesTransferred { get; }
+ *         byte[]  e.Buffer { get; }
+ *         IList<ArraySegment<byte>>  e.BufferList { get; set; }
+ *         int     e.SendPacketsSendSize { get; set; }
+ *         bool    e.DisconnectReuseSocket { get; set; }
+ *         object  e.UserToken { get; set; }
+ *         EndPoint e.RemoteEndPoint { get; set; }
+ *         Socket   e.ConnectSocket { get; }
+ *         Socket   e.AcceptSocket { get; set; }
+ *         SocketFlags  e.SocketFlags { get; set; }
+ *         SocketError  e.SocketError { get; set; }
+ *         SocketAsyncOperation  e.LastOperation { get; }
+ *         SocketClientAccessPolicyProtocol  e.SocketClientAccessPolicyProtocol { get; set; }
+ *         TransmitFileOptions   e.SendPacketsFlags { get; set; }
+ *         SendPacketsElement[]  e.SendPacketsElements { get; set; }
+ *         IPPacketInformation   e.ReceiveMessageFromPacketInfo { get; }
+ *         Exception  e.ConnectByNameError { get; }
+ *                 
+ *         void  e.SetBuffer([byte[] buffer], int offset, int count)
+ *   event EventHandler<SocketAsyncEventArgs>  e.Completed
+ */
+#endregion
+/*
  *@see ImageTcpClientSample.jpg
  *@see 
  *@author shika
- *@date 
+ *@date 2022-11-06
  */
 using System;
 using System.Drawing;
@@ -402,7 +491,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR15_Network
             flow = new FlowLayoutPanel()
             {
                 FlowDirection = FlowDirection.TopDown,
-                //ClientSize = this.ClientSize,
+                ClientSize = this.ClientSize,
                 Dock = DockStyle.Fill,
                 AutoSize = true,
             };
