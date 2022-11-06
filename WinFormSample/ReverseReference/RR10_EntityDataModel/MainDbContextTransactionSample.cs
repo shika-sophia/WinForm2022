@@ -114,7 +114,6 @@
  *
  *@subject ◆class DbRawSqlQuery : IEnumerable, IListSource, IDbAsyncEnumerable
  *              -- System.Data.Entity.Infrastructure.
- *         DbSqlQuery               dbSet.SqlQuery(string sql, params object[] parameters);
  *         DbRawSqlQuery            database.SqlQuery(Type elementType, string sql, params object[] parameters);
  *         DbRawSqlQuery<TElement>  database.SqlQuery<TElement>(string sql, params object[] parameters);
  *         DbRawSqlQuery  AsStreaming();  [非推奨] バッファリングの代わりに結果をストリームする新しいクエリを返します。
@@ -144,7 +143,7 @@
  *        明示的に設定していないのに、なぜかソート機能が備わっている・・
  *        
  *@see ImageDbContextTransactionSample.jpg
- *@see 
+ *@copyTo WinFormGUI / WinFormSample / DbContextReference.txt 
  *@author shika
  *@date 2022-10-30
  * -->

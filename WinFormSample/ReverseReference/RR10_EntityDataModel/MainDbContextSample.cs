@@ -258,13 +258,24 @@
  *                 Load(): DbSet<T>, ObjectSet<T>, ObjectQuery<T>などのサーバー クエリを対象に、
  *                         クエリの結果がクライアント上の関連付けられた DbContext, ObjectContextなどのキャッシュに読み込まれるように、
  *                         クエリを列挙します。これは ToList() を呼び出してから、実際にリストを作成するオーバーヘッドなしでリストを破棄する場合と同じです。
- *    
+ *
+ *@subject ◆class DbQuery<TResult> : IOrderedQueryable<TResult>, IQueryable<TResult>, IEnumerable<TResult>, IOrderedQueryable, IQueryable, IEnumerable, IListSource, IInternalQueryAdapter, IDbAsyncEnumerable<TResult>, IDbAsyncEnumerable
+ *                   -- System.Data.Entity.Infrastructure
+ *         (DbSetの base)
+ *         [×] 'new' is not available.
+ *         
+ *         string  dbQuery.Sql { get; }
+ *         DbQuery<TResult>  dbQuery.AsNoTracking()
+ *         DbQuery<TResult>  dbQuery.AsStreaming()
+ *         DbQuery<TResult>  dbQuery.Include(string path)  クエリ結果に含める関連オブジェクトを指定
+ *         
  *@subject ◆DataGridView  =>〔MainDataGridViewBasicSample.cs〕
  */
 #endregion 
 /*
  *@see ImageDbContextSample.jpg
  *@see MainPrepareEntityFrameworkModelSample.cs
+ *@copyTo WinFormGUI / WinFormSample / DbContextReference.txt
  *@author shika
  *@date 2022-10-18
  */

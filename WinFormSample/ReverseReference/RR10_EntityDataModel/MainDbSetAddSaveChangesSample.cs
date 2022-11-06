@@ -64,7 +64,7 @@
  *@subject ◆class DbSqlQuery<T> : DbRawSqlQuery -- System.Data.Entity.Infrastructure
  *         # DbSqlQuery  DbSqlQuery()
  *         + DbSqlQuery<TEntity>  dbSet.SqlQuery(string sql, params object[] parameters);
-
+ *
  *         virtual DbSqlQuery AsNoTracking()  
  *             DbContext によってクエリ結果が追跡されない場合に新しいクエリを返します。
  *         virtual DbSqlQuery AsStreaming();  
@@ -149,7 +149,7 @@
  *         TextBox.Text が "" であるかどうかで判定すると解決
  *         
  *@see ImageDbSetAddSaveChangesSample.jpg
- *@see 
+ *@copyTo WinFormGUI / WinFormSample / DbContextReference.txt
  *@author shika
  *@date 2022-10-21
  */
