@@ -30,14 +30,8 @@
  *@date 2022-06-26
  */
 using System;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Globalization;
-using System.IO;
 using System.Net.Sockets;
 using System.Text;
-using System.Windows.Forms;
 
 namespace WinFormGUI.CsharpCode
 {
@@ -50,7 +44,7 @@ namespace WinFormGUI.CsharpCode
         //static void Main()
         public void Main()
         {
-            var here = new ShowEnumValue(typeof(ProtocolType));
+            var here = new ShowEnumValue(typeof(AddressFamily));
             string content = here.BuildEnumContent(here.enumType, isSubject: true);
             Console.WriteLine(content);
         }//Main()
