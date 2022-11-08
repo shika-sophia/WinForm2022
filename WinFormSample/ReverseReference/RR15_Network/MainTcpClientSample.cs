@@ -64,6 +64,34 @@
  *         IAsyncResult  tcpCilent.BeginConnect(IPAddress[] addresses, int port, AsyncCallback, object state)
  *         void          tcpCilent.EndConnect(IAsyncResult asyncResult)
  *
+ *@subject ◆abstract class EndPoint -- System.Net
+ *         # EndPoint  EndPoint()  [×] 'new' is not avaliable, except to inherit class.
+ *         + EndPoint       endPoint.Create(SocketAddress socketAddress)
+ *         + AddressFamily  endPoint.AddressFamily { get; }
+ *         + SocketAddress  endPoint.Serialize()
+ *             └ class SocketAddress 〔below〕
+ *          ↑
+ *@subject ◆class IPEndPoint : EndPoint -- System.Net
+ *         IPEndPoint  new IPEndPoint(IPAddress address, int port)
+ *         IPEndPoint  new IPEndPoint(long address, int port)
+ *         
+ *         + const int MinPort = 0
+ *         + const int MaxPort = 65535
+ *         
+ *         + AddressFamily  ipEndPoint.AddressFamily { get; }
+ *         + IPAddress      ipEndPoint.Address { get; set; }
+ *         + int            ipEndPoint.Port { get; set; }
+ *         + EndPoint       ipEndPoint.Create(SocketAddress socketAddress)
+ *         + SocketAddress  ipEndPoint.Serialize()
+ *             └ class SocketAddress 〔below〕
+ *             
+ *@subject ◆class SocketAddress -- System.Net
+ *         SocketAddress  new SocketAddress(AddressFamily family)
+ *         SocketAddress  new SocketAddress(AddressFamily family, int size)
+ *         + byte this[int offset] { get; set; }
+ *         + int            socketAddress.Size { get; }
+ *         + AddressFamily  socketAddress.Family { get; }
+ *
  *@subject ◆class Socket : IDisposable -- System.Net.Sockets
  *         Socket  new Socket(SocketInformation)
  *         Socket  new Socket(SocketType, ProtocolType)
@@ -72,7 +100,8 @@
  *               ・struct SocketInformation -- System.Net.Sockets
  *                 + byte[] ProtocolInformation { get; set; }
  *                 + SocketInformationOptions Options { get; set; }
- *                 
+ *                     └ struct SocketInformationOptions 〔below〕
+ *                     
  *               ・enum SocketType -- System.Net.Sockets
  *                 {   
  *                   Unknown = -1,  //不明
@@ -129,10 +158,7 @@
  *              ・enum AddressFamily =>〔MainDnsSample.cs〕
  *              
  *         Socket  socket.Accept()  新しく作成された接続に対して Socket を作成
- *         Socket  socket.EndAccept(IAsyncResult asyncResult);
- *         Socket  socket.EndAccept(out byte[] buffer, IAsyncResult asyncResult);
- *         Socket  socket.EndAccept(out byte[] buffer, out int bytesTransferred, IAsyncResult asyncResult);
- *         
+        
  *         ＊static Field
  *         static bool  Socket.OSSupportsIPv4 { get; } OS および ネットワーク アダプターが、IPv4 をサポートするかどうか
  *         static bool  Socket.OSSupportsIPv6 { get; } OS および ネットワーク アダプターが、IPv6 をサポートするかどうか
@@ -147,8 +173,8 @@
  *         EndPoint       socket.RemoteEndPoint { get; }
  *         int   socket.ReceiveTimeout { get; set; }        〔上記〕
  *         int   socket.SendTimeout { get; set; }           〔上記〕
- *         int   socket.SendBufferSize { get; set; }        〔上記〕
  *         int   socket.ReceiveBufferSize { get; set; }     〔上記〕
+ *         int   socket.SendBufferSize { get; set; }        〔上記〕
  *         int   socket.Available { get; }                  〔上記〕
  *         bool  socket.Connected { get; }                  〔上記〕
  *         bool  socket.NoDelay { get; set; }               〔上記〕
@@ -238,7 +264,6 @@
  *          int SendTo(byte[] buffer, SocketFlags, EndPoint remoteEP)
  *          int SendTo(byte[] buffer, int size, SocketFlags, EndPoint remoteEP)
  *          int SendTo(byte[] buffer, int offset, int size, SocketFlags, EndPoint remoteEP)  
- *          
  *          void SendFile(string fileName)  接続された Socketに ファイルを送信
  *          void SendFile(string fileName, byte[] preBuffer, byte[] postBuffer, TransmitFileOptions flags)
  *             TransmitFileOptions 値を使用して、接続された Socketオブジェクトにファイル fileName およびデータのバッファーを送信。
@@ -251,7 +276,7 @@
  *                     UseSystemThread = 16,
  *                     UseKernelApc = 32,
  *                  }
-
+ *
  *          SocketInformation DuplicateAndClose(int targetProcessId);
  *            └ struct SocketInformation -- System.Net.Sockets
  *                 Socket を複製するために必要な情報をカプセル化
@@ -280,12 +305,11 @@
  *         object GetSocketOption(SocketOptionLevel, SocketOptionName);
  *         byte[] GetSocketOption(SocketOptionLevel, SocketOptionName, int optionLength);
  *         void GetSocketOption(SocketOptionLevel, SocketOptionName, byte[] optionValue);
- *         void SetIPProtectionLevel(IPProtectionLevel level)
  *         void SetSocketOption(SocketOptionLevel, SocketOptionName, bool optionValue);
  *         void SetSocketOption(SocketOptionLevel, SocketOptionName, object optionValue);
  *         void SetSocketOption(SocketOptionLevel, SocketOptionName, byte[] optionValue);
- *         
- *         └ Argument
+ *         void SetIPProtectionLevel(IPProtectionLevel level)
+ *           └ Argument
  *           ・enum IPProtectionLevel
  *             {
  *                Unspecified = -1,  IP 保護レベルは未指定 (Windows 7, Windows Server 2008 R2)

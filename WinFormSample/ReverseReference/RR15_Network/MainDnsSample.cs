@@ -93,13 +93,13 @@
  *             {
  *                Unspecified = 0,
  *                Unix = 1,
- *                InterNetwork = 2,   //IPv4
+ *                InterNetwork = 2,
  *                ImpLink = 3,
  *                Pup = 4,
  *                Chaos = 5,
+ *                Ipx = 6,
  *                NS = 6,
- *                NS = 6,
- *                Osi = 7,
+ *                Iso = 7,
  *                Osi = 7,
  *                Ecma = 8,
  *                DataKit = 9,

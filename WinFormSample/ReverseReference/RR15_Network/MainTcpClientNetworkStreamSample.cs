@@ -19,29 +19,30 @@
  *         + NetworkStream  new NetworkStream(Socket socket, FileAccess access)
  *         + NetworkStream  new NetworkStream(Socket socket, FileAccess access, bool ownsSocket)
  *         
- *         + bool DataAvailable { get; }
- *         + int WriteTimeout { get; set; }
- *         + int ReadTimeout { get; set; }
- *         + bool CanTimeout { get; }
- *         + bool CanWrite { get; }
- *         + bool CanSeek { get; }
- *         + bool CanRead { get; }
  *         + long Length { get; }
  *         + long Position { get; set; }
+ *         + int ReadTimeout { get; set; }
+ *         + int WriteTimeout { get; set; }
+ *         + bool CanRead { get; }
+ *         + bool CanWrite { get; }
+ *         + bool CanTimeout { get; }
+ *         + bool CanSeek { get; }
+ *         + bool DataAvailable { get; }
  *         # Socket Socket { get; }
  *         # bool Readable { get; set; }
  *         # bool Writeable { get; set; }
+ *         
+ *         + void SetLength(long value)
+ *         + int Read(byte[] buffer, int offset, int size)
+ *         + void Write(byte[] buffer, int offset, int size)
+ *         + long Seek(long offset, SeekOrigin origin)
  *         + IAsyncResult BeginRead(byte[] buffer, int offset, int size, AsyncCallback callback, object state)
  *         + IAsyncResult BeginWrite(byte[] buffer, int offset, int size, AsyncCallback callback, object state)
+ *         + void Flush()
+ *         + Task FlushAsync(CancellationToken cancellationToken)
  *         + void Close(int timeout)
  *         + int EndRead(IAsyncResult asyncResult)
  *         + void EndWrite(IAsyncResult asyncResult)
- *         + void Flush()
- *         + Task FlushAsync(CancellationToken cancellationToken)
- *         + int Read(byte[] buffer, int offset, int size)
- *         + long Seek(long offset, SeekOrigin origin)
- *         + void SetLength(long value)
- *         + void Write(byte[] buffer, int offset, int size)
  *         # void Dispose(bool disposing)
  *         
  *@see ImageTcpClientNetworkStreamSample.jpg
