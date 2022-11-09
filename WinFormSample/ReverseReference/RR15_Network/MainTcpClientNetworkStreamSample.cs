@@ -45,6 +45,19 @@
  *         + void EndWrite(IAsyncResult asyncResult)
  *         # void Dispose(bool disposing)
  *         
+ *@NOTE【Problem】Result
+ *      Send: output "Successed to send data", when 'Apache' was running.
+ *            But 'startTcpSample.html' had no data.
+ *            
+ *      Recieve: output "400 Bad Request" from Web Server.
+ *               I don't find the reason.
+ *               
+ *               output "404 Not Found" when 'startTcpSample.html' was not.
+ *               So I made the Html file in Directory 'Apache24',
+ *               wrote "../startTcpSample.html" in 'GetBytes()' argument.
+ *               "../" means the relative path from 'httpd.exe' as Apache execute file.
+ *               Then output changed "400 Bad Request" as above.
+ *               
  *@see ImageTcpClientNetworkStreamSample.jpg
  *@see 
  *@author shika
@@ -150,7 +163,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR15_Network
                 client.Connect("localhost", 80);
                 NetworkStream stream = client.GetStream();
                 byte[] buffer = Encoding.ASCII.GetBytes(
-                    "GET /start.htm HTTP/1.0\r\n\r\n");
+                    "GET /startTcpSample.html HTTP/1.0\r\n\r\n");
                 stream.Write(buffer, offset: 0, size: buffer.Length);
 
                 textBox.Text = "Successed to send data.";
