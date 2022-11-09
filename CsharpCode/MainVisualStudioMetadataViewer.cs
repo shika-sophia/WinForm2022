@@ -206,14 +206,15 @@ namespace WinFormGUI.CsharpCode
                     if (isInherit)
                     {
                         int length = trimedLine.IndexOf(":") - startIndex;
-                        className = trimedLine.Substring(startIndex, length);
+                        className = trimedLine.Substring(startIndex, length).Trim();
                     }
                     else
                     {
-                        className = trimedLine.Substring(startIndex);
+                        className = trimedLine.Substring(startIndex).Trim();
                     }
 
                     bld.Append($"{trimedLine}");
+
                     if (isInherit)
                     { 
                         bld.Append("\n"); 
@@ -230,10 +231,46 @@ namespace WinFormGUI.CsharpCode
                     continue;
                 }//if class
                 
-                //---- Append Member----
+                //---- Append Member with className ----
                 if (isSubject) { bld.Append(" *         "); }
 
-                bld.Append($"{trimedLine}\n");
+                string[] splitedWord = trimedLine.Split(
+                    new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+
+                for (int i = 0; i < splitedWord.Length; i++)
+                {                    
+                    if (trimedLine.Contains(className))
+                    { 
+                        if (i == 1)
+                        {
+                            bld.Append($"{className}  new ");
+                        }
+                    } 
+                    else if (trimedLine.Contains("static"))
+                    {
+                        if (i == 3)
+                        {
+                            bld.Append($" {className}.");
+                        }
+                    }
+                    else if (trimedLine.Contains("event"))
+                    {
+                        if (i == 3)
+                        {
+                            bld.Append(
+                                $" {className.Substring(0, 1).ToLower()}{className.Substring(1)}.");
+                        }
+                    }
+                    else if (i == 2)
+                    {
+                        bld.Append(
+                            $" {className.Substring(0, 1).ToLower()}{className.Substring(1)}.");
+                    }
+
+                    bld.Append($"{splitedWord[i]} ");
+                }//for word
+
+                bld.Append("\n");
             }//foreach
 
             isSimpled = true;
@@ -274,5 +311,4 @@ namespace WinFormGUI.CsharpCode
  *         + string VolumeLabel { get; set; }
  *         + static DriveInfo[] GetDrives()
  *         + string ToString()
-
  */
