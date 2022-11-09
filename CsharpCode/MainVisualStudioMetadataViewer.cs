@@ -11,35 +11,34 @@
  *         Program to Remove comment and annotation from VS-Metadata.
  *         
  *@subject ◆class Clipboard -- System.Windows.Forms
- *         [×] 'new' is not avaliable, because of static class.
+ *         [×] 'new' is not avaliable.
  *         
- *         + static bool ContainsText()
- *         + static bool ContainsText(TextDataFormat format)
- *         + static bool ContainsImage()
- *         + static bool ContainsAudio()
- *         + static bool ContainsData(string format)
- *         + static bool ContainsFileDropList()
+ *         + static bool    Clipboard.ContainsText() 
+ *         + static bool    Clipboard.ContainsText(TextDataFormat format) 
+ *         + static bool    Clipboard.ContainsImage() 
+ *         + static bool    Clipboard.ContainsAudio() 
+ *         + static bool    Clipboard.ContainsData(string format) 
+ *         + static bool    Clipboard.ContainsFileDropList() 
  *         
- *         + static string GetText()
- *         + static string GetText(TextDataFormat format)
- *         + static Image GetImage()
- *         + static Stream GetAudioStream()
- *         + static object GetData(string format)
- *         + static IDataObject GetDataObject()
- *         + static StringCollection GetFileDropList()
+ *         + static string  Clipboard.GetText() 
+ *         + static string  Clipboard.GetText(TextDataFormat format) 
+ *         + static Image   Clipboard.GetImage() 
+ *         + static Stream  Clipboard.GetAudioStream() 
+ *         + static object  Clipboard.GetData(string format) 
+ *         + static IDataObject  Clipboard.GetDataObject() 
+ *         + static StringCollection  Clipboard.GetFileDropList() 
  *         
- *         + static void SetText(string text)
- *         + static void SetText(string text, TextDataFormat format)
- *         + static void SetImage(Image image)
- *         + static void SetAudio(Stream audioStream)
- *         + static void SetAudio(byte[] audioBytes)
- *         + static void SetData(string format, object data)
- *         + static void SetDataObject(object data)
- *         + static void SetDataObject(object data, bool copy, int retryTimes, int retryDelay)
- *         + static void SetDataObject(object data, bool copy)
- *         + static void SetFileDropList(StringCollection filePaths)
- *         
- *         + static void Clear()
+ *         + static void  Clipboard.SetText(string text) 
+ *         + static void  Clipboard.SetText(string text, TextDataFormat format) 
+ *         + static void  Clipboard.SetImage(Image image) 
+ *         + static void  Clipboard.SetAudio(Stream audioStream) 
+ *         + static void  Clipboard.SetAudio(byte[] audioBytes) 
+ *         + static void  Clipboard.SetData(string format, object data) 
+ *         + static void  Clipboard.SetDataObject(object data) 
+ *         + static void  Clipboard.SetDataObject(object data, bool copy, int retryTimes, int retryDelay) 
+ *         + static void  Clipboard.SetDataObject(object data, bool copy) 
+ *         + static void  Clipboard.SetFileDropList(StringCollection filePaths) 
+ *         + static void  Clipboard.Clear() 
  *
  *@see ImageVisualStudioMetadataViewer.jpg
  *@see 
@@ -48,9 +47,8 @@
  */
 using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace WinFormGUI.CsharpCode
@@ -79,6 +77,7 @@ namespace WinFormGUI.CsharpCode
         private readonly Button buttonCopy;
         private const bool isSubject = true;
         private bool isSimpled = false;
+        private Regex regexConstructor;
 
         public FormVisualStudioMetadataViewer()
         {
@@ -213,6 +212,10 @@ namespace WinFormGUI.CsharpCode
                         className = trimedLine.Substring(startIndex).Trim();
                     }
 
+                    string pattenConstructor = $@"{className}\(+[0-9a-zA-z,<>\[\] ]*\)+";
+                    regexConstructor = new Regex(pattenConstructor);
+
+                    trimedLine = trimedLine.Replace("+ ", "");
                     bld.Append($"{trimedLine}");
 
                     if (isInherit)
@@ -228,18 +231,26 @@ namespace WinFormGUI.CsharpCode
                     }
 
                     bld.Append($" -- {namespaceName}\n");
+
+                    //---- No Constructor Message ----
+                    if(trimedLine.Contains("statc class "))
+                    {
+                        bld.Append("[×] 'new' is not avaliable, because of static class.\n");
+                    }
+
                     continue;
                 }//if class
                 
+
                 //---- Append Member with className ----
                 if (isSubject) { bld.Append(" *         "); }
 
                 string[] splitedWord = trimedLine.Split(
                     new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-
+ 
                 for (int i = 0; i < splitedWord.Length; i++)
                 {                    
-                    if (trimedLine.Contains(className))
+                    if (regexConstructor.IsMatch(trimedLine))
                     { 
                         if (i == 1)
                         {
@@ -271,7 +282,7 @@ namespace WinFormGUI.CsharpCode
                 }//for word
 
                 bld.Append("\n");
-            }//foreach
+            }//foreach lineAry
 
             isSimpled = true;
             label.Text = "Simpled Metadata:";
