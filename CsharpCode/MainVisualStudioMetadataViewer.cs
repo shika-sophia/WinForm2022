@@ -75,8 +75,9 @@ namespace WinFormGUI.CsharpCode
         private readonly RichTextBox textBox;
         private readonly Button buttonReplace;
         private readonly Button buttonCopy;
-        private const bool isSubject = true;
+        private const bool withSubject = true;
         private bool isSimpled = false;
+        private bool isCaseDic = false;
         private Regex regexConstructor;
 
         public FormVisualStudioMetadataViewer()
@@ -158,7 +159,7 @@ namespace WinFormGUI.CsharpCode
                  StringSplitOptions.RemoveEmptyEntries);
 
             var bld = new StringBuilder();
-            if (isSubject) { bld.Append(" *@subject ◆"); }
+            if (withSubject) { bld.Append(" *@subject ◆"); }
 
             string namespaceName = "";
             string className = "";
@@ -222,7 +223,7 @@ namespace WinFormGUI.CsharpCode
                     { 
                         bld.Append("\n"); 
 
-                        if (isSubject){ bld.Append(" *         "); }
+                        if (withSubject){ bld.Append(" *         "); }
                     
                         for(int i = 0; i < ("class ".Length + className.Length); i++)
                         {
@@ -243,39 +244,87 @@ namespace WinFormGUI.CsharpCode
                 
 
                 //---- Append Member with className ----
-                if (isSubject) { bld.Append(" *         "); }
+                if (withSubject) { bld.Append(" *         "); }
 
                 string[] splitedWord = trimedLine.Split(
                     new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
  
                 for (int i = 0; i < splitedWord.Length; i++)
                 {                    
-                    if (regexConstructor.IsMatch(trimedLine))
+                    if (regexConstructor.IsMatch(trimedLine))  //case constructor
                     { 
-                        if (i == 1)
+                        if (i == 1)  //index of returnType
                         {
-                            bld.Append($"{className}  new ");
+                            if (trimedLine.Contains("# "))     //case protected constructor
+                            {
+                                bld.Append($"{className}  ");
+                            }
+                            else    //case public constructor
+                            {
+                                bld.Append($"{className}  new ");
+                            }
+                        }//if constructor
+
+                        if(trimedLine.Contains("# ") && i == splitedWord.Length - 1)  //case protected constructor
+                        {
+                            bld.Append(splitedWord[i]);
+                            bld.Append("\n");
+
+                            if (withSubject) { bld.Append(" *         "); }
+                            bld.Append("  [×] 'new' is not available, but 'base()' is OK from constructor of inherited class ONLY.\n");
+                            if (withSubject) { bld.Append(" *         "); }
+                            break;
                         }
                     } 
-                    else if (trimedLine.Contains("static"))
+                    else if (trimedLine.Contains("static "))
                     {
-                        if (i == 3)
+                        if (i == 2 && CaseDicType(ref i, splitedWord, className, ref bld))
+                        {
+                            bld.Append($" {className}.");
+                            continue;
+                        }
+                            
+                        if (i == 3 && !isCaseDic)
                         {
                             bld.Append($" {className}.");
                         }
                     }
-                    else if (trimedLine.Contains("event"))
+                    else if (trimedLine.Contains("internal abstract"))
                     {
-                        if (i == 3)
+                        if (i == 3 && CaseDicType(ref i, splitedWord, className, ref bld))
                         {
-                            bld.Append(
-                                $" {className.Substring(0, 1).ToLower()}{className.Substring(1)}.");
+                            InsertInstanceClassName(bld, className);
+                            continue;
+                        }
+
+                        if (i == 4 && !isCaseDic)
+                        {
+                            InsertInstanceClassName(bld, className);
                         }
                     }
-                    else if (i == 2)
+                    else if (trimedLine.Contains("abstract ")
+                        || trimedLine.Contains("internal ")
+                        || trimedLine.Contains("event "))
+                    { 
+                        if (i == 2 && CaseDicType(ref i, splitedWord, className, ref bld))
+                        {
+                            InsertInstanceClassName(bld, className);
+                            continue;
+                        }
+                        
+                        if (i == 3 && !isCaseDic)
+                        {
+                            InsertInstanceClassName(bld, className);
+                        }
+                    }
+                    else if (i == 1 && CaseDicType(ref i, splitedWord, className, ref bld))  //case Dictionary<T, T>
                     {
-                        bld.Append(
-                            $" {className.Substring(0, 1).ToLower()}{className.Substring(1)}.");
+                        InsertInstanceClassName(bld, className);
+                        continue;
+                    }
+                    else if (i == 2 && !isCaseDic)
+                    {
+                        InsertInstanceClassName(bld, className);
                     }
 
                     bld.Append($"{splitedWord[i]} ");
@@ -290,6 +339,26 @@ namespace WinFormGUI.CsharpCode
             textBox.Refresh();
             textBox.Focus();   //Scroll を Topに戻す
         }//ButtonReplace_Click()
+
+        private void InsertInstanceClassName(StringBuilder bld, string className)
+        {
+            bld.Append(
+                $" {className.Substring(0, 1).ToLower()}{className.Substring(1)}.");
+        }//InsertInstanceClassName()
+
+        private bool CaseDicType(ref int i, string[] splitedWord, string className, ref StringBuilder bld)
+        {
+            if (splitedWord[i].Contains(","))  //case Dictionary<T, T>
+            {
+                bld.Append($"{splitedWord[i]} ");
+                bld.Append($"{splitedWord[++i]} ");
+
+                isCaseDic = true;
+                return true;
+            }
+
+            return false;
+         }//CaseDicType()
 
         private void ButtonCopy_Click(object sender, EventArgs e)
         {
