@@ -175,6 +175,7 @@ namespace WinFormGUI.CsharpCode
                     || trimedLine.Contains("~")
                     || trimedLine.Contains("#")
                     || trimedLine.Contains("using")
+                    || trimedLine.Contains("operator")
                 ) { continue; }
 
                 //---- Replace ----
