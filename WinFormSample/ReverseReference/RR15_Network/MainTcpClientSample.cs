@@ -435,6 +435,7 @@
  *         int EndReceive(IAsyncResult asyncResult, out SocketError errorCode)
  *         int EndReceive(IAsyncResult asyncResult)
  *         int EndReceiveFrom(IAsyncResult asyncResult, ref EndPoint endPoint)
+ *         int EndReceiveMessageFrom(IAsyncResult, ref SocketFlags, ref EndPoint endPoint, out IPPacketInformation);
  *         int EndSend(IAsyncResult asyncResult)
  *         int EndSend(IAsyncResult asyncResult, out SocketError errorCode)
  *         int EndSendTo(IAsyncResult asyncResult)
