@@ -1,0 +1,153 @@
+
+◆HttpClientをusingで囲わないでください
+https://qiita.com/superriver/items/91781bca04a76aec7dc0
+@superriver
+投稿日 2019年10月02日
+更新日 2019年10月05日
+ -- C#,Azure,AzureWebApps
+ 
+C#でHTTP通信をするためのコードのサンプルはネットに沢山あり、そのほとんどが以下のような感じです
+
+    using (var client = new HttpClient())
+    {
+       var response = await client.GetAsync(url);
+       ....
+    }
+これは間違いです。HttpClientオブジェクトは dispose してはいけません！
+Stackoverflowにも沢山この間違いがあります。
+
+(追記: 正確に言うとdisposeしてはいけないわけではなく、生成と破壊を繰り返すのが誤りです)
+
+正しい使い方はAPIの公式ドキュメントに書いてある通りです。
+
+HttpClient クラス (System.Net.Http)
+https://docs.microsoft.com
+
+
+public class GoodController : ApiController
+{
+    private static readonly HttpClient HttpClient;
+
+    static GoodController()
+    {
+        HttpClient = new HttpClient();
+    }
+}
+上記の通り、HttpClientオブジェクトは一度作成するだけでそれをずっと使い続けるのが正しい使用法です。知ってる人には当然なんですけども、知らないと結構驚くかも知れません。APIドキュメントにはこう書いてあります。
+
+HttpClientは、1回インスタンス化し、アプリケーションの有効期間全体に再利用することを目的としています。 すべての要求に対して HttpClient クラスをインスタンス化すると、大量の読み込みで使用可能なソケットの数が枯渇します。 これにより、SocketException エラーが発生します。
+
+間違った使い方をしていても普段はあまり問題は起きませんが、高負荷時に突然ダウンすることが起こりえます。
+
+Azure App Service で問題になりやすい理由
+間違った実装のアプリをAzure App Serviceで運用している場合、特に問題になりやすいです。どうしてかというとSNATの枯渇につながるからです。
+
+SNATとは
+SNATの正確な説明はここにあります(なぜか和訳されてませんが)
+
+アウトバウンド接続の送信元ネットワーク アドレス変換 (SNAT) - Azure Load Balancer
+https://docs.microsoft.com
+
+
+このページの中の重要な部分を引用します。Understanding SNAT and PATの中のTCP SNAT Portsセクションからです。
+
+One SNAT port is consumed per flow to a single destination IP address, port. For multiple TCP flows to the same destination IP address, port, and protocol, each TCP flow consumes a single SNAT port. This ensures that the flows are unique when they originate from the same public IP address and go to the same destination IP address, port, and protocol.
+
+1つの宛先IPアドレスとポートへの通信のためにSNATポートが1つ消費されます。同一の宛先に対する複数の通信の場合、それぞれの通信が一つずつのSNATポートを消費します。これにより、一つのIPアドレスから複数の同じ宛先IPアドレス、ポートへの通信がそれぞれ別の通信となることを保証します。
+
+Multiple flows, each to a different destination IP address, port, and protocol, share a single SNAT port. The destination IP address, port, and protocol make flows unique without the need for additional source ports to distinguish flows in the public IP address space.
+
+反対に、複数の通信がそれぞれ違う宛先の場合は消費せずに一つのSNATポートが共有されます。宛先が違うことで、それぞれの通信が別のものであることが確定しているからです。
+
+直観的に「同じ宛先の通信には同じSNATポートが使われる」と考えがちですが、実際は正反対です。ばらばらの宛先に対して通信している場合はSNATポートは1つしか使いませんが、同じ通信相手に対しては都度SNATポートを消費します。
+
+使い終わったSNATポートはTCP CLOSE_WAITあるいはTIME_WAIT状態に遷移し、4分間再利用できない状態のままポートを占有し続けます(TCPプロトコルの標準動作です)。
+
+HttpClientとSNAT浪費がもたらす問題
+ここで最初のHttpClientの問題に戻ります。HttpClientオブジェクトを通信のたびに作成すると、ソケットを再利用せずに新しいTCPポートを作ります。もし通信相手が同じ場合(たとえばAzure ADによる認証や外部SaaSサービスなど)はIPアドレスも同じ可能性がかなり高く、SNATは再利用されることなく1つ消費されます。これが短時間に多数起きるとCLOSE_WAITまたはTIME_WAIT状態のSNATポートが大量にできてしまいます。
+
+Azure App ServiceとSNAT浪費
+VMサービスにグローバルIPアドレスを割り当てている場合はあまり問題になりませんが、App Serviceは1つのスケールユニット中のVM群がSNATを共有しているため、1つのVMあたりに使えるSNAT数は最低保証数(128)以上はBest Effortによる割り当てになります。これらのSNATポートがCLOSE_WAITやTIME_WAITで埋まってしまうと、それ以上割り当てることができないことがあります。
+
+たとえばあるSNAT浪費問題を持っているアプリがあると、こういうシナリオが起きることがあります。
+1. アプリがSNAT枯渇により通信エラーを起こす
+2. 原因が分からないのでとりあえずスケールアウトする
+3. スケールアウトしたすべてのVMが同じ挙動をすることで大量のSNATを消費し続ける
+4. 新たにSNATを確保することが非常に困難になり、通信エラーの確率が上がる
+
+この手の問題の厄介なところは、手元のテスト環境では発生しにくいことです。クラウドにデプロイしてしばらく運用してから初めて発生し、しかもとりあえず行う問題回避行動（上記の場合スケールアウト）が余計事態を悪化させがちです。
+
+(追記: 128個は2019年9月現時点での値です。また128個までしか使えないのではなく、128個は確実に使えます。これはApp ServiceのスケールユニットのサイズをApp Service側で制御し、VMごとのSNATポート数を確保していることによります)
+
+どうすればいいか
+一番あきらかで最適な解は、コードを修正することです。公式のAPIドキュメントの記載にしたがって正しく実装すれば上記の問題の発生確率を大幅に下げることができます。ちょっとだけ面倒なのは、認証等の動的なヘッダー情報が必要な際は少し記述量が増えることです。具体的にはHttpRequestMessageオブジェクトとSendAsync()メソッドを使います。なおHttpClientはスレッドセーフなのでロックは不要です。
+
+GET
+まずはHTTP GETのサンプルコードです。本質部分だけを書くのでエラー処理は含んでいません。
+
+public class SampleHttp
+{
+    private static readonly HttpClient _httpClient;
+
+    static SampleHttp()
+    {
+        _httpClient = new HttpClient();
+    }
+
+    public async Task<string> GetAsync(string uri)
+    {
+        var request = new HttpRequestMessage
+        {
+            Method = HttpMethod.Get,
+            RequestUri = new Uri(uri)
+        };
+
+        var response = await _httpClient.SendAsync(request);
+        return await response.Content.ReadAsStringAsync();        
+    }
+}
+HTTP VerbはHttpRequestMessageのMethodプロパティに設定し、送信先URLはRequestUriプロパティに設定します。responseオブジェクトを受け取った後はGetAsync()の場合と全く同じです。
+
+PUT/POST
+PUTとPOSTはbodyの送信が入る部分がGETと異なります。JSONで送信する例を示します。
+
+    public async Task PostAsync(string uri, SomeClass data)
+    {
+        var request = new HttpRequestMessage
+        {
+            Method = HttpMethod.Post,
+            RequestUri = new Uri(uri)
+        };
+
+        var content = JsonConvert.SerializeObject(data);
+        request.Content = new StringContent(content, Encoding.UTF8, "application/json");
+        var response = await _httpClient.SendAsync(request);
+        response.EnsureSuccessStatusCode(); 
+    }
+認証ヘッダが必要な場合
+トークンをヘッダに入れるときはHttpRequestMessage.Headers.Authorizationプロパティにセットします。GETでの例を示します（他のVerbでもまったく同じ）
+
+    public async Task<string> GetAsync(string uri, string token)
+    {
+        var request = new HttpRequestMessage
+        {
+            Method = HttpMethod.Get,
+            RequestUri = new Uri(uri)
+        };
+
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        var response = await _httpClient.SendAsync(request);
+        return await response.Content.ReadAsStringAsync();        
+    }
+HttpClientオブジェクトをusingで囲って使っている場合DefaultRequestHeaders.Authorizationに入れるのが楽ですが、staticオブジェクトの初期化時にはまだトークンが得られていないことが多いです。なので上記のようにHttpRequestMessageのHeaders.Authorizationにセットします。
+
+.NET Coreの場合
+上記は.NET Frameworkの場合でしたが、.NET Coreではもう少し便利になっています。詳細は以下のリンクで説明されていますので、そちらに譲ります。ありがとうございます。
+
+Make HTTP requests using IHttpClientFactory in ASP.NET Core
+HttpClient よりも HttpClientFactory を利用したほうが良いかも
+さいごに
+コマンドラインアプリなどのインタラクティブ and/or 寿命の短いコードと、サーバ上で動かすコードとでは、気を付ける部分がだいぶ違います。手元でやってみて動いたことと、クラウドで動かすことは必ずしも一致しません。思わぬトラブルを避けるためには公式ドキュメントをよく読むのが大事だと思います。つまりこの記事も鵜呑みにしないでくださいね！ Happy Hacking!!
+
+
+© 2011-2022Qiita Inc.

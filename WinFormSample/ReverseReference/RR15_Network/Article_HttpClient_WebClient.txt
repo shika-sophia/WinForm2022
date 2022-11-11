@@ -1,0 +1,998 @@
+(下記: 日本語訳あり)
+
+■ Stack Overflow
+◆Deciding between HttpClient and WebClient [closed]
+https://stackoverflow.com/questions/20530152/deciding-between-httpclient-and-webclient
+Asked 8 years, 11 months ago
+Modified 4 months ago
+
+
+Our web application is running in .NET Framework 4.0. 
+The UI calls the controller methods through Ajax calls.
+
+We need to consume the REST service from our vendor.
+I am evaluating the best way to call the REST service in .NET 4.0. 
+The REST service requires a basic authentication scheme and it can return data in both XML and JSON.
+
+There isn't any requirement for uploading/downloading huge data and I don't see anything in future. 
+I took a look at few open source code projects for REST consumption 
+and didn't find any value in those to justify additional dependency in the project. 
+I started to evaluate WebClient and HttpClient.
+ I downloaded HttpClient for .NET 4.0 from NuGet.
+
+I searched for differences between WebClient and HttpClient 
+and this site mentioned that single HttpClient can handle concurrent calls and it can reuse resolved DNS, 
+cookie configuration and authentication.
+ I am yet to see practical values that we may gain due to the differences.
+
+I did a quick performance test to find how 
+WebClient (synchronous calls), 
+HttpClient (synchronous and asynchronous) perform. 
+And here are the results:
+
+I am using the same HttpClient instance for all the requests (minimum - maximum).
+
+WebClient sync: 8 ms - 167 ms
+HttpClient sync: 3 ms - 7228 ms
+HttpClient async: 985 - 10405 ms
+
+Using a new HttpClient for each request (minimum - maximum):
+
+WebClient sync: 4 ms - 297 ms
+HttpClient sync: 3 ms - 7953 ms
+HttpClient async: 1027 - 10834 ms
+
+私たちのWebアプリケーションは.NET Framework 4.0で動作しています。 
+UIは、ajax呼び出しによってコントローラメソッドを呼び出します。
+
+我々はベンダーからRESTサービスを利用する必要があります。 
+私は.NET 4.0でRESTサービスを呼び出す最良の方法を評価しています。 
+RESTサービスは基本認証スキームを必要とし、XMLとJSONの両方でデータを返すことができます。
+膨大なデータをアップロード/ダウンロードする必要はなく、今後は何も表示されません。 
+私は、REST消費のためのオープンソース・コード・プロジェクトをほとんど見ておらず、
+プロジェクトにおける追加の依存関係を正当化するための価値を見いだせませんでした。 
+WebClient と HttpClient を評価し始めました。
+私はNuGetから.Net 4.0用のHttpClientをダウンロードしました。
+
+私はWebClientとHttpClient違いを探しました。
+このサイトでは、単一のHttpClientが同時呼び出しを処理でき、
+解決されたDNS、Cookie設定、および認証を再利用できると述べています。 
+私はまだその違いのために得ることができる実用的な価値を見ています。
+
+WebClient （同期呼び出し）、 HttpClient （同期と非同期）がどのように機能するかを調べるためのパフォーマンステストを行いました。
+結果は次のとおりです。
+
+すべての要求に対して同じHttpClientインスタンスを使用する（最小 - 最大）
+WebClient同期：8ミリ秒〜167ミリ秒
+HttpClientの同期：3ミリ秒〜7228ミリ秒
+HttpClient async：985 - 10405 ms
+
+リクエストごとに新しいHttpClientを使用する（min - max）
+WebClient同期：4 ms〜297 ms
+HttpClientの同期：3ミリ秒〜7953ミリ秒
+HttpClient async：1027 - 10834 ms
+
+
+Code
+public class AHNData
+{
+    public int i;
+    public string str;
+}
+
+public class Program
+{
+    public static HttpClient httpClient = new HttpClient();
+    private static readonly string _url = "http://localhost:9000/api/values/";
+
+    public static void Main(string[] args)
+    {
+       #region "Trace"
+       Trace.Listeners.Clear();
+
+       TextWriterTraceListener twtl = new TextWriterTraceListener(
+           "C:\\Temp\\REST_Test.txt");
+       twtl.Name = "TextLogger";
+       twtl.TraceOutputOptions = TraceOptions.ThreadId | TraceOptions.DateTime;
+
+       ConsoleTraceListener ctl = new ConsoleTraceListener(false);
+       ctl.TraceOutputOptions = TraceOptions.DateTime;
+
+       Trace.Listeners.Add(twtl);
+       Trace.Listeners.Add(ctl);
+       Trace.AutoFlush = true;
+       #endregion
+
+       int batchSize = 1000;
+
+       ParallelOptions parallelOptions = new ParallelOptions();
+       parallelOptions.MaxDegreeOfParallelism = batchSize;
+
+       ServicePointManager.DefaultConnectionLimit = 1000000;
+
+       Parallel.For(0, batchSize, parallelOptions,
+           j =>
+           {
+               Stopwatch sw1 = Stopwatch.StartNew();
+               GetDataFromHttpClientAsync<List<AHNData>>(sw1);
+           });
+       Parallel.For(0, batchSize, parallelOptions,
+            j =>
+            {
+                Stopwatch sw1 = Stopwatch.StartNew();
+                GetDataFromHttpClientSync<List<AHNData>>(sw1);
+            });
+       Parallel.For(0, batchSize, parallelOptions,
+            j =>
+            {
+                using (WebClient client = new WebClient())
+                {
+                   Stopwatch sw = Stopwatch.StartNew();
+                   byte[] arr = client.DownloadData(_url);
+                   sw.Stop();
+
+                   Trace.WriteLine("WebClient Sync " + sw.ElapsedMilliseconds);
+                }
+           });
+
+           Console.Read();
+        }
+
+        public static T GetDataFromWebClient<T>()
+        {
+            using (var webClient = new WebClient())
+            {
+                webClient.BaseAddress = _url;
+                return JsonConvert.DeserializeObject<T>(
+                    webClient.DownloadString(_url));
+            }
+        }
+
+        public static void GetDataFromHttpClientSync<T>(Stopwatch sw)
+        {
+            HttpClient httpClient = new HttpClient();
+            var response = httpClient.GetAsync(_url).Result;
+            var obj = JsonConvert.DeserializeObject<T>(
+                response.Content.ReadAsStringAsync().Result);
+            sw.Stop();
+
+            Trace.WriteLine("HttpClient Sync " + sw.ElapsedMilliseconds);
+        }
+
+        public static void GetDataFromHttpClientAsync<T>(Stopwatch sw)
+        {
+           HttpClient httpClient = new HttpClient();
+           var response = httpClient.GetAsync(_url).ContinueWith(
+              (a) => {
+                 JsonConvert.DeserializeObject<T>(
+                    a.Result.Content.ReadAsStringAsync().Result);
+                 sw.Stop();
+                 Trace.WriteLine("HttpClient Async " + sw.ElapsedMilliseconds);
+              }, TaskContinuationOptions.None);
+        }
+    }
+}
+My Questions
+The REST calls return in 3-4 seconds which is acceptable. Calls to REST service are initiated in the controller methods which gets invoked from Ajax calls. To begin with, the calls runs in a different thread and doesn't block the UI. So, can I just stick with synchronous calls?
+The above code was run in my localbox. In a production setup, DNS and proxy lookup will be involved. Is there an advantage of using HttpClient over WebClient?
+Is HttpClient concurrency better than WebClient? From the test results, I see WebClient synchronous calls perform better.
+Will HttpClient be a better design choice if we upgrade to .NET 4.5? Performance is the key design factor.
+c#.netrestwebclientdotnet-httpclient
+Share
+Follow
+edited Jun 20 at 12:41
+Peter Mortensen's user avatar
+Peter Mortensen
+30.6k2121 gold badges102102 silver badges125125 bronze badges
+asked Dec 11, 2013 at 21:20
+user3092913's user avatar
+user3092913
+2,67522 gold badges1111 silver badges44 bronze badges
+6
+Your test is unfair to GetDataFromHttpClientAsync because it runs first, the other invocations get to benefit of potentially having cahed data (be it on the local machine or any transparent proxy between you and the destination) and will be faster. Also, under the right conditions var response = httpClient.GetAsync("http://localhost:9000/api/values/").Result; can result in a deadlock due to you exhausting threadpool threads. You should never block on a activity that depends on the thread pool in ThreadPool threads , you should await instead so it returns the thread back in to the pool. – 
+Scott Chamberlain
+ Dec 11, 2013 at 21:28 
+1
+HttpClient with Web API Client is fantastic for a JSON/XML REST client. – 
+Cory Nelson
+ Dec 11, 2013 at 22:08
+2
+Here are few words on the difference between HttpClient and WebClient: blogs.msdn.com/b/henrikn/archive/2012/02/11/… – 
+JustAndrei
+ May 30, 2014 at 5:39
+2
+learn.microsoft.com/en-us/dotnet/api/… recommends using HttpClient for new development instead of WebClient. This is true for both .NET Framework and .NET Core. – 
+Theophilus
+ Feb 20, 2019 at 17:05
+1
+The question is moot since at least 2018 because even .NET Framework's HttpWebRequest and by extension WebClient actually use HttpClient WebClient and HttpWebRequest are just compatibility wrappers over HttpClient for some years, with the .NET Framework version having a socket exhaustion bug that was fixed in .NET Core – 
+Panagiotis Kanavos
+ Sep 9, 2021 at 7:35 
+Show 11 more comments
+6 Answers
+Sorted by:
+
+Highest score (default)
+
+94
+
+
+HttpClient is the newer of the APIs and it has the benefits of
+
+has a good asynchronous programming model
+being worked on by Henrik F Nielson who is basically one of the inventors of HTTP, and he designed the API so it is easy for you to follow the HTTP standard, e.g. generating standards-compliant headers
+is in the .NET framework 4.5, so it has some guaranteed level of support for the forseeable future
+also has the xcopyable/portable-framework version of the library if you want to use it on other platforms - .NET 4.0, Windows Phone, etc.
+If you are writing a web service which is making REST calls to other web services, you should want to be using an asynchronous programming model for all your REST calls, so that you don't hit thread starvation. You probably also want to use the newest C# compiler which has async/await support.
+
+Note: It isn't more performant, AFAIK. It's probably somewhat similarly performant if you create a fair test.
+
+Share
+Follow
+edited Jun 20 at 12:20
+community wiki
+3 revs, 2 users 61%
+Tim Lovell-Smith
+If it had a way to switch proxy it would be insane – 
+ed22
+ Dec 14, 2018 at 17:23
+10
+While this is an old question, it came up on my search, so I thought I'd point out that Microsoft's documentation for WebClient in .NET 5 states, "We don't recommend that you use the WebClient class for new development. Instead, use the System.Net.Http.HttpClient class." – 
+Mmm
+ Nov 3, 2021 at 19:21 
+Add a comment
+
+13
+
+
+HttpClientFactory
+It's important to evaluate the different ways you can create an HttpClient, and part of that is understanding HttpClientFactory.
+
+https://learn.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests
+
+This is not a direct answer I know - but you're better off starting here than ending up with new HttpClient(...) everywhere.
+
+Share
+Follow
+answered Feb 5, 2020 at 0:37
+Simon_Weaver's user avatar
+Simon_Weaver
+134k7777 gold badges625625 silver badges671671 bronze badges
+4
+It's worth stressing that even HttpWebRequest in .NET Framework and by extension WebClient use HttpClient since at least 2018, so the question is essentially moot – 
+Panagiotis Kanavos
+ Sep 9, 2021 at 7:34
+Add a comment
+
+11
+
+
+When it comes to ASP.NET apps I still prefer WebClient over HttpClient because:
+
+The modern implementation comes with async/awaitable task-based methods
+Has smaller memory footprint and 2-5 times faster (other answers already mention that)
+It's suggested to "reuse a single instance of HttpClient for the lifetime of your application". But ASP.NET has no "lifetime of application", only lifetime of a request. The current guidance for ASP.NET 5 is to use HttpClientFactory, but it can only be used via dependency injection. Some people want a simpler solution.
+Most importantly, if you're using one singleton instance of HttpClient through the lifetime of the app like MS suggests - it has known issues. For example the DNS caching issue - HttpClient simply ignores the TTL and caches DNS "forever". There are workarounds, however. If you'd like to learn more about the issues and confusion with HttpClient just read this comment at Microsoft GitHub.
+Share
+Follow
+edited Jun 20 at 12:27
+Peter Mortensen's user avatar
+Peter Mortensen
+30.6k2121 gold badges102102 silver badges125125 bronze badges
+answered Jun 6, 2020 at 13:26
+Alex from Jitbit's user avatar
+Alex from Jitbit
+47.8k1717 gold badges143143 silver badges135135 bronze badges
+3
+Given how .NET Old has been replaced by .NET Core, have you run your benchmarks with .NET Core? By now HttpWebRequest is a wrapper over HttpClient, so WebClient is essentially a legacy adapter for WebClient – 
+Panagiotis Kanavos
+ Oct 12, 2020 at 9:29
+7
+only lifetime of a request. that's wrong. Using DI containers to provide singleton or scoped objects is available in the older ASP.NET stacks too, only harder to use. – 
+Panagiotis Kanavos
+ Oct 12, 2020 at 9:31
+1
+@PanagiotisKanavos yes, but you still do not control lifetime of the application. And average "Joe the programmer" won't bother creating static/singleton vars to cache the HttpClient anyway. – 
+Alex from Jitbit
+ Oct 12, 2020 at 16:37 
+The lifetime of the application doesn't matter, only the injected HttpClient's - or rather, the HttpClientHandler's. Which is something easily doable for all applications. And HttpWebRequest does use a cached HttpClientHandler if available. You should rerun your benchmarks. If your results say that the wrapper over a class is faster or uses less memory than the class itself, something's wrong – 
+Panagiotis Kanavos
+ Oct 12, 2020 at 16:40 
+4
+Also this ".NET Old has been replaced by .NET Core" - it hasn't replaced it yet, .NET Framework is still supported and will be for another 10 years at the very least (basically as long as it's part of Windows). BUt i should've probably indicated that my answer is for .NET Framework, not Core – 
+Alex from Jitbit
+ Oct 12, 2020 at 16:48
+Show 5 more comments
+
+6
+
+
+Firstly, I am not an authority on WebClient vs. HttpClient, specifically. Secondly, from your comments above, it seems to suggest that WebClient is synchronous only whereas HttpClient is both.
+
+I did a quick performance test to find how WebClient (synchronous calls), HttpClient (synchronous and asynchronous) perform. And here are the results.
+
+I see that as a huge difference when thinking for future, i.e., long running processes, responsive GUI, etc. (add to the benefit you suggest by .NET framework 4.5 - which in my actual experience is hugely faster on IIS).
+
+Share
+Follow
+edited Jun 20 at 12:15
+Peter Mortensen's user avatar
+Peter Mortensen
+30.6k2121 gold badges102102 silver badges125125 bronze badges
+answered May 30, 2014 at 7:54
+Anthony Horne's user avatar
+Anthony Horne
+2,47822 gold badges3232 silver badges5151 bronze badges
+4
+WebClient does seem to have async capabilities in the latest .NET versions. I'd like to know why it seems to be outperforming HttpClient on such a massive scale. – 
+crush
+ Oct 28, 2015 at 22:17
+1
+According to stackoverflow.com/a/4988325/1662973, it seems to be the same, other than the fact that one is an abstraction of the other. Maybe, it depends on how the objects are used / loaded. The minimum time does support the statement that webclient is in fact an abstraction of HttpClient, so there is a millisecond worth of overhead. The framework could be being "sneaky" in how it is really pooling or disposing of webclient. – 
+Anthony Horne
+ Oct 29, 2015 at 11:52
+Add a comment
+
+5
+
+
+Perhaps you could think about the problem in a different way. WebClient and HttpClient are essentially different implementations of the same thing. What I recommend is implementing the Dependency Injection pattern with an IoC Container throughout your application. You should construct a client interface with a higher level of abstraction than the low level HTTP transfer. You can write concrete classes that use both WebClient and HttpClient, and then use the IoC container to inject the implementation via config.
+
+What this would allow you to do would be to switch between HttpClient and WebClient easily so that you are able to objectively test in the production environment.
+
+So questions like:
+
+Will HttpClient be a better design choice if we upgrade to .Net 4.5?
+
+Can actually be objectively answered by switching between the two client implementations using the IoC container. Here is an example interface that you might depend on that doesn't include any details about HttpClient or WebClient.
+
+/// <summary>
+/// Dependency Injection abstraction for rest clients. 
+/// </summary>
+public interface IClient
+{
+    /// <summary>
+    /// Adapter for serialization/deserialization of http body data
+    /// </summary>
+    ISerializationAdapter SerializationAdapter { get; }
+
+    /// <summary>
+    /// Sends a strongly typed request to the server and waits for a strongly typed response
+    /// </summary>
+    /// <typeparam name="TResponseBody">The expected type of the response body</typeparam>
+    /// <typeparam name="TRequestBody">The type of the request body if specified</typeparam>
+    /// <param name="request">The request that will be translated to a http request</param>
+    /// <returns></returns>
+    Task<Response<TResponseBody>> SendAsync<TResponseBody, TRequestBody>(Request<TRequestBody> request);
+
+    /// <summary>
+    /// Default headers to be sent with http requests
+    /// </summary>
+    IHeadersCollection DefaultRequestHeaders { get; }
+
+    /// <summary>
+    /// Default timeout for http requests
+    /// </summary>
+    TimeSpan Timeout { get; set; }
+
+    /// <summary>
+    /// Base Uri for the client. Any resources specified on requests will be relative to this.
+    /// </summary>
+    Uri BaseUri { get; set; }
+
+    /// <summary>
+    /// Name of the client
+    /// </summary>
+    string Name { get; }
+}
+
+public class Request<TRequestBody>
+{
+    #region Public Properties
+    public IHeadersCollection Headers { get; }
+    public Uri Resource { get; set; }
+    public HttpRequestMethod HttpRequestMethod { get; set; }
+    public TRequestBody Body { get; set; }
+    public CancellationToken CancellationToken { get; set; }
+    public string CustomHttpRequestMethod { get; set; }
+    #endregion
+
+    public Request(Uri resource,
+        TRequestBody body,
+        IHeadersCollection headers,
+        HttpRequestMethod httpRequestMethod,
+        IClient client,
+        CancellationToken cancellationToken)
+    {
+        Body = body;
+        Headers = headers;
+        Resource = resource;
+        HttpRequestMethod = httpRequestMethod;
+        CancellationToken = cancellationToken;
+
+        if (Headers == null) Headers = new RequestHeadersCollection();
+
+        var defaultRequestHeaders = client?.DefaultRequestHeaders;
+        if (defaultRequestHeaders == null) return;
+
+        foreach (var kvp in defaultRequestHeaders)
+        {
+            Headers.Add(kvp);
+        }
+    }
+}
+
+public abstract class Response<TResponseBody> : Response
+{
+    #region Public Properties
+    public virtual TResponseBody Body { get; }
+
+    #endregion
+
+    #region Constructors
+    /// <summary>
+    /// Only used for mocking or other inheritance
+    /// </summary>
+    protected Response() : base()
+    {
+    }
+
+    protected Response(
+    IHeadersCollection headersCollection,
+    int statusCode,
+    HttpRequestMethod httpRequestMethod,
+    byte[] responseData,
+    TResponseBody body,
+    Uri requestUri
+    ) : base(
+        headersCollection,
+        statusCode,
+        httpRequestMethod,
+        responseData,
+        requestUri)
+    {
+        Body = body;
+    }
+
+    public static implicit operator TResponseBody(Response<TResponseBody> readResult)
+    {
+        return readResult.Body;
+    }
+    #endregion
+}
+
+public abstract class Response
+{
+    #region Fields
+    private readonly byte[] _responseData;
+    #endregion
+
+    #region Public Properties
+    public virtual int StatusCode { get; }
+    public virtual IHeadersCollection Headers { get; }
+    public virtual HttpRequestMethod HttpRequestMethod { get; }
+    public abstract bool IsSuccess { get; }
+    public virtual Uri RequestUri { get; }
+    #endregion
+
+    #region Constructor
+    /// <summary>
+    /// Only used for mocking or other inheritance
+    /// </summary>
+    protected Response()
+    {
+    }
+
+    protected Response
+    (
+    IHeadersCollection headersCollection,
+    int statusCode,
+    HttpRequestMethod httpRequestMethod,
+    byte[] responseData,
+    Uri requestUri
+    )
+    {
+        StatusCode = statusCode;
+        Headers = headersCollection;
+        HttpRequestMethod = httpRequestMethod;
+        RequestUri = requestUri;
+        _responseData = responseData;
+    }
+    #endregion
+
+    #region Public Methods
+    public virtual byte[] GetResponseData()
+    {
+        return _responseData;
+    }
+    #endregion
+}
+Full code
+
+HttpClient Implementation
+
+You can use Task.Run to make WebClient run asynchronously in its implementation.
+
+Dependency Injection, when done well helps alleviate the problem of having to make low level decisions upfront. Ultimately, the only way to know the true answer is try both in a live environment and see which one works the best. It's quite possible that WebClient may work better for some customers, and HttpClient may work better for others. This is why abstraction is important. It means that code can quickly be swapped in, or changed with configuration without changing the fundamental design of the app.
+
+BTW: there are numerous other reasons that you should use an abstraction instead of directly calling one of these low-level APIs. One huge one being unit-testability.
+
+Share
+Follow
+edited Feb 5, 2021 at 22:22
+answered Jan 4, 2020 at 6:31
+Christian Findlay's user avatar
+Christian Findlay
+6,12155 gold badges4343 silver badges9292 bronze badges
+For this example, why use an abstract as opposed to an interface? (ignoring default implementations) Is it purely for the purposes of the GetResponseData() definition? Or am I missing something here? – 
+Seeds
+ Feb 5, 2021 at 20:49 
+I don't understand the question – 
+Christian Findlay
+ Feb 5, 2021 at 22:20
+I'm curious why you chose to use an Abstract here, as opposed to an interface with your "Response" objects (generic and non-generic) – 
+Seeds
+ Feb 8, 2021 at 22:15
+WebClient uses HttpClient indirectly, because HttpWebRequest uses HttpClient internally even in .NET Framework, since at least 2018. Both WebClient and HttpWebRrequest are just obsolete compatibility wrappers at this point. WebClient does have proper async methods so it doesn't need Task.Run. – 
+Panagiotis Kanavos
+ Sep 9, 2021 at 7:38
+Add a comment
+
+3
+
+
+I have benchmarked between HttpClient, WebClient, and HttpWebResponse, and then called the REST Web API.
+
+And the results:
+
+Call REST Web API Benchmark
+---------------------Stage 1  ---- 10 Request
+
+{00:00:17.2232544} ====>HttpClinet
+{00:00:04.3108986} ====>WebRequest
+{00:00:04.5436889} ====>WebClient
+
+---------------------Stage 1  ---- 10 Request--Small Size
+{00:00:17.2232544}====>HttpClinet
+{00:00:04.3108986}====>WebRequest
+{00:00:04.5436889}====>WebClient
+
+---------------------Stage 3  ---- 10 sync Request--Small Size
+{00:00:15.3047502}====>HttpClinet
+{00:00:03.5505249}====>WebRequest
+{00:00:04.0761359}====>WebClient
+
+---------------------Stage 4  ---- 100 sync Request--Small Size
+{00:03:23.6268086}====>HttpClinet
+{00:00:47.1406632}====>WebRequest
+{00:01:01.2319499}====>WebClient
+
+---------------------Stage 5  ---- 10 sync Request--Max Size
+
+{00:00:58.1804677}====>HttpClinet
+{00:00:58.0710444}====>WebRequest
+{00:00:38.4170938}====>WebClient
+
+---------------------Stage 6  ---- 10 sync Request--Max Size
+
+{00:01:04.9964278}====>HttpClinet
+{00:00:59.1429764}====>WebRequest
+{00:00:32.0584836}====>WebClient
+WebClient Is faster
+var stopWatch = new Stopwatch();
+
+stopWatch.Start();
+for (var i = 0; i < 10; ++i)
+{
+    CallGetHttpClient();
+    CallPostHttpClient();
+}
+
+stopWatch.Stop();
+
+var httpClientValue = stopWatch.Elapsed;
+
+stopWatch = new Stopwatch();
+
+stopWatch.Start();
+for (var i = 0; i < 10; ++i)
+{
+    CallGetWebRequest();
+    CallPostWebRequest();
+}
+
+stopWatch.Stop();
+
+var webRequesttValue = stopWatch.Elapsed;
+
+stopWatch = new Stopwatch();
+
+stopWatch.Start();
+for (var i = 0; i < 10; ++i)
+{
+    CallGetWebClient();
+    CallPostWebClient();
+}
+
+stopWatch.Stop();
+
+var webClientValue = stopWatch.Elapsed;
+
+//-------------------------Functions
+
+private void CallPostHttpClient()
+{
+    var httpClient = new HttpClient();
+    httpClient.BaseAddress = new Uri("https://localhost:44354/api/test/");
+    var responseTask = httpClient.PostAsync("PostJson", null);
+    responseTask.Wait();
+
+    var result = responseTask.Result;
+    var readTask = result.Content.ReadAsStringAsync().Result;
+}
+
+private void CallGetHttpClient()
+{
+    var httpClient = new HttpClient();
+    httpClient.BaseAddress = new Uri("https://localhost:44354/api/test/");
+    var responseTask = httpClient.GetAsync("getjson");
+    responseTask.Wait();
+
+    var result = responseTask.Result;
+    var readTask = result.Content.ReadAsStringAsync().Result;
+}
+
+private string CallGetWebRequest()
+{
+    var request = (HttpWebRequest)WebRequest.Create("https://localhost:44354/api/test/getjson");
+
+    request.Method = "GET";
+    request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+
+    var content = string.Empty;
+
+    using (var response = (HttpWebResponse)request.GetResponse())
+    {
+        using (var stream = response.GetResponseStream())
+        {
+            using (var sr = new StreamReader(stream))
+            {
+                content = sr.ReadToEnd();
+            }
+        }
+    }
+    return content;
+}
+
+private string CallPostWebRequest()
+{
+    var apiUrl = "https://localhost:44354/api/test/PostJson";
+
+    HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(new Uri(apiUrl));
+    httpRequest.ContentType = "application/json";
+    httpRequest.Method = "POST";
+    httpRequest.ContentLength = 0;
+
+    using (var httpResponse = (HttpWebResponse)httpRequest.GetResponse())
+    {
+        using (Stream stream = httpResponse.GetResponseStream())
+        {
+            var json = new StreamReader(stream).ReadToEnd();
+            return json;
+        }
+    }
+    return "";
+}
+
+private string CallGetWebClient()
+{
+    string apiUrl = "https://localhost:44354/api/test/getjson";
+
+    var client = new WebClient();
+
+    client.Headers["Content-type"] = "application/json";
+
+    client.Encoding = Encoding.UTF8;
+
+    var json = client.DownloadString(apiUrl);
+
+    return json;
+}
+
+private string CallPostWebClient()
+{
+    string apiUrl = "https://localhost:44354/api/test/PostJson";
+
+    var client = new WebClient();
+
+    client.Headers["Content-type"] = "application/json";
+
+    client.Encoding = Encoding.UTF8;
+
+    var json = client.UploadString(apiUrl, "");
+
+    return json;
+}
+Share
+Follow
+edited Jun 20 at 12:43
+Peter Mortensen's user avatar
+Peter Mortensen
+30.6k2121 gold badges102102 silver badges125125 bronze badges
+answered Dec 18, 2019 at 7:36
+user3754071's user avatar
+user3754071
+3922 bronze badges
+5
+See Gabriel's comment above. In short, HttpClient is much faster if you create one instance of HttpClient and reuse it. – 
+LT Dan
+ Dec 24, 2019 at 19:08
+1
+Besides, HttpWebRequest calls HttpClient in .NET Core. Which is the only platform going forward – 
+Panagiotis Kanavos
+ Oct 12, 2020 at 9:32
+In fact, HttpWebRequests uses HttpClient even in .NET Framework, although it has bugs. That GetResponse() calls HttpClient underneath and blocks with .GetAwaiter().GetResult() – 
+Panagiotis Kanavos
+ Sep 9, 2021 at 7:33
+Add a comment
+Not the answer you're looking for? Browse other questions tagged c#.netrestwebclientdotnet-httpclient or ask your own question.
+The Overflow Blog
+Hashgraph: The sustainable alternative to blockchain
+sponsored post
+Five Stack Exchange sites are celebrating their ten year anniversaries in Q4...
+Upcoming Events
+2022 Community Moderator Election
+ends November 22
+Featured on Meta
+Mobile app infrastructure being decommissioned
+The Ask Wizard (2022) has graduated
+Staging Ground Workflow: Canned Comments
+
+Report this ad
+Linked
+1417
+Send HTTP POST request in .NET
+180
+What is the overhead of creating a new HttpClient per call in a WebAPI client?
+185
+What difference is there between WebClient and HTTPWebRequest classes in .NET?
+73
+Download file with WebClient or HttpClient?
+44
+System.Net.WebException: The remote name could not be resolved:
+27
+Download files from url to local device in .Net Core
+18
+How do I download zip file in C#?
+32
+How to use WebClient with .NetCore?
+20
+How to Replace WebClient with HttpClient?
+18
+HttpClient doesn't redirect even when AllowAutoRedirect = true
+See more linked questions
+Related
+7340
+What is the difference between String and string in C#?
+1632
+What is the difference between const and readonly in C#?
+2106
+How do I create an Excel (.XLS and .XLSX) file in C# without installing Microsoft Office?
+2359
+Difference between decimal, float and double in .NET?
+6116
+What is the difference between POST and PUT in HTTP?
+1293
+Difference Between Select and SelectMany
+1872
+What is a NullReferenceException, and how do I fix it?
+1041
+How do you set the Content-Type header for an HttpClient request?
+753
+Setting Authorization Header of HttpClient
+483
+Why is HttpClient BaseAddress not working?
+Hot Network Questions
+I believe I was misdiagnosed with ADHD when I was a small child. Can I get my private pilots licence?
+Why does this picture look so painterly?
+Why don't American traffic signs use pictograms as much as other countries?
+How to divide an unsigned 8-bit integer by 3 without divide or multiply instructions (or lookup tables)
+Were this character's actions legal in 'SAS: Rogue Heroes'?
+Can you safely assume that Beholder's rays are visible and audible? (based on rules / lore / novels / famous campaign streams, etc)
+Counting from the 21st century forward, what place on Earth will be last to experience a total solar eclipse?
+How can I restore power to a gas-fired water heater protected by a tripped GFCI outlet?
+What are the punctuation symbols in early magazines?
+Can we use "will" to describe future plans?
+Traverse a rectangle's antidiagonals
+How to notate a "softened" dotted rhythm?
+Which versions of Mathematica work on macOS Ventura?
+Are users' personal notes about other users subjected to the GDPR right of access?
+Is there an analytic non-linear function that maps rational numbers to rational numbers and it maps irrational numbers to irrational numbers?
+What is the difference between the root "hemi" and the root "semi"?
+Perfect Nontransitive Sets
+Is it illegal to cut out a face from the newspaper?
+How did Space Shuttles get off the NASA Crawler?
+scifi dystopian movie possibly horror elements as well from the 70s-80s the twist is that main villian and the protagonist are brothers
+How does capacitance depend on AC voltage?
+When dealing with a drought or a bushfire, is a million tons of water overkill?
+Do US Senate election run-offs run ad infinitum?
+Book or short story about a character who is kept alive as a disembodied brain encased in a mechanical device after an accident
+STACK OVERFLOW
+Site design / logo © 2022 Stack Exchange Inc; user contributions licensed under CC BY-SA. rev 2022.11.10.43027
+
+
+◆c# - new - HttpClient と Web クライアントの間の決定
+https://code-examples.net/ja/q/13943e8
+
+.net rest (3)
+私たちのWebアプリケーションは.NET Framework 4.0で動作しています。 UIは、ajax呼び出しによってコントローラメソッドを呼び出します。
+
+我々はベンダーからRESTサービスを利用する必要があります。 私は.NET 4.0でRESTサービスを呼び出す最良の方法を評価しています。 RESTサービスは基本認証スキームを必要とし、XMLとJSONの両方でデータを返すことができます。 膨大なデータをアップロード/ダウンロードする必要はなく、今後は何も表示されません。 私は、REST消費のためのオープンソース・コード・プロジェクトをほとんど見ておらず、プロジェクトにおける追加の依存関係を正当化するための価値を見いだせませんでした。 WebClientとHttpClientを評価し始めました。 私はNuGetから.Net 4.0用のHttpClientをダウンロードしました。
+
+私はWebClientとHttpClient違いを探しました。 このサイトでは、単一のHttpClientが同時呼び出しを処理でき、解決されたDNS、Cookie設定、および認証を再利用できると述べています。 私はまだその違いのために得ることができる実用的な価値を見ています。
+
+WebClient （同期呼び出し）、 HttpClient （同期と非同期）がどのように機能するかを調べるためのパフォーマンステストを行いました。 結果は次のとおりです。
+
+すべての要求に対して同じHttpClientインスタンスを使用する（最小 - 最大）
+
+WebClient同期：8ミリ秒〜167ミリ秒
+HttpClientの同期：3ミリ秒〜7228ミリ秒
+HttpClient async：985 - 10405 ms
+
+リクエストごとに新しいHttpClientを使用する（min - max）
+
+WebClient同期：4 ms〜297 ms
+HttpClientの同期：3ミリ秒〜7953ミリ秒
+HttpClient async：1027 - 10834 ms
+
+コード
+public class AHNData
+{
+    public int i;
+    public string str;
+}
+
+public class Program
+{
+    public static HttpClient httpClient = new HttpClient();
+    private static readonly string _url = "http://localhost:9000/api/values/";
+
+    public static void Main(string[] args)
+    {
+       #region "Trace"
+       Trace.Listeners.Clear();
+
+       TextWriterTraceListener twtl = new TextWriterTraceListener(
+           "C:\\Temp\\REST_Test.txt");
+       twtl.Name = "TextLogger";
+       twtl.TraceOutputOptions = TraceOptions.ThreadId | TraceOptions.DateTime;
+
+       ConsoleTraceListener ctl = new ConsoleTraceListener(false);
+       ctl.TraceOutputOptions = TraceOptions.DateTime;
+
+       Trace.Listeners.Add(twtl);
+       Trace.Listeners.Add(ctl);
+       Trace.AutoFlush = true;
+       #endregion
+
+       int batchSize = 1000;
+
+       ParallelOptions parallelOptions = new ParallelOptions();
+       parallelOptions.MaxDegreeOfParallelism = batchSize;
+
+       ServicePointManager.DefaultConnectionLimit = 1000000;
+
+       Parallel.For(0, batchSize, parallelOptions,
+           j =>
+           {
+               Stopwatch sw1 = Stopwatch.StartNew();
+               GetDataFromHttpClientAsync<List<AHNData>>(sw1);
+           });
+       Parallel.For(0, batchSize, parallelOptions,
+            j =>
+            {
+                Stopwatch sw1 = Stopwatch.StartNew();
+                GetDataFromHttpClientSync<List<AHNData>>(sw1);
+            });
+       Parallel.For(0, batchSize, parallelOptions,
+            j =>
+            {
+                using (WebClient client = new WebClient())
+                {
+                   Stopwatch sw = Stopwatch.StartNew();
+                   byte[] arr = client.DownloadData(_url);
+                   sw.Stop();
+
+                   Trace.WriteLine("WebClient Sync " + sw.ElapsedMilliseconds);
+                }
+           });
+
+           Console.Read();
+        }
+
+        public static T GetDataFromWebClient<T>()
+        {
+            using (var webClient = new WebClient())
+            {
+                webClient.BaseAddress = _url;
+                return JsonConvert.DeserializeObject<T>(
+                    webClient.DownloadString(_url));
+            }
+        }
+
+        public static void GetDataFromHttpClientSync<T>(Stopwatch sw)
+        {
+            HttpClient httpClient = new HttpClient();
+            var response = httpClient.GetAsync(_url).Result;
+            var obj = JsonConvert.DeserializeObject<T>(
+                response.Content.ReadAsStringAsync().Result);
+            sw.Stop();
+
+            Trace.WriteLine("HttpClient Sync " + sw.ElapsedMilliseconds);
+        }
+
+        public static void GetDataFromHttpClientAsync<T>(Stopwatch sw)
+        {
+           HttpClient httpClient = new HttpClient();
+           var response = httpClient.GetAsync(_url).ContinueWith(
+              (a) => {
+                 JsonConvert.DeserializeObject<T>(
+                    a.Result.Content.ReadAsStringAsync().Result);
+                 sw.Stop();
+                 Trace.WriteLine("HttpClient Async " + sw.ElapsedMilliseconds);
+              }, TaskContinuationOptions.None);
+        }
+    }
+}
+私の質問
+RESTの呼び出しは3-4秒で返され、これは受け入れられるものです。 RESTサービスへの呼び出しは、ajax呼び出しから呼び出されるコントローラメソッドで開始されます。 まず、呼び出しは別のスレッドで実行され、UIはブロックされません。 だから、ちょうど同期の呼び出しに固執することはできますか？
+上記のコードは私のローカルボックスで実行されました。 prodセットアップでは、DNSとプロキシの検索が行われます。 WebClient HttpClientを使用する利点はありWebClientか？
+HttpClient同時実行性はWebClientより優れていWebClientか？ テスト結果から、私はWebClient同期呼び出しがより良く機能することを確認しWebClient 。
+.Net 4.5にアップグレードすると、 HttpClientはより良い設計の選択になりますか？ パフォーマンスが重要な設計要素です。
+HttpClientはAPIの新バージョンであり、
+
+良い非同期プログラミングモデルを持っています
+基本的にHTTPの発明者の一人であるHenrik F Nielsonによって開発されており、HTTP規格に準拠するようにAPIを設計しました。例えば、標準に準拠したヘッダを生成する
+.NETフレームワーク4.5に含まれているので、将来に向けていくらかのサポートレベルが保証されています
+他のプラットフォーム（.Net 4.0、Windows Phoneなど）で使用したい場合は、ライブラリのxcopyable / portable-frameworkバージョンも持っています。
+他のWebサービスへのREST呼び出しを行っているWebサービスを作成する場合は、すべてのREST呼び出しに非同期プログラミングモデルを使用してスレッド飢餓に遭わないようにする必要があります。 おそらく、非同期/待機をサポートしている最新のC＃コンパイラを使用することもできます。
+
+注：AFAIKはそれ以上のパフォーマンスはありません。 公平なテストを作成しても、多分同様のパフォーマンスが得られます。
+
+まず、WebClientとHttpClientの間の権限ではありません。 第二に、上記のコメントから、HttpClientが両方であるのに対し、WebClientはSyncのみであることが示唆されているようです。
+
+WebClient（同期呼び出し）、HttpClient（同期と非同期）がどのように機能するかを調べるためのパフォーマンステストを行いました。 ここに結果があります。
+
+私はこれが、将来の、すなわち長時間実行されるプロセス、応答性の高いGUIなどを考えているときに大きな違いがあることを見ています（フレームワーク4.5が提案するメリットに加えて、実際の経験ではIISで非常に高速です）
+
+私はF＃とWeb APIの両方の世界に住んでいます。
+
+Web APIには、特にセキュリティなどのメッセージハンドラの形で、多くの良いことが起こっています。
+
+私は唯一の意見だと知っていHttpClientが、今後の作業にはHttpClient使用を推奨します 。 おそらく、アセンブリを直接使用せずにSystem.Net.Httpから出てくる他の部分を活用する方法はいくつかありますが、現時点でどのように動作するのか想像できません。
+
+これらの2つを比較すると
+
+HttpClientはWebClientよりHTTPに近い。
+HttpClientはWebクライアントの完全な置き換えではありませんでした.WebClientが提供するレポートの進捗状況、カスタムURIスキーム、FTP呼び出しなどがあるためですが、HttpClientはそうではありません。
+.NET 4.5を使用している場合は、Microsoftが開発者に提供するHttpClientで非同期機能を使用してください。 HttpClientは、HttpRequestとHttpResponseであるHTTPのサーバー側の兄弟に対して非常に対称的です。
+
+更新：新しいHttpClient APIを使用する5つの理由：
+
+強く型付けされたヘッダ。
+共有キャッシュ、Cookie、および資格情報
+クッキーと共有クッキーへのアクセス
+キャッシュと共有キャッシュの制御
+コードモジュールをASP.NETパイプラインに挿入します。 クリーナーとモジュラーコード。
+リファレンス
+
+C＃5.0 Joseph Albahari
+
+（Channel9 - Video Build 2013）
+
+新しいHttpClient APIを使用してWebサービスに接続する5つの大きな理由
+
+WebClient対HttpClient対HttpWebRequest
+
+
+
