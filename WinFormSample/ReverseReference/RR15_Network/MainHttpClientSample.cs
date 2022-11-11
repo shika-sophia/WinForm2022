@@ -2,12 +2,18 @@
  *@title WinFormGUI / WinFormSample / ReverseReference / RR15_Network
  *@class MainHttpClientSample.cs
  *@class   └ new FormHttpClientSample() : Form
- *@class       └ new HttpClient()
+ *@class       └ new HttpClient() : HttpMessageInvoker  -- System.Net.Http
  *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
  *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
  *          
  *@content RR[425]-[426] p719 / HttpClient
+ *         ・HTTPの開発者 Henrik F Nielson による HTTPの規格に準拠したAPI設計
+ *         ・WebClientより、HTTPに適合した API = HttpClientを優先的に利用すべき
+ *         ・このプログラムでもパフォーマンスを計測してみた
+ *             WebClient  Sync:  CostTime = 1188 milliSeconds
+ *             WebClient  Async: CostTime = 1028 milliSeconds
+ *             HttpClient Async: CostTime = 1278 milliSeconds
  *         ・using() で利用すべきではない。Dispose()しない。
  *           https://qiita.com/superriver/items/91781bca04a76aec7dc0
  *           => 〔Article_HttpClient_DontUseUsingDispose.txt〕
@@ -48,7 +54,7 @@
  *         ＊StreamReader
  *         StreamReader reader = new StreamReader(Stream);
  */
-#region -> HttpClient, WebClient
+#region -> HttpClient
 /*
  *@subject ◆class HttpClient : HttpMessageInvoker
  *                          -- System.Net.Http
@@ -107,11 +113,14 @@
  *         + Task<string>  httpClient.GetStringAsync(Uri requestUri) 
  *         
  *         + void  httpClient.CancelPendingRequests() 
+ *         + void  httpClient.Dispose() 
  *         # void  httpClient.Dispose(bool disposing) 
  *
  *@subject ◆abstract class HttpMessageHandler : IDisposable
  *                                  -- System.Net.Http
- *         # HttpMessageHandler  new HttpMessageHandler() 
+ *         # HttpMessageHandler  HttpMessageHandler() 
+ *         [×] 'new' is not available, because of abstract class.
+ *         
  *         # abstract Task<HttpResponseMessage>  
  *                 httpMessageHandler.SendAsync(HttpRequestMessage request, CancellationToken) 
  *         + void  httpMessageHandler.Dispose() 
@@ -134,11 +143,11 @@
  *         + HttpRequestMessage  new HttpRequestMessage(HttpMethod method, string requestUri) 
  *         
  *         + HttpRequestHeaders  httpRequestMessage.Headers { get; } 
+ *         + IDictionary<string, object>  httpRequestMessage.Properties { get; } 
  *         + Uri          httpRequestMessage.RequestUri { get; set; } 
  *         + HttpMethod   httpRequestMessage.Method { get; set; } 
  *         + Version      httpRequestMessage.Version { get; set; } 
  *         + HttpContent  httpRequestMessage.Content { get; set; } 
- *         + IDictionary<string, object>  httpRequestMessage.Properties { get; } 
  *         + string ToString() 
  *         + void Dispose() 
  *         # void Dispose(bool disposing) 
@@ -151,18 +160,18 @@
  *         + HttpResponseHeaders  httpResponseMessage.Headers { get; } 
  *         + HttpStatusCode       httpResponseMessage.StatusCode { get; set; } 
  *         + bool                 httpResponseMessage.IsSuccessStatusCode { get; } 
+ *         + string               httpResponseMessage.ReasonPhrase { get; set; }    StatusCodeの文字列
  *         + Version              httpResponseMessage.Version { get; set; } 
  *         + HttpContent          httpResponseMessage.Content { get; set; } 
- *         + string               httpResponseMessage.ReasonPhrase { get; set; } 
  *         + HttpRequestMessage   httpResponseMessage.RequestMessage { get; set; } 
- *             └ class HttpRequestMessage 〔below〕
+ *             └ class HttpRequestMessage 〔above〕
  *             
  *         + HttpResponseMessage  httpResponseMessage.EnsureSuccessStatusCode() 
- *             └ this
+ *             └ 〔this〕
  *         + string  httpResponseMessage.ToString() 
  *         + void  httpResponseMessage.Dispose() 
  *         # void  httpResponseMessage.Dispose(bool disposing) 
- *
+ *         
  *@subject ◆enum HttpStatusCode
  *          {
  *             Continue = 100,
@@ -214,6 +223,37 @@
  *             HttpVersionNotSupported = 505,
  *          }
  *          
+ *@subject ◆class HttpMethod : IEquatable<HttpMethod>
+ *                          -- System.Net.Http
+ *         + HttpMethod  new HttpMethod(string method) 
+ *         + static HttpMethod  HttpMethod.Get { get; } 
+ *         + static HttpMethod  HttpMethod.Post { get; } 
+ *         + static HttpMethod  HttpMethod.Put { get; } 
+ *         + static HttpMethod  HttpMethod.Delete { get; } 
+ *         + static HttpMethod  HttpMethod.Head { get; } 
+ *         + static HttpMethod  HttpMethod.Trace { get; } 
+ *         + static HttpMethod  HttpMethod.Options { get; } 
+ *         + string             httpMethod.Method { get; } 
+ *
+ *@subject ◆abstract class HttpContent : IDisposable
+ *                           -- System.Net.Http
+ *         # HttpContent  HttpContent() 
+ *         [×] 'new' is not available, but 'base()' is OK from constructor of inherited class ONLY.
+ *         
+ *         + HttpContentHeaders  httpContent.Headers { get; } 
+ *         + Task<string>  httpContent.ReadAsStringAsync() 
+ *         + Task<byte[]>  httpContent.ReadAsByteArrayAsync() 
+ *         + Task<Stream>  httpContent.ReadAsStreamAsync() 
+ *         # Task<Stream>  httpContent.CreateContentReadStreamAsync() 
+ *         + Task          httpContent.LoadIntoBufferAsync() 
+ *         + Task          httpContent.LoadIntoBufferAsync(long maxBufferSize) 
+ *         + Task          httpContent.CopyToAsync(Stream stream) 
+ *         + Task          httpContent.CopyToAsync(Stream stream, TransportContext context) 
+ *         # abstract Task httpContent.SerializeToStreamAsync(Stream stream, TransportContext context) 
+ *         # internal abstract bool  httpContent.TryComputeLength(out long length) 
+ *         + void  httpContent.Dispose() 
+ *         # void  httpContent.Dispose(bool disposing) 
+ *          
  *@subject ◆abstract class HttpHeaders : IEnumerable<KeyValuePair<string, IEnumerable<string>>>, IEnumerable
  *                           -- System.Net.Http.Headers
  *         # HttpHeaders  HttpHeaders() 
@@ -253,22 +293,22 @@
  *         
  *         + HttpHeaderValueCollection<string>
  *                  httpRequestHeaders.Connection { get; } 
+ *         + HttpHeaderValueCollection<ViaHeaderValue>
+ *                  httpRequestHeaders.Via { get; } 
+ *         + HttpHeaderValueCollection<ProductInfoHeaderValue>
+ *                  httpRequestHeaders.UserAgent { get; } 
+ *         + HttpHeaderValueCollection<TransferCodingHeaderValue>
+ *                  httpRequestHeaders.TransferEncoding { get; } 
  *         + HttpHeaderValueCollection<string>  
  *                  httpRequestHeaders.Trailer { get; } 
  *         + HttpHeaderValueCollection <MediaTypeWithQualityHeaderValue>  
  *                  httpRequestHeaders.Accept { get; } 
  *         + HttpHeaderValueCollection<ProductHeaderValue>  
  *                  httpRequestHeaders.Upgrade { get; }
- *         + HttpHeaderValueCollection<ProductInfoHeaderValue>
- *                  httpRequestHeaders.UserAgent { get; } 
  *         + HttpHeaderValueCollection<NameValueHeaderValue>
  *                  httpRequestHeaders.Pragma { get; } 
- *         + HttpHeaderValueCollection<TransferCodingHeaderValue>
- *                  httpRequestHeaders.TransferEncoding { get; } 
  *         + HttpHeaderValueCollection<TransferCodingWithQualityHeaderValue>
  *                  httpRequestHeaders.TE { get; } 
- *         + HttpHeaderValueCollection<ViaHeaderValue>
- *                  httpRequestHeaders.Via { get; } 
  *         + HttpHeaderValueCollection<EntityTagHeaderValue>
  *                 httpRequestHeaders.IfNoneMatch { get; } 
  *         + HttpHeaderValueCollection<EntityTagHeaderValue> 
@@ -283,160 +323,69 @@
  *                 httpRequestHeaders.AcceptCharset { get; } 
  *         + HttpHeaderValueCollection<WarningHeaderValue> 
  *                 httpRequestHeaders.Warning { get; } 
+ *                 
+ *@subject ◆sealed class HttpResponseHeaders : HttpHeaders
+ *                                   -- System.Net.Http.Headers
+ *         + Uri                        httpResponseHeaders.Location { get; set; } 
+ *         + bool?                      httpResponseHeaders.TransferEncodingChunked { get; set; } 
+ *         + bool?                      httpResponseHeaders.ConnectionClose { get; set; } 
+ *         + DateTimeOffset?            httpResponseHeaders.Date { get; set; } 
+ *         + TimeSpan?                  httpResponseHeaders.Age { get; set; } 
+ *         + EntityTagHeaderValue       httpResponseHeaders.ETag { get; set; } 
+ *         + CacheControlHeaderValue    httpResponseHeaders.CacheControl { get; set; } 
+ *         + RetryConditionHeaderValue  httpResponseHeaders.RetryAfter { get; set; } 
  *         
- *@subject ◆abstract class HttpContent : IDisposable
- *                           -- System.Net.Http
- *         # HttpContent  HttpContent() 
- *         [×] 'new' is not available, but 'base()' is OK from constructor of inherited class ONLY.
- *         
- *         + HttpContentHeaders  httpContent.Headers { get; } 
- *         + Task          httpContent.LoadIntoBufferAsync() 
- *         + Task          httpContent.LoadIntoBufferAsync(long maxBufferSize) 
- *         + Task          httpContent.CopyToAsync(Stream stream) 
- *         + Task          httpContent.CopyToAsync(Stream stream, TransportContext context) 
- *         + Task<byte[]>  httpContent.ReadAsByteArrayAsync() 
- *         + Task<string>  httpContent.ReadAsStringAsync() 
- *         + Task<Stream>  httpContent.ReadAsStreamAsync() 
- *         # Task<Stream>  httpContent.CreateContentReadStreamAsync() 
- *         # abstract Task httpContent.SerializeToStreamAsync(Stream stream, TransportContext context) 
- *         # internal abstract bool  httpContent.TryComputeLength(out long length) 
- *         + void  httpContent.Dispose() 
- *         # void  httpContent.Dispose(bool disposing) 
+ *         + HttpHeaderValueCollection<ProductInfoHeaderValue>
+ *              httpResponseHeaders.Server { get; } 
+ *         + HttpHeaderValueCollection<string>
+ *              httpResponseHeaders.Connection { get; } 
+ *         + HttpHeaderValueCollection<ViaHeaderValue> 
+ *              httpResponseHeaders.Via { get; } 
+ *         + HttpHeaderValueCollection<TransferCodingHeaderValue> 
+ *              httpResponseHeaders.TransferEncoding { get; } 
+ *         + HttpHeaderValueCollection<string>  
+ *              httpResponseHeaders.AcceptRanges { get; } 
+ *         + HttpHeaderValueCollection<ProductHeaderValue>
+ *              httpResponseHeaders.Upgrade { get; } 
+ *         + HttpHeaderValueCollection<string>
+ *              httpResponseHeaders.Trailer { get; } 
+ *         + HttpHeaderValueCollection<NameValueHeaderValue> 
+ *              httpResponseHeaders.Pragma { get; } 
+ *         + HttpHeaderValueCollection<AuthenticationHeaderValue>
+ *              httpResponseHeaders.WwwAuthenticate { get; } 
+ *         + HttpHeaderValueCollection<string> 
+ *              httpResponseHeaders.Vary { get; } 
+ *         + HttpHeaderValueCollection<AuthenticationHeaderValue>
+ *              httpResponseHeaders.ProxyAuthenticate { get; } 
+ *         + HttpHeaderValueCollection<WarningHeaderValue>
+ *              httpResponseHeaders.Warning { get; } 
  *
- *@subject ◆class WebClient : Component  -- System.Net
- *         + WebClient  new WebClient() 
- *         
- *         ＊Property
- *         + string               webClient.BaseAddress { get; set; } 
- *         + WebHeaderCollection  webClient.Headers { get; set; } 
- *         + WebHeaderCollection  webClient.ResponseHeaders { get; } 
- *         + NameValueCollection  webClient.QueryString { get; set; } 
- *         + Encoding             webClient.Encoding { get; set; } 
- *         + IWebProxy            webClient.Proxy { get; set; } 
- *         + RequestCachePolicy   webClient.CachePolicy { get; set; } 
- *         + ICredentials         webClient.Credentials { get; set; } 
- *         + bool                 webClient.UseDefaultCredentials { get; set; } 
- *         + bool                 webClient.IsBusy { get; } 
- *         + bool                 webClient.AllowReadStreamBuffering { get; set; } 
- *         + bool                 webClient.AllowWriteStreamBuffering { get; set; } 
- *         
- *         ＊Method
- *         + Stream  webClient.OpenRead(Uri address) 
- *         + Stream  webClient.OpenRead(string address) 
- *         + Stream  webClient.OpenWrite(string address) 
- *         + Stream  webClient.OpenWrite(string address, string method) 
- *         + Stream  webClient.OpenWrite(Uri address, string method) 
- *         + Stream  webClient.OpenWrite(Uri address) 
- *         
- *         + string  webClient.DownloadString(string address) 
- *         + string  webClient.DownloadString(Uri address) 
- *         + byte[]  webClient.DownloadData(string address) 
- *         + byte[]  webClient.DownloadData(Uri address) 
- *         + void    webClient.DownloadFile(string address, string fileName) 
- *         + void    webClient.DownloadFile(Uri address, string fileName) 
+ *@subject ◆sealed class HttpContentHeaders : HttpHeaders
+ *                                  -- System.Net.Http.Headers
+ *         + Uri                   httpContentHeaders.ContentLocation { get; set; } 
+ *         + long?                 httpContentHeaders.ContentLength { get; set; } 
+ *         + MediaTypeHeaderValue  httpContentHeaders.ContentType { get; set; } 
+ *         + ICollection<string>   httpContentHeaders.ContentEncoding { get; } 
+ *         + ICollection<string>   httpContentHeaders.ContentLanguage { get; } 
+ *         + byte[]                httpContentHeaders.ContentMD5 { get; set; } 
+ *         + ContentRangeHeaderValue        httpContentHeaders.ContentRange { get; set; } 
+ *         + ContentDispositionHeaderValue  httpContentHeaders.ContentDisposition { get; set; } 
+ *         + ICollection<string>   httpContentHeaders.Allow { get; } 
+ *         + DateTimeOffset?       httpContentHeaders.Expires { get; set; } 
+ *         + DateTimeOffset?       httpContentHeaders.LastModified { get; set; } 
  *
- *         + string  webClient.UploadString(string address, string data) 
- *         + string  webClient.UploadString(Uri address, string data) 
- *         + string  webClient.UploadString(string address, string method, string data) 
- *         + string  webClient.UploadString(Uri address, string method, string data) 
- *         + byte[]  webClient.UploadValues(string address, NameValueCollection data) 
- *         + byte[]  webClient.UploadValues(string address, string method, NameValueCollection data) 
- *         + byte[]  webClient.UploadValues(Uri address, NameValueCollection data) 
- *         + byte[]  webClient.UploadValues(Uri address, string method, NameValueCollection data) 
- *         + byte[]  webClient.UploadData(string address, string method, byte[] data) 
- *         + byte[]  webClient.UploadData(string address, byte[] data) 
- *         + byte[]  webClient.UploadData(Uri address, string method, byte[] data) 
- *         + byte[]  webClient.UploadData(Uri address, byte[] data) 
- *         + byte[]  webClient.UploadFile(string address, string method, string fileName) 
- *         + byte[]  webClient.UploadFile(Uri address, string method, string fileName) 
- *         + byte[]  webClient.UploadFile(string address, string fileName) 
- *         + byte[]  webClient.UploadFile(Uri address, string fileName)
- *         
- *         # WebRequest   webClient.GetWebRequest(Uri address) 
- *         # WebResponse  webClient.GetWebResponse(WebRequest request) 
- *         # WebResponse  webClient.GetWebResponse(WebRequest request, IAsyncResult result) 
- *         
- *         ＊Async Method
- *         + void          webClient.OpenReadAsync(Uri address) 
- *         + void          webClient.OpenReadAsync(Uri address, object userToken) 
- *         + Task<Stream>  webClient.OpenReadTaskAsync(string address) 
- *         + Task<Stream>  webClient.OpenReadTaskAsync(Uri address) 
- *         + void          webClient.OpenWriteAsync(Uri address) 
- *         + void          webClient.OpenWriteAsync(Uri address, string method) 
- *         + void          webClient.OpenWriteAsync(Uri address, string method, object userToken) 
- *         + Task<Stream>  webClient.OpenWriteTaskAsync(string address) 
- *         + Task<Stream>  webClient.OpenWriteTaskAsync(string address, string method)
- *         + Task<Stream>  webClient.OpenWriteTaskAsync(Uri address) 
- *         + Task<Stream>  webClient.OpenWriteTaskAsync(Uri address, string method) 
- *         
- *         + void          webClient.DownloadStringAsync(Uri address) 
- *         + void          webClient.DownloadStringAsync(Uri address, object userToken) 
- *         + Task<string>  webClient.DownloadStringTaskAsync(string address) 
- *         + Task<string>  webClient.DownloadStringTaskAsync(Uri address) 
- *         + void          webClient.DownloadDataAsync(Uri address) 
- *         + void          webClient.DownloadDataAsync(Uri address, object userToken) 
- *         + Task<byte[]>  webClient.DownloadDataTaskAsync(string address) 
- *         + Task<byte[]>  webClient.DownloadDataTaskAsync(Uri address) 
- *         + void          webClient.DownloadFileAsync(Uri address, string fileName) 
- *         + void          webClient.DownloadFileAsync(Uri address, string fileName, object userToken) 
- *         + Task          webClient.DownloadFileTaskAsync(string address, string fileName) 
- *         + Task          webClient.DownloadFileTaskAsync(Uri address, string fileName) 
- *         
- *         + void          webClient.UploadStringAsync(Uri address, string data) 
- *         + void          webClient.UploadStringAsync(Uri address, string method, string data) 
- *         + void          webClient.UploadStringAsync(Uri address, string method, string data, object userToken) 
- *         + Task<string>  webClient.UploadStringTaskAsync(string address, string data) 
- *         + Task<string>  webClient.UploadStringTaskAsync(string address, string method, string data) 
- *         + Task<string>  webClient.UploadStringTaskAsync(Uri address, string data) 
- *         + Task<string>  webClient.UploadStringTaskAsync(Uri address, string method, string data)
- *         + void          webClient.UploadValuesAsync(Uri address, NameValueCollection data) 
- *         + void          webClient.UploadValuesAsync(Uri address, string method, NameValueCollection data) 
- *         + void          webClient.UploadValuesAsync(Uri address, string method, NameValueCollection data, object userToken) 
- *         + Task<byte[]>  webClient.UploadValuesTaskAsync(string address, NameValueCollection data) 
- *         + Task<byte[]>  webClient.UploadValuesTaskAsync(string address, string method, NameValueCollection data) 
- *         + Task<byte[]>  webClient.UploadValuesTaskAsync(Uri address, NameValueCollection data) 
- *         + Task<byte[]>  webClient.UploadValuesTaskAsync(Uri address, string method, NameValueCollection data) 
- *         + void          webClient.UploadDataAsync(Uri address, byte[] data) 
- *         + void          webClient.UploadDataAsync(Uri address, string method, byte[] data) 
- *         + void          webClient.UploadDataAsync(Uri address, string method, byte[] data, object userToken) 
- *         + Task<byte[]>  webClient.UploadDataTaskAsync(string address, byte[] data) 
- *         + Task<byte[]>  webClient.UploadDataTaskAsync(string address, string method, byte[] data) 
- *         + Task<byte[]>  webClient.UploadDataTaskAsync(Uri address, byte[] data) 
- *         + Task<byte[]>  webClient.UploadDataTaskAsync(Uri address, string method, byte[] data) 
- *         + void          webClient.UploadFileAsync(Uri address, string fileName) 
- *         + void          webClient.UploadFileAsync(Uri address, string method, string fileName) 
- *         + void          webClient.UploadFileAsync(Uri address, string method, string fileName, object userToken) 
- *         + Task<byte[]>  webClient.UploadFileTaskAsync(string address, string fileName) 
- *         + Task<byte[]>  webClient.UploadFileTaskAsync(string address, string method, string fileName) 
- *         + Task<byte[]>  webClient.UploadFileTaskAsync(Uri address, string fileName) 
- *         + Task<byte[]>  webClient.UploadFileTaskAsync(Uri address, string method, string fileName)
- *         + void          webClient.CancelAsync() 
- *         
- *         ＊Event 
- *         + event OpenReadCompletedEventHandler        webClient.OpenReadCompleted 
- *         + event OpenWriteCompletedEventHandler       webClient.OpenWriteCompleted 
- *         + event WriteStreamClosedEventHandler        webClient.WriteStreamClosed 
- *         + event DownloadStringCompletedEventHandler  webClient.DownloadStringCompleted 
- *         + event DownloadDataCompletedEventHandler    webClient.DownloadDataCompleted 
- *         + event DownloadProgressChangedEventHandler  webClient.DownloadProgressChanged 
- *         + event UploadStringCompletedEventHandler    webClient.UploadStringCompleted 
- *         + event UploadValuesCompletedEventHandler    webClient.UploadValuesCompleted 
- *         + event UploadDataCompletedEventHandler      webClient.UploadDataCompleted 
- *         + event UploadFileCompletedEventHandler      webClient.UploadFileCompleted 
- *         + event UploadProgressChangedEventHandler    webClient.UploadProgressChanged 
- *         + event AsyncCompletedEventHandler           webClient.DownloadFileCompleted 
  */
 #endregion
 /*
  *@see ImageHttpClientSample.jpg
- *@see 
+ *@see MainWebClientSample.cs
  *@author shika
  *@date 2022-11-10
  */
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Windows.Forms;
@@ -542,14 +491,17 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR15_Network
 
         private async void Button_Click(object sender, EventArgs e)
         {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
             var client = new HttpClient();
+            var bld = new StringBuilder();
             
             try
             {
                 using (Stream stream = await client.GetStreamAsync(textBoxUrl.Text))
                 using (StreamReader reader = new StreamReader(stream))
                 {
-                    StringBuilder bld = new StringBuilder();
                     while (!reader.EndOfStream) 
                     {
                         bld.Append(reader.ReadLine());
@@ -559,7 +511,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR15_Network
                     textBoxBody.Text = bld.ToString();
 
                     reader.Close();
-                    stream.Dispose();
+                    stream.Close();
                 }//using
             }
             catch (Exception ex)
@@ -568,6 +520,13 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR15_Network
                     $"{ex.GetType()}:{Environment.NewLine}" +
                     $"{ex.Message}{Environment.NewLine}";
             }
+            finally
+            {
+                sw.Stop();
+            }
+
+            Console.WriteLine(
+                $"HttpClient Async: CostTime = {sw.ElapsedMilliseconds} milliSeconds");
         }//Button_Click()
     }//class
 }
