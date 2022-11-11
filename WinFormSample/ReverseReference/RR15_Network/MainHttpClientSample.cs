@@ -7,10 +7,48 @@
  *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
  *          
- *@content RR[425]-[426] p719 / HttpClientSample
+ *@content RR[425]-[426] p719 / HttpClient
+ *         ・using() で利用すべきではない。Dispose()しない。
+ *           https://qiita.com/superriver/items/91781bca04a76aec7dc0
+ *           => 〔Article_HttpClient_DontUseUsingDispose.txt〕
+ *           
+ *           MSDN: HttpClientは、1回インスタンス化し、
+ *           アプリケーションの有効期間全体に再利用することを目的としています。
+ *           すべての要求に対して HttpClient クラスをインスタンス化すると、
+ *           大量の読み込みで使用可能な Socket の数が枯渇します。
+ *           これにより、SocketException エラーが発生します。
+ *           
+ *         ・It connect to Web page and read HTML source.
+ *         
+ *         ・async - await: asynchronous
+ *             While it try to be connecting, UI event can be accepted.
  *
+ *         ・WebClient   syncronous and asynchronous
+ *           HttpClient  asynchronous ?
+ *           => 〔Article_HttpClient_WebClient.txt〕
+ *               Notation:
+ *               The Article said the oppsite conclusion to above.
+ *               But I watched these APIs in Visual Studio Reference〔as below〕, 
+ *               HttpClient has only asynchronous Method.
+ *               
+ *               It is interesting that:
+ *               The Article wrote each performances per milliseccons 
+ *               about WebCient synchronous and HttpClient synchronous, asynchronous.
+ *           
+ *@subject To read Web page
+ *         HttpCient  client = new HttpCient();
+ *         
+ *         ＊synchronous
+ *         Task<Stream> streamTask = client.GetStreamAsync(string address);
+ *         TResult      Task<TResult>.Result
+ *         
+ *         ＊asynchronous
+ *         Stream stream = await client.GetStreamAsync(string address);
+ *         
+ *         ＊StreamReader
+ *         StreamReader reader = new StreamReader(Stream);
  */
-#region
+#region -> HttpClient, WebClient
 /*
  *@subject ◆class HttpClient : HttpMessageInvoker
  *                          -- System.Net.Http
@@ -71,6 +109,111 @@
  *         + void  httpClient.CancelPendingRequests() 
  *         # void  httpClient.Dispose(bool disposing) 
  *
+ *@subject ◆abstract class HttpMessageHandler : IDisposable
+ *                                  -- System.Net.Http
+ *         # HttpMessageHandler  new HttpMessageHandler() 
+ *         # abstract Task<HttpResponseMessage>  
+ *                 httpMessageHandler.SendAsync(HttpRequestMessage request, CancellationToken) 
+ *         + void  httpMessageHandler.Dispose() 
+ *         # void  httpMessageHandler.Dispose(bool disposing) 
+ *         
+ *@subject ◆class HttpMessageInvoker : IDisposable
+ *                                  -- System.Net.Http
+ *         + HttpMessageInvoker  new HttpMessageInvoker(HttpMessageHandler handler) 
+ *         + HttpMessageInvoker  new HttpMessageInvoker(HttpMessageHandler handler, bool disposeHandler) 
+ *         
+ *         + Task<HttpResponseMessage>  
+ *                 httpMessageInvoker.SendAsync(HttpRequestMessage request, CancellationToken) 
+ *         + void  httpMessageInvoker.Dispose() 
+ *         # void  httpMessageInvoker.Dispose(bool disposing) 
+ *
+ *@subject ◆class HttpRequestMessage : IDisposable
+ *                                  -- System.Net.Http
+ *         + HttpRequestMessage  new HttpRequestMessage() 
+ *         + HttpRequestMessage  new HttpRequestMessage(HttpMethod method, Uri requestUri) 
+ *         + HttpRequestMessage  new HttpRequestMessage(HttpMethod method, string requestUri) 
+ *         
+ *         + HttpRequestHeaders  httpRequestMessage.Headers { get; } 
+ *         + Uri          httpRequestMessage.RequestUri { get; set; } 
+ *         + HttpMethod   httpRequestMessage.Method { get; set; } 
+ *         + Version      httpRequestMessage.Version { get; set; } 
+ *         + HttpContent  httpRequestMessage.Content { get; set; } 
+ *         + IDictionary<string, object>  httpRequestMessage.Properties { get; } 
+ *         + string ToString() 
+ *         + void Dispose() 
+ *         # void Dispose(bool disposing) 
+ *
+ *@subject ◆class HttpResponseMessage : IDisposable
+ *                                   -- System.Net.Http
+ *         + HttpResponseMessage  new HttpResponseMessage() 
+ *         + HttpResponseMessage  new HttpResponseMessage(HttpStatusCode statusCode) 
+ *             └ enum HttpStatusCode 〔below〕
+ *         + HttpResponseHeaders  httpResponseMessage.Headers { get; } 
+ *         + HttpStatusCode       httpResponseMessage.StatusCode { get; set; } 
+ *         + bool                 httpResponseMessage.IsSuccessStatusCode { get; } 
+ *         + Version              httpResponseMessage.Version { get; set; } 
+ *         + HttpContent          httpResponseMessage.Content { get; set; } 
+ *         + string               httpResponseMessage.ReasonPhrase { get; set; } 
+ *         + HttpRequestMessage   httpResponseMessage.RequestMessage { get; set; } 
+ *             └ class HttpRequestMessage 〔below〕
+ *             
+ *         + HttpResponseMessage  httpResponseMessage.EnsureSuccessStatusCode() 
+ *             └ this
+ *         + string  httpResponseMessage.ToString() 
+ *         + void  httpResponseMessage.Dispose() 
+ *         # void  httpResponseMessage.Dispose(bool disposing) 
+ *
+ *@subject ◆enum HttpStatusCode
+ *          {
+ *             Continue = 100,
+ *             SwitchingProtocols = 101,
+ *             OK = 200,
+ *             Created = 201,
+ *             Accepted = 202,
+ *             NonAuthoritativeInformation = 203,
+ *             NoContent = 204,
+ *             ResetContent = 205,
+ *             PartialContent = 206,
+ *             MultipleChoices = 300,
+ *             Ambiguous = 300,
+ *             MovedPermanently = 301,
+ *             Moved = 301,
+ *             Found = 302,
+ *             Redirect = 302,
+ *             SeeOther = 303,
+ *             RedirectMethod = 303,
+ *             NotModified = 304,
+ *             UseProxy = 305,
+ *             Unused = 306,
+ *             TemporaryRedirect = 307,
+ *             RedirectKeepVerb = 307,
+ *             BadRequest = 400,
+ *             Unauthorized = 401,
+ *             PaymentRequired = 402,
+ *             Forbidden = 403,
+ *             NotFound = 404,
+ *             MethodNotAllowed = 405,
+ *             NotAcceptable = 406,
+ *             ProxyAuthenticationRequired = 407,
+ *             RequestTimeout = 408,
+ *             Conflict = 409,
+ *             Gone = 410,
+ *             LengthRequired = 411,
+ *             PreconditionFailed = 412,
+ *             RequestEntityTooLarge = 413,
+ *             RequestUriTooLong = 414,
+ *             UnsupportedMediaType = 415,
+ *             RequestedRangeNotSatisfiable = 416,
+ *             ExpectationFailed = 417,
+ *             UpgradeRequired = 426,
+ *             InternalServerError = 500,
+ *             NotImplemented = 501,
+ *             BadGateway = 502,
+ *             ServiceUnavailable = 503,
+ *             GatewayTimeout = 504,
+ *             HttpVersionNotSupported = 505,
+ *          }
+ *          
  *@subject ◆abstract class HttpHeaders : IEnumerable<KeyValuePair<string, IEnumerable<string>>>, IEnumerable
  *                           -- System.Net.Http.Headers
  *         # HttpHeaders  HttpHeaders() 
@@ -90,109 +233,6 @@
  *         + void  httpHeaders.Clear() 
  *         + string  httpHeaders.ToString() 
  *         
- *@subject ◆abstract class HttpMessageHandler : IDisposable
- *                                  -- System.Net.Http
- *         # HttpMessageHandler  new HttpMessageHandler() 
- *         # abstract Task<HttpResponseMessage>  
- *                 httpMessageHandler.SendAsync(HttpRequestMessage request, CancellationToken) 
- *         + void  httpMessageHandler.Dispose() 
- *         # void  httpMessageHandler.Dispose(bool disposing) 
- *         
- *@subject ◆class HttpMessageInvoker : IDisposable
- *                                  -- System.Net.Http
- *         + HttpMessageInvoker  new HttpMessageInvoker(HttpMessageHandler handler) 
- *         + HttpMessageInvoker  new HttpMessageInvoker(HttpMessageHandler handler, bool disposeHandler) 
- *         
- *         + Task<HttpResponseMessage>  
- *                 httpMessageInvoker.SendAsync(HttpRequestMessage request, CancellationToken) 
- *         + void  httpMessageInvoker.Dispose() 
- *         # void  httpMessageInvoker.Dispose(bool disposing) 
- *         
- *@subject ◆class HttpResponseMessage : IDisposable
- *                                   -- System.Net.Http
- *         + HttpResponseMessage  new HttpResponseMessage() 
- *         + HttpResponseMessage  new HttpResponseMessage(HttpStatusCode statusCode) 
- *             └ enum HttpStatusCode
- *               {
- *                   Continue = 100,
- *                   SwitchingProtocols = 101,
- *                   OK = 200,
- *                   Created = 201,
- *                   Accepted = 202,
- *                   NonAuthoritativeInformation = 203,
- *                   NoContent = 204,
- *                   ResetContent = 205,
- *                   PartialContent = 206,
- *                   MultipleChoices = 300,
- *                   Ambiguous = 300,
- *                   MovedPermanently = 301,
- *                   Moved = 301,
- *                   Found = 302,
- *                   Redirect = 302,
- *                   SeeOther = 303,
- *                   RedirectMethod = 303,
- *                   NotModified = 304,
- *                   UseProxy = 305,
- *                   Unused = 306,
- *                   TemporaryRedirect = 307,
- *                   RedirectKeepVerb = 307,
- *                   BadRequest = 400,
- *                   Unauthorized = 401,
- *                   PaymentRequired = 402,
- *                   Forbidden = 403,
- *                   NotFound = 404,
- *                   MethodNotAllowed = 405,
- *                   NotAcceptable = 406,
- *                   ProxyAuthenticationRequired = 407,
- *                   RequestTimeout = 408,
- *                   Conflict = 409,
- *                   Gone = 410,
- *                   LengthRequired = 411,
- *                   PreconditionFailed = 412,
- *                   RequestEntityTooLarge = 413,
- *                   RequestUriTooLong = 414,
- *                   UnsupportedMediaType = 415,
- *                   RequestedRangeNotSatisfiable = 416,
- *                   ExpectationFailed = 417,
- *                   UpgradeRequired = 426,
- *                   InternalServerError = 500,
- *                   NotImplemented = 501,
- *                   BadGateway = 502,
- *                   ServiceUnavailable = 503,
- *                   GatewayTimeout = 504,
- *                   HttpVersionNotSupported = 505,
- *               }
- *
- *         + HttpResponseHeaders  httpResponseMessage.Headers { get; } 
- *         + HttpStatusCode       httpResponseMessage.StatusCode { get; set; } 
- *         + bool                 httpResponseMessage.IsSuccessStatusCode { get; } 
- *         + Version              httpResponseMessage.Version { get; set; } 
- *         + HttpContent          httpResponseMessage.Content { get; set; } 
- *         + string               httpResponseMessage.ReasonPhrase { get; set; } 
- *         + HttpRequestMessage   httpResponseMessage.RequestMessage { get; set; } 
- *             └ class HttpRequestMessage 〔below〕
- *             
- *         + HttpResponseMessage  httpResponseMessage.EnsureSuccessStatusCode() 
- *         + string  httpResponseMessage.ToString() 
- *         + void  httpResponseMessage.Dispose() 
- *         # void  httpResponseMessage.Dispose(bool disposing) 
- *
- *@subject ◆class HttpRequestMessage : IDisposable
- *                                  -- System.Net.Http
- *         + HttpRequestMessage  new HttpRequestMessage() 
- *         + HttpRequestMessage  new HttpRequestMessage(HttpMethod method, Uri requestUri) 
- *         + HttpRequestMessage  new HttpRequestMessage(HttpMethod method, string requestUri) 
- *         
- *         + Version      httpRequestMessage.Version { get; set; } 
- *         + HttpContent  httpRequestMessage.Content { get; set; } 
- *         + HttpMethod   httpRequestMessage.Method { get; set; } 
- *         + Uri          httpRequestMessage.RequestUri { get; set; } 
- *         + HttpRequestHeaders  httpRequestMessage.Headers { get; } 
- *         + IDictionary<string, object>  httpRequestMessage.Properties { get; } 
- *         + string ToString() 
- *         + void Dispose() 
- *         # void Dispose(bool disposing) 
- *
  *@subject ◆sealed class HttpRequestHeaders : HttpHeaders
  *                                  -- System.Net.Http.Headers
  *         + string  httpRequestHeaders.Host { get; set; } 
@@ -202,36 +242,47 @@
  *         + bool?   httpRequestHeaders.ConnectionClose { get; set; }
  *         + bool?   httpRequestHeaders.ExpectContinue { get; set; } 
  *         + int?    httpRequestHeaders.MaxForwards { get; set; } 
+ *         + DateTimeOffset?  httpRequestHeaders.Date { get; set; } 
+ *         + DateTimeOffset?  httpRequestHeaders.IfUnmodifiedSince { get; set; } 
+ *         + DateTimeOffset?  httpRequestHeaders.IfModifiedSince { get; set; } 
+ *         + RangeHeaderValue           httpRequestHeaders.Range { get; set; } 
+ *         + RangeConditionHeaderValue  httpRequestHeaders.IfRange { get; set; } 
+ *         + AuthenticationHeaderValue  httpRequestHeaders.Authorization { get; set; } 
+ *         + AuthenticationHeaderValue  httpRequestHeaders.ProxyAuthorization { get; set; } 
+ *         + CacheControlHeaderValue    httpRequestHeaders.CacheControl { get; set; } 
+ *         
+ *         + HttpHeaderValueCollection<string>
+ *                  httpRequestHeaders.Connection { get; } 
+ *         + HttpHeaderValueCollection<string>  
+ *                  httpRequestHeaders.Trailer { get; } 
  *         + HttpHeaderValueCollection <MediaTypeWithQualityHeaderValue>  
  *                  httpRequestHeaders.Accept { get; } 
  *         + HttpHeaderValueCollection<ProductHeaderValue>  
  *                  httpRequestHeaders.Upgrade { get; }
- *         + HttpHeaderValueCollection<TransferCodingHeaderValue>
- *                  httpRequestHeaders.TransferEncoding { get; } 
- *         + HttpHeaderValueCollection<string>  
- *                  httpRequestHeaders.Trailer { get; } 
+ *         + HttpHeaderValueCollection<ProductInfoHeaderValue>
+ *                  httpRequestHeaders.UserAgent { get; } 
  *         + HttpHeaderValueCollection<NameValueHeaderValue>
  *                  httpRequestHeaders.Pragma { get; } 
- *         + DateTimeOffset?  httpRequestHeaders.Date { get; set; } 
- *         + HttpHeaderValueCollection<string>
- *                  httpRequestHeaders.Connection { get; } 
- *         + CacheControlHeaderValue  httpRequestHeaders.CacheControl { get; set; } 
- *         + HttpHeaderValueCollection<ProductInfoHeaderValue>  httpRequestHeaders.UserAgent { get; } 
- *         + HttpHeaderValueCollection<TransferCodingWithQualityHeaderValue>  httpRequestHeaders.TE { get; } 
- *         + RangeHeaderValue  httpRequestHeaders.Range { get; set; } 
- *         + HttpHeaderValueCollection<ViaHeaderValue>  httpRequestHeaders.Via { get; } 
- *         + AuthenticationHeaderValue  httpRequestHeaders.ProxyAuthorization { get; set; } 
- *         + DateTimeOffset?  httpRequestHeaders.IfUnmodifiedSince { get; set; } 
- *         + RangeConditionHeaderValue  httpRequestHeaders.IfRange { get; set; } 
- *         + HttpHeaderValueCollection<EntityTagHeaderValue>  httpRequestHeaders.IfNoneMatch { get; } 
- *         + DateTimeOffset?  httpRequestHeaders.IfModifiedSince { get; set; } 
- *         + HttpHeaderValueCollection<EntityTagHeaderValue>  httpRequestHeaders.IfMatch { get; } 
- *         + HttpHeaderValueCollection<NameValueWithParametersHeaderValue>  httpRequestHeaders.Expect { get; } 
- *         + AuthenticationHeaderValue  httpRequestHeaders.Authorization { get; set; } 
- *         + HttpHeaderValueCollection<StringWithQualityHeaderValue>  httpRequestHeaders.AcceptLanguage { get; } 
- *         + HttpHeaderValueCollection<StringWithQualityHeaderValue>  httpRequestHeaders.AcceptEncoding { get; } 
- *         + HttpHeaderValueCollection<StringWithQualityHeaderValue>  httpRequestHeaders.AcceptCharset { get; } 
- *         + HttpHeaderValueCollection<WarningHeaderValue>  httpRequestHeaders.Warning { get; } 
+ *         + HttpHeaderValueCollection<TransferCodingHeaderValue>
+ *                  httpRequestHeaders.TransferEncoding { get; } 
+ *         + HttpHeaderValueCollection<TransferCodingWithQualityHeaderValue>
+ *                  httpRequestHeaders.TE { get; } 
+ *         + HttpHeaderValueCollection<ViaHeaderValue>
+ *                  httpRequestHeaders.Via { get; } 
+ *         + HttpHeaderValueCollection<EntityTagHeaderValue>
+ *                 httpRequestHeaders.IfNoneMatch { get; } 
+ *         + HttpHeaderValueCollection<EntityTagHeaderValue> 
+ *                 httpRequestHeaders.IfMatch { get; } 
+ *         + HttpHeaderValueCollection<NameValueWithParametersHeaderValue>
+ *                 httpRequestHeaders.Expect { get; } 
+ *         + HttpHeaderValueCollection<StringWithQualityHeaderValue>
+ *                 httpRequestHeaders.AcceptLanguage { get; } 
+ *         + HttpHeaderValueCollection<StringWithQualityHeaderValue>
+ *                 httpRequestHeaders.AcceptEncoding { get; } 
+ *         + HttpHeaderValueCollection<StringWithQualityHeaderValue>
+ *                 httpRequestHeaders.AcceptCharset { get; } 
+ *         + HttpHeaderValueCollection<WarningHeaderValue> 
+ *                 httpRequestHeaders.Warning { get; } 
  *         
  *@subject ◆abstract class HttpContent : IDisposable
  *                           -- System.Net.Http
@@ -239,142 +290,141 @@
  *         [×] 'new' is not available, but 'base()' is OK from constructor of inherited class ONLY.
  *         
  *         + HttpContentHeaders  httpContent.Headers { get; } 
- *         + Task  httpContent.CopyToAsync(Stream stream, TransportContext context) 
- *         + Task  httpContent.CopyToAsync(Stream stream) 
- *         + void  httpContent.Dispose() 
- *         + Task  httpContent.LoadIntoBufferAsync() 
- *         + Task  httpContent.LoadIntoBufferAsync(long maxBufferSize) 
+ *         + Task          httpContent.LoadIntoBufferAsync() 
+ *         + Task          httpContent.LoadIntoBufferAsync(long maxBufferSize) 
+ *         + Task          httpContent.CopyToAsync(Stream stream) 
+ *         + Task          httpContent.CopyToAsync(Stream stream, TransportContext context) 
  *         + Task<byte[]>  httpContent.ReadAsByteArrayAsync() 
- *         + Task<Stream>  httpContent.ReadAsStreamAsync() 
  *         + Task<string>  httpContent.ReadAsStringAsync() 
+ *         + Task<Stream>  httpContent.ReadAsStreamAsync() 
  *         # Task<Stream>  httpContent.CreateContentReadStreamAsync() 
- *         # void  httpContent.Dispose(bool disposing) 
- *         # abstract Task  httpContent.SerializeToStreamAsync(Stream stream, TransportContext context) 
+ *         # abstract Task httpContent.SerializeToStreamAsync(Stream stream, TransportContext context) 
  *         # internal abstract bool  httpContent.TryComputeLength(out long length) 
+ *         + void  httpContent.Dispose() 
+ *         # void  httpContent.Dispose(bool disposing) 
  *
- *@subject ◆class WebClient : Component
- *                         -- System.Net
+ *@subject ◆class WebClient : Component  -- System.Net
  *         + WebClient  new WebClient() 
- *         + bool  webClient.AllowWriteStreamBuffering { get; set; } 
- *         + Encoding  webClient.Encoding { get; set; } 
- *         + string  webClient.BaseAddress { get; set; } 
- *         + ICredentials  webClient.Credentials { get; set; } 
- *         + bool  webClient.UseDefaultCredentials { get; set; } 
+ *         
+ *         ＊Property
+ *         + string               webClient.BaseAddress { get; set; } 
  *         + WebHeaderCollection  webClient.Headers { get; set; } 
- *         + NameValueCollection  webClient.QueryString { get; set; } 
  *         + WebHeaderCollection  webClient.ResponseHeaders { get; } 
- *         + IWebProxy  webClient.Proxy { get; set; } 
- *         + RequestCachePolicy  webClient.CachePolicy { get; set; } 
- *         + bool  webClient.IsBusy { get; } 
- *         + bool  webClient.AllowReadStreamBuffering { get; set; } 
- *         + event WriteStreamClosedEventHandler  webClient.WriteStreamClosed 
- *         + event OpenReadCompletedEventHandler  webClient.OpenReadCompleted 
- *         + event OpenWriteCompletedEventHandler  webClient.OpenWriteCompleted 
- *         + event DownloadStringCompletedEventHandler  webClient.DownloadStringCompleted 
- *         + event DownloadDataCompletedEventHandler  webClient.DownloadDataCompleted 
- *         + event AsyncCompletedEventHandler  webClient.DownloadFileCompleted 
- *         + event UploadStringCompletedEventHandler  webClient.UploadStringCompleted 
- *         + event UploadDataCompletedEventHandler  webClient.UploadDataCompleted 
- *         + event UploadFileCompletedEventHandler  webClient.UploadFileCompleted 
- *         + event UploadValuesCompletedEventHandler  webClient.UploadValuesCompleted 
- *         + event DownloadProgressChangedEventHandler  webClient.DownloadProgressChanged 
- *         + event UploadProgressChangedEventHandler  webClient.UploadProgressChanged 
- *         + void  webClient.CancelAsync() 
- *         + byte[]  webClient.DownloadData(string address) 
- *         + byte[]  webClient.DownloadData(Uri address) 
- *         + void  webClient.DownloadDataAsync(Uri address, object userToken) 
- *         + void  webClient.DownloadDataAsync(Uri address) 
- *         + Task<byte[]>  webClient.DownloadDataTaskAsync(string address) 
- *         + Task<byte[]>  webClient.DownloadDataTaskAsync(Uri address) 
- *         + void  webClient.DownloadFile(string address, string fileName) 
- *         + void  webClient.DownloadFile(Uri address, string fileName) 
- *         + void  webClient.DownloadFileAsync(Uri address, string fileName, object userToken) 
- *         + void  webClient.DownloadFileAsync(Uri address, string fileName) 
- *         + Task  webClient.DownloadFileTaskAsync(string address, string fileName) 
- *         + Task  webClient.DownloadFileTaskAsync(Uri address, string fileName) 
- *         + string  webClient.DownloadString(Uri address) 
- *         + string  webClient.DownloadString(string address) 
- *         + void  webClient.DownloadStringAsync(Uri address) 
- *         + void  webClient.DownloadStringAsync(Uri address, object userToken) 
- *         + Task<string>  webClient.DownloadStringTaskAsync(string address) 
- *         + Task<string>  webClient.DownloadStringTaskAsync(Uri address) 
+ *         + NameValueCollection  webClient.QueryString { get; set; } 
+ *         + Encoding             webClient.Encoding { get; set; } 
+ *         + IWebProxy            webClient.Proxy { get; set; } 
+ *         + RequestCachePolicy   webClient.CachePolicy { get; set; } 
+ *         + ICredentials         webClient.Credentials { get; set; } 
+ *         + bool                 webClient.UseDefaultCredentials { get; set; } 
+ *         + bool                 webClient.IsBusy { get; } 
+ *         + bool                 webClient.AllowReadStreamBuffering { get; set; } 
+ *         + bool                 webClient.AllowWriteStreamBuffering { get; set; } 
+ *         
+ *         ＊Method
  *         + Stream  webClient.OpenRead(Uri address) 
  *         + Stream  webClient.OpenRead(string address) 
- *         + void  webClient.OpenReadAsync(Uri address, object userToken) 
- *         + void  webClient.OpenReadAsync(Uri address) 
- *         + Task<Stream>  webClient.OpenReadTaskAsync(string address) 
- *         + Task<Stream>  webClient.OpenReadTaskAsync(Uri address) 
  *         + Stream  webClient.OpenWrite(string address) 
  *         + Stream  webClient.OpenWrite(string address, string method) 
  *         + Stream  webClient.OpenWrite(Uri address, string method) 
  *         + Stream  webClient.OpenWrite(Uri address) 
- *         + void  webClient.OpenWriteAsync(Uri address, string method, object userToken) 
- *         + void  webClient.OpenWriteAsync(Uri address) 
- *         + void  webClient.OpenWriteAsync(Uri address, string method) 
- *         + Task<Stream>  webClient.OpenWriteTaskAsync(Uri address) 
- *         + Task<Stream>  webClient.OpenWriteTaskAsync(Uri address, string method) 
- *         + Task<Stream>  webClient.OpenWriteTaskAsync(string address) 
- *         + Task<Stream>  webClient.OpenWriteTaskAsync(string address, string method) 
- *         + byte[]  webClient.UploadData(Uri address, string method, byte[] data) 
- *         + byte[]  webClient.UploadData(string address, string method, byte[] data) 
- *         + byte[]  webClient.UploadData(string address, byte[] data) 
- *         + byte[]  webClient.UploadData(Uri address, byte[] data) 
- *         + void  webClient.UploadDataAsync(Uri address, string method, byte[] data, object userToken) 
- *         + void  webClient.UploadDataAsync(Uri address, string method, byte[] data) 
- *         + void  webClient.UploadDataAsync(Uri address, byte[] data) 
- *         + Task<byte[]>  webClient.UploadDataTaskAsync(string address, string method, byte[] data) 
- *         + Task<byte[]>  webClient.UploadDataTaskAsync(Uri address, byte[] data) 
- *         + Task<byte[]>  webClient.UploadDataTaskAsync(string address, byte[] data) 
- *         + Task<byte[]>  webClient.UploadDataTaskAsync(Uri address, string method, byte[] data) 
- *         + byte[]  webClient.UploadFile(Uri address, string method, string fileName) 
- *         + byte[]  webClient.UploadFile(string address, string method, string fileName) 
- *         + byte[]  webClient.UploadFile(Uri address, string fileName) 
- *         + byte[]  webClient.UploadFile(string address, string fileName) 
- *         + void  webClient.UploadFileAsync(Uri address, string method, string fileName) 
- *         + void  webClient.UploadFileAsync(Uri address, string method, string fileName, object userToken) 
- *         + void  webClient.UploadFileAsync(Uri address, string fileName) 
- *         + Task<byte[]>  webClient.UploadFileTaskAsync(string address, string fileName) 
- *         + Task<byte[]>  webClient.UploadFileTaskAsync(Uri address, string fileName) 
- *         + Task<byte[]>  webClient.UploadFileTaskAsync(string address, string method, string fileName) 
- *         + Task<byte[]>  webClient.UploadFileTaskAsync(Uri address, string method, string fileName) 
+ *         
+ *         + string  webClient.DownloadString(string address) 
+ *         + string  webClient.DownloadString(Uri address) 
+ *         + byte[]  webClient.DownloadData(string address) 
+ *         + byte[]  webClient.DownloadData(Uri address) 
+ *         + void    webClient.DownloadFile(string address, string fileName) 
+ *         + void    webClient.DownloadFile(Uri address, string fileName) 
+ *
  *         + string  webClient.UploadString(string address, string data) 
  *         + string  webClient.UploadString(Uri address, string data) 
  *         + string  webClient.UploadString(string address, string method, string data) 
  *         + string  webClient.UploadString(Uri address, string method, string data) 
- *         + void  webClient.UploadStringAsync(Uri address, string method, string data, object userToken) 
- *         + void  webClient.UploadStringAsync(Uri address, string method, string data) 
- *         + void  webClient.UploadStringAsync(Uri address, string data) 
- *         + Task<string>  webClient.UploadStringTaskAsync(string address, string method, string data) 
- *         + Task<string>  webClient.UploadStringTaskAsync(Uri address, string method, string data) 
- *         + Task<string>  webClient.UploadStringTaskAsync(string address, string data) 
- *         + Task<string>  webClient.UploadStringTaskAsync(Uri address, string data) 
- *         + byte[]  webClient.UploadValues(Uri address, string method, NameValueCollection data) 
  *         + byte[]  webClient.UploadValues(string address, NameValueCollection data) 
  *         + byte[]  webClient.UploadValues(string address, string method, NameValueCollection data) 
  *         + byte[]  webClient.UploadValues(Uri address, NameValueCollection data) 
- *         + void  webClient.UploadValuesAsync(Uri address, string method, NameValueCollection data, object userToken) 
- *         + void  webClient.UploadValuesAsync(Uri address, NameValueCollection data) 
- *         + void  webClient.UploadValuesAsync(Uri address, string method, NameValueCollection data) 
- *         + Task<byte[]>  webClient.UploadValuesTaskAsync(Uri address, string method, NameValueCollection data) 
- *         + Task<byte[]>  webClient.UploadValuesTaskAsync(Uri address, NameValueCollection data) 
- *         + Task<byte[]>  webClient.UploadValuesTaskAsync(string address, string method, NameValueCollection data) 
- *         + Task<byte[]>  webClient.UploadValuesTaskAsync(string address, NameValueCollection data) 
- *         # WebRequest  webClient.GetWebRequest(Uri address) 
+ *         + byte[]  webClient.UploadValues(Uri address, string method, NameValueCollection data) 
+ *         + byte[]  webClient.UploadData(string address, string method, byte[] data) 
+ *         + byte[]  webClient.UploadData(string address, byte[] data) 
+ *         + byte[]  webClient.UploadData(Uri address, string method, byte[] data) 
+ *         + byte[]  webClient.UploadData(Uri address, byte[] data) 
+ *         + byte[]  webClient.UploadFile(string address, string method, string fileName) 
+ *         + byte[]  webClient.UploadFile(Uri address, string method, string fileName) 
+ *         + byte[]  webClient.UploadFile(string address, string fileName) 
+ *         + byte[]  webClient.UploadFile(Uri address, string fileName)
+ *         
+ *         # WebRequest   webClient.GetWebRequest(Uri address) 
  *         # WebResponse  webClient.GetWebResponse(WebRequest request) 
  *         # WebResponse  webClient.GetWebResponse(WebRequest request, IAsyncResult result) 
- *         # void  webClient.OnDownloadDataCompleted(DownloadDataCompletedEventArgs e) 
- *         # void  webClient.OnDownloadFileCompleted(AsyncCompletedEventArgs e) 
- *         # void  webClient.OnDownloadProgressChanged(DownloadProgressChangedEventArgs e) 
- *         # void  webClient.OnDownloadStringCompleted(DownloadStringCompletedEventArgs e) 
- *         # void  webClient.OnOpenReadCompleted(OpenReadCompletedEventArgs e) 
- *         # void  webClient.OnOpenWriteCompleted(OpenWriteCompletedEventArgs e) 
- *         # void  webClient.OnUploadDataCompleted(UploadDataCompletedEventArgs e) 
- *         # void  webClient.OnUploadFileCompleted(UploadFileCompletedEventArgs e) 
- *         # void  webClient.OnUploadProgressChanged(UploadProgressChangedEventArgs e) 
- *         # void  webClient.OnUploadStringCompleted(UploadStringCompletedEventArgs e) 
- *         # void  webClient.OnUploadValuesCompleted(UploadValuesCompletedEventArgs e) 
- *         # void  webClient.OnWriteStreamClosed(WriteStreamClosedEventArgs e) 
-
+ *         
+ *         ＊Async Method
+ *         + void          webClient.OpenReadAsync(Uri address) 
+ *         + void          webClient.OpenReadAsync(Uri address, object userToken) 
+ *         + Task<Stream>  webClient.OpenReadTaskAsync(string address) 
+ *         + Task<Stream>  webClient.OpenReadTaskAsync(Uri address) 
+ *         + void          webClient.OpenWriteAsync(Uri address) 
+ *         + void          webClient.OpenWriteAsync(Uri address, string method) 
+ *         + void          webClient.OpenWriteAsync(Uri address, string method, object userToken) 
+ *         + Task<Stream>  webClient.OpenWriteTaskAsync(string address) 
+ *         + Task<Stream>  webClient.OpenWriteTaskAsync(string address, string method)
+ *         + Task<Stream>  webClient.OpenWriteTaskAsync(Uri address) 
+ *         + Task<Stream>  webClient.OpenWriteTaskAsync(Uri address, string method) 
+ *         
+ *         + void          webClient.DownloadStringAsync(Uri address) 
+ *         + void          webClient.DownloadStringAsync(Uri address, object userToken) 
+ *         + Task<string>  webClient.DownloadStringTaskAsync(string address) 
+ *         + Task<string>  webClient.DownloadStringTaskAsync(Uri address) 
+ *         + void          webClient.DownloadDataAsync(Uri address) 
+ *         + void          webClient.DownloadDataAsync(Uri address, object userToken) 
+ *         + Task<byte[]>  webClient.DownloadDataTaskAsync(string address) 
+ *         + Task<byte[]>  webClient.DownloadDataTaskAsync(Uri address) 
+ *         + void          webClient.DownloadFileAsync(Uri address, string fileName) 
+ *         + void          webClient.DownloadFileAsync(Uri address, string fileName, object userToken) 
+ *         + Task          webClient.DownloadFileTaskAsync(string address, string fileName) 
+ *         + Task          webClient.DownloadFileTaskAsync(Uri address, string fileName) 
+ *         
+ *         + void          webClient.UploadStringAsync(Uri address, string data) 
+ *         + void          webClient.UploadStringAsync(Uri address, string method, string data) 
+ *         + void          webClient.UploadStringAsync(Uri address, string method, string data, object userToken) 
+ *         + Task<string>  webClient.UploadStringTaskAsync(string address, string data) 
+ *         + Task<string>  webClient.UploadStringTaskAsync(string address, string method, string data) 
+ *         + Task<string>  webClient.UploadStringTaskAsync(Uri address, string data) 
+ *         + Task<string>  webClient.UploadStringTaskAsync(Uri address, string method, string data)
+ *         + void          webClient.UploadValuesAsync(Uri address, NameValueCollection data) 
+ *         + void          webClient.UploadValuesAsync(Uri address, string method, NameValueCollection data) 
+ *         + void          webClient.UploadValuesAsync(Uri address, string method, NameValueCollection data, object userToken) 
+ *         + Task<byte[]>  webClient.UploadValuesTaskAsync(string address, NameValueCollection data) 
+ *         + Task<byte[]>  webClient.UploadValuesTaskAsync(string address, string method, NameValueCollection data) 
+ *         + Task<byte[]>  webClient.UploadValuesTaskAsync(Uri address, NameValueCollection data) 
+ *         + Task<byte[]>  webClient.UploadValuesTaskAsync(Uri address, string method, NameValueCollection data) 
+ *         + void          webClient.UploadDataAsync(Uri address, byte[] data) 
+ *         + void          webClient.UploadDataAsync(Uri address, string method, byte[] data) 
+ *         + void          webClient.UploadDataAsync(Uri address, string method, byte[] data, object userToken) 
+ *         + Task<byte[]>  webClient.UploadDataTaskAsync(string address, byte[] data) 
+ *         + Task<byte[]>  webClient.UploadDataTaskAsync(string address, string method, byte[] data) 
+ *         + Task<byte[]>  webClient.UploadDataTaskAsync(Uri address, byte[] data) 
+ *         + Task<byte[]>  webClient.UploadDataTaskAsync(Uri address, string method, byte[] data) 
+ *         + void          webClient.UploadFileAsync(Uri address, string fileName) 
+ *         + void          webClient.UploadFileAsync(Uri address, string method, string fileName) 
+ *         + void          webClient.UploadFileAsync(Uri address, string method, string fileName, object userToken) 
+ *         + Task<byte[]>  webClient.UploadFileTaskAsync(string address, string fileName) 
+ *         + Task<byte[]>  webClient.UploadFileTaskAsync(string address, string method, string fileName) 
+ *         + Task<byte[]>  webClient.UploadFileTaskAsync(Uri address, string fileName) 
+ *         + Task<byte[]>  webClient.UploadFileTaskAsync(Uri address, string method, string fileName)
+ *         + void          webClient.CancelAsync() 
+ *         
+ *         ＊Event 
+ *         + event OpenReadCompletedEventHandler        webClient.OpenReadCompleted 
+ *         + event OpenWriteCompletedEventHandler       webClient.OpenWriteCompleted 
+ *         + event WriteStreamClosedEventHandler        webClient.WriteStreamClosed 
+ *         + event DownloadStringCompletedEventHandler  webClient.DownloadStringCompleted 
+ *         + event DownloadDataCompletedEventHandler    webClient.DownloadDataCompleted 
+ *         + event DownloadProgressChangedEventHandler  webClient.DownloadProgressChanged 
+ *         + event UploadStringCompletedEventHandler    webClient.UploadStringCompleted 
+ *         + event UploadValuesCompletedEventHandler    webClient.UploadValuesCompleted 
+ *         + event UploadDataCompletedEventHandler      webClient.UploadDataCompleted 
+ *         + event UploadFileCompletedEventHandler      webClient.UploadFileCompleted 
+ *         + event UploadProgressChangedEventHandler    webClient.UploadProgressChanged 
+ *         + event AsyncCompletedEventHandler           webClient.DownloadFileCompleted 
  */
 #endregion
 /*
@@ -385,9 +435,10 @@
  */
 using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
+using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Windows.Forms;
 
 namespace WinFormGUI.WinFormSample.ReverseReference.RR15_Network
@@ -432,17 +483,18 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR15_Network
                 Dock = DockStyle.Fill,
                 AutoSize = true,
             };
-            table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 15f));
+            table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10f));
             table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 70f));
-            table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 15f));
-            table.RowStyles.Add(new RowStyle(SizeType.Percent, 15f));
-            table.RowStyles.Add(new RowStyle(SizeType.Percent, 85f));
+            table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20f));
+            table.RowStyles.Add(new RowStyle(SizeType.Percent, 10f));
+            table.RowStyles.Add(new RowStyle(SizeType.Percent, 90f));
 
             //---- Label ----
             label = new Label()
             {
                 Text = "URL: ",
-                TextAlign = ContentAlignment.TopCenter,
+                TextAlign = ContentAlignment.MiddleRight,
+                Margin = new Padding(10),
                 Dock = DockStyle.Fill,
                 AutoSize = true,
             };
@@ -451,8 +503,10 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR15_Network
             //---- TextBox ----
             textBoxUrl = new TextBox()
             {
+                Text = "https://www.shuwasystem.co.jp/",
                 Multiline = false,
-                BorderStyle = BorderStyle.Fixed3D,
+                Margin = new Padding(10),
+                BorderStyle = BorderStyle.FixedSingle,
                 Dock = DockStyle.Fill,
                 AutoSize = true,
             };
@@ -461,11 +515,12 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR15_Network
             textBoxBody = new TextBox()
             {
                 Multiline = true,
+                ScrollBars = ScrollBars.Vertical,
                 BorderStyle = BorderStyle.Fixed3D,
                 Dock = DockStyle.Fill,
                 AutoSize = true,
             };
-            table.Controls.Add(textBoxUrl, 0, 1);
+            table.Controls.Add(textBoxBody, 0, 1);
             table.SetColumnSpan(textBoxBody, table.ColumnCount);
 
             //---- Button ----
@@ -485,12 +540,34 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR15_Network
             });
         }//constructor
 
-        private void Button_Click(object sender, EventArgs e)
+        private async void Button_Click(object sender, EventArgs e)
         {
-            using(var client = new HttpClient())
+            var client = new HttpClient();
+            
+            try
             {
-                
-            }//using
+                using (Stream stream = await client.GetStreamAsync(textBoxUrl.Text))
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    StringBuilder bld = new StringBuilder();
+                    while (!reader.EndOfStream) 
+                    {
+                        bld.Append(reader.ReadLine());
+                        bld.Append(Environment.NewLine);
+                    }//while
+
+                    textBoxBody.Text = bld.ToString();
+
+                    reader.Close();
+                    stream.Dispose();
+                }//using
+            }
+            catch (Exception ex)
+            {
+                textBoxBody.Text =
+                    $"{ex.GetType()}:{Environment.NewLine}" +
+                    $"{ex.Message}{Environment.NewLine}";
+            }
         }//Button_Click()
     }//class
 }
