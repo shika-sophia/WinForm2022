@@ -30,8 +30,13 @@
  *@date 2022-06-26
  */
 using System;
+using System.Drawing;
+using System.IO;
+using System.Net;
 using System.Net.Sockets;
+using System.Runtime.Serialization;
 using System.Text;
+using System.Windows.Forms;
 
 namespace WinFormGUI.CsharpCode
 {
@@ -44,7 +49,7 @@ namespace WinFormGUI.CsharpCode
         //static void Main()
         public void Main()
         {
-            var here = new ShowEnumValue(typeof(AddressFamily));
+            var here = new ShowEnumValue(typeof(BorderStyle));
             string content = here.BuildEnumContent(here.enumType, isSubject: true);
             Console.WriteLine(content);
         }//Main()
@@ -60,29 +65,26 @@ namespace WinFormGUI.CsharpCode
             this.enumName = enumType.Name;
             this.enumType = enumType;
             CheckEnum(enumType);
-        }
+        }//constructor
 
         private void CheckEnum(Type enumType)
         {
-            try
+            if(!enumType.IsEnum)
             {
-                Enum.GetValues(enumType);
-            }
-            catch (ArgumentException e)
-            {
-                Console.WriteLine(e.GetType());
                 Console.WriteLine(
                     $"The Constructor Argument: typeof(Xxxx)\n" +
                     $"Xxxx: {enumName}\n" +
                     $"Xxxx should be Enum type.");
+
+                throw new ArgumentException();
             }
-        }
+        }//CheckEnum()
 
         private string BuildEnumContent(Type enumType, bool isSubject = true)
         {
             Array valueAry = Enum.GetValues(enumType);
             string[] nameAry = Enum.GetNames(enumType);
-            int length = nameAry.Length * 20;
+            int length = nameAry.Length * 100;
 
             var bld = new StringBuilder(length);
             if(isSubject)
@@ -90,7 +92,15 @@ namespace WinFormGUI.CsharpCode
                 bld.Append("/*\n");
                 bld.Append(" *@subject "); 
             }
-            bld.Append($"enum {enumName}\n");
+
+            bld.Append($"◆enum {enumName} : System.Enum\n");
+
+            if (isSubject) { bld.Append(" *         "); }
+            for(int i = 0; i < enumName.Length; i++)
+            {
+                bld.Append(" ");
+            }
+            bld.Append($"  -- {enumType.Namespace}\n");
 
             if (isSubject) { bld.Append(" *         "); }
             bld.Append("{\n");
@@ -119,26 +129,14 @@ namespace WinFormGUI.CsharpCode
 
 //==== bool subject true ====
 /*
- *@subject enum FileMode
- *         {
- *             CreateNew = 1,
- *             Create = 2,
- *             Open = 3,
- *             OpenOrCreate = 4,
- *             Truncate = 5,
- *             Append = 6,
- *         }
- */
 /*
-enum MessageBoxButtons
-{
-    OK = 0,
-    OKCancel = 1,
-    AbortRetryIgnore = 2,
-    YesNoCancel = 3,
-    YesNo = 4,
-    RetryCancel = 5,
-}
+ *@subject ◆enum BorderStyle : System.Enum
+ *                      -- System.Windows.Forms
+ *         {
+ *             None = 0,
+ *             FixedSingle = 1,
+ *             Fixed3D = 2,
+ *         }
 
 System.ArgumentNullException: 
 'new ShowEnumValue(Type)' require its argument as like 'typeof(Xxxx)'

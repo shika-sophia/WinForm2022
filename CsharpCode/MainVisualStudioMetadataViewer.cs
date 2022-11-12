@@ -8,7 +8,11 @@
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
  *          
  *@content Visual Studio Metadata Viewer
- *         Program to Remove comment and annotation from VS-Metadata.
+ *         This Viewer is for 'class' and 'struct'
+ *         to Remove comment ,annotation, or others,
+ *         to Edit for adjustment from VS-Metadata.
+ *         
+ *         If Type were 'enum', use 'ShowEnumValue.cs'.
  *         
  *@subject ◆class Clipboard -- System.Windows.Forms
  *         [×] 'new' is not avaliable.
@@ -200,9 +204,12 @@ namespace WinFormGUI.CsharpCode
                 //---- Get className and Append ----
                 bool isInherit = trimedLine.Contains(":");
 
-                if (trimedLine.Contains("class "))
+                if (trimedLine.Contains("class ") 
+                    || trimedLine.Contains("struct "))
                 {
-                    int startIndex = "class ".Length + trimedLine.IndexOf("class");
+                    string containText = trimedLine.Contains("class ") ? "class " : "struct ";
+                    
+                    int startIndex = containText.Length + trimedLine.IndexOf(containText);
                     
                     if (isInherit)
                     {
@@ -214,7 +221,7 @@ namespace WinFormGUI.CsharpCode
                         className = trimedLine.Substring(startIndex).Trim();
                     }
 
-                    string pattenConstructor = $@"{className}\(+[0-9a-zA-z,<>\[\] ]*\)+";
+                    string pattenConstructor = $@"[ ]+{className}\(+[0-9a-zA-z,<>\[\] ]*\)+";
                     regexConstructor = new Regex(pattenConstructor);
 
                     trimedLine = trimedLine.Replace("+ ", "");
@@ -276,7 +283,20 @@ namespace WinFormGUI.CsharpCode
                             if (withSubject) { bld.Append(" *         "); }
                             break;
                         }
-                    } 
+                    }
+                    else if (trimedLine.Contains("static readonly"))
+                    {
+                        if (i == 3 && CaseDicType(ref i, splitedWord, className, ref bld))
+                        {
+                            bld.Append($" {className}.");
+                            continue;
+                        }
+
+                        if (i == 4 && !isCaseDic)
+                        {
+                            bld.Append($" {className}.");                            
+                        }
+                    }
                     else if (trimedLine.Contains("static "))
                     {
                         if (i == 2 && CaseDicType(ref i, splitedWord, className, ref bld))
