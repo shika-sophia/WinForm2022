@@ -8,11 +8,36 @@
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
  *          
  *@content RR[426] p721 / HttpClient, Uri. Query, UriBuilder
+ *         ◆class UriBuilder:         to build automatically Uri path with Query
+ *         string  uriBuilder.Uri:     whole Uri path to send Web Server
+ *         string  uriBuilder.Query:   Uri Query such as '?q=xxxxx&hl=XXXX'  
+ *         
+ *         ◆class HttpUtility:        to encode from 2 Bytes Character
+ *         NameValueCollection  httpUtility.ParseQueryString(string)
+ *         string               httpUtility.UrlEncode(string)
+ *         
+ *         [Example]
+ *         var uriBuilder = new UriBuilder("http://www.google.com/search");
+ *           
+ *         NameValueCollection queryCollection = HttpUtility.ParseQueryString("");
+ *         queryCollection["q"] = HttpUtility.UrlEncode(searchWord);
+ *         queryCollection["hl"] = "jp";
  *
- *@subject HttpClient => 〔MainHttpClientSample.cs〕
+ *         uriBuilder.Query = queryCollection.ToString();
+ *         
+ *@NOTE 【Result】
+ *       //---- Test Print ----
+ *       //Console.WriteLine($"searchWord: {searchWord}");
+ *       //Console.WriteLine($"Uri with Query: {uriBuilder.Uri}");
+ *
+ *       //---- Test Result ----
+ *       //searchWord:     Eron Musk Twitter 解雇
+ *       //Uri with Query: http://www.google.com/search?q=Eron%2bMusk%2bTwitter%2b%25e8%25a7%25a3%25e9%259b%2587&hl=jp
  */
-#region -> Uri, UriBuilder
+#region -> Uri, UriBuilder, HttpUtility
 /*
+ *@subject HttpClient => 〔MainHttpClientSample.cs〕
+ *
  *@subject ◆class Uri : ISerializable -- System
  *         + Uri  new Uri(string uriString) 
  *         + Uri  new Uri(string uriString, bool dontEscape) 
@@ -112,50 +137,54 @@
  *@subject ◆sealed class SerializationInfo -- System.Runtime.Serialization
  *         + SerializationInfo  new SerializationInfo(Type type, IFormatterConverter converter) 
  *         + SerializationInfo  new SerializationInfo(Type type, IFormatterConverter converter, bool requireSameTokenInPartialTrust) 
- *         + Type  serializationInfo.ObjectType { get; } 
- *         + int  serializationInfo.MemberCount { get; } 
+ *        
  *         + string  serializationInfo.AssemblyName { get; set; } 
  *         + string  serializationInfo.FullTypeName { get; set; } 
- *         + bool  serializationInfo.IsFullTypeNameSetExplicit { get; } 
- *         + bool  serializationInfo.IsAssemblyNameSetExplicit { get; } 
- *         + void  serializationInfo.AddValue(string name, sbyte value) 
- *         + void  serializationInfo.AddValue(string name, object value, Type type) 
- *         + void  serializationInfo.AddValue(string name, bool value) 
- *         + void  serializationInfo.AddValue(string name, DateTime value) 
- *         + void  serializationInfo.AddValue(string name, decimal value) 
- *         + void  serializationInfo.AddValue(string name, double value) 
- *         + void  serializationInfo.AddValue(string name, object value) 
- *         + void  serializationInfo.AddValue(string name, float value) 
- *         + void  serializationInfo.AddValue(string name, long value) 
- *         + void  serializationInfo.AddValue(string name, uint value) 
- *         + void  serializationInfo.AddValue(string name, int value) 
- *         + void  serializationInfo.AddValue(string name, ushort value) 
- *         + void  serializationInfo.AddValue(string name, short value) 
- *         + void  serializationInfo.AddValue(string name, byte value) 
- *         + void  serializationInfo.AddValue(string name, ulong value) 
- *         + void  serializationInfo.AddValue(string name, char value) 
- *         + bool  serializationInfo.GetBoolean(string name) 
- *         + byte  serializationInfo.GetByte(string name) 
- *         + char  serializationInfo.GetChar(string name) 
- *         + DateTime  serializationInfo.GetDateTime(string name) 
- *         + decimal  serializationInfo.GetDecimal(string name) 
- *         + double  serializationInfo.GetDouble(string name) 
+ *         + Type    serializationInfo.ObjectType { get; } 
+ *         + int     serializationInfo.MemberCount { get; } 
+ *         + bool    serializationInfo.IsAssemblyNameSetExplicit { get; } 
+ *         + bool    serializationInfo.IsFullTypeNameSetExplicit { get; }
+ *         
+ *         + void    serializationInfo.AddValue(string name, sbyte value) 
+ *         + void    serializationInfo.AddValue(string name, object value, Type type) 
+ *         + void    serializationInfo.AddValue(string name, bool value) 
+ *         + void    serializationInfo.AddValue(string name, DateTime value) 
+ *         + void    serializationInfo.AddValue(string name, decimal value) 
+ *         + void    serializationInfo.AddValue(string name, double value) 
+ *         + void    serializationInfo.AddValue(string name, object value) 
+ *         + void    serializationInfo.AddValue(string name, float value) 
+ *         + void    serializationInfo.AddValue(string name, long value) 
+ *         + void    serializationInfo.AddValue(string name, uint value) 
+ *         + void    serializationInfo.AddValue(string name, int value) 
+ *         + void    serializationInfo.AddValue(string name, ushort value) 
+ *         + void    serializationInfo.AddValue(string name, short value) 
+ *         + void    serializationInfo.AddValue(string name, byte value) 
+ *         + void    serializationInfo.AddValue(string name, ulong value) 
+ *         + void    serializationInfo.AddValue(string name, char value) 
+ *         
  *         + SerializationInfoEnumerator  serializationInfo.GetEnumerator() 
- *         + short  serializationInfo.GetInt16(string name) 
- *         + int  serializationInfo.GetInt32(string name) 
- *         + long  serializationInfo.GetInt64(string name) 
- *         + sbyte  serializationInfo.GetSByte(string name) 
- *         + float  serializationInfo.GetSingle(string name) 
+ *         + bool    serializationInfo.GetBoolean(string name) 
+ *         + byte    serializationInfo.GetByte(string name) 
+ *         + char    serializationInfo.GetChar(string name) 
+ *         + DateTime  serializationInfo.GetDateTime(string name) 
+ *         + decimal serializationInfo.GetDecimal(string name) 
+ *         + double  serializationInfo.GetDouble(string name) 
+ *         + short   serializationInfo.GetInt16(string name) 
+ *         + int     serializationInfo.GetInt32(string name) 
+ *         + long    serializationInfo.GetInt64(string name) 
+ *         + sbyte   serializationInfo.GetSByte(string name) 
+ *         + float   serializationInfo.GetSingle(string name) 
  *         + string  serializationInfo.GetString(string name) 
  *         + ushort  serializationInfo.GetUInt16(string name) 
- *         + uint  serializationInfo.GetUInt32(string name) 
- *         + ulong  serializationInfo.GetUInt64(string name) 
+ *         + uint    serializationInfo.GetUInt32(string name) 
+ *         + ulong   serializationInfo.GetUInt64(string name) 
  *         + object  serializationInfo.GetValue(string name, Type type) 
- *         + void  serializationInfo.SetType(Type type) 
+ *         + void    serializationInfo.SetType(Type type) 
  *
  *@subject ◆struct StreamingContext -- System.Runtime.Serialization
  *         + StreamingContext  new StreamingContext(StreamingContextStates state) 
  *         + StreamingContext  new StreamingContext(StreamingContextStates state, object additional) 
+ *         
  *         + object  streamingContext.Context { get; } 
  *         + StreamingContextStates  streamingContext.State { get; } 
  *             └ enum  enum StreamingContextStates  -- System.Runtime.Serialization
@@ -171,7 +200,11 @@
  *                   All = 255,
  *               }
  *               
- *@subject ◆class UriBuilder -- System
+ *@subject ◆class UriBuilder -- System   
+ *         ・２Byte文字の Encode, Decode
+ *         ・URL Queryには、ASCII code (半角英数字)のみ記述可。
+ *         ・日本語の２Byte文字(全角文字)は、このクラスのメソッドで Encode, Decode
+ *         
  *         + UriBuilder  new UriBuilder() 
  *         + UriBuilder  new UriBuilder(string uri) 
  *         + UriBuilder  new UriBuilder(Uri uri) 
@@ -179,30 +212,68 @@
  *         + UriBuilder  new UriBuilder(string scheme, string host, int portNumber) 
  *         + UriBuilder  new UriBuilder(string scheme, string host, int port, string pathValue) 
  *         + UriBuilder  new UriBuilder(string scheme, string host, int port, string path, string extraValue) 
- *         + string  uriBuilder.Scheme { get; set; } 
- *         + string  uriBuilder.Query { get; set; } 
- *         + int  uriBuilder.Port { get; set; } 
+ *         
+ *         + Uri     uriBuilder.Uri { get; } 
  *         + string  uriBuilder.Path { get; set; } 
- *         + string  uriBuilder.Password { get; set; } 
- *         + string  uriBuilder.UserName { get; set; } 
- *         + string  uriBuilder.Fragment { get; set; } 
- *         + Uri  uriBuilder.Uri { get; } 
  *         + string  uriBuilder.Host { get; set; } 
- *         + bool  uriBuilder.Equals(object rparam) 
- *         + int  uriBuilder.GetHashCode() 
- *         + string  uriBuilder.ToString() 
+ *         + int     uriBuilder.Port { get; set; } 
+ *         + string  uriBuilder.Query { get; set; } 
+ *         + string  uriBuilder.Scheme { get; set; } 
+ *         + string  uriBuilder.UserName { get; set; } 
+ *         + string  uriBuilder.Password { get; set; } 
+ *         + string  uriBuilder.Fragment { get; set; } 
+ *         
+ *@subject ◆sealed class HttpUtility -- System.Web
+ *         + HttpUtility    new HttpUtility()
+ *         
+ *         + static string  HttpUtility.HtmlEncode(string s) 
+ *         + static string  HttpUtility.HtmlEncode(object value) 
+ *         + static void    HttpUtility.HtmlEncode(string s, TextWriter output) 
+ *         + static string  HttpUtility.HtmlAttributeEncode(string s) 
+ *         + static void    HttpUtility.HtmlAttributeEncode(string s, TextWriter output) 
+ *         + static string  HttpUtility.JavaScriptStringEncode(string value) 
+ *         + static string  HttpUtility.JavaScriptStringEncode(string value, bool addDoubleQuotes) 
+ *         + static NameValueCollection  HttpUtility.ParseQueryString(string query) 
+ *         + static NameValueCollection  HttpUtility.ParseQueryString(string query, Encoding encoding) 
+ *         + static string  HttpUtility.UrlEncode(string str) 
+ *         + static string  HttpUtility.UrlEncode(string str, Encoding e) 
+ *         + static string  HttpUtility.UrlEncode(byte[] bytes) 
+ *         + static string  HttpUtility.UrlEncode(byte[] bytes, int offset, int count) 
+ *         + static string  HttpUtility.UrlPathEncode(string str) 
+ *         + static byte[]  HttpUtility.UrlEncodeToBytes(string str) 
+ *         + static byte[]  HttpUtility.UrlEncodeToBytes(byte[] bytes, int offset, int count) 
+ *         + static byte[]  HttpUtility.UrlEncodeToBytes(byte[] bytes) 
+ *         + static byte[]  HttpUtility.UrlEncodeToBytes(string str, Encoding e) 
+ *         + static string  HttpUtility.UrlEncodeUnicode(string str) 
+ *         + static byte[]  HttpUtility.UrlEncodeUnicodeToBytes(string str) 
+ *         
+ *         + static string  HttpUtility.HtmlDecode(string s) 
+ *         + static void    HttpUtility.HtmlDecode(string s, TextWriter output) 
+ *         + static string  HttpUtility.UrlDecode(byte[] bytes, int offset, int count, Encoding e) 
+ *         + static string  HttpUtility.UrlDecode(string str) 
+ *         + static string  HttpUtility.UrlDecode(string str, Encoding e) 
+ *         + static string  HttpUtility.UrlDecode(byte[] bytes, Encoding e) 
+ *         + static byte[]  HttpUtility.UrlDecodeToBytes(string str) 
+ *         + static byte[]  HttpUtility.UrlDecodeToBytes(byte[] bytes) 
+ *         + static byte[]  HttpUtility.UrlDecodeToBytes(byte[] bytes, int offset, int count) 
+ *         + static byte[]  HttpUtility.UrlDecodeToBytes(string str, Encoding e) 
  *
  */
 #endregion
 /*
  *@see ImageHttpClientUriQuerySample.jpg
- *@see 
+ *@see MainHttpClientSample.cs
  *@author shika
  *@date 2022-11-12
  */
 using System;
+using System.Collections.Specialized;
 using System.Drawing;
+using System.IO;
 using System.Net.Http;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Web;
 using System.Windows.Forms;
 
 namespace WinFormGUI.WinFormSample.ReverseReference.RR15_Network
@@ -227,7 +298,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR15_Network
         private readonly HttpClient client;
         private readonly TableLayoutPanel table;
         private readonly Label label;
-        private readonly TextBox textBoxUrl;
+        private readonly TextBox textBoxSearch;
         private readonly TextBox textBoxBody;
         private readonly Button button;
 
@@ -260,7 +331,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR15_Network
             //---- Label ----
             label = new Label()
             {
-                Text = "URL: ",
+                Text = "Search: ",
                 TextAlign = ContentAlignment.MiddleRight,
                 Margin = new Padding(10),
                 Dock = DockStyle.Fill,
@@ -269,16 +340,16 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR15_Network
             table.Controls.Add(label, 0, 0);
 
             //---- TextBox ----
-            textBoxUrl = new TextBox()
+            textBoxSearch = new TextBox()
             {
-                Text = "https://www.shuwasystem.co.jp/",
+                Text = "",
                 Multiline = false,
                 Margin = new Padding(10),
                 BorderStyle = BorderStyle.FixedSingle,
                 Dock = DockStyle.Fill,
                 AutoSize = true,
             };
-            table.Controls.Add(textBoxUrl, 1, 0);
+            table.Controls.Add(textBoxSearch, 1, 0);
 
             textBoxBody = new TextBox()
             {
@@ -308,9 +379,89 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR15_Network
             });
         }//constructor
 
-        private void Button_Click(object sender, EventArgs e)
+        private async void Button_Click(object sender, EventArgs e)
         {
+            //---- Validation ----
+            if(String.IsNullOrEmpty(textBoxSearch.Text)) { return; }
+            string searchWord = textBoxSearch.Text;
 
+            bool canOutput = ValidateInput(searchWord);
+            if(!canOutput) { return; }
+
+            //---- Build Uri with Query ----
+            var uriBuilder = new UriBuilder("http://www.google.com/search");
+            
+            NameValueCollection queryCollection = HttpUtility.ParseQueryString("");
+            queryCollection["q"] = HttpUtility.UrlEncode(searchWord);
+            queryCollection["hl"] = "jp";
+
+            uriBuilder.Query = queryCollection.ToString();
+         
+            //---- Connect to Uri, Search word ----
+            try
+            {
+                using (Stream stream = await client.GetStreamAsync(uriBuilder.Uri))
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    //---- Read content ----
+                    StringBuilder readBld = new StringBuilder();
+                    while (!reader.EndOfStream)
+                    {
+                        readBld.Append(reader.ReadLine());
+                        readBld.Append(Environment.NewLine);
+                    }//while
+
+                    //---- Show content ----
+                    textBoxBody.Text = readBld.ToString();
+
+                    reader.Close();
+                    stream.Close();
+                }//using
+            }
+            catch (Exception ex)
+            {
+                ShowErrorMessage($"{ex.GetType()}:{Environment.NewLine}" +
+                    $"{ex.Message}");
+            }
         }//Button_Click()
+
+        private bool ValidateInput(string searchWord)
+        {
+            var errorMessageBld = new StringBuilder();
+            
+            //---- Less Length ----
+            if (searchWord.Length <= 4) 
+            {
+                errorMessageBld.Append(
+                    $"The Search word should be described over 5 characters.{Environment.NewLine}");
+            }
+
+            //---- Anti Script ----
+            Regex regexAntiScript = new Regex(@"[<>&;/]+");
+            bool isMatch = regexAntiScript.IsMatch(searchWord);
+
+            if (isMatch)
+            {
+                errorMessageBld.Append(
+                    $"<！> Invalid Input ! {Environment.NewLine}");
+            }
+
+            if(errorMessageBld.Length > 0)
+            {
+                ShowErrorMessage(errorMessageBld.ToString());
+                return false;
+            }
+
+            return true; // bool canOutput
+        }//ValidateInput()
+
+        private void ShowErrorMessage(string errorMessage)
+        {
+            MessageBox.Show(
+                                errorMessage,
+                                "InputError",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+        }//ShowErrorMessage()
     }//class
 }
