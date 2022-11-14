@@ -183,7 +183,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR15_Network
             try
             {
                 //Stream stream = await client.GetStreamAsync("http://localhost:80");
-                byte[] dataAry = await client.GetByteArrayAsync(
+                dataAry = await client.GetByteArrayAsync(
                     "http://localhost:80/../" + $"{textBoxSearch.Text}");
 
                 textBoxBody.Text = "The File Download Completed.";
@@ -206,9 +206,12 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR15_Network
 
             string dir = "../../WinFormSample/ReverseReference/RR15_Network/";
             
-            using (FileStream fs = File.OpenWrite(dir + textBoxSearch.Text))
+            using (FileStream fs = File.OpenWrite(dir + "Apache_README.txt"))
             {
+                fs.Write(dataAry, offset: 0, dataAry.Length);
+                fs.Close();
 
+                textBoxBody.Text = "Save File Completed.";
             }
         }//ButtonSave_Click()
 
