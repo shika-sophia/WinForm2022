@@ -13,6 +13,7 @@
  *                 [Example] { "key":"value", "key":"value", ... }
  *                 
  *         ・JSON形式で POST送信
+ *         ・Apache WebAPI 未実装 -> 404 Not Found
  *         
  *@prepare NuGet -> JsonConvertクラス
  *         PM> Install-Package Newtonsoft.Json
