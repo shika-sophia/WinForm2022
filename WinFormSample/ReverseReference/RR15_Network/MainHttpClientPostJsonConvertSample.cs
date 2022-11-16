@@ -50,27 +50,27 @@
  *             └ class JsonSerializerSettings 〔below〕
  *             
  *         + static Func<JsonSerializerSettings>?  
- *                      JsonConvert.DefaultSettings { get; set; } 
- *         + static T?  JsonConvert.DeserializeAnonymousType<T>(string value, T anonymousTypeObject) 
- *         + static T?  JsonConvert.DeserializeAnonymousType<T>(string value, T anonymousTypeObject, JsonSerializerSettings settings)          
- *         + static T?  JsonConvert.DeserializeObject<T>(string value, JsonSerializerSettings? settings) 
+ *                           JsonConvert.DefaultSettings { get; set; } 
+ *         + static T?       JsonConvert.DeserializeAnonymousType<T>(string value, T anonymousTypeObject) 
+ *         + static T?       JsonConvert.DeserializeAnonymousType<T>(string value, T anonymousTypeObject, JsonSerializerSettings settings)          
  *         + static object?  JsonConvert.DeserializeObject(string value) 
- *         + static object?  JsonConvert.DeserializeObject(string value, JsonSerializerSettings settings) 
  *         + static object?  JsonConvert.DeserializeObject(string value, Type type) 
- *         + static T?  JsonConvert.DeserializeObject<T>(string value) 
+ *         + static object?  JsonConvert.DeserializeObject(string value, JsonSerializerSettings settings) 
  *         + static object?  JsonConvert.DeserializeObject(string value, Type? type, JsonSerializerSettings? settings) 
  *         + static object?  JsonConvert.DeserializeObject(string value, Type type, params JsonConverter[] converters) 
- *         + static T?  JsonConvert.DeserializeObject<T>(string value, params JsonConverter[] converters) 
+ *         + static T?       JsonConvert.DeserializeObject<T>(string value) 
+ *         + static T?       JsonConvert.DeserializeObject<T>(string value, JsonSerializerSettings? settings) 
+ *         + static T?       JsonConvert.DeserializeObject<T>(string value, params JsonConverter[] converters) 
  *         + static XmlDocument?  JsonConvert.DeserializeXmlNode(string value, string? deserializeRootElementName, bool writeArrayAttribute, bool encodeSpecialCharacters) 
  *         + static XmlDocument?  JsonConvert.DeserializeXmlNode(string value, string? deserializeRootElementName, bool writeArrayAttribute) 
  *         + static XmlDocument?  JsonConvert.DeserializeXmlNode(string value, string? deserializeRootElementName) 
  *         + static XmlDocument?  JsonConvert.DeserializeXmlNode(string value) 
- *         + static XDocument?  JsonConvert.DeserializeXNode(string value, string? deserializeRootElementName, bool writeArrayAttribute, bool encodeSpecialCharacters) 
- *         + static XDocument?  JsonConvert.DeserializeXNode(string value) 
- *         + static XDocument?  JsonConvert.DeserializeXNode(string value, string? deserializeRootElementName) 
- *         + static XDocument?  JsonConvert.DeserializeXNode(string value, string? deserializeRootElementName, bool writeArrayAttribute) 
- *         + static void  JsonConvert.PopulateObject(string value, object target) 
- *         + static void  JsonConvert.PopulateObject(string value, object target, JsonSerializerSettings? settings) 
+ *         + static XDocument?    JsonConvert.DeserializeXNode(string value) 
+ *         + static XDocument?    JsonConvert.DeserializeXNode(string value, string? deserializeRootElementName) 
+ *         + static XDocument?    JsonConvert.DeserializeXNode(string value, string? deserializeRootElementName, bool writeArrayAttribute) 
+ *         + static XDocument?    JsonConvert.DeserializeXNode(string value, string? deserializeRootElementName, bool writeArrayAttribute, bool encodeSpecialCharacters) 
+ *         + static void          JsonConvert.PopulateObject(string value, object target) 
+ *         + static void          JsonConvert.PopulateObject(string value, object target, JsonSerializerSettings? settings) 
  *         
  *         + static string  JsonConvert.ToString(object? value) 
  *         + static string  JsonConvert.ToString(DateTimeOffset value) 
@@ -100,95 +100,110 @@
  *         
  *@subject ◆class JsonSerializerSettings -- Newtonsoft.Json
  *         + JsonSerializerSettings  new JsonSerializerSettings() 
- *         + StringEscapeHandling  jsonSerializerSettings.StringEscapeHandling { get; set; } 
- *         + FloatParseHandling  jsonSerializerSettings.FloatParseHandling { get; set; } 
- *         + FloatFormatHandling  jsonSerializerSettings.FloatFormatHandling { get; set; } 
- *         + DateParseHandling  jsonSerializerSettings.DateParseHandling { get; set; } 
- *         + DateTimeZoneHandling  jsonSerializerSettings.DateTimeZoneHandling { get; set; } 
- *         + DateFormatHandling  jsonSerializerSettings.DateFormatHandling { get; set; } 
- *         + Formatting  jsonSerializerSettings.Formatting { get; set; } 
- *         + int?  jsonSerializerSettings.MaxDepth { get; set; } 
- *         + string  jsonSerializerSettings.DateFormatString { get; set; } 
- *         + StreamingContext  jsonSerializerSettings.Context { get; set; } 
- *         + EventHandler<ErrorEventArgs>?  jsonSerializerSettings.Error { get; set; } 
- *         + ISerializationBinder?  jsonSerializerSettings.SerializationBinder { get; set; } 
- *         + SerializationBinder?  jsonSerializerSettings.Binder { get; set; } 
- *         + ITraceWriter?  jsonSerializerSettings.TraceWriter { get; set; } 
- *         + CultureInfo  jsonSerializerSettings.Culture { get; set; } 
- *         + Func<IReferenceResolver?>?  jsonSerializerSettings.ReferenceResolverProvider { get; set; } 
- *         + IEqualityComparer?  jsonSerializerSettings.EqualityComparer { get; set; } 
- *         + IContractResolver?  jsonSerializerSettings.ContractResolver { get; set; } 
- *         + ConstructorHandling  jsonSerializerSettings.ConstructorHandling { get; set; } 
- *         + TypeNameAssemblyFormatHandling  jsonSerializerSettings.TypeNameAssemblyFormatHandling { get; set; } 
- *         + FormatterAssemblyStyle  jsonSerializerSettings.TypeNameAssemblyFormat { get; set; } 
- *         + MetadataPropertyHandling  jsonSerializerSettings.MetadataPropertyHandling { get; set; } 
- *         + TypeNameHandling  jsonSerializerSettings.TypeNameHandling { get; set; } 
- *         + PreserveReferencesHandling  jsonSerializerSettings.PreserveReferencesHandling { get; set; } 
- *         + IList<JsonConverter>  jsonSerializerSettings.Converters { get; set; } 
- *         + DefaultValueHandling  jsonSerializerSettings.DefaultValueHandling { get; set; } 
- *         + NullValueHandling  jsonSerializerSettings.NullValueHandling { get; set; } 
- *         + ObjectCreationHandling  jsonSerializerSettings.ObjectCreationHandling { get; set; } 
- *         + MissingMemberHandling  jsonSerializerSettings.MissingMemberHandling { get; set; } 
- *         + ReferenceLoopHandling  jsonSerializerSettings.ReferenceLoopHandling { get; set; } 
- *         + IReferenceResolver?  jsonSerializerSettings.ReferenceResolver { get; set; } 
- *         + bool  jsonSerializerSettings.CheckAdditionalContent { get; set; } 
  *         
+ *         + StreamingContext  jsonSerializerSettings.Context { get; set; } 
+ *         + bool              jsonSerializerSettings.CheckAdditionalContent { get; set; } 
+ *         + CultureInfo       jsonSerializerSettings.Culture { get; set; } 
+ *         + string            jsonSerializerSettings.DateFormatString { get; set; } 
+ *         + Formatting        jsonSerializerSettings.Formatting { get; set; } 
+ *         + int?              jsonSerializerSettings.MaxDepth { get; set; } 
+ *         + SerializationBinder?   jsonSerializerSettings.Binder { get; set; } 
+ *         + ISerializationBinder?  jsonSerializerSettings.SerializationBinder { get; set; } 
+ *         
+ *         + IList<JsonConverter>           jsonSerializerSettings.Converters { get; set; } 
+ *         + ITraceWriter?                  jsonSerializerSettings.TraceWriter { get; set; } 
+ *         + EventHandler<ErrorEventArgs>?  jsonSerializerSettings.Error { get; set; } 
+ *         + IEqualityComparer?             jsonSerializerSettings.EqualityComparer { get; set; } 
+ *         + IContractResolver?             jsonSerializerSettings.ContractResolver { get; set; } 
+ *         + IReferenceResolver?            jsonSerializerSettings.ReferenceResolver { get; set; } 
+ *         + Func<IReferenceResolver?>?     jsonSerializerSettings.ReferenceResolverProvider { get; set; } 
+ *         + FormatterAssemblyStyle         jsonSerializerSettings.TypeNameAssemblyFormat { get; set; } 
+ *         
+ *         + ConstructorHandling   jsonSerializerSettings.ConstructorHandling { get; set; } 
+ *         + DefaultValueHandling  jsonSerializerSettings.DefaultValueHandling { get; set; } 
+ *         + StringEscapeHandling  jsonSerializerSettings.StringEscapeHandling { get; set; } 
+ *         + FloatParseHandling    jsonSerializerSettings.FloatParseHandling { get; set; } 
+ *         + FloatFormatHandling   jsonSerializerSettings.FloatFormatHandling { get; set; } 
+ *         + DateParseHandling     jsonSerializerSettings.DateParseHandling { get; set; } 
+ *         + DateTimeZoneHandling  jsonSerializerSettings.DateTimeZoneHandling { get; set; } 
+ *         + DateFormatHandling    jsonSerializerSettings.DateFormatHandling { get; set; } 
+ *         + TypeNameHandling      jsonSerializerSettings.TypeNameHandling { get; set; } 
+ *         + NullValueHandling       jsonSerializerSettings.NullValueHandling { get; set; } 
+ *         + ObjectCreationHandling  jsonSerializerSettings.ObjectCreationHandling { get; set; } 
+ *         + MissingMemberHandling   jsonSerializerSettings.MissingMemberHandling { get; set; } 
+ *         + ReferenceLoopHandling   jsonSerializerSettings.ReferenceLoopHandling { get; set; } 
+ *         + TypeNameAssemblyFormatHandling  jsonSerializerSettings.TypeNameAssemblyFormatHandling { get; set; } 
+ *         + PreserveReferencesHandling      jsonSerializerSettings.PreserveReferencesHandling { get; set; } 
+ *         + MetadataPropertyHandling        jsonSerializerSettings.MetadataPropertyHandling { get; set; } 
+ *         
+ *@subject ◆class StringContent : ByteArrayContent
+ *                             -- System.Net.Http
+ *         + StringContent  new StringContent(string content) 
+ *         + StringContent  new StringContent(string content, Encoding encoding) 
+ *         + StringContent  new StringContent(string content, Encoding encoding, string mediaType) 
+ *
+ *@subject ◆class MediaTypeHeaderValue : ICloneable
+ *                                    -- System.Net.Http.Headers
+ *         + MediaTypeHeaderValue  new MediaTypeHeaderValue(string mediaType) 
+ *         # MediaTypeHeaderValue  MediaTypeHeaderValue(MediaTypeHeaderValue source)
+ *         
+ *         + string  mediaTypeHeaderValue.MediaType { get; set; } 
+ *         + string  mediaTypeHeaderValue.CharSet { get; set; } 
+ *         + ICollection<NameValueHeaderValue> 
+ *                   mediaTypeHeaderValue.Parameters { get; } 
+ *         + static MediaTypeHeaderValue  MediaTypeHeaderValue.Parse(string input) 
+ *         + static bool                  MediaTypeHeaderValue.TryParse(string input, out MediaTypeHeaderValue parsedValue) 
+ *
  *@subject ◆class XmlDocument : XmlNode  -- System.Xml
- *         ・XML形式の文書に整形するクラス => 〔MainHttpClientXmlSample.cs〕
+ *         ・XML形式
  *         
  *         + XmlDocument  new XmlDocument() 
  *         + XmlDocument  new XmlDocument(XmlNameTable nt) 
  *         # XmlDocument  internal XmlDocument(XmlImplementation imp)
- *           [×] 'new' is not available, but 'base()' is OK from constructor of inherited class ONLY.
  *         
- *         + XmlNode  xmlDocument.ParentNode { get; } 
- *         + XmlDocumentType  xmlDocument.DocumentType { get; } 
- *         + XmlImplementation  xmlDocument.Implementation { get; } 
  *         + string  xmlDocument.Name { get; } 
  *         + string  xmlDocument.LocalName { get; } 
- *         + XmlElement  xmlDocument.DocumentElement { get; } 
- *         + XmlDocument  xmlDocument.OwnerDocument { get; } 
- *         + XmlSchemaSet  xmlDocument.Schemas { get; set; } 
- *         + XmlResolver  xmlDocument.XmlResolver { set; } 
- *         + XmlNameTable  xmlDocument.NameTable { get; } 
- *         + bool  xmlDocument.PreserveWhitespace { get; set; } 
- *         + bool  xmlDocument.IsReadOnly { get; } 
  *         + string  xmlDocument.InnerText { set; } 
  *         + string  xmlDocument.InnerXml { get; set; } 
- *         + IXmlSchemaInfo  xmlDocument.SchemaInfo { get; } 
  *         + string  xmlDocument.BaseURI { get; } 
- *         + XmlNodeType  xmlDocument.NodeType { get; } 
- *         + event XmlNodeChangedEventHandler  xmlDocument.NodeInserting 
- *         + event XmlNodeChangedEventHandler  xmlDocument.NodeInserted 
- *         + event XmlNodeChangedEventHandler  xmlDocument.NodeRemoving 
- *         + event XmlNodeChangedEventHandler  xmlDocument.NodeRemoved 
- *         + event XmlNodeChangedEventHandler  xmlDocument.NodeChanging 
- *         + event XmlNodeChangedEventHandler  xmlDocument.NodeChanged 
- *         + XmlNode  xmlDocument.CloneNode(bool deep) 
+ *         + bool    xmlDocument.PreserveWhitespace { get; set; } 
+ *         + bool    xmlDocument.IsReadOnly { get; } 
+ *         + XmlNode            xmlDocument.ParentNode { get; } 
+ *         + XmlDocumentType    xmlDocument.DocumentType { get; } 
+ *         + XmlImplementation  xmlDocument.Implementation { get; } 
+ *         + XmlElement         xmlDocument.DocumentElement { get; } 
+ *         + XmlDocument        xmlDocument.OwnerDocument { get; } 
+ *         + XmlSchemaSet       xmlDocument.Schemas { get; set; } 
+ *         + XmlResolver        xmlDocument.XmlResolver { set; } 
+ *         + XmlNameTable       xmlDocument.NameTable { get; } 
+ *         + IXmlSchemaInfo     xmlDocument.SchemaInfo { get; } 
+ *         + XmlNodeType        xmlDocument.NodeType { get; }
+ *         
+ *         + XmlElement  xmlDocument.CreateElement(string name) 
+ *         + XmlElement  xmlDocument.CreateElement(string qualifiedName, string namespaceURI) 
+ *         + XmlElement  xmlDocument.CreateElement(string prefix, string localName, string namespaceURI) 
  *         + XmlAttribute  xmlDocument.CreateAttribute(string qualifiedName, string namespaceURI) 
  *         + XmlAttribute  xmlDocument.CreateAttribute(string name) 
  *         + XmlAttribute  xmlDocument.CreateAttribute(string prefix, string localName, string namespaceURI) 
- *         + XmlCDataSection  xmlDocument.CreateCDataSection(string data) 
- *         + XmlComment  xmlDocument.CreateComment(string data) 
+ *         + XmlCDataSection      xmlDocument.CreateCDataSection(string data) 
+ *         + XmlComment           xmlDocument.CreateComment(string data) 
  *         + XmlDocumentFragment  xmlDocument.CreateDocumentFragment() 
- *         + XmlDocumentType  xmlDocument.CreateDocumentType(string name, string +Id, string systemId, string internalSubset) 
- *         + XmlElement  xmlDocument.CreateElement(string qualifiedName, string namespaceURI) 
- *         + XmlElement  xmlDocument.CreateElement(string name) 
- *         + XmlElement  xmlDocument.CreateElement(string prefix, string localName, string namespaceURI) 
- *         + XmlEntityReference  xmlDocument.CreateEntityReference(string name) 
- *         + XPathNavigator  xmlDocument.CreateNavigator() 
+ *         + XmlDocumentType      xmlDocument.CreateDocumentType(string name, string +Id, string systemId, string internalSubset) 
+ *         + XmlEntityReference   xmlDocument.CreateEntityReference(string name) 
+ *         + XPathNavigator       xmlDocument.CreateNavigator() 
+ *         + XmlText  xmlDocument.CreateTextNode(string text) 
  *         + XmlNode  xmlDocument.CreateNode(string nodeTypeString, string name, string namespaceURI) 
  *         + XmlNode  xmlDocument.CreateNode(XmlNodeType type, string prefix, string name, string namespaceURI) 
  *         + XmlNode  xmlDocument.CreateNode(XmlNodeType type, string name, string namespaceURI) 
+ *         + XmlNode  xmlDocument.ImportNode(XmlNode node, bool deep) 
+ *         + XmlNode  xmlDocument.CloneNode(bool deep) 
  *         + XmlProcessingInstruction  xmlDocument.CreateProcessingInstruction(string target, string data) 
  *         + XmlSignificantWhitespace  xmlDocument.CreateSignificantWhitespace(string text) 
- *         + XmlText  xmlDocument.CreateTextNode(string text) 
- *         + XmlWhitespace  xmlDocument.CreateWhitespace(string text) 
+ *         + XmlWhitespace   xmlDocument.CreateWhitespace(string text) 
  *         + XmlDeclaration  xmlDocument.CreateXmlDeclaration(string version, string encoding, string standalone) 
- *         + XmlElement  xmlDocument.GetElementById(string elementId) 
- *         + XmlNodeList  xmlDocument.GetElementsByTagName(string name) 
- *         + XmlNodeList  xmlDocument.GetElementsByTagName(string localName, string namespaceURI) 
- *         + XmlNode  xmlDocument.ImportNode(XmlNode node, bool deep) 
+ *         + XmlElement      xmlDocument.GetElementById(string elementId) 
+ *         + XmlNodeList     xmlDocument.GetElementsByTagName(string name) 
+ *         + XmlNodeList     xmlDocument.GetElementsByTagName(string localName, string namespaceURI) 
  *         + void  xmlDocument.Load(string filename) 
  *         + void  xmlDocument.Load(Stream inStream) 
  *         + void  xmlDocument.Load(XmlReader reader) 
@@ -206,27 +221,63 @@
  *         # internal XmlAttribute  xmlDocument.CreateDefaultAttribute(string prefix, string localName, string namespaceURI) 
  *         # internal XPathNavigator  xmlDocument.CreateNavigator(XmlNode node) 
  *         
- *@subject ◆class StringContent : ByteArrayContent
- *                             -- System.Net.Http
- *         + StringContent  new StringContent(string content) 
- *         + StringContent  new StringContent(string content, Encoding encoding) 
- *         + StringContent  new StringContent(string content, Encoding encoding, string mediaType) 
- *
- *@subject ◆class MediaTypeHeaderValue : ICloneable
- *                                    -- System.Net.Http.Headers
- *         + MediaTypeHeaderValue  new MediaTypeHeaderValue(string mediaType) 
- *         # MediaTypeHeaderValue  MediaTypeHeaderValue(MediaTypeHeaderValue source)
- *           [×] 'new' is not available, but 'base()' is OK from constructor of inherited class ONLY.
+ *         + event XmlNodeChangedEventHandler  xmlDocument.NodeInserting 
+ *         + event XmlNodeChangedEventHandler  xmlDocument.NodeInserted 
+ *         + event XmlNodeChangedEventHandler  xmlDocument.NodeRemoving 
+ *         + event XmlNodeChangedEventHandler  xmlDocument.NodeRemoved 
+ *         + event XmlNodeChangedEventHandler  xmlDocument.NodeChanging 
+ *         + event XmlNodeChangedEventHandler  xmlDocument.NodeChanged 
  *         
- *         + string  mediaTypeHeaderValue.CharSet { get; set; } 
- *         + ICollection<NameValueHeaderValue>  mediaTypeHeaderValue.Parameters { get; } 
- *         + string  mediaTypeHeaderValue.MediaType { get; set; } 
- *         + static MediaTypeHeaderValue  MediaTypeHeaderValue.Parse(string input) 
- *         + static bool  MediaTypeHeaderValue.TryParse(string input, out MediaTypeHeaderValue parsedValue) 
- *         + bool  mediaTypeHeaderValue.Equals(object obj) 
- *         + int  mediaTypeHeaderValue.GetHashCode() 
- *         + string  mediaTypeHeaderValue.ToString() 
- *
+ *@subject ◆abstract class XmlNode : ICloneable, IEnumerable, IXPathNavigable
+ *                       -- System.Xml
+ *         + XmlElement   xmlNode.this[string name] { get; } 
+ *         + XmlElement   xmlNode.this[string localname, string ns] { get; } 
+ *         
+ *         + abstract string  xmlNode.Name { get; } 
+ *         + abstract string  xmlNode.LocalName { get; } 
+ *         + abstract XmlNodeType  xmlNode.NodeType { get; } 
+ *         + string  xmlNode.Value { get; set; } 
+ *         + string  xmlNode.NamespaceURI { get; } 
+ *         + string  xmlNode.BaseURI { get; } 
+ *         + string  xmlNode.Prefix { get; set; } 
+ *         + string  xmlNode.InnerText { get; set; } 
+ *         + string  xmlNode.InnerXml { get; set; } 
+ *         + string  xmlNode.OuterXml { get; } 
+ *         + bool    xmlNode.IsReadOnly { get; } 
+ *         + XmlNode      xmlNode.PreviousText { get; } 
+ *         + XmlNode      xmlNode.ParentNode { get; } 
+ *         + XmlNode      xmlNode.PreviousSibling { get; } 
+ *         + XmlNode      xmlNode.NextSibling { get; } 
+ *         + XmlNodeList  xmlNode.ChildNodes { get; } 
+ *         + IXmlSchemaInfo  xmlNode.SchemaInfo { get; } 
+ *         + XmlAttributeCollection  xmlNode.Attributes { get; } 
+ *         + XmlDocument  xmlNode.OwnerDocument { get; } 
+ *         + XmlNode      xmlNode.FirstChild { get; } 
+ *         + XmlNode      xmlNode.LastChild { get; } 
+ *         + bool         xmlNode.HasChildNodes { get; } 
+ *         
+ *         + XmlNode         xmlNode.AppendChild(XmlNode newChild) 
+ *         + void            xmlNode.Normalize() 
+ *         + bool            xmlNode.Supports(string feature, string version) 
+ *         + IEnumerator     xmlNode.GetEnumerator() 
+ *         + string          xmlNode.GetNamespaceOfPrefix(string prefix) 
+ *         + string          xmlNode.GetPrefixOfNamespace(string namespaceURI) 
+ *         + XmlNode         xmlNode.InsertBefore(XmlNode newChild, XmlNode refChild) 
+ *         + XmlNode         xmlNode.InsertAfter(XmlNode newChild, XmlNode refChild) 
+ *         + XmlNode         xmlNode.PrependChild(XmlNode newChild) 
+ *         + XPathNavigator  xmlNode.CreateNavigator() 
+ *         + XmlNode         xmlNode.SelectSingleNode(string xpath, XmlNamespaceManager nsmgr) 
+ *         + XmlNode         xmlNode.SelectSingleNode(string xpath) 
+ *         + XmlNodeList     xmlNode.SelectNodes(string xpath, XmlNamespaceManager nsmgr) 
+ *         + XmlNodeList     xmlNode.SelectNodes(string xpath) 
+ *         + XmlNode         xmlNode.Clone() 
+ *         + XmlNode         xmlNode.RemoveChild(XmlNode oldChild) 
+ *         + XmlNode         xmlNode.ReplaceChild(XmlNode newChild, XmlNode oldChild) 
+ *         + void            xmlNode.RemoveAll() 
+ *         + abstract void     xmlNode.WriteTo(XmlWriter w) 
+ *         + abstract void     xmlNode.WriteContentTo(XmlWriter w) 
+ *         + abstract XmlNode  xmlNode.CloneNode(bool deep) 
+ *         
  *@see No Image (ImageHttpClientPostJsonConvertSample.jpg)
  *@see 
  *@author shika
@@ -298,7 +349,6 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR15_Network
             textBox = new TextBox()
             {
                 Multiline = true,
-                Height = 60,
                 BorderStyle = BorderStyle.Fixed3D,
                 Dock = DockStyle.Fill,
                 AutoSize = true,
