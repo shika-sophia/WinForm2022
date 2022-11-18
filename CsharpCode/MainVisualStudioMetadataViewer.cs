@@ -14,6 +14,9 @@
  *         
  *         If Type were 'enum', use 'ShowEnumValue.cs'.
  *         
+ *         case Dictionary: className location need 1 right shift.
+ *         case Func:       className location need some right shift, such case as Func<T, T, ...>
+ *         
  *@subject ◆class Clipboard -- System.Windows.Forms
  *         [×] 'new' is not avaliable.
  *         
@@ -81,7 +84,7 @@ namespace WinFormGUI.CsharpCode
         private readonly Button buttonCopy;
         private const bool withSubject = true;
         private bool isSimpled = false;
-        private bool isCaseDic = false;
+        private bool isGenericOverTwo = false;
         private Regex regexConstructor;
 
         public FormVisualStudioMetadataViewer()
@@ -176,6 +179,7 @@ namespace WinFormGUI.CsharpCode
                     || trimedLine.StartsWith("[")
                     || trimedLine.StartsWith("{")
                     || trimedLine.StartsWith("}")
+                    || trimedLine.StartsWith("*")
                     || trimedLine.Contains("~")
                     || trimedLine.Contains("#")
                     || trimedLine.Contains("using")
@@ -286,39 +290,39 @@ namespace WinFormGUI.CsharpCode
                     }
                     else if (trimedLine.Contains("static readonly"))
                     {
-                        if (i == 3 && CaseDicType(ref i, splitedWord, className, ref bld))
+                        if (i == 3 && CaseGenericOverTwo(ref i, splitedWord, className, ref bld))
                         {
                             bld.Append($" {className}.");
                             continue;
                         }
 
-                        if (i == 4 && !isCaseDic)
+                        if (i == 4 && !isGenericOverTwo)
                         {
                             bld.Append($" {className}.");                            
                         }
                     }
                     else if (trimedLine.Contains("static "))
                     {
-                        if (i == 2 && CaseDicType(ref i, splitedWord, className, ref bld))
+                        if (i == 2 && CaseGenericOverTwo(ref i, splitedWord, className, ref bld))
                         {
                             bld.Append($" {className}.");
                             continue;
                         }
                             
-                        if (i == 3 && !isCaseDic)
+                        if (i == 3 && !isGenericOverTwo)
                         {
                             bld.Append($" {className}.");
                         }
                     }
                     else if (trimedLine.Contains("internal abstract"))
                     {
-                        if (i == 3 && CaseDicType(ref i, splitedWord, className, ref bld))
+                        if (i == 3 && CaseGenericOverTwo(ref i, splitedWord, className, ref bld))
                         {
                             InsertInstanceClassName(bld, className);
                             continue;
                         }
 
-                        if (i == 4 && !isCaseDic)
+                        if (i == 4 && !isGenericOverTwo)
                         {
                             InsertInstanceClassName(bld, className);
                         }
@@ -327,23 +331,23 @@ namespace WinFormGUI.CsharpCode
                         || trimedLine.Contains("internal ")
                         || trimedLine.Contains("event "))
                     { 
-                        if (i == 2 && CaseDicType(ref i, splitedWord, className, ref bld))
+                        if (i == 2 && CaseGenericOverTwo(ref i, splitedWord, className, ref bld))
                         {
                             InsertInstanceClassName(bld, className);
                             continue;
                         }
                         
-                        if (i == 3 && !isCaseDic)
+                        if (i == 3 && !isGenericOverTwo)
                         {
                             InsertInstanceClassName(bld, className);
                         }
                     }
-                    else if (i == 1 && CaseDicType(ref i, splitedWord, className, ref bld))  //case Dictionary<T, T>
+                    else if (i == 1 && CaseGenericOverTwo(ref i, splitedWord, className, ref bld))  //case Dictionary<T, T>
                     {
                         InsertInstanceClassName(bld, className);
                         continue;
                     }
-                    else if (i == 2 && !isCaseDic)
+                    else if (i == 2 && !isGenericOverTwo)
                     {
                         InsertInstanceClassName(bld, className);
                     }
@@ -367,17 +371,24 @@ namespace WinFormGUI.CsharpCode
                 $" {className.Substring(0, 1).ToLower()}{className.Substring(1)}.");
         }//InsertInstanceClassName()
 
-        private bool CaseDicType(ref int i, string[] splitedWord, string className, ref StringBuilder bld)
+        private bool CaseGenericOverTwo(ref int i, string[] splitedWord, string className, ref StringBuilder bld)
         {
-            if (splitedWord[i].Contains(","))  //case Dictionary<T, T>
-            {
+            if (splitedWord[i].Contains("<") 
+                && splitedWord[i].Contains(","))  //case Dictionary<T, T>, Func<T1, T2, T3, ...>
+            {                                     //[Example] class HttpClientHandler
                 bld.Append($"{splitedWord[i]} ");
-                bld.Append($"{splitedWord[++i]} ");
 
-                isCaseDic = true;
+                do
+                {
+                    bld.Append($"{splitedWord[++i]} ");
+                }
+                while (!splitedWord[i].Contains(">"));
+
+                isGenericOverTwo = true;
                 return true;
             }
 
+            isGenericOverTwo = false;
             return false;
          }//CaseDicType()
 
