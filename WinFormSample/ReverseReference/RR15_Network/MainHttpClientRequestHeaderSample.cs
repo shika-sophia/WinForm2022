@@ -45,13 +45,25 @@
  *         HttpRequestHeaders  httpClient.DefaultRequestHeaders
  *         void                httpHeaders.Add(string name, IEnumerable<string> values)
  *         
- *         ＊Uaser-Agent  ブラウザの種類
+ *@subject ＊Uaser-Agent  ブラウザの種類
  *         httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0");
  *         
- *         ＊Cookieの利用
- *         bool  httpClient.UseCookie = true;
+ *@subject ＊Cookieの利用  
+ *         ・HttpClientのコンストラクタ時に 引数 HttpClentHanderを new し、
+ *           UseCookies = true;に設定する
+ *         ・RequestHeaderに Cookie を追加する必要はない
  *         
- *         ＊独自の RequestHeaderを設定する場合
+ *         HttpClient  new HttpClient(HttpMessageHandler)
+ *           └ [Argument] HttpClientHandler : HttpMessageHandler
+ *         bool  httpClientHandler.UseCookie = true;
+ *           
+ *         [Example]
+ *         client = new HttpClient(new HttpClientHandler()
+ *         {
+ *             UseCookies = true,
+ *         });
+ *         
+ *@subject ＊独自の RequestHeaderを設定する場合
  *         httpClient.DefaultRequestHeaders.Add( "X-API-KEY", "XXXX-XXXX-XXXX");
  *         
  *@subject ◆class StringContent : ByteArrayContent
@@ -75,32 +87,35 @@
  *@subject ◆class HttpClientHandler : HttpMessageHandler
  *                                 -- System.Net.Http
  *         + HttpClientHandler  new HttpClientHandler() 
- *         + bool UseCookies { get; set; } 
- *         + bool UseProxy { get; set; } 
- *         + bool SupportsProxy { get; } 
- *         + bool AllowAutoRedirect { get; set; } 
- *         + bool SupportsRedirectConfiguration { get; } 
- *         + bool UseDefaultCredentials { get; set; } 
- *         + bool PreAuthenticate { get; set; } 
- *         + bool SupportsAutomaticDecompression { get; } 
- *         + bool CheckCertificateRevocationList { get; set; } 
- *         + int MaxResponseHeadersLength { get; set; } 
- *         + int MaxConnectionsPerServer { get; set; } 
- *         + int MaxAutomaticRedirections { get; set; } 
- *         + long MaxRequestContentBufferSize { get; set; } 
+ *         
+ *         + bool  httpClientHandler.UseCookies { get; set; } 
+ *         + bool  httpClientHandler.UseProxy { get; set; } 
+ *         + bool  httpClientHandler.SupportsProxy { get; } 
+ *         + bool  httpClientHandler.AllowAutoRedirect { get; set; } 
+ *         + bool  httpClientHandler.SupportsRedirectConfiguration { get; } 
+ *         + bool  httpClientHandler.UseDefaultCredentials { get; set; } 
+ *         + bool  httpClientHandler.PreAuthenticate { get; set; } 
+ *         + bool  httpClientHandler.SupportsAutomaticDecompression { get; } 
+ *         + bool  httpClientHandler.CheckCertificateRevocationList { get; set; } 
+ *         + long  httpClientHandler.MaxRequestContentBufferSize { get; set; } 
+ *         + int   httpClientHandler.MaxResponseHeadersLength { get; set; } 
+ *         + int   httpClientHandler.MaxConnectionsPerServer { get; set; } 
+ *         + int   httpClientHandler.MaxAutomaticRedirections { get; set; } 
  *         + IDictionary<string, object>  httpClientHandler.Properties { get; } 
- *         + SslProtocols SslProtocols { get; set; } 
- *         + CookieContainer CookieContainer { get; set; } 
- *         + IWebProxy Proxy { get; set; } 
- *         + ICredentials Credentials { get; set; } 
- *         + ICredentials DefaultProxyCredentials { get; set; } 
- *         + DecompressionMethods AutomaticDecompression { get; set; } 
- *         + X509CertificateCollection ClientCertificates { get; } 
- *         + ClientCertificateOption ClientCertificateOptions { get; set; } 
- *         + static Func<HttpRequestMessage, X509Certificate2,  HttpClientHandler.X509Chain, SslPolicyErrors, bool> DangerousAcceptAnyServerCertificateValidator { get; } 
- *         + Func<HttpRequestMessage, X509Certificate2,  httpClientHandler.X509Chain, SslPolicyErrors, bool> ServerCertificateCustomValidationCallback { get; set; } 
- *         # void Dispose(bool disposing) 
- *         # internal Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) 
+ *         + IWebProxy     httpClientHandler.Proxy { get; set; } 
+ *         + ICredentials  httpClientHandler.DefaultProxyCredentials { get; set; } 
+ *         + ICredentials  httpClientHandler.Credentials { get; set; } 
+ *         + SslProtocols  httpClientHandler.SslProtocols { get; set; } 
+ *         + CookieContainer          httpClientHandler.CookieContainer { get; set; } 
+ *         + DecompressionMethods     httpClientHandler.AutomaticDecompression { get; set; } 
+ *         + ClientCertificateOption  httpClientHandler.ClientCertificateOptions { get; set; } 
+ *         + X509CertificateCollection  httpClientHandler.ClientCertificates { get; } 
+ *         + static Func<HttpRequestMessage, X509Certificate2, X509Chain, SslPolicyErrors, bool> 
+ *                         HttpClientHandler.DangerousAcceptAnyServerCertificateValidator { get; } 
+ *         + Func<HttpRequestMessage, X509Certificate2, X509Chain, SslPolicyErrors, bool> 
+ *                         httpClientHandler.ServerCertificateCustomValidationCallback { get; set; } 
+ *         # internal Task<HttpResponseMessage>  httpClientHandler.SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) 
+ *         # void  httpClientHandler.Dispose(bool disposing) 
  *
  *@see No Image (ImageHttpClientRequestHeaderSample.jpg)
  *@see 
