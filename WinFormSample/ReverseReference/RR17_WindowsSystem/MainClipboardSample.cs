@@ -68,7 +68,7 @@
  *         + static          Format  DataFormats.GetFormat(int id) 
  *         + static          Format  DataFormats.GetFormat(string format) 
  *         
- *         ＊inner class
+ *         ＊Inner class
  *         + class Format -- System.Windows.Forms
  *         + Format  new Format(string name, int id) 
  *         + string  format.Name { get; } 
