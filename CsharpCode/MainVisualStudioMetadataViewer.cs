@@ -14,44 +14,23 @@
  *         
  *         If Type were 'enum', use 'ShowEnumValue.cs'.
  *         
- *         case Dictionary: className location need 1 right shift.
- *         case Func:       className location need some right shift, such case as Func<T, T, ...>
- *
+ *         ---- Flag Parameters ----
+ *@params  bool withSubject   if it is for VS top comment.
+ *@params  bool isSimpled     if 'buttonReplace' already has been clicked once.
+ *@params  bool isGenericOverTwo
+ *           case Dictionary: className location need 1 right shift.
+ *           case Func:       className location need some right shift, such case as Func<T, T, ...>
+ *@params  bool isInherit     (local)  if this class has base class.
+ *           case inherit:    className with ":" base class.
+ *@params  bool isInnerClass  (local)
+ *           case inner class:  Because it is a Member of this class, 
+ *                              write with "＊Inner class", as usual member.
+ *         
  *@subject Mutex     => 〔MainMutexWaitOneSample.cs〕
  *         二重起動を防止
  *         
  *@subject Clipboard => 〔MainClipboardSample.cs〕
  *         TextBox.Text を Windows OS の Clipboard にコピー
- *
- *@subject ◆class Clipboard -- System.Windows.Forms
- *         [×] 'new' is not avaliable.
- *         
- *         + static bool    Clipboard.ContainsText() 
- *         + static bool    Clipboard.ContainsText(TextDataFormat format) 
- *         + static bool    Clipboard.ContainsImage() 
- *         + static bool    Clipboard.ContainsAudio() 
- *         + static bool    Clipboard.ContainsData(string format) 
- *         + static bool    Clipboard.ContainsFileDropList() 
- *         
- *         + static string  Clipboard.GetText() 
- *         + static string  Clipboard.GetText(TextDataFormat format) 
- *         + static Image   Clipboard.GetImage() 
- *         + static Stream  Clipboard.GetAudioStream() 
- *         + static object  Clipboard.GetData(string format) 
- *         + static IDataObject  Clipboard.GetDataObject() 
- *         + static StringCollection  Clipboard.GetFileDropList() 
- *         
- *         + static void  Clipboard.SetText(string text) 
- *         + static void  Clipboard.SetText(string text, TextDataFormat format) 
- *         + static void  Clipboard.SetImage(Image image) 
- *         + static void  Clipboard.SetAudio(Stream audioStream) 
- *         + static void  Clipboard.SetAudio(byte[] audioBytes) 
- *         + static void  Clipboard.SetData(string format, object data) 
- *         + static void  Clipboard.SetDataObject(object data) 
- *         + static void  Clipboard.SetDataObject(object data, bool copy, int retryTimes, int retryDelay) 
- *         + static void  Clipboard.SetDataObject(object data, bool copy) 
- *         + static void  Clipboard.SetFileDropList(StringCollection filePaths) 
- *         + static void  Clipboard.Clear() 
  *
  *@see ImageVisualStudioMetadataViewer.jpg
  *@see 
@@ -183,6 +162,8 @@ namespace WinFormGUI.CsharpCode
 
             string namespaceName = "";
             string className = "";
+            bool isInnerClass = false;
+
             foreach (string line in lineAry)
             {
                 string trimedLine = line.Trim();
@@ -227,7 +208,9 @@ namespace WinFormGUI.CsharpCode
                     string containText = trimedLine.Contains("class ") ? "class " : "struct ";
                     
                     int startIndex = containText.Length + trimedLine.IndexOf(containText);
-                    
+
+                    isInnerClass = (className == "") ? false : true;
+
                     if (isInherit)
                     {
                         int length = trimedLine.IndexOf(":") - startIndex;
@@ -241,9 +224,22 @@ namespace WinFormGUI.CsharpCode
                     string pattenConstructor = $@"[ ]+{className}\(+[0-9a-zA-z,<>\[\] ]*\)+";
                     regexConstructor = new Regex(pattenConstructor);
 
-                    trimedLine = trimedLine.Replace("+ ", "");
+                    //---- case inner class ----
+                    if (isInnerClass && withSubject)
+                    {
+                        bld.Append(" *         \n");
+                        bld.Append(" *         ＊Inner class\n");
+                        bld.Append(" *         ");
+                    }
+                    else
+                    {
+                        trimedLine = trimedLine.Replace("+ ", "");
+                    }
+
+                    //---- class line ----
                     bld.Append($"{trimedLine}");
 
+                    //---- case inherit ----
                     if (isInherit)
                     { 
                         bld.Append("\n"); 
@@ -258,8 +254,8 @@ namespace WinFormGUI.CsharpCode
 
                     bld.Append($" -- {namespaceName}\n");
 
-                    //---- No Constructor Message ----
-                    if(trimedLine.Contains("statc class "))
+                    //---- case No Constructor Message ----
+                    if(trimedLine.Contains("static class "))
                     {
                         bld.Append("[×] 'new' is not avaliable, because of static class.\n");
                     }
@@ -370,6 +366,7 @@ namespace WinFormGUI.CsharpCode
 
                 bld.Append("\n");
             }//foreach lineAry
+            bld.Append(" *\n");
 
             isSimpled = true;
             label.Text = "Simpled Metadata:";
@@ -421,7 +418,7 @@ namespace WinFormGUI.CsharpCode
         {
             if(!mutex.WaitOne(millisecondsTimeout: 0, exitContext: false))
             {
-                MessageBox.Show("This Form already has been in here.");
+                MessageBox.Show("This Form already has been running here.");
                 this.Close();
             }
         }//FormVisualStudioMetadataViewer_Load()
