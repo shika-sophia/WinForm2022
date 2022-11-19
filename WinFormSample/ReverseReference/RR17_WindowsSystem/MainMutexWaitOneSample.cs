@@ -4,6 +4,7 @@
  *@class   └ new FormMutexWaitOneSample() : Form
  *@class       └ new Mutex()  -- -- System.Threading.
  *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
+ *@reference MT 結城 浩『デザインパターン入門 マルチスレッド編 [増補改訂版]』SB Creative, 2006 
  *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
  *          
@@ -26,6 +27,7 @@
  *@subject ◆sealed class Mutex : WaitHandle  -- System.Threading
  *         ・mutex: mutual exclusion 相互排他  
  *           =>〔MT MultiThread / SingleThreadExecution | MT p84, p478〕
+ *           =>〔CsharpBegin / MultiThread / MTCS01_SingleThreadExecution / Mutex / MainMutex.cs〕
  *           =>〔[java] ReentrantLockクラス〕
  *         
  *         + Mutex  new Mutex() 
