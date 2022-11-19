@@ -19,7 +19,6 @@
  */
 using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
 /*
@@ -40,6 +39,7 @@ using System.Windows.Forms;
 
 class Form1 : Form
 {
+    private readonly Mutex mutex;
 
     public Form1()
     {
@@ -50,12 +50,33 @@ class Form1 : Form
         this.AutoSize = true;
         this.BackColor = SystemColors.Window;
 
+        //---- Form Event ----
+        mutex = new Mutex(initiallyOwned: false, "Form1");
+        this.Load += new EventHandler(Form1_Load);
+        this.FormClosed += new FormClosedEventHandler(Form1_FormClosed);
 
+        //---- Controls ----
+
+        //---- Deployment ----
         this.Controls.AddRange(new Control[]
         {
             
         });
     }//constructor
+
+    private void Form1_Load(object sender, EventArgs e)
+    {
+        if(!mutex.WaitOne(millisecondsTimeout: 0, exitContext: false))
+        {
+            MessageBox.Show("This Form already has been running.");
+            this.Close();
+        }
+    }//Form1_Load()
+
+    private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+    {
+        mutex.Close();
+    }//Form1_FormClosed()
 }//class
 
  */

@@ -16,7 +16,13 @@
  *         
  *         case Dictionary: className location need 1 right shift.
  *         case Func:       className location need some right shift, such case as Func<T, T, ...>
+ *
+ *@subject Mutex     => 〔MainMutexWaitOneSample.cs〕
+ *         二重起動を防止
  *         
+ *@subject Clipboard => 〔MainClipboardSample.cs〕
+ *         TextBox.Text を Windows OS の Clipboard にコピー
+ *
  *@subject ◆class Clipboard -- System.Windows.Forms
  *         [×] 'new' is not avaliable.
  *         
@@ -56,6 +62,7 @@ using System;
 using System.Drawing;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace WinFormGUI.CsharpCode
@@ -77,6 +84,7 @@ namespace WinFormGUI.CsharpCode
 
     class FormVisualStudioMetadataViewer : Form
     {
+        private readonly Mutex mutex;
         private readonly TableLayoutPanel table;
         private readonly Label label;
         private readonly RichTextBox textBox;
@@ -95,6 +103,11 @@ namespace WinFormGUI.CsharpCode
             //this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.AutoSize = true;
             this.BackColor = SystemColors.Window;
+
+            //---- Form Event ----
+            mutex = new Mutex(initiallyOwned: false, "FormVisualStudioMetadataViewer");
+            this.Load += new EventHandler(FormVisualStudioMetadataViewer_Load);
+            this.FormClosed += new FormClosedEventHandler(FormVisualStudioMetadataViewer_FormClosed);
 
             //---- TableLayoutPanel ----
             table = new TableLayoutPanel()
@@ -254,7 +267,6 @@ namespace WinFormGUI.CsharpCode
                     continue;
                 }//if class
                 
-
                 //---- Append Member with className ----
                 if (withSubject) { bld.Append(" *         "); }
 
@@ -329,7 +341,8 @@ namespace WinFormGUI.CsharpCode
                     }
                     else if (trimedLine.Contains("abstract ")
                         || trimedLine.Contains("internal ")
-                        || trimedLine.Contains("event "))
+                        || trimedLine.Contains("event ")
+                        || trimedLine.Contains("const "))
                     { 
                         if (i == 2 && CaseGenericOverTwo(ref i, splitedWord, className, ref bld))
                         {
@@ -404,6 +417,19 @@ namespace WinFormGUI.CsharpCode
             textBox.Text = "";
         }//ButtonCopy_Click()
 
+        private void FormVisualStudioMetadataViewer_Load(object sender, EventArgs e)
+        {
+            if(!mutex.WaitOne(millisecondsTimeout: 0, exitContext: false))
+            {
+                MessageBox.Show("This Form already has been in here.");
+                this.Close();
+            }
+        }//FormVisualStudioMetadataViewer_Load()
+
+        private void FormVisualStudioMetadataViewer_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            mutex.Close();
+        }//FormVisualStudioMetadataViewer_FormClosed()
     }//class
 }
 
