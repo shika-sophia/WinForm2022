@@ -257,7 +257,8 @@ namespace WinFormGUI.CsharpCode
                     //---- case No Constructor Message ----
                     if(trimedLine.Contains("static class "))
                     {
-                        bld.Append("[×] 'new' is not avaliable, because of static class.\n");
+                        if (withSubject) { bld.Append(" *         "); }
+                        bld.Append("[×] 'new' is not available, because of static class.\n");
                     }
 
                     continue;
