@@ -163,6 +163,7 @@ namespace WinFormGUI.CsharpCode
             string namespaceName = "";
             string className = "";
             bool isInnerClass = false;
+            bool isInterface = false;
 
             foreach (string line in lineAry)
             {
@@ -203,10 +204,16 @@ namespace WinFormGUI.CsharpCode
                 bool isInherit = trimedLine.Contains(":");
 
                 if (trimedLine.Contains("class ") 
-                    || trimedLine.Contains("struct "))
+                    || trimedLine.Contains("struct ")
+                    || trimedLine.Contains("interface "))
                 {
                     string containText = trimedLine.Contains("class ") ? "class " : "struct ";
-                    
+                    if (trimedLine.Contains("interface "))
+                    {
+                        containText = "interface ";
+                        isInterface = true;
+                    }
+
                     int startIndex = containText.Length + trimedLine.IndexOf(containText);
 
                     isInnerClass = (className == "") ? false : true;
@@ -350,6 +357,19 @@ namespace WinFormGUI.CsharpCode
                         if (i == 3 && !isGenericOverTwo)
                         {
                             InsertInstanceClassName(bld, className);
+                        }
+                    }
+                    else if (isInterface)
+                    {
+                        if (i == 0 && CaseGenericOverTwo(ref i, splitedWord, className, ref bld))
+                        {
+                            bld.Append($" {className}.");
+                            continue;
+                        }
+
+                        if (i == 1 && !isGenericOverTwo)
+                        {
+                            bld.Append($" {className}.");
                         }
                     }
                     else if (i == 1 && CaseGenericOverTwo(ref i, splitedWord, className, ref bld))  //case Dictionary<T, T>
