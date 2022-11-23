@@ -25,7 +25,13 @@
  *@params  bool isInnerClass  (local)
  *           case inner class:  Because it is a Member of this class, 
  *                              write with "＊Inner class", as usual member.
- *         
+ *         bool isInterface   (local)
+ *           case interface:  no '+' instead of 'public' -> className location shifts 1 word to left
+ *
+ *         ---- Problem ----
+ *         case indexer:  this[] ->  unnecessary className -> duplicate 'this' and className
+ *                        (not improved yet)
+ *                        
  *@subject Mutex     => 〔MainMutexWaitOneSample.cs〕
  *         二重起動を防止
  *         
