@@ -56,50 +56,73 @@
  *         
  *@subject ◆interface  _Application -- Microsoft.Office.Interop.Excel
  *         ＊Property
+ *         string       _Application.Name { get; } 
+ *         Names        _Application.Names { get; } 
+ *         string       _Application.UserName { get; set; } 
+ *         string       _Application.Value { get; } 
+ *         string       _Application.Version { get; } 
+ *         string       _Application.StandardFont { get; set; } 
+ *         double       _Application.StandardFontSize { get; set; } 
+ *         bool         _Application.Visible { get; set; } 
+ *         bool         _Application.EnableEvents { get; set; } 
+ *         double       _Application.Width { get; set; } 
+ *         double       _Application.Height { get; set; } 
+ *         double       _Application.UsableWidth { get; } 
+ *         double       _Application.UsableHeight { get; } 
+ *         double       _Application.Top { get; set; } 
+ *         double       _Application.Left { get; set; } 
+ *         double       _Application.MaxChange { get; set; }
+ *         int          _Application.FormulaBarHeight { get; set; } 
+ *         Range        _Application.Columns { get; } 
+ *         Range        _Application.Rows { get; } 
+ *         Range        _Application.Cells { get; } 
  *         XlCreator    _Application.Creator { get; } 
  *         Application  _Application.Application { get; } 
  *         Application  _Application.Parent { get; } 
  *         dynamic      _Application.Selection { get; } 
- *         Names        _Application.Names { get; } 
  *         Windows      _Application.Windows { get; } 
- *         Window       _Application.ActiveWindow { get; } 
  *         Workbooks    _Application.Workbooks { get; } 
  *         Workbook     _Application.ThisWorkbook { get; } 
- *         Workbook     _Application.ActiveWorkbook { get; } 
  *         Sheets       _Application.Sheets { get; } 
  *         Sheets       _Application.Worksheets { get; } 
  *         Sheets       _Application.DialogSheets { get; } 
- *         dynamic      _Application.ActiveSheet { get; } 
- *         Range        _Application.Columns { get; } 
- *         Range        _Application.Rows { get; } 
- *         Range        _Application.Cells { get; } 
- *         Range        _Application.ActiveCell { get; } 
  *         Sheets       _Application.Charts { get; } 
+ *         Window       _Application.ActiveWindow { get; } 
+ *         Workbook     _Application.ActiveWorkbook { get; } 
+ *         dynamic      _Application.ActiveSheet { get; } 
+ *         Range        _Application.ActiveCell { get; } 
  *         Chart        _Application.ActiveChart { get; } 
  *         DialogSheet  _Application.ActiveDialog { get; } 
- *         WorksheetFunction  _Application.WorksheetFunction { get; } 
  *         string       _Application.ActivePrinter { get; set; } 
- *         AddIns       _Application.AddIns { get; } 
+ *         WorksheetFunction  _Application.WorksheetFunction { get; } 
  *         Assistant    _Application.Assistant { get; } 
  *         MenuBars     _Application.MenuBars { get; } 
  *         MenuBar      _Application.ActiveMenuBar { get; } 
  *         CommandBars  _Application.CommandBars { get; } 
  *         Toolbars     _Application.Toolbars { get; } 
+ *         dynamic      _Application.StatusBar { get; set; } 
  *         Modules      _Application.Modules { get; } 
- *         Sheets       _Application.Excel4IntlMacroSheets { get; } 
  *         Sheets       _Application.Excel4MacroSheets { get; } 
+ *         Sheets       _Application.Excel4IntlMacroSheets { get; } 
  *         
  *         string       _Application._Default { get; } 
- *         string       _Application.Name { get; } 
  *         string       _Application.OrganizationName { get; } 
  *         string       _Application.OperatingSystem { get; } 
  *         string       _Application.Path { get; } 
  *         string       _Application.DefaultFilePath { get; set; } 
+ *         string       _Application.StartupPath { get; } 
+ *         string       _Application.TemplatesPath { get; } 
  *         string       _Application.LibraryPath { get; } 
+ *         string       _Application.UserLibraryPath { get; } 
  *         string       _Application.NetworkTemplatesPath { get; } 
  *         string       _Application.PathSeparator { get; } 
  *         string       _Application.AltStartupPath { get; set; } 
  *         string       _Application.Caption { get; set; } 
+ *         string       _Application.TransitionMenuKey { get; set; } 
+ *         string       _Application.ProductCode { get; } 
+ *         string       _Application.DecimalSeparator { get; set; } 
+ *         string       _Application.ThousandsSeparator { get; set; } 
+ *         string       _Application.ClusterConnector { get; set; } 
  *         string       _Application.OnWindow { get; set; } 
  *         string       _Application.OnSheetActivate { get; set; } 
  *         string       _Application.OnSheetDeactivate { get; set; } 
@@ -109,19 +132,45 @@
  *         string       _Application.OnDoubleClick { get; set; } 
  *         
  *         int          _Application.Build { get; } 
- *         int          _Application.DDEAppReturnCode { get; } 
  *         int          _Application.CustomListCount { get; } 
  *         int          _Application.DataEntryMode { get; set; } 
  *         int          _Application.FixedDecimalPlaces { get; set; } 
- *         double       _Application.Height { get; set; } 
- *         double       _Application.Left { get; set; } 
- *         double       _Application.MaxChange { get; set; } 
- *         int  _Application.MaxIterations { get; set; } 
- *         int  _Application.MemoryFree { get; } 
- *         int  _Application.MemoryTotal { get; } 
- *         int  _Application.MemoryUsed { get; } 
- *         int  _Application.ODBCTimeout { get; set; } 
+ *         int          _Application.MaxIterations { get; set; } 
+ *         int          _Application.MemoryFree { get; } 
+ *         int          _Application.MemoryTotal { get; } 
+ *         int          _Application.MemoryUsed { get; } 
+ *         int          _Application.ODBCTimeout { get; set; } 
+ *         int          _Application.DDEAppReturnCode { get; } 
+ *         int          _Application.SheetsInNewWorkbook { get; set; } 
+ *         int          _Application.TransitionMenuKeyAction { get; set; } 
+ *         int          _Application.Hwnd { get; } 
+ *         int          _Application.Hinstance { get; } 
+ *         int          _Application.UILanguage { get; set; } 
+ *         int          _Application.DefaultSheetDirection { get; set; } 
+ *         int          _Application.CursorMovement { get; set; } 
+ *         int          _Application.CalculationVersion { get; } 
+ *         int          _Application.LargeOperationCellThousandCount { get; set; } 
+ *         int          _Application.ActiveEncryptionSession { get; } 
+ *         int          _Application.MeasurementUnit { get; set; }  
  *         
+ *         bool         _Application.WindowsForPens { get; } 
+ *         bool         _Application.DisplayInfoWindow { get; set; } 
+ *         bool         _Application.PivotTableSelection { get; set; } 
+ *         bool         _Application.PromptForSummaryInfo { get; set; } 
+ *         bool         _Application.RecordRelative { get; } 
+ *         bool         _Application.RollZoom { get; set; } 
+ *         bool         _Application.ScreenUpdating { get; set; } 
+ *         bool         _Application.ShowToolTips { get; set; } 
+ *         bool         _Application.ShowChartTipNames { get; set; } 
+ *         bool         _Application.ShowChartTipValues { get; set; } 
+ *         bool         _Application.DisplayFunctionToolTips { get; set; } 
+ *         bool         _Application.TransitionNavigKeys { get; set; } 
+ *         bool         _Application.UserControl { get; set; } 
+ *         bool         _Application.ControlCharacters { get; set; } 
+ *         bool         _Application.ExtendList { get; set; } 
+ *         bool         _Application.AutoPercentEntry { get; set; } 
+ *         bool         _Application.Ready { get; } 
+ *         bool         _Application.ShowWindowsInTaskbar { get; set; } 
  *         bool         _Application.AlertBeforeOverwriting { get; set; } 
  *         bool         _Application.AskToUpdateLinks { get; set; } 
  *         bool         _Application.EnableAnimations { get; set; } 
@@ -134,26 +183,61 @@
  *         bool         _Application.ConstrainNumeric { get; set; } 
  *         bool         _Application.CopyObjectsWithCells { get; set; } 
  *         bool         _Application.DisplayAlerts { get; set; } 
- *         bool  _Application.DisplayFormulaBar { get; set; } 
- *         bool  _Application.DisplayFullScreen { get; set; } 
- *         bool  _Application.DisplayNoteIndicator { get; set; } 
- *         bool  _Application.DisplayExcel4Menus { get; set; } 
- *         bool  _Application.DisplayRecentFiles { get; set; } 
- *         bool  _Application.DisplayScrollBars { get; set; } 
- *         bool  _Application.DisplayStatusBar { get; set; } 
- *         bool  _Application.EditDirectlyInCell { get; set; } 
- *         bool  _Application.EnableAutoComplete { get; set; } 
- *         bool  _Application.EnableSound { get; set; } 
- *         bool  _Application.EnableTipWizard { get; set; } 
- *         bool  _Application.FixedDecimal { get; set; } 
- *         bool  _Application.IgnoreRemoteRequests { get; set; } 
- *         bool  _Application.Interactive { get; set; } 
- *         bool  _Application.Iteration { get; set; } 
- *         bool  _Application.LargeButtons { get; set; } 
- *         bool  _Application.MathCoprocessorAvailable { get; } 
- *         bool  _Application.MouseAvailable { get; } 
- *         bool  _Application.MoveAfterReturn { get; set; } 
+ *         bool         _Application.DisplayFullScreen { get; set; } 
+ *         bool         _Application.DisplayNoteIndicator { get; set; } 
+ *         bool         _Application.DisplayExcel4Menus { get; set; } 
+ *         bool         _Application.DisplayRecentFiles { get; set; } 
+ *         bool         _Application.DisplayStatusBar { get; set; } 
+ *         bool         _Application.DisplayScrollBars { get; set; } 
+ *         bool         _Application.DisplayFormulaBar { get; set; } 
+ *         bool         _Application.EditDirectlyInCell { get; set; } 
+ *         bool         _Application.EnableAutoComplete { get; set; } 
+ *         bool         _Application.EnableSound { get; set; } 
+ *         bool         _Application.EnableTipWizard { get; set; } 
+ *         bool         _Application.FixedDecimal { get; set; } 
+ *         bool         _Application.IgnoreRemoteRequests { get; set; } 
+ *         bool         _Application.Interactive { get; set; } 
+ *         bool         _Application.Iteration { get; set; } 
+ *         bool         _Application.LargeButtons { get; set; } 
+ *         bool         _Application.MathCoprocessorAvailable { get; } 
+ *         bool         _Application.MouseAvailable { get; } 
+ *         bool         _Application.MoveAfterReturn { get; set; } 
+ *         bool         _Application.DisplayPasteOptions { get; set; } 
+ *         bool         _Application.DisplayInsertOptions { get; set; } 
+ *         bool         _Application.GenerateGetPivotData { get; set; } 
+ *         bool         _Application.AutoFormatAsYouTypeReplaceHyperlinks { get; set; } 
+ *         bool         _Application.MapPaperSize { get; set; } 
+ *         bool         _Application.ShowStartupDialog { get; set; } 
+ *         bool         _Application.UseSystemSeparators { get; set; } 
+ *         bool         _Application.DisplayDocumentActionTaskPane { get; set; } 
+ *         bool         _Application.ArbitraryXMLSupportAvailable { get; } 
+ *         bool         _Application.ShowSelectionFloaties { get; set; } 
+ *         bool         _Application.ShowMenuFloaties { get; set; } 
+ *         bool         _Application.ShowDevTools { get; set; } 
+ *         bool         _Application.EnableLivePreview { get; set; } 
+ *         bool         _Application.DisplayDocumentInformationPanel { get; set; } 
+ *         bool         _Application.AlwaysUseClearType { get; set; } 
+ *         bool         _Application.WarnOnFunctionNameConflict { get; set; } 
+ *         bool         _Application.EnableLargeOperationAlert { get; set; } 
+ *         bool         _Application.DeferAsyncQueries { get; set; } 
+ *         bool         _Application.HighQualityModeForGraphics { get; set; } 
+ *         bool         _Application.PrintCommunication { get; set; } 
+ *         bool         _Application.UseClusterConnector { get; set; } 
+ *         bool         _Application.Quitting { get; } 
+ *         bool         _Application.Dummy22 { get; set; } 
+ *         bool         _Application.Dummy23 { get; set; } 
+ *         bool         _Application.IsSandboxed { get; } 
+ *         bool         _Application.SaveISO8601Dates { get; set; } 
+ *         bool         _Application.DisplayFormulaAutoComplete { get; set; } 
+ *         bool         _Application.ShowQuickAnalysis { get; set; } 
+ *         bool         _Application.FlashFill { get; set; } 
+ *         bool         _Application.EnableMacroAnimations { get; set; } 
+ *         bool         _Application.ChartDataPointTrack { get; set; } 
+ *         bool         _Application.FlashFillMode { get; set; } 
+ *         bool         _Application.MergeInstances { get; set; } 
+ *         bool         _Application.EnableCheckFileExtensions { get; set; } 
  *         
+ *         AddIns       _Application.AddIns { get; } 
  *         XlCalculation  _Application.Calculation { get; set; } 
  *         AutoCorrect    _Application.AutoCorrect { get; } 
  *         XlCommandUnderlines  _Application.CommandUnderlines { get; set; } 
@@ -170,137 +254,53 @@
  *         RecentFiles  _Application.RecentFiles { get; } 
  *         ODBCErrors   _Application.ODBCErrors { get; } 
  *         XlReferenceStyle  _Application.ReferenceStyle { get; set; } 
- *         bool  _Application.PivotTableSelection { get; set; } 
- *         bool  _Application.PromptForSummaryInfo { get; set; } 
- *         bool  _Application.RecordRelative { get; } 
- *         bool  _Application.RollZoom { get; set; } 
- *         bool  _Application.ScreenUpdating { get; set; } 
- *         int  _Application.SheetsInNewWorkbook { get; set; } 
- *         bool  _Application.ShowChartTipNames { get; set; } 
- *         bool  _Application.ShowChartTipValues { get; set; } 
- *         string  _Application.StandardFont { get; set; } 
- *         double  _Application.StandardFontSize { get; set; } 
- *         int  _Application.TransitionMenuKeyAction { get; set; } 
- *         string  _Application.StartupPath { get; } 
- *         dynamic  _Application.StatusBar { get; set; } 
- *         string  _Application.TemplatesPath { get; } 
- *         bool  _Application.ShowToolTips { get; set; } 
- *         double  _Application.Top { get; set; } 
- *         string  _Application.TransitionMenuKey { get; set; } 
  *         XlFileFormat  _Application.DefaultSaveFormat { get; set; } 
- *         bool  _Application.TransitionNavigKeys { get; set; } 
- *         double  _Application.UsableHeight { get; } 
- *         double  _Application.UsableWidth { get; } 
- *         bool  _Application.UserControl { get; set; } 
- *         string  _Application.UserName { get; set; } 
- *         string  _Application.Value { get; } 
  *         VBE  _Application.VBE { get; } 
- *         string  _Application.Version { get; } 
- *         bool  _Application.Visible { get; set; } 
- *         double  _Application.Width { get; set; } 
- *         bool  _Application.WindowsForPens { get; } 
  *         XlWindowState  _Application.WindowState { get; set; } 
- *         int  _Application.UILanguage { get; set; } 
- *         int  _Application.DefaultSheetDirection { get; set; } 
- *         int  _Application.CursorMovement { get; set; } 
- *         bool  _Application.ControlCharacters { get; set; } 
- *         bool  _Application.EnableEvents { get; set; } 
- *         bool  _Application.DisplayInfoWindow { get; set; } 
- *         bool  _Application.ExtendList { get; set; } 
  *         OLEDBErrors  _Application.OLEDBErrors { get; } 
  *         COMAddIns  _Application.COMAddIns { get; } 
  *         DefaultWebOptions  _Application.DefaultWebOptions { get; } 
- *         string  _Application.ProductCode { get; } 
- *         string  _Application.UserLibraryPath { get; } 
- *         bool  _Application.AutoPercentEntry { get; set; } 
  *         LanguageSettings  _Application.LanguageSettings { get; } 
  *         dynamic  _Application.Dummy101 { get; } 
  *         AnswerWizard  _Application.AnswerWizard { get; } 
- *         int  _Application.CalculationVersion { get; } 
- *         bool  _Application.ShowWindowsInTaskbar { get; set; } 
  *         MsoFeatureInstall  _Application.FeatureInstall { get; set; } 
- *         bool  _Application.Ready { get; } 
  *         CellFormat  _Application.FindFormat { get; set; } 
  *         CellFormat  _Application.ReplaceFormat { get; set; } 
  *         UsedObjects  _Application.UsedObjects { get; } 
  *         XlCalculationState  _Application.CalculationState { get; } 
  *         XlCalculationInterruptKey  _Application.CalculationInterruptKey { get; set; } 
  *         Watches  _Application.Watches { get; } 
- *         bool  _Application.DisplayFunctionToolTips { get; set; } 
  *         MsoAutomationSecurity  _Application.AutomationSecurity { get; set; } 
- *         bool  _Application.DisplayPasteOptions { get; set; } 
- *         bool  _Application.DisplayInsertOptions { get; set; } 
- *         bool  _Application.GenerateGetPivotData { get; set; } 
  *         AutoRecover  _Application.AutoRecover { get; } 
- *         int  _Application.Hwnd { get; } 
- *         int  _Application.Hinstance { get; } 
  *         ErrorCheckingOptions  _Application.ErrorCheckingOptions { get; } 
- *         bool  _Application.AutoFormatAsYouTypeReplaceHyperlinks { get; set; } 
  *         SmartTagRecognizers  _Application.SmartTagRecognizers { get; } 
  *         NewFile  _Application.NewWorkbook { get; } 
  *         SpellingOptions  _Application.SpellingOptions { get; } 
  *         Speech  _Application.Speech { get; } 
- *         bool  _Application.MapPaperSize { get; set; } 
- *         bool  _Application.ShowStartupDialog { get; set; } 
- *         string  _Application.DecimalSeparator { get; set; } 
- *         string  _Application.ThousandsSeparator { get; set; } 
- *         bool  _Application.UseSystemSeparators { get; set; } 
  *         Range  _Application.ThisCell { get; } 
  *         RTD  _Application.RTD { get; } 
- *         bool  _Application.DisplayDocumentActionTaskPane { get; set; } 
- *         bool  _Application.ArbitraryXMLSupportAvailable { get; } 
- *         int  _Application.MeasurementUnit { get; set; } 
- *         bool  _Application.ShowSelectionFloaties { get; set; } 
- *         bool  _Application.ShowMenuFloaties { get; set; } 
- *         bool  _Application.ShowDevTools { get; set; } 
- *         bool  _Application.EnableLivePreview { get; set; } 
- *         bool  _Application.DisplayDocumentInformationPanel { get; set; } 
- *         bool  _Application.AlwaysUseClearType { get; set; } 
- *         bool  _Application.WarnOnFunctionNameConflict { get; set; } 
- *         int  _Application.FormulaBarHeight { get; set; } 
- *         bool  _Application.DisplayFormulaAutoComplete { get; set; } 
  *         XlGenerateTableRefs  _Application.GenerateTableRefs { get; set; } 
  *         IAssistance  _Application.Assistance { get; } 
- *         bool  _Application.EnableLargeOperationAlert { get; set; } 
- *         int  _Application.LargeOperationCellThousandCount { get; set; } 
- *         bool  _Application.DeferAsyncQueries { get; set; } 
  *         MultiThreadedCalculation  _Application.MultiThreadedCalculation { get; } 
- *         int  _Application.ActiveEncryptionSession { get; } 
- *         bool  _Application.HighQualityModeForGraphics { get; set; } 
  *         FileExportConverters  _Application.FileExportConverters { get; } 
  *         SmartArtLayouts  _Application.SmartArtLayouts { get; } 
  *         SmartArtQuickStyles  _Application.SmartArtQuickStyles { get; } 
  *         SmartArtColors  _Application.SmartArtColors { get; } 
  *         AddIns2  _Application.AddIns2 { get; } 
- *         bool  _Application.PrintCommunication { get; set; } 
- *         bool  _Application.UseClusterConnector { get; set; } 
- *         string  _Application.ClusterConnector { get; set; } 
- *         bool  _Application.Quitting { get; } 
- *         bool  _Application.Dummy22 { get; set; } 
- *         bool  _Application.Dummy23 { get; set; } 
  *         ProtectedViewWindows  _Application.ProtectedViewWindows { get; } 
  *         ProtectedViewWindow  _Application.ActiveProtectedViewWindow { get; } 
- *         bool  _Application.IsSandboxed { get; } 
- *         bool  _Application.SaveISO8601Dates { get; set; } 
  *         dynamic  _Application.HinstancePtr { get; } 
  *         MsoFileValidationMode  _Application.FileValidation { get; set; } 
  *         XlFileValidationPivotMode  _Application.FileValidationPivot { get; set; } 
- *         bool  _Application.ShowQuickAnalysis { get; set; } 
  *         QuickAnalysis  _Application.QuickAnalysis { get; } 
- *         bool  _Application.FlashFill { get; set; } 
- *         bool  _Application.EnableMacroAnimations { get; set; } 
- *         bool  _Application.ChartDataPointTrack { get; set; } 
- *         bool  _Application.FlashFillMode { get; set; } 
- *         bool  _Application.MergeInstances { get; set; } 
- *         bool  _Application.EnableCheckFileExtensions { get; set; } 
  *         
  *         ＊abstract Method
  *         void  _Application.Calculate() 
  *         void  _Application.DDEExecute(int Channel, string String) 
- *         int  _Application.DDEInitiate(string App, string Topic) 
+ *         int   _Application.DDEInitiate(string App, string Topic) 
  *         void  _Application.DDEPoke(int Channel, object Item, object Data) 
- *         dynamic  _Application.DDERequest(int Channel, string Item) 
  *         void  _Application.DDETerminate(int Channel) 
+ *         dynamic  _Application.DDERequest(int Channel, string Item) 
  *         dynamic  _Application.Evaluate(object Name) 
  *         dynamic  _Application._Evaluate(object Name) 
  *         dynamic  _Application.ExecuteExcel4Macro(string String) 
