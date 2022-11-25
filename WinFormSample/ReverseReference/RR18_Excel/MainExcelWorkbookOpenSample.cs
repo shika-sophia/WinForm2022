@@ -42,6 +42,29 @@
  *         Excel.Application excelApp = new Excel.Application();
  *         Excel.Workbook wb = excelApp.Workbooks.Open(
  *            Path.GetFullPath(@"..\..\WinFormSample\ReverseReference\RR18_Excel\RR18_ExcelFileSample.xlsx"));
+ *            
+ *@NOTE【註】Move File
+ *      [×] VSの機能で Excelファイル移動してはいけない
+ *      Excelで保存したディレクトリを変更すると、Excelからファイルを開けなくなる。
+ *      VSでも利用し、「編集中のためロック」と表示される。
+ *      こうなると、Excel, VSとも open, deleteができなくなる。
+ *      => PC Shutdownしてファイルを強制終了して解決
+ *      
+ *      [×] Don't use File Move Operation of Visual Studio.
+ *      If you would change the directory of this file where Excel saved, 
+ *      Excel cannot open this file.
+ *      If VS would use this file, VS said "Locking this file, due to be editing".
+ *      On these cases, both Excel and VS cannot open or delete either.
+ *      => 【Solve】by PC Shutdown, this file should close enforcely.
+ *
+ *@NOTE【註】Save changes certainly / 変更は確実に保存する
+ *      Excel変更時、「変更を保存しますか」という Dialog Message が出される。
+ *      この時に確実に保存すべき。
+ *      さもないと、上記のように Excelの状態は「編集中のためロック」状態になってしまう。
+ *     
+ *      When Excel changed, Excel ask "Do you save this changes to Excel" by Dialog Message.
+ *      You should save certainly, 
+ *      or Excel State is to "Locking this file, due to be editing" state, as above.
  */
 #region -> interface Microsoft.Office.Interop.Excel.Application
 /*

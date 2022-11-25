@@ -48,20 +48,6 @@
  *         }//while
  *         grid.DataSource = dataList;
  *
- *@NOTE【註】Move File
- *      [×] VSの機能で Excelファイル移動してはいけない
- *      Excelで保存したディレクトリを変更すると、Excelからファイルを開けなくなる。
- *      VSでも利用し、「編集中のためロック」と表示される。
- *      こうなると、Excel, VSとも open, deleteができなくなる。
- *      => PC Shutdownしてファイルを強制終了して解決
- *      
- *      [×] Don't use File Move Operation of Visual Studio.
- *      If you would change the directory of this file where Excel saved, 
- *      Excel cannot open this file.
- *      If VS would use this file, VS said "Locking this file, due to be editing".
- *      On these cases, both Excel and VS cannot open or delete either.
- *      => 【Solve】by PC Shutdown, this file should close enforcely.
- *      
  *@see ImageExcelDataGridViewSample.jpg
  *@see 
  *@author shika
