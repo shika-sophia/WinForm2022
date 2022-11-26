@@ -7,7 +7,7 @@
  *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
  *          
- *@content RR[484][485] p818 / Excel ファイルを Open
+ *@content RR[484][485][491] p818 / Excel ファイルを Open(), Save()
  *         Microsoft Excel を C#から操作するクラス群
  *         
  *@prepare【Addition Referece Library / 参照追加】
@@ -65,6 +65,27 @@
  *      When Excel changed, Excel ask "Do you save this changes to Excel" by Dialog Message.
  *      You should save certainly, 
  *      or Excel State is to "Locking this file, due to be editing" state, as above.
+ *
+ *@subject excelApp.Quit()
+ *         上記の問題回避のために、プログラムで開いたファイルは必ず閉じる
+ *         
+ *         using() は IDisposable 継承クラスのみ可能。
+ *         Microsoft.Office.Interop.Excel は IDisposableを継承していないので、
+ *         try - finally で、excelApp.Quit(); を行う
+ *         
+ *@subject workbook.Save()  ファイルを保存 
+ *         -> [Excel] 「すでに同名のファイルが存在します。上書きしますか？」と出る
+ *         -> [OK]
+ *         
+ *         void  workbook.Save()                     上書き保存
+ *         void  workbook.SaveAs(string newFileName) 名前を付けて保存
+ *         
+ *@subject【註】C#プログラム実行する場合は、
+ *         プログラムで利用する 対象Excelファイル[.xlsx]を閉じた状態で実行する。
+ *         (Excel画面で 対象Excelファイル[.xlsx]を開いている状態で
+ *         プログラム実行しても２回目以降の更新を反映しない)
+ *         => 〔MainExcelInteriorColorSample.cs〕
+ *         
  */
 #region -> interface Microsoft.Office.Interop.Excel.Application
 /*
