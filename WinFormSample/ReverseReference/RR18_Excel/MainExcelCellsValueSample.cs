@@ -13,9 +13,10 @@
  *         Sheets   workbook.Sheets
  *         dynamic  workbook.Sheets[i]
  *         dynamic  workBook.ActiveSheet
- *         Range    workSheet.Range[object]                 // Argument is Excel CellName
- *         Range    workSheet.Range[object from, object to] // Argument is Excel Range of CellNames
  *         Range    workSheet.Cells[i, j]                   // [row, column] Arguments start from 1 (not 0)
+ *         Range    workSheet.Range[object]                 // Argument is Excel CellName
+ *         dynamic  workSheet.Range[object from, object to] // Argument is Excel Range of CellNames,
+ *                                                          // return 'dynamic', not necessary cast to 'Range', but need do when use Range's Property
  *         string   range.Value
  *         double   range.Value  数値
  *         

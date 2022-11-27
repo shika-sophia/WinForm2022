@@ -11,7 +11,7 @@
  *@content RR[489] p824 / Excel / range.Interior.Color
  *
  *@summary Cell 範囲を指定して、色を設定
- *         Range    workSheet.Range[object from, object to];
+ *         dynamic  workSheet.Range[object from, object to];
  *         Interior range.Interior { get; }
  *           └ interface Interior --  Microsoft.Office.Interop.Excel 〔below〕
  *         dynamic  range.Interior.Color { get; set;}

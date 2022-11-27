@@ -566,11 +566,23 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR18_Excel
         private void Button_Click(object sender, EventArgs e)
         {
             Excel.Application excelApp = new Excel.Application();
-            Excel.Workbook wb = excelApp.Workbooks.Open(
-                Path.GetFullPath(@"..\..\WinFormSample\ReverseReference\RR18_Excel\RR18_ExcelFileSample.xlsx"));
-            textBox.Text = wb.Name;
+            try
+            {
+                Excel.Workbook wb = excelApp.Workbooks.Open(
+                    Path.GetFullPath(@"..\..\WinFormSample\ReverseReference\RR18_Excel\RR18_ExcelFileSample.xlsx"));
+                Excel.Worksheet sheet1 = (Excel.Worksheet)wb.Sheets[1];
 
-            excelApp.Quit();
+                textBox.Text = wb.Name;
+                wb.Save();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name);
+            }
+            finally
+            {
+                excelApp.Quit();
+            }
         }//Button_Click()
 
         //====== Form Event ======
