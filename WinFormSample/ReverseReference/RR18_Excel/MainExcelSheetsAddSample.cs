@@ -14,6 +14,7 @@
  *@summary Sheets     workbook.Sheets
  *         dynamic    workbook.Sheets[i]
  *         dynamic    sheets.Add([object Before], [object After], [object Count], [object Type]);
+ *           └ [Return] the Added Worksheet as dynamic -> need cast to Worksheet, if use it's property.
  *         string     worksheet.Name
  *
  *@see ImageExcelSheetsAddSample.jpg
