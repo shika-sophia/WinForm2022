@@ -3,7 +3,7 @@
  *@class MainExcelSheetsAddSample.cs
  *@class   └ new FormExcelSheetsAddSample() : Form
  *@class       └ new Excel.Application()
- *using Excel = Microsoft.Office.Interop.Excel;
+ *@using Excel = Microsoft.Office.Interop.Excel;
  *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
  *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
@@ -16,6 +16,9 @@
  *         dynamic    sheets.Add([object Before], [object After], [object Count], [object Type]);
  *           └ [Return] the Added Worksheet as dynamic -> need cast to Worksheet, if use it's property.
  *         string     worksheet.Name
+ *         
+ *         =>〔MainExcelWorkbookOpenSample.cs〕
+ *         =>〔MianExcelCellsValueSample.cs〕
  *
  *@see ImageExcelSheetsAddSample.jpg
  *@see 

@@ -1,8 +1,9 @@
 ﻿/** 
- *@title WinFormGUI / WinFormSample / 
+ *@title WinFormGUI / WinFormSample / ReverseReference / RR18_Excel
  *@class MainExcelCellsValueSample.cs
  *@class   └ new FormExcelCellsValueSample() : Form
- *@class       └ new Microsoft.Office.Interop.Excel()
+ *@class       └ new Excel.Application()
+ *@using Excel = Microsoft.Office.Interop.Excel
  *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
  *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
@@ -25,7 +26,7 @@
  *         textBox.Text = sheet1.Range["A1"].Value;
  *         textBox.Text = sheet1.Cells[1, 1].Value;
  */
-#region -> interface Workbook, WorkSheet, Sheets, Range
+#region -> interface Workbook, _Workbook, WorkSheet, _WorkSheet, Sheets, Range
 /*
  *@subject ◆interface Workbook : _Workbook, WorkbookEvents_Event
  *                        -- Microsoft.Office.Interop.Excel
@@ -38,64 +39,65 @@
  *@subject ◆interface _Workbook -- Microsoft.Office.Interop.Excel
  *         string  _Workbook.Name { get; } 
  *         Names   _Workbook.Names { get; } 
- *         string  _Workbook.Path { get; } 
+ *         string  _Workbook.FullName { get; } 
  *         string  _Workbook.CodeName { get; } 
  *         string  _Workbook._CodeName { get; set; } 
- *         string  _Workbook.FullName { get; } 
+ *         string  _Workbook.Path { get; } 
+ *         string  _Workbook.Title { get; set; } 
  *         string  _Workbook.Subject { get; set; } 
  *         string  _Workbook.Author { get; set; } 
- *         string  _Workbook.Title { get; set; } 
  *         string  _Workbook.Comments { get; set; } 
  *         string  _Workbook.Keywords { get; set; } 
  *         string  _Workbook.Password { get; set; } 
  *         string  _Workbook.WritePassword { get; set; } 
- *         Sheets  _Workbook.Sheets { get; } 
  *         Styles  _Workbook.Styles { get; } 
- *         dynamic _Workbook.Parent { get; } 
+ *         Connections   _Workbook.Connections { get; } 
+ *         SignatureSet  _Workbook.Signatures { get; } 
+ *         int     _Workbook.RevisionNumber { get; } 
+ *         bool    _Workbook.ReadOnly { get; } 
  *         Application   _Workbook.Application { get; } 
  *         XlCreator     _Workbook.Creator { get; } 
- *         XlFileFormat  _Workbook.FileFormat { get; } 
+ *         Windows  _Workbook.Windows { get; } 
+ *         dynamic  _Workbook.Parent { get; } 
+ *         Sheets   _Workbook.Sheets { get; } 
+ *         Sheets   _Workbook.Charts { get; } 
+ *         Sheets   _Workbook.Worksheets { get; } 
+ *         Sheets   _Workbook.DialogSheets { get; } 
  *         dynamic  _Workbook.ActiveSheet { get; } 
  *         Chart    _Workbook.ActiveChart { get; } 
- *         Windows  _Workbook.Windows { get; } 
- *         Sheets  _Workbook.Worksheets { get; } 
- *         Sheets  _Workbook.DialogSheets { get; } 
- *         Sheets  _Workbook.Charts { get; } 
+ *         XlFileFormat  _Workbook.FileFormat { get; } 
  *         CommandBars  _Workbook.CommandBars { get; } 
  *         dynamic  _Workbook.Container { get; } 
  *         dynamic  _Workbook.CustomDocumentProperties { get; } 
- *         
  *         string  _Workbook.WriteReservedBy { get; } 
+ *         string  _Workbook.FullNameURLEncoded { get; } 
+ *         string  _Workbook.EncryptionProvider { get; set; } 
+ *         string  _Workbook.PasswordEncryptionProvider { get; } 
+ *         string  _Workbook.PasswordEncryptionAlgorithm { get; } 
+ *         int     _Workbook.PasswordEncryptionKeyLength { get; } 
  *         string  _Workbook.OnSave { get; set; } 
  *         string  _Workbook.OnSheetActivate { get; set; } 
  *         string  _Workbook.OnSheetDeactivate { get; set; } 
- *         string  _Workbook.FullNameURLEncoded { get; } 
- *         string  _Workbook.PasswordEncryptionProvider { get; } 
- *         string  _Workbook.PasswordEncryptionAlgorithm { get; } 
- *         string  _Workbook.EncryptionProvider { get; set; } 
  *         
- *         int  _Workbook.PasswordEncryptionKeyLength { get; } 
- *         int  _Workbook.RevisionNumber { get; } 
- *         int  _Workbook.CalculationVersion { get; } 
  *         int  _Workbook.AutoUpdateFrequency { get; set; } 
+ *         int  _Workbook.CalculationVersion { get; } 
  *         int  _Workbook.ChangeHistoryDuration { get; set; } 
  *         int  _Workbook.AccuracyVersion { get; set; } 
  *         
- *         bool  _Workbook.DoNotPromptForConvert { get; set; } 
- *         bool  _Workbook.ForceFullCalculation { get; set; } 
- *         bool  _Workbook.AutoUpdateSaveChanges { get; set; } 
+ *         bool  _Workbook.IsAddin { get; set; } 
  *         bool  _Workbook.HasMailer { get; set; } 
  *         bool  _Workbook.HasPassword { get; } 
+ *         bool  _Workbook.ForceFullCalculation { get; set; } 
+ *         bool  _Workbook.AutoUpdateSaveChanges { get; set; } 
  *         bool  _Workbook.HasRoutingSlip { get; set; } 
  *         bool  _Workbook.AcceptLabelsInFormulas { get; set; } 
- *         bool  _Workbook.IsAddin { get; set; } 
  *         bool  _Workbook.MultiUserEditing { get; } 
  *         bool  _Workbook.PersonalViewListSettings { get; set; } 
+ *         bool  _Workbook.DoNotPromptForConvert { get; set; } 
  *         bool  _Workbook.PersonalViewPrintSettings { get; set; } 
  *         bool  _Workbook.PrecisionAsDisplayed { get; set; } 
  *         bool  _Workbook.ProtectStructure { get; } 
  *         bool  _Workbook.ProtectWindows { get; } 
- *         bool  _Workbook.ReadOnly { get; } 
  *         bool  _Workbook._ReadOnlyRecommended { get; } 
  *         bool  _Workbook.Routed { get; } 
  *         bool  _Workbook.CreateBackup { get; } 
@@ -157,12 +159,10 @@
  *         SharedWorkspace  _Workbook.SharedWorkspace { get; } 
  *         Sync  _Workbook.Sync { get; } 
  *         XmlNamespaces  _Workbook.XmlNamespaces { get; } 
- *         XmlMaps  _Workbook.XmlMaps { get; } 
+ *         XmlMaps        _Workbook.XmlMaps { get; } 
  *         SmartDocument  _Workbook.SmartDocument { get; } 
  *         DocumentLibraryVersions  _Workbook.DocumentLibraryVersions { get; } 
  *         MetaProperties  _Workbook.ContentTypeProperties { get; } 
- *         Connections   _Workbook.Connections { get; } 
- *         SignatureSet  _Workbook.Signatures { get; } 
  *         ServerPolicy  _Workbook.ServerPolicy { get; } 
  *         DocumentInspectors  _Workbook.DocumentInspectors { get; } 
  *         ServerViewableItems  _Workbook.ServerViewableItems { get; } 
@@ -175,9 +175,10 @@
  *         dynamic  _Workbook.DefaultSlicerStyle { get; set; } 
  *         Model  _Workbook.Model { get; } 
  *         
- *         void  _Workbook.OpenLinks(string Name, object ReadOnly, object Type) 
- *         Window  _Workbook.NewWindow() 
+ *         ＊Method
  *         void  _Workbook.Activate() 
+ *         Window  _Workbook.NewWindow() 
+ *         void  _Workbook.OpenLinks(string Name, object ReadOnly, object Type) 
  *         void  _Workbook.ChangeFileAccess(XlFileAccess Mode, object WritePassword, object Notify) 
  *         void  _Workbook.ChangeLink(string Name, string NewName, XlLinkType Type = XlLinkType.xlLinkTypeExcelLinks) 
  *         dynamic  _Workbook.get_Colors(object Index) 
@@ -255,22 +256,19 @@
  *
  *@subject ◆interface _Worksheet -- Microsoft.Office.Interop.Excel
  *         string  _Worksheet.Name { get; set; } 
- *         Names  _Worksheet.Names { get; } 
- *         int  _Worksheet.Index { get; } 
+ *         Names   _Worksheet.Names { get; } 
+ *         int     _Worksheet.Index { get; } 
  *         string  _Worksheet.CodeName { get; } 
  *         string  _Worksheet._CodeName { get; set; } 
- *         dynamic  _Worksheet.Previous { get; } 
- *         dynamic  _Worksheet.Next { get; } 
- *         Range  _Worksheet.Columns { get; } 
- *         Range  _Worksheet.Rows { get; } 
- *         Range  _Worksheet.Cells { get; } 
+ *         dynamic _Worksheet.Previous { get; } 
+ *         dynamic _Worksheet.Next { get; } 
+ *         Range   _Worksheet.Columns { get; } 
+ *         Range   _Worksheet.Rows { get; } 
+ *         Range   _Worksheet.Cells { get; } 
  *         Application  _Worksheet.Application { get; } 
- *         XlCreator  _Worksheet.Creator { get; } 
+ *         XlCreator    _Worksheet.Creator { get; } 
  *         XlSheetVisibility  _Worksheet.Visible { get; set; } 
  *         dynamic  _Worksheet.Parent { get; } 
- *         string  _Worksheet.OnDoubleClick { get; set; } 
- *         string  _Worksheet.OnSheetActivate { get; set; } 
- *         string  _Worksheet.OnSheetDeactivate { get; set; } 
  *         PageSetup  _Worksheet.PageSetup { get; } 
  *         bool  _Worksheet.ProtectContents { get; } 
  *         bool  _Worksheet.ProtectDrawingObjects { get; } 
@@ -290,9 +288,6 @@
  *         bool  _Worksheet.EnableOutlining { get; set; } 
  *         bool  _Worksheet.EnablePivotTable { get; set; } 
  *         bool  _Worksheet.FilterMode { get; } 
- *         string  _Worksheet.OnCalculate { get; set; } 
- *         string  _Worksheet.OnData { get; set; } 
- *         string  _Worksheet.OnEntry { get; set; } 
  *         Outline  _Worksheet.Outline { get; } 
  *         string  _Worksheet.ScrollArea { get; set; } 
  *         double  _Worksheet.StandardHeight { get; } 
@@ -377,9 +372,16 @@
  *         void  _Worksheet.PrintOutEx(object From, object To, object Copies, object Preview, object ActivePrinter, object PrintToFile, object Collate, object PrToFileName, object IgnorePrintAreas) 
  *         void  _Worksheet.ExportAsFixedFormat(XlFixedFormatType Type, object Filename, object Quality, object IncludeDocProperties, object IgnorePrintAreas, object From, object To, object OpenAfterPublish, object FixedFormatExtClassPtr) 
  *
+ *         string  _Worksheet.OnDoubleClick { get; set; } 
+ *         string  _Worksheet.OnSheetActivate { get; set; } 
+ *         string  _Worksheet.OnSheetDeactivate { get; set; } 
+ *         string  _Worksheet.OnCalculate { get; set; } 
+ *         string  _Worksheet.OnData { get; set; } 
+ *         string  _Worksheet.OnEntry { get; set; } 
+ *         
  *@subject ◆interface Sheets : IEnumerable
  *                      -- Microsoft.Office.Interop.Excel
- *         dynamic      Sheets.this[object Index] { get; } 
+ *         dynamic      this[object Index] { get; } 
  *         dynamic      Sheets.Visible { get; set; } 
  *         Application  Sheets.Application { get; } 
  *         XlCreator    Sheets.Creator { get; } 
@@ -405,25 +407,57 @@
  *@subject ◆interface Range : IEnumerable
  *                     -- Microsoft.Office.Interop.Excel
  *         dynamic  this[object RowIndex, object ColumnIndex] { get; set; } 
- *         int  Range.Column { get; } 
- *         Range  Range.Columns { get; } 
- *         Range  Range.Cells { get; } 
- *         int  Range.Count { get; } 
- *         Areas  Range.Areas { get; } 
+ *         dynamic  Range.Name { get; set; } 
+ *         dynamic  Range.Text { get; } 
+ *         string   Range.ID { get; set; } 
+ *         int      Range.Count { get; } 
+ *         dynamic  Range.CountLarge { get; } 
+ *         Worksheet  Range.Worksheet { get; } 
+ *         Range    Range.Columns { get; } 
+ *         Range    Range.Rows { get; } 
+ *         Range    Range.Cells { get; } 
+ *         int      Range.Column { get; } 
+ *         int      Range.Row { get; } 
+ *         Range    Range.MergeArea { get; } 
+ *         dynamic  Range.MergeCells { get; set; } 
+ *         dynamic  Range.Summary { get; } 
+ *         dynamic  Range.Style { get; set; } 
+ *         dynamic  Range.Width { get; } 
+ *         dynamic  Range.Height { get; } 
+ *         dynamic  Range.ColumnWidth { get; set; } 
+ *         dynamic  Range.RowHeight { get; set; } 
+ *         dynamic  Range.Top { get; } 
+ *         dynamic  Range.Left { get; } 
+ *         Interior Range.Interior { get; }   セルの内側
+ *           └ interface Interior =>〔MainExcelInteriorColorSample.cs〕
+ *         dynamic  Range.Value2 { get; set; } 
+ *         Areas    Range.Areas { get; } 
+ *         Borders  Range.Borders { get; } 
+ *         Range    Range.CurrentArray { get; } 
+ *         Range    Range.CurrentRegion { get; } 
+ *         Range    Range.Previous { get; } 
+ *         Range    Range.Next { get; } 
+ *         bool     Range.AllowEdit { get; } 
+ *         int      Range.ReadingOrder { get; set; } 
+ *         Actions  Range.ServerActions { get; } 
  *         Application  Range.Application { get; } 
  *         XlCreator  Range.Creator { get; } 
  *         dynamic  Range.Parent { get; } 
  *         dynamic  Range.AddIndent { get; set; } 
- *         Borders  Range.Borders { get; } 
- *         dynamic  Range.ColumnWidth { get; set; } 
- *         Range  Range.CurrentArray { get; } 
- *         Range  Range.CurrentRegion { get; } 
- *         Range  Range.Dependents { get; } 
- *         Range  Range.DirectDependents { get; } 
- *         Range  Range.DirectPrecedents { get; } 
- *         Range  Range.EntireColumn { get; } 
- *         Range  Range.EntireRow { get; } 
- *         Font  Range.Font { get; } 
+ *         Range    Range.Dependents { get; } 
+ *         Range    Range.DirectDependents { get; } 
+ *         Range    Range.DirectPrecedents { get; } 
+ *         Range    Range.EntireColumn { get; } 
+ *         Range    Range.EntireRow { get; } 
+ *         int      Range.ListHeaderRows { get; } 
+ *         dynamic  Range.Hidden { get; set; } 
+ *         dynamic  Range.Locked { get; set; } 
+ *         Font     Range.Font { get; } 
+ *         dynamic  Range.Orientation { get; set; } 
+ *         dynamic  Range.HorizontalAlignment { get; set; } 
+ *         dynamic  Range.IndentLevel { get; set; } 
+ *         Comment  Range.Comment { get; } 
+ *         Phonetic Range.Phonetic { get; } 
  *         dynamic  Range.Formula { get; set; } 
  *         dynamic  Range.FormulaArray { get; set; } 
  *         XlFormulaLabel  Range.FormulaLabel { get; set; } 
@@ -433,165 +467,135 @@
  *         dynamic  Range.FormulaR1C1Local { get; set; } 
  *         dynamic  Range.HasArray { get; } 
  *         dynamic  Range.HasFormula { get; } 
- *         dynamic  Range.Height { get; } 
- *         dynamic  Range.Hidden { get; set; } 
- *         dynamic  Range.HorizontalAlignment { get; set; } 
- *         dynamic  Range.IndentLevel { get; set; } 
- *         Interior  Range.Interior { get; } 
- *         dynamic  Range.Left { get; } 
- *         int  Range.ListHeaderRows { get; } 
  *         XlLocationInTable  Range.LocationInTable { get; } 
- *         dynamic  Range.Locked { get; set; } 
- *         Range  Range.MergeArea { get; } 
- *         dynamic  Range.MergeCells { get; set; } 
- *         dynamic  Range.Name { get; set; } 
- *         Range  Range.Next { get; } 
+ *         DisplayFormat  Range.DisplayFormat { get; } 
  *         dynamic  Range.NumberFormat { get; set; } 
  *         dynamic  Range.NumberFormatLocal { get; set; } 
- *         dynamic  Range.Orientation { get; set; } 
- *         dynamic  Range.OutlineLevel { get; set; } 
- *         int  Range.PageBreak { get; set; } 
- *         PivotField  Range.PivotField { get; } 
- *         PivotItem  Range.PivotItem { get; } 
- *         PivotTable  Range.PivotTable { get; } 
- *         Range  Range.Precedents { get; } 
- *         dynamic  Range.PrefixCharacter { get; } 
- *         Range  Range.Previous { get; } 
+ *         FormatConditions  Range.FormatConditions { get; } 
+ *         dynamic     Range.OutlineLevel { get; set; } 
+ *         int         Range.PageBreak { get; set; } 
  *         QueryTable  Range.QueryTable { get; } 
- *         int  Range.Row { get; } 
- *         dynamic  Range.RowHeight { get; set; } 
- *         Range  Range.Rows { get; } 
+ *         PivotTable  Range.PivotTable { get; } 
+ *         PivotField  Range.PivotField { get; } 
+ *         PivotItem   Range.PivotItem { get; } 
+ *         Range    Range.Precedents { get; } 
+ *         dynamic  Range.PrefixCharacter { get; } 
  *         dynamic  Range.ShowDetail { get; set; } 
  *         dynamic  Range.ShrinkToFit { get; set; } 
  *         SoundNote  Range.SoundNote { get; } 
- *         dynamic  Range.Style { get; set; } 
- *         dynamic  Range.Summary { get; } 
- *         dynamic  Range.Text { get; } 
- *         dynamic  Range.Top { get; } 
  *         dynamic  Range.UseStandardHeight { get; set; } 
  *         dynamic  Range.UseStandardWidth { get; set; } 
  *         Validation  Range.Validation { get; } 
- *         dynamic  Range.Value2 { get; set; } 
  *         dynamic  Range.VerticalAlignment { get; set; } 
- *         dynamic  Range.Width { get; } 
- *         Worksheet  Range.Worksheet { get; } 
  *         dynamic  Range.WrapText { get; set; } 
- *         Comment  Range.Comment { get; } 
- *         Phonetic  Range.Phonetic { get; } 
- *         FormatConditions  Range.FormatConditions { get; } 
- *         int  Range.ReadingOrder { get; set; } 
  *         Hyperlinks  Range.Hyperlinks { get; } 
- *         Phonetics  Range.Phonetics { get; } 
- *         string  Range.ID { get; set; } 
- *         PivotCell  Range.PivotCell { get; } 
- *         Errors  Range.Errors { get; } 
- *         SmartTags  Range.SmartTags { get; } 
- *         bool  Range.AllowEdit { get; } 
+ *         Phonetics   Range.Phonetics { get; } 
+ *         PivotCell   Range.PivotCell { get; } 
+ *         SmartTags   Range.SmartTags { get; } 
  *         ListObject  Range.ListObject { get; } 
- *         XPath  Range.XPath { get; } 
- *         Actions  Range.ServerActions { get; } 
- *         string  Range.MDX { get; } 
- *         dynamic  Range.CountLarge { get; } 
+ *         XPath       Range.XPath { get; } 
+ *         string      Range.MDX { get; } 
  *         SparklineGroups  Range.SparklineGroups { get; } 
- *         DisplayFormat  Range.DisplayFormat { get; } 
+ *         Errors      Range.Errors { get; } 
  *         
+ *         ＊Method
  *         dynamic  Range.Activate() 
- *         string  Range.get_Address(object RowAbsolute, object ColumnAbsolute, XlReferenceStyle ReferenceStyle = XlReferenceStyle.xlA1, object External = null, object RelativeTo = null) 
- *         string  Range.get_AddressLocal(object RowAbsolute, object ColumnAbsolute, XlReferenceStyle ReferenceStyle = XlReferenceStyle.xlA1, object External = null, object RelativeTo = null) 
- *         dynamic  Range.AdvancedFilter(XlFilterAction Action, object CriteriaRange, object CopyToRange, object Unique) 
- *         dynamic  Range.ApplyNames(object Names, object IgnoreRelativeAbsolute, object UseRowColumnNames, object OmitColumn, object OmitRow, XlApplyNamesOrder Order = XlApplyNamesOrder.xlRowThenColumn, object AppendLast = null) 
- *         dynamic  Range.ApplyOutlineStyles() 
- *         string  Range.AutoComplete(string String) 
- *         dynamic  Range.AutoFill(Range Destination, XlAutoFillType Type = XlAutoFillType.xlFillDefault) 
- *         dynamic  Range.AutoFilter(object Field, object Criteria1, XlAutoFilterOperator Operator = XlAutoFilterOperator.xlAnd, object Criteria2 = null, object VisibleDropDown = null) 
- *         dynamic  Range.AutoFit() 
- *         dynamic  Range.AutoFormat(XlRangeAutoFormat Format = XlRangeAutoFormat.xlRangeAutoFormatClassic1, object Number = null, object Font = null, object Alignment = null, object Border = null, object Pattern = null, object Width = null) 
- *         dynamic  Range.AutoOutline() 
- *         dynamic  Range.BorderAround(object LineStyle, XlBorderWeight Weight = XlBorderWeight.xlThin, XlColorIndex ColorIndex = XlColorIndex.xlColorIndexAutomatic, object Color = null) 
+ *         dynamic  Range.Select() 
+ *         dynamic  Range.ListNames() 
+ *         Range    Range.get_Range(object Cell1, object Cell2) 
+ *         Range    Range.SpecialCells(XlCellType Type, object Value) 
+ *         string   Range.get_Address(object RowAbsolute, object ColumnAbsolute, XlReferenceStyle ReferenceStyle = XlReferenceStyle.xlA1, object External = null, object RelativeTo = null) 
+ *         string   Range.get_AddressLocal(object RowAbsolute, object ColumnAbsolute, XlReferenceStyle ReferenceStyle = XlReferenceStyle.xlA1, object External = null, object RelativeTo = null) 
+ *         dynamic  Range.Run(object Arg1, object Arg2, object Arg3, object Arg4, object Arg5, object Arg6, object Arg7, object Arg8, object Arg9, object Arg10, object Arg11, object Arg12, object Arg13, object Arg14, object Arg15, object Arg16, object Arg17, object Arg18, object Arg19, object Arg20, object Arg21, object Arg22, object Arg23, object Arg24, object Arg25, object Arg26, object Arg27, object Arg28, object Arg29, object Arg30) 
  *         dynamic  Range.Calculate() 
- *         Characters  Range.get_Characters(object Start, object Length) 
- *         dynamic  Range.CheckSpelling(object CustomDictionary, object IgnoreUppercase, object AlwaysSuggest, object SpellLang) 
- *         dynamic  Range.Clear() 
- *         dynamic  Range.ClearContents() 
- *         dynamic  Range.ClearFormats() 
- *         dynamic  Range.ClearNotes() 
- *         dynamic  Range.ClearOutline() 
- *         Range  Range.ColumnDifferences(object Comparison) 
- *         dynamic  Range.Consolidate(object Sources, object Function, object TopRow, object LeftColumn, object CreateLinks) 
- *         dynamic  Range.Copy(object Destination) 
- *         int  Range.CopyFromRecordset(object Data, object MaxRows, object MaxColumns) 
- *         dynamic  Range.CopyPicture(XlPictureAppearance Appearance = XlPictureAppearance.xlScreen, XlCopyPictureFormat Format = XlCopyPictureFormat.xlPicture) 
+ *         dynamic  Range.CalculateRowMajorOrder() 
+ *         dynamic  Range.get_Item(object RowIndex, object ColumnIndex) 
+ *         void     Range.set_Item(object RowIndex, object ColumnIndex, object value) 
+ *         dynamic  Range.get_Value(object RangeValueDataType) 
+ *         void     Range.set_Value(object RangeValueDataType, object value) 
+ *         dynamic  Range.Table(object RowInput, object ColumnInput) 
+ *         dynamic  Range.TextToColumns(object Destination, XlTextParsingType DataType = XlTextParsingType.xlDelimited, XlTextQualifier TextQualifier = XlTextQualifier.xlTextQualifierDoubleQuote, object ConsecutiveDelimiter = null, object Tab = null, object Semicolon = null, object Comma = null, object Space = null, object Other = null, object OtherChar = null, object FieldInfo = null, object DecimalSeparator = null, object ThousandsSeparator = null, object TrailingMinusNumbers = null) 
+ *         Comment  Range.AddComment(object Text) 
+ *         string   Range.NoteText(object Text, object Start, object Length) 
  *         dynamic  Range.CreateNames(object Top, object Left, object Bottom, object Right) 
  *         dynamic  Range.CreatePublisher(object Edition, XlPictureAppearance Appearance = XlPictureAppearance.xlScreen, object ContainsPICT = null, object ContainsBIFF = null, object ContainsRTF = null, object ContainsVALU = null) 
+ *         dynamic  Range.ApplyNames(object Names, object IgnoreRelativeAbsolute, object UseRowColumnNames, object OmitColumn, object OmitRow, XlApplyNamesOrder Order = XlApplyNamesOrder.xlRowThenColumn, object AppendLast = null) 
+ *         dynamic  Range.AutoFormat(XlRangeAutoFormat Format = XlRangeAutoFormat.xlRangeAutoFormatClassic1, object Number = null, object Font = null, object Alignment = null, object Border = null, object Pattern = null, object Width = null) 
+ *         dynamic  Range.BorderAround(object LineStyle, XlBorderWeight Weight = XlBorderWeight.xlThin, XlColorIndex ColorIndex = XlColorIndex.xlColorIndexAutomatic, object Color = null) 
+ *         dynamic  Range.BorderAround2(object LineStyle, XlBorderWeight Weight = XlBorderWeight.xlThin, XlColorIndex ColorIndex = XlColorIndex.xlColorIndexAutomatic, object Color = null, object ThemeColor = null) 
+ *         dynamic  Range.CheckSpelling(object CustomDictionary, object IgnoreUppercase, object AlwaysSuggest, object SpellLang) 
+ *         Range    Range.ColumnDifferences(object Comparison) 
+ *         Range    Range.RowDifferences(object Comparison) 
+ *         bool     Range.GoalSeek(object Goal, Range ChangingCell) 
+ *         void     Range.AllocateChanges() 
+ *         void     Range.DiscardChanges() 
+ *         Range    Range.get_Resize(object RowSize, object ColumnSize) 
+ *         dynamic  Range.Consolidate(object Sources, object Function, object TopRow, object LeftColumn, object CreateLinks) 
+ *         dynamic  Range.Copy(object Destination) 
+ *         int      Range.CopyFromRecordset(object Data, object MaxRows, object MaxColumns) 
+ *         dynamic  Range.CopyPicture(XlPictureAppearance Appearance = XlPictureAppearance.xlScreen, XlCopyPictureFormat Format = XlCopyPictureFormat.xlPicture) 
  *         dynamic  Range.Cut(object Destination) 
- *         dynamic  Range.DataSeries(object Rowcol, XlDataSeriesType Type = XlDataSeriesType.xlDataSeriesLinear, XlDataSeriesDate Date = XlDataSeriesDate.xlDay, object Step = null, object Stop = null, object Trend = null) 
+ *         dynamic  Range.PasteSpecial(XlPasteType Paste = XlPasteType.xlPasteAll, XlPasteSpecialOperation Operation = XlPasteSpecialOperation.xlPasteSpecialOperationNone, object SkipBlanks = null, object Transpose = null) 
+ *         dynamic  Range._PasteSpecial(XlPasteType Paste = XlPasteType.xlPasteAll, XlPasteSpecialOperation Operation = XlPasteSpecialOperation.xlPasteSpecialOperationNone, object SkipBlanks = null, object Transpose = null) 
+ *         Range    Range.Find(object What, object After, object LookIn, object LookAt, object SearchOrder, XlSearchDirection SearchDirection = XlSearchDirection.xlNext, object MatchCase = null, object MatchByte = null, object SearchFormat = null) 
+ *         Range    Range.FindNext(object After) 
+ *         Range    Range.FindPrevious(object After) 
+ *         void     Range.InsertIndent(int InsertAmount) 
+ *         dynamic  Range.Insert(object Shift, object CopyOrigin) 
+ *         void     Range.Merge(object Across) 
+ *         void     Range.UnMerge() 
+ *         dynamic  Range.Sort(object Key1, XlSortOrder Order1 = XlSortOrder.xlAscending, object Key2 = null, object Type = null, XlSortOrder Order2 = XlSortOrder.xlAscending, object Key3 = null, XlSortOrder Order3 = XlSortOrder.xlAscending, XlYesNoGuess Header = XlYesNoGuess.xlNo, object OrderCustom = null, object MatchCase = null, XlSortOrientation Orientation = XlSortOrientation.xlSortRows, XlSortMethod SortMethod = XlSortMethod.xlPinYin, XlSortDataOption DataOption1 = XlSortDataOption.xlSortNormal, XlSortDataOption DataOption2 = XlSortDataOption.xlSortNormal, XlSortDataOption DataOption3 = XlSortDataOption.xlSortNormal) 
+ *         dynamic  Range.SortSpecial(XlSortMethod SortMethod = XlSortMethod.xlPinYin, object Key1 = null, XlSortOrder Order1 = XlSortOrder.xlAscending, object Type = null, object Key2 = null, XlSortOrder Order2 = XlSortOrder.xlAscending, object Key3 = null, XlSortOrder Order3 = XlSortOrder.xlAscending, XlYesNoGuess Header = XlYesNoGuess.xlNo, object OrderCustom = null, object MatchCase = null, XlSortOrientation Orientation = XlSortOrientation.xlSortRows, XlSortDataOption DataOption1 = XlSortDataOption.xlSortNormal, XlSortDataOption DataOption2 = XlSortDataOption.xlSortNormal, XlSortDataOption DataOption3 = XlSortDataOption.xlSortNormal) 
+ *         dynamic  Range.Group(object Start, object End, object By, object Periods) 
+ *         dynamic  Range.Ungroup() 
+ *         dynamic  Range.Parse(object ParseLine, object Destination) 
+ *         bool     Range.Replace(object What, object Replacement, object LookAt, object SearchOrder, object MatchCase, object MatchByte, object SearchFormat, object ReplaceFormat) 
+ *         void     Range.RemoveDuplicates(object Columns, XlYesNoGuess Header = XlYesNoGuess.xlNo) 
  *         dynamic  Range.Delete(object Shift) 
- *         dynamic  Range.DialogBox() 
- *         dynamic  Range.EditionOptions(XlEditionType Type, XlEditionOptionsOption Option, object Name, object Reference, XlPictureAppearance Appearance = XlPictureAppearance.xlScreen, XlPictureAppearance ChartSize = XlPictureAppearance.xlScreen, object Format = null) 
- *         Range  Range.get_End(XlDirection Direction) 
+ *         dynamic  Range.NavigateArrow(object TowardPrecedent, object ArrowNumber, object LinkNumber) 
+ *         dynamic  Range.DataSeries(object Rowcol, XlDataSeriesType Type = XlDataSeriesType.xlDataSeriesLinear, XlDataSeriesDate Date = XlDataSeriesDate.xlDay, object Step = null, object Stop = null, object Trend = null) 
+ *         dynamic  Range.AutoFill(Range Destination, XlAutoFillType Type = XlAutoFillType.xlFillDefault) 
+ *         dynamic  Range.FillUp() 
  *         dynamic  Range.FillDown() 
  *         dynamic  Range.FillLeft() 
  *         dynamic  Range.FillRight() 
- *         dynamic  Range.FillUp() 
- *         Range  Range.Find(object What, object After, object LookIn, object LookAt, object SearchOrder, XlSearchDirection SearchDirection = XlSearchDirection.xlNext, object MatchCase = null, object MatchByte = null, object SearchFormat = null) 
- *         Range  Range.FindNext(object After) 
- *         Range  Range.FindPrevious(object After) 
- *         dynamic  Range.FunctionWizard() 
- *         bool  Range.GoalSeek(object Goal, Range ChangingCell) 
- *         dynamic  Range.Group(object Start, object End, object By, object Periods) 
- *         void  Range.InsertIndent(int InsertAmount) 
- *         dynamic  Range.Insert(object Shift, object CopyOrigin) 
- *         dynamic  Range.get_Item(object RowIndex, object ColumnIndex) 
- *         void  Range.set_Item(object RowIndex, object ColumnIndex, object value) 
- *         dynamic  Range.Justify() 
- *         dynamic  Range.ListNames() 
- *         void  Range.Merge(object Across) 
- *         void  Range.UnMerge() 
- *         dynamic  Range.NavigateArrow(object TowardPrecedent, object ArrowNumber, object LinkNumber) 
- *         IEnumerator  Range.GetEnumerator() 
- *         string  Range.NoteText(object Text, object Start, object Length) 
- *         Range  Range.get_Offset(object RowOffset, object ColumnOffset) 
- *         dynamic  Range.Parse(object ParseLine, object Destination) 
- *         dynamic  Range._PasteSpecial(XlPasteType Paste = XlPasteType.xlPasteAll, XlPasteSpecialOperation Operation = XlPasteSpecialOperation.xlPasteSpecialOperationNone, object SkipBlanks = null, object Transpose = null) 
- *         dynamic  Range._PrintOut(object From, object To, object Copies, object Preview, object ActivePrinter, object PrintToFile, object Collate) 
- *         dynamic  Range.PrintPreview(object EnableChanges) 
- *         Range  Range.get_Range(object Cell1, object Cell2) 
- *         dynamic  Range.RemoveSubtotal() 
- *         bool  Range.Replace(object What, object Replacement, object LookAt, object SearchOrder, object MatchCase, object MatchByte, object SearchFormat, object ReplaceFormat) 
- *         Range  Range.get_Resize(object RowSize, object ColumnSize) 
- *         Range  Range.RowDifferences(object Comparison) 
- *         dynamic  Range.Run(object Arg1, object Arg2, object Arg3, object Arg4, object Arg5, object Arg6, object Arg7, object Arg8, object Arg9, object Arg10, object Arg11, object Arg12, object Arg13, object Arg14, object Arg15, object Arg16, object Arg17, object Arg18, object Arg19, object Arg20, object Arg21, object Arg22, object Arg23, object Arg24, object Arg25, object Arg26, object Arg27, object Arg28, object Arg29, object Arg30) 
- *         dynamic  Range.Select() 
+ *         void     Range.FlashFill() 
  *         dynamic  Range.Show() 
- *         dynamic  Range.ShowDependents(object Remove) 
  *         dynamic  Range.ShowErrors() 
  *         dynamic  Range.ShowPrecedents(object Remove) 
- *         dynamic  Range.Sort(object Key1, XlSortOrder Order1 = XlSortOrder.xlAscending, object Key2 = null, object Type = null, XlSortOrder Order2 = XlSortOrder.xlAscending, object Key3 = null, XlSortOrder Order3 = XlSortOrder.xlAscending, XlYesNoGuess Header = XlYesNoGuess.xlNo, object OrderCustom = null, object MatchCase = null, XlSortOrientation Orientation = XlSortOrientation.xlSortRows, XlSortMethod SortMethod = XlSortMethod.xlPinYin, XlSortDataOption DataOption1 = XlSortDataOption.xlSortNormal, XlSortDataOption DataOption2 = XlSortDataOption.xlSortNormal, XlSortDataOption DataOption3 = XlSortDataOption.xlSortNormal) 
- *         dynamic  Range.SortSpecial(XlSortMethod SortMethod = XlSortMethod.xlPinYin, object Key1 = null, XlSortOrder Order1 = XlSortOrder.xlAscending, object Type = null, object Key2 = null, XlSortOrder Order2 = XlSortOrder.xlAscending, object Key3 = null, XlSortOrder Order3 = XlSortOrder.xlAscending, XlYesNoGuess Header = XlYesNoGuess.xlNo, object OrderCustom = null, object MatchCase = null, XlSortOrientation Orientation = XlSortOrientation.xlSortRows, XlSortDataOption DataOption1 = XlSortDataOption.xlSortNormal, XlSortDataOption DataOption2 = XlSortDataOption.xlSortNormal, XlSortDataOption DataOption3 = XlSortDataOption.xlSortNormal) 
- *         Range  Range.SpecialCells(XlCellType Type, object Value) 
+ *         dynamic  Range.ShowDependents(object Remove) 
+ *         dynamic  Range.DialogBox() 
+ *         dynamic  Range.FunctionWizard() 
+ *         IEnumerator  Range.GetEnumerator() 
+ *         dynamic  Range.AutoFit() 
+ *         dynamic  Range.EditionOptions(XlEditionType Type, XlEditionOptionsOption Option, object Name, object Reference, XlPictureAppearance Appearance = XlPictureAppearance.xlScreen, XlPictureAppearance ChartSize = XlPictureAppearance.xlScreen, object Format = null) 
+ *         dynamic  Range.AutoOutline() 
+ *         string   Range.AutoComplete(string String) 
+ *         dynamic  Range.ApplyOutlineStyles() 
+ *         dynamic  Range.AutoFilter(object Field, object Criteria1, XlAutoFilterOperator Operator = XlAutoFilterOperator.xlAnd, object Criteria2 = null, object VisibleDropDown = null) 
+ *         dynamic  Range.AdvancedFilter(XlFilterAction Action, object CriteriaRange, object CopyToRange, object Unique) 
+ *         Characters  Range.get_Characters(object Start, object Length) 
+ *         Range    Range.get_End(XlDirection Direction) 
+ *         Range    Range.get_Offset(object RowOffset, object ColumnOffset) 
  *         dynamic  Range.SubscribeTo(string Edition, XlSubscribeToFormat Format = XlSubscribeToFormat.xlSubscribeToText) 
  *         dynamic  Range.Subtotal(int GroupBy, XlConsolidationFunction Function, object TotalList, object Replace, object PageBreaks, XlSummaryRow SummaryBelowData = XlSummaryRow.xlSummaryBelow) 
- *         dynamic  Range.Table(object RowInput, object ColumnInput) 
- *         dynamic  Range.TextToColumns(object Destination, XlTextParsingType DataType = XlTextParsingType.xlDelimited, XlTextQualifier TextQualifier = XlTextQualifier.xlTextQualifierDoubleQuote, object ConsecutiveDelimiter = null, object Tab = null, object Semicolon = null, object Comma = null, object Space = null, object Other = null, object OtherChar = null, object FieldInfo = null, object DecimalSeparator = null, object ThousandsSeparator = null, object TrailingMinusNumbers = null) 
- *         dynamic  Range.Ungroup() 
- *         dynamic  Range.get_Value(object RangeValueDataType) 
- *         void  Range.set_Value(object RangeValueDataType, object value) 
- *         Comment  Range.AddComment(object Text) 
- *         void  Range.ClearComments() 
- *         void  Range.SetPhonetic() 
+ *         dynamic  Range.RemoveSubtotal() 
+ *         void     Range.SetPhonetic() 
  *         dynamic  Range.PrintOut(object From, object To, object Copies, object Preview, object ActivePrinter, object PrintToFile, object Collate, object PrToFileName) 
- *         void  Range.Dirty() 
- *         void  Range.Speak(object SpeakDirection, object SpeakFormulas) 
- *         dynamic  Range.PasteSpecial(XlPasteType Paste = XlPasteType.xlPasteAll, XlPasteSpecialOperation Operation = XlPasteSpecialOperation.xlPasteSpecialOperationNone, object SkipBlanks = null, object Transpose = null) 
- *         void  Range.RemoveDuplicates(object Columns, XlYesNoGuess Header = XlYesNoGuess.xlNo) 
+ *         dynamic  Range._PrintOut(object From, object To, object Copies, object Preview, object ActivePrinter, object PrintToFile, object Collate) 
  *         dynamic  Range.PrintOutEx(object From, object To, object Copies, object Preview, object ActivePrinter, object PrintToFile, object Collate, object PrToFileName) 
- *         void  Range.ExportAsFixedFormat(XlFixedFormatType Type, object Filename, object Quality, object IncludeDocProperties, object IgnorePrintAreas, object From, object To, object OpenAfterPublish, object FixedFormatExtClassPtr) 
- *         dynamic  Range.CalculateRowMajorOrder() 
- *         void  Range.ClearHyperlinks() 
- *         dynamic  Range.BorderAround2(object LineStyle, XlBorderWeight Weight = XlBorderWeight.xlThin, XlColorIndex ColorIndex = XlColorIndex.xlColorIndexAutomatic, object Color = null, object ThemeColor = null) 
- *         void  Range.AllocateChanges() 
- *         void  Range.DiscardChanges() 
- *         void  Range.FlashFill() 
+ *         dynamic  Range.PrintPreview(object EnableChanges) 
+ *         void     Range.ExportAsFixedFormat(XlFixedFormatType Type, object Filename, object Quality, object IncludeDocProperties, object IgnorePrintAreas, object From, object To, object OpenAfterPublish, object FixedFormatExtClassPtr) 
+ *         void     Range.Speak(object SpeakDirection, object SpeakFormulas) 
+ *         dynamic  Range.Justify() 
+ *         void     Range.Dirty() 
+ *         dynamic  Range.Clear() 
+ *         dynamic  Range.ClearContents() 
+ *         void     Range.ClearComments() 
+ *         dynamic  Range.ClearFormats() 
+ *         dynamic  Range.ClearNotes() 
+ *         dynamic  Range.ClearOutline() 
+ *         void     Range.ClearHyperlinks() 
  */
 #endregion
 /*

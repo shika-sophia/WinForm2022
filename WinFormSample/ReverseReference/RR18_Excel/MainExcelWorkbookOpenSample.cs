@@ -2,7 +2,8 @@
  *@title WinFormGUI / WinFormSample / ReverseReference.RR18_Excel
  *@class MainExcelWorkbookOpenSample.cs
  *@class   └ new FormExcelWorkbookOpenSample() : Form
- *@interface  └ new Microsoft.Office.Interop.Excel.Application() : _Application, AppEvents_Event
+ *@class      └ new Excel.Application() : _Application, AppEvents_Event
+ *@using Excel = Microsoft.Office.Interop.Excel
  *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
  *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
@@ -113,10 +114,10 @@
  *         double       _Application.Height { get; set; } 
  *         double       _Application.UsableWidth { get; } 
  *         double       _Application.UsableHeight { get; } 
+ *         int          _Application.FormulaBarHeight { get; set; } 
  *         double       _Application.Top { get; set; } 
  *         double       _Application.Left { get; set; } 
  *         double       _Application.MaxChange { get; set; }
- *         int          _Application.FormulaBarHeight { get; set; } 
  *         Range        _Application.Columns { get; } 
  *         Range        _Application.Rows { get; } 
  *         Range        _Application.Cells { get; } 
@@ -281,31 +282,39 @@
  *         bool         _Application.MergeInstances { get; set; } 
  *         bool         _Application.EnableCheckFileExtensions { get; set; } 
  *         
- *         AddIns       _Application.AddIns { get; } 
- *         XlCalculation  _Application.Calculation { get; set; } 
- *         AutoCorrect    _Application.AutoCorrect { get; } 
- *         XlCommandUnderlines  _Application.CommandUnderlines { get; set; } 
- *         XlMousePointer  _Application.Cursor { get; set; } 
- *         XlCutCopyMode  _Application.CutCopyMode { get; set; } 
- *         Dialogs  _Application.Dialogs { get; } 
- *         XlCommentDisplayMode  _Application.DisplayCommentIndicator { get; set; } 
- *         XlEnableCancelKey  _Application.EnableCancelKey { get; set; } 
- *         FileSearch  _Application.FileSearch { get; } 
- *         IFind  _Application.FileFind { get; } 
- *         dynamic  _Application.MailSession { get; } 
- *         XlMailSystem  _Application.MailSystem { get; } 
- *         XlDirection  _Application.MoveAfterReturnDirection { get; set; } 
- *         RecentFiles  _Application.RecentFiles { get; } 
- *         ODBCErrors   _Application.ODBCErrors { get; } 
- *         XlReferenceStyle  _Application.ReferenceStyle { get; set; } 
- *         XlFileFormat  _Application.DefaultSaveFormat { get; set; } 
- *         VBE  _Application.VBE { get; } 
- *         XlWindowState  _Application.WindowState { get; set; } 
- *         OLEDBErrors  _Application.OLEDBErrors { get; } 
- *         COMAddIns  _Application.COMAddIns { get; } 
+ *         XlWindowState   _Application.WindowState { get; set; } 
+ *         XlFileFormat    _Application.DefaultSaveFormat { get; set; } 
  *         DefaultWebOptions  _Application.DefaultWebOptions { get; } 
- *         LanguageSettings  _Application.LanguageSettings { get; } 
- *         dynamic  _Application.Dummy101 { get; } 
+ *         LanguageSettings   _Application.LanguageSettings { get; } 
+ *         SpellingOptions    _Application.SpellingOptions { get; } 
+ *         NewFile         _Application.NewWorkbook { get; } 
+ *         Speech          _Application.Speech { get; } 
+ *         Range           _Application.ThisCell { get; } 
+ *         Watches         _Application.Watches { get; } 
+ *         IAssistance     _Application.Assistance { get; } 
+ *         XlMousePointer  _Application.Cursor { get; set; } 
+ *         AutoCorrect     _Application.AutoCorrect { get; } 
+ *         AutoRecover     _Application.AutoRecover { get; } 
+ *         MsoAutomationSecurity  _Application.AutomationSecurity { get; set; } 
+ *         Dialogs         _Application.Dialogs { get; } 
+ *         XlCalculation         _Application.Calculation { get; set; } 
+ *         XlCommandUnderlines   _Application.CommandUnderlines { get; set; } 
+ *         XlCommentDisplayMode  _Application.DisplayCommentIndicator { get; set; } 
+ *         XlEnableCancelKey     _Application.EnableCancelKey { get; set; } 
+ *         IFind                 _Application.FileFind { get; } 
+ *         FileSearch            _Application.FileSearch { get; } 
+ *         RecentFiles           _Application.RecentFiles { get; } 
+ *         XlMailSystem          _Application.MailSystem { get; } 
+ *         dynamic               _Application.MailSession { get; } 
+ *         XlGenerateTableRefs   _Application.GenerateTableRefs { get; set; } 
+ *         ProtectedViewWindows  _Application.ProtectedViewWindows { get; } 
+ *         ProtectedViewWindow   _Application.ActiveProtectedViewWindow { get; } 
+ *         QuickAnalysis         _Application.QuickAnalysis { get; } 
+ *         XlDirection           _Application.MoveAfterReturnDirection { get; set; } 
+ *         XlCutCopyMode         _Application.CutCopyMode { get; set; } 
+ *         MultiThreadedCalculation   _Application.MultiThreadedCalculation { get; } 
+ *         VBE  _Application.VBE { get; } 
+ *         RTD  _Application.RTD { get; } 
  *         AnswerWizard  _Application.AnswerWizard { get; } 
  *         MsoFeatureInstall  _Application.FeatureInstall { get; set; } 
  *         CellFormat  _Application.FindFormat { get; set; } 
@@ -313,56 +322,91 @@
  *         UsedObjects  _Application.UsedObjects { get; } 
  *         XlCalculationState  _Application.CalculationState { get; } 
  *         XlCalculationInterruptKey  _Application.CalculationInterruptKey { get; set; } 
- *         Watches  _Application.Watches { get; } 
- *         MsoAutomationSecurity  _Application.AutomationSecurity { get; set; } 
- *         AutoRecover  _Application.AutoRecover { get; } 
- *         ErrorCheckingOptions  _Application.ErrorCheckingOptions { get; } 
- *         SmartTagRecognizers  _Application.SmartTagRecognizers { get; } 
- *         NewFile  _Application.NewWorkbook { get; } 
- *         SpellingOptions  _Application.SpellingOptions { get; } 
- *         Speech  _Application.Speech { get; } 
- *         Range  _Application.ThisCell { get; } 
- *         RTD  _Application.RTD { get; } 
- *         XlGenerateTableRefs  _Application.GenerateTableRefs { get; set; } 
- *         IAssistance  _Application.Assistance { get; } 
- *         MultiThreadedCalculation  _Application.MultiThreadedCalculation { get; } 
- *         FileExportConverters  _Application.FileExportConverters { get; } 
- *         SmartArtLayouts  _Application.SmartArtLayouts { get; } 
- *         SmartArtQuickStyles  _Application.SmartArtQuickStyles { get; } 
- *         SmartArtColors  _Application.SmartArtColors { get; } 
- *         AddIns2  _Application.AddIns2 { get; } 
- *         ProtectedViewWindows  _Application.ProtectedViewWindows { get; } 
- *         ProtectedViewWindow  _Application.ActiveProtectedViewWindow { get; } 
- *         dynamic  _Application.HinstancePtr { get; } 
- *         MsoFileValidationMode  _Application.FileValidation { get; set; } 
+ *         SmartTagRecognizers        _Application.SmartTagRecognizers { get; } 
+ *         FileExportConverters       _Application.FileExportConverters { get; } 
+ *         MsoFileValidationMode      _Application.FileValidation { get; set; } 
  *         XlFileValidationPivotMode  _Application.FileValidationPivot { get; set; } 
- *         QuickAnalysis  _Application.QuickAnalysis { get; } 
+ *         ODBCErrors   _Application.ODBCErrors { get; } 
+ *         OLEDBErrors  _Application.OLEDBErrors { get; } 
+ *         ErrorCheckingOptions   _Application.ErrorCheckingOptions { get; } 
+ *         XlReferenceStyle  _Application.ReferenceStyle { get; set; } 
+ *         SmartArtLayouts        _Application.SmartArtLayouts { get; } 
+ *         SmartArtQuickStyles    _Application.SmartArtQuickStyles { get; } 
+ *         SmartArtColors         _Application.SmartArtColors { get; } 
+ *         AddIns   _Application.AddIns { get; } 
+ *         AddIns2  _Application.AddIns2 { get; } 
+ *         COMAddIns  _Application.COMAddIns { get; } 
+ *         dynamic  _Application.HinstancePtr { get; } 
+ *         dynamic  _Application.Dummy101 { get; } 
  *         
  *         ＊abstract Method
- *         void  _Application.Calculate() 
- *         void  _Application.DDEExecute(int Channel, string String) 
- *         int   _Application.DDEInitiate(string App, string Topic) 
- *         void  _Application.DDEPoke(int Channel, object Item, object Data) 
- *         void  _Application.DDETerminate(int Channel) 
- *         dynamic  _Application.DDERequest(int Channel, string Item) 
- *         dynamic  _Application.Evaluate(object Name) 
- *         dynamic  _Application._Evaluate(object Name) 
- *         dynamic  _Application.ExecuteExcel4Macro(string String) 
- *         Range  _Application.Intersect(Range Arg1, Range Arg2, object Arg3, object Arg4, object Arg5, object Arg6, object Arg7, object Arg8, object Arg9, object Arg10, object Arg11, object Arg12, object Arg13, object Arg14, object Arg15, object Arg16, object Arg17, object Arg18, object Arg19, object Arg20, object Arg21, object Arg22, object Arg23, object Arg24, object Arg25, object Arg26, object Arg27, object Arg28, object Arg29, object Arg30) 
- *         Range  _Application.get_Range(object Cell1, object Cell2) 
  *         dynamic  _Application.Run(object Macro, object Arg1, object Arg2, object Arg3, object Arg4, object Arg5, object Arg6, object Arg7, object Arg8, object Arg9, object Arg10, object Arg11, object Arg12, object Arg13, object Arg14, object Arg15, object Arg16, object Arg17, object Arg18, object Arg19, object Arg20, object Arg21, object Arg22, object Arg23, object Arg24, object Arg25, object Arg26, object Arg27, object Arg28, object Arg29, object Arg30) 
  *         dynamic  _Application._Run2(object Macro, object Arg1, object Arg2, object Arg3, object Arg4, object Arg5, object Arg6, object Arg7, object Arg8, object Arg9, object Arg10, object Arg11, object Arg12, object Arg13, object Arg14, object Arg15, object Arg16, object Arg17, object Arg18, object Arg19, object Arg20, object Arg21, object Arg22, object Arg23, object Arg24, object Arg25, object Arg26, object Arg27, object Arg28, object Arg29, object Arg30) 
- *         void  _Application.SendKeys(object Keys, object Wait) 
- *         Menu  _Application.get_ShortcutMenus(int Index) 
- *         Range  _Application.Union(Range Arg1, Range Arg2, object Arg3, object Arg4, object Arg5, object Arg6, object Arg7, object Arg8, object Arg9, object Arg10, object Arg11, object Arg12, object Arg13, object Arg14, object Arg15, object Arg16, object Arg17, object Arg18, object Arg19, object Arg20, object Arg21, object Arg22, object Arg23, object Arg24, object Arg25, object Arg26, object Arg27, object Arg28, object Arg29, object Arg30) 
- *         void  _Application.ActivateMicrosoftApp(XlMSApplication Index) 
- *         void  _Application.AddChartAutoFormat(object Chart, string Name, object Description) 
- *         void  _Application.AddCustomList(object ListArray, object ByRow) 
- *         dynamic  _Application.get_Caller(object Index) 
- *         double  _Application.CentimetersToPoints(double Centimeters) 
- *         bool  _Application.CheckSpelling(string Word, object CustomDictionary, object IgnoreUppercase) 
- *         dynamic  _Application.get_ClipboardFormats(object Index) 
+ *         dynamic  _Application.InputBox(string Prompt, object Title, object Default, object Left, object Top, object HelpFile, object HelpContextID, object Type) 
+ *         Range    _Application.get_Range(object Cell1, object Cell2) 
+ *         Range    _Application.Intersect(Range Arg1, Range Arg2, object Arg3, object Arg4, object Arg5, object Arg6, object Arg7, object Arg8, object Arg9, object Arg10, object Arg11, object Arg12, object Arg13, object Arg14, object Arg15, object Arg16, object Arg17, object Arg18, object Arg19, object Arg20, object Arg21, object Arg22, object Arg23, object Arg24, object Arg25, object Arg26, object Arg27, object Arg28, object Arg29, object Arg30) 
+ *         void     _Application.CheckAbort(object KeepAbort) 
+ *         void     _Application.AddChartAutoFormat(object Chart, string Name, object Description) 
+ *         void     _Application.AddCustomList(object ListArray, object ByRow) 
+ *         Range    _Application.Union(Range Arg1, Range Arg2, object Arg3, object Arg4, object Arg5, object Arg6, object Arg7, object Arg8, object Arg9, object Arg10, object Arg11, object Arg12, object Arg13, object Arg14, object Arg15, object Arg16, object Arg17, object Arg18, object Arg19, object Arg20, object Arg21, object Arg22, object Arg23, object Arg24, object Arg25, object Arg26, object Arg27, object Arg28, object Arg29, object Arg30) 
+ *         int      _Application.SharePointVersion(string bstrUrl) 
+ *         double   _Application.InchesToPoints(double Inches) 
+ *         double   _Application.CentimetersToPoints(double Centimeters) 
+ *         bool     _Application.CheckSpelling(string Word, object CustomDictionary, object IgnoreUppercase) 
  *         dynamic  _Application.ConvertFormula(object Formula, XlReferenceStyle FromReferenceStyle, object ToReferenceStyle, object ToAbsolute, object RelativeTo) 
+ *         Workbook _Application.NextLetter() 
+ *         void     _Application.DoubleClick() 
+ *         void     _Application.Undo() 
+ *         void     _Application.Repeat() 
+ *         bool     _Application.FindFile() 
+ *         void     _Application._FindFile() 
+ *         dynamic  _Application.GetOpenFilename(object FileFilter, object FilterIndex, object Title, object ButtonText, object MultiSelect) 
+ *         void     _Application.Calculate() 
+ *         void     _Application.CalculateFull() 
+ *         void     _Application.CalculateFullRebuild() 
+ *         void     _Application.CalculateUntilAsyncQueriesDone() 
+ *         dynamic  _Application.Evaluate(object Name) 
+ *         dynamic  _Application._Evaluate(object Name) 
+ *         void     _Application.Save(object Filename) 
+ *         void     _Application.SaveWorkspace(object Filename) 
+ *         dynamic  _Application.GetSaveAsFilename(object InitialFilename, object FileFilter, object FilterIndex, object Title, object ButtonText) 
+ *         void     _Application.Volatile(object Volatile) 
+ *         bool     _Application.Wait(object Time) 
+ *         void     _Application._Wait(object Time) 
+ *         dynamic  _Application.Support(object Object, int ID, object arg) 
+ *         bool     _Application.RegisterXLL(string Filename) 
+ *         void     _Application.ResetTipWizard() 
+ *         void     _Application.Goto(object Reference, object Scroll) 
+ *         void     _Application.Help(object HelpFile, object HelpContextID) 
+ *         void     _Application.MailLogon(object Name, object Password, object DownloadNewMail) 
+ *         void     _Application.MailLogoff() 
+ *         void     _Application.DeleteChartAutoFormat(string Name) 
+ *         void     _Application.DeleteCustomList(int ListNum) 
+ *         dynamic  _Application.get_Caller(object Index) 
+ *         Menu     _Application.get_ShortcutMenus(int Index) 
+ *         dynamic  _Application.get_FileConverters(object Index1, object Index2) 
+ *         dynamic  _Application.GetCustomListContents(int ListNum) 
+ *         FileDialog  _Application.get_FileDialog(MsoFileDialogType fileDialogType) 
+ *         int      _Application.GetCustomListNum(object ListArray) 
+ *         string   _Application.GetPhonetic(object Text) 
+ *         dynamic  _Application.get_International(object Index) 
+ *         dynamic  _Application.get_RegisteredFunctions(object Index1, object Index2) 
+ *         dynamic  _Application.get_PreviousSelections(object Index) 
+ *         dynamic  _Application.get_ClipboardFormats(object Index) 
+ *         void     _Application.SetDefaultChart(object FormatName, object Gallery) 
+ *         void     _Application.DisplayXMLSourcePane(object XmlMap) 
+ *         void     _Application.SendKeys(object Keys, object Wait) 
+ *         dynamic  _Application._WSFunction(object Arg1, object Arg2, object Arg3, object Arg4, object Arg5, object Arg6, object Arg7, object Arg8, object Arg9, object Arg10, object Arg11, object Arg12, object Arg13, object Arg14, object Arg15, object Arg16, object Arg17, object Arg18, object Arg19, object Arg20, object Arg21, object Arg22, object Arg23, object Arg24, object Arg25, object Arg26, object Arg27, object Arg28, object Arg29, object Arg30) 
+ *         void     _Application.ActivateMicrosoftApp(XlMSApplication Index) 
+ *         dynamic  _Application.ExecuteExcel4Macro(string String) 
+ *         void     _Application.RecordMacro(object BasicCode, object XlmCode) 
+ *         void     _Application.MacroOptions(object Macro, object Description, object HasMenu, object MenuText, object HasShortcutKey, object ShortcutKey, object Category, object StatusBar, object HelpContextID, object HelpFile) 
+ *         void     _Application.MacroOptions2(object Macro, object Description, object HasMenu, object MenuText, object HasShortcutKey, object ShortcutKey, object Category, object StatusBar, object HelpContextID, object HelpFile, object ArgumentDescriptions) 
+ *         void     _Application.DDEExecute(int Channel, string String) 
+ *         dynamic  _Application.DDERequest(int Channel, string Item) 
+ *         int      _Application.DDEInitiate(string App, string Topic) 
+ *         void     _Application.DDEPoke(int Channel, object Item, object Data) 
+ *         void     _Application.DDETerminate(int Channel) 
  *         dynamic  _Application.Dummy1(object Arg1, object Arg2, object Arg3, object Arg4) 
  *         dynamic  _Application.Dummy2(object Arg1, object Arg2, object Arg3, object Arg4, object Arg5, object Arg6, object Arg7, object Arg8) 
  *         dynamic  _Application.Dummy3() 
@@ -372,60 +416,18 @@
  *         dynamic  _Application.Dummy7() 
  *         dynamic  _Application.Dummy8(object Arg1) 
  *         dynamic  _Application.Dummy9() 
- *         bool  _Application.Dummy10(object arg) 
- *         void  _Application.Dummy11() 
- *         void  _Application.DeleteChartAutoFormat(string Name) 
- *         void  _Application.DeleteCustomList(int ListNum) 
- *         void  _Application.DoubleClick() 
- *         dynamic  _Application.get_FileConverters(object Index1, object Index2) 
- *         void  _Application._FindFile() 
- *         dynamic  _Application.GetCustomListContents(int ListNum) 
- *         int  _Application.GetCustomListNum(object ListArray) 
- *         dynamic  _Application.GetOpenFilename(object FileFilter, object FilterIndex, object Title, object ButtonText, object MultiSelect) 
- *         dynamic  _Application.GetSaveAsFilename(object InitialFilename, object FileFilter, object FilterIndex, object Title, object ButtonText) 
- *         void  _Application.Goto(object Reference, object Scroll) 
- *         void  _Application.Help(object HelpFile, object HelpContextID) 
- *         double  _Application.InchesToPoints(double Inches) 
- *         dynamic  _Application.InputBox(string Prompt, object Title, object Default, object Left, object Top, object HelpFile, object HelpContextID, object Type) 
- *         dynamic  _Application.get_International(object Index) 
- *         void  _Application.MacroOptions(object Macro, object Description, object HasMenu, object MenuText, object HasShortcutKey, object ShortcutKey, object Category, object StatusBar, object HelpContextID, object HelpFile) 
- *         void  _Application.MailLogoff() 
- *         void  _Application.MailLogon(object Name, object Password, object DownloadNewMail) 
- *         Workbook  _Application.NextLetter() 
+ *         bool     _Application.Dummy10(object arg) 
+ *         void     _Application.Dummy11() 
+ *         void     _Application.Dummy12(PivotTable p1, PivotTable p2) 
+ *         dynamic  _Application.Dummy13(object Arg1, object Arg2, object Arg3, object Arg4, object Arg5, object Arg6, object Arg7, object Arg8, object Arg9, object Arg10, object Arg11, object Arg12, object Arg13, object Arg14, object Arg15, object Arg16, object Arg17, object Arg18, object Arg19, object Arg20, object Arg21, object Arg22, object Arg23, object Arg24, object Arg25, object Arg26, object Arg27, object Arg28, object Arg29, object Arg30) 
+ *         void     _Application.Dummy14() 
+ *         dynamic  _Application.Dummy20(int grfCompareFunctions) 
+ *         void     _Application.Quit() 
+ *          
  *         void  _Application.OnKey(string Key, object Procedure) 
  *         void  _Application.OnRepeat(string Text, string Procedure) 
  *         void  _Application.OnTime(object EarliestTime, string Procedure, object LatestTime, object Schedule) 
  *         void  _Application.OnUndo(string Text, string Procedure) 
- *         dynamic  _Application.get_PreviousSelections(object Index) 
- *         void  _Application.Quit() 
- *         void  _Application.RecordMacro(object BasicCode, object XlmCode) 
- *         dynamic  _Application.get_RegisteredFunctions(object Index1, object Index2) 
- *         bool  _Application.RegisterXLL(string Filename) 
- *         void  _Application.Repeat() 
- *         void  _Application.ResetTipWizard() 
- *         void  _Application.Save(object Filename) 
- *         void  _Application.SaveWorkspace(object Filename) 
- *         void  _Application.SetDefaultChart(object FormatName, object Gallery) 
- *         void  _Application.Undo() 
- *         void  _Application.Volatile(object Volatile) 
- *         void  _Application._Wait(object Time) 
- *         dynamic  _Application._WSFunction(object Arg1, object Arg2, object Arg3, object Arg4, object Arg5, object Arg6, object Arg7, object Arg8, object Arg9, object Arg10, object Arg11, object Arg12, object Arg13, object Arg14, object Arg15, object Arg16, object Arg17, object Arg18, object Arg19, object Arg20, object Arg21, object Arg22, object Arg23, object Arg24, object Arg25, object Arg26, object Arg27, object Arg28, object Arg29, object Arg30) 
- *         bool  _Application.Wait(object Time) 
- *         string  _Application.GetPhonetic(object Text) 
- *         void  _Application.Dummy12(PivotTable p1, PivotTable p2) 
- *         void  _Application.CalculateFull() 
- *         bool  _Application.FindFile() 
- *         dynamic  _Application.Dummy13(object Arg1, object Arg2, object Arg3, object Arg4, object Arg5, object Arg6, object Arg7, object Arg8, object Arg9, object Arg10, object Arg11, object Arg12, object Arg13, object Arg14, object Arg15, object Arg16, object Arg17, object Arg18, object Arg19, object Arg20, object Arg21, object Arg22, object Arg23, object Arg24, object Arg25, object Arg26, object Arg27, object Arg28, object Arg29, object Arg30) 
- *         FileDialog  _Application.get_FileDialog(MsoFileDialogType fileDialogType) 
- *         void  _Application.Dummy14() 
- *         void  _Application.CalculateFullRebuild() 
- *         void  _Application.CheckAbort(object KeepAbort) 
- *         void  _Application.DisplayXMLSourcePane(object XmlMap) 
- *         dynamic  _Application.Support(object Object, int ID, object arg) 
- *         dynamic  _Application.Dummy20(int grfCompareFunctions) 
- *         void  _Application.CalculateUntilAsyncQueriesDone() 
- *         int  _Application.SharePointVersion(string bstrUrl) 
- *         void  _Application.MacroOptions2(object Macro, object Description, object HasMenu, object MenuText, object HasShortcutKey, object ShortcutKey, object Category, object StatusBar, object HelpContextID, object HelpFile, object ArgumentDescriptions) 
  *
  *@subject ◆interface AppEvents_Event -- Microsoft.Office.Interop.Excel
  *         event AppEvents_NewWorkbookEventHandler NewWorkbook 
