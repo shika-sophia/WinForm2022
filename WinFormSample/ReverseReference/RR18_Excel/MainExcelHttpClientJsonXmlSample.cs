@@ -2,14 +2,17 @@
  *@title WinFormGUI / WinFormSample / ReverseReference / RR18_Excel
  *@class MainHttpClientJsonXmlSample.cs
  *@class   └ new FormHttpClientJsonXmlSample() : Form
- *@class       └ new Excel.Application()
  *@class       └ new HttpClient()
+ *@class       └ new Excel.Application()
  *@using Excel = Microsoft.Office.Interop.Excel
  *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
  *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
  *          
  *@content RR[496] p834 / Excel, HttpClient / JsonXmlSample
+ *         HttpClientでネット接続し、
+ *         Webページの HTML を JSON形式, XML形式で Excelに出力
+ *         
  *@subject 
  *
  *@see ImageHttpClientJsonXmlSample.jpg
@@ -46,10 +49,12 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR18_Excel
 
     class FormHttpClientJsonXmlSample : Form
     {
+        private readonly HttpClient client;
+        private const string url = "https://www.shuwasystem.co.jp/";
+        private string htmlContent;
         private readonly Excel.Application excelApp;
         private readonly Excel.Workbook workbook;
         private readonly Excel.Worksheet sheet2;
-        private readonly HttpClient client;
         private readonly Mutex mutex;
         private readonly TableLayoutPanel table;
         private readonly Label label;
@@ -57,7 +62,6 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR18_Excel
         private readonly TextBox textBoxContent;
         private readonly Button buttonJson;
         private readonly Button buttonXml;
-        private const string url = "https://www.shuwasystem.co.jp/";
 
         public FormHttpClientJsonXmlSample()
         {
@@ -72,6 +76,9 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR18_Excel
             mutex = new Mutex(initiallyOwned: false, "FormHttpClientJsonXmlSample");
             this.Load += new EventHandler(FormHttpClientJsonXmlSample_Load);
             this.FormClosed += new FormClosedEventHandler(FormHttpClientJsonXmlSample_FormClosed);
+            
+            //---- HttpClient ----
+            client = new HttpClient();
 
             //---- Excel Application ----
             excelApp = new Excel.Application();
@@ -87,8 +94,6 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR18_Excel
                 sheet2.Range["D1"].Value = "Description";
             }
 
-            //---- HttpClient ----
-            client = new HttpClient();
 
             //---- Controls ----
             table = new TableLayoutPanel()
@@ -160,16 +165,39 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR18_Excel
             });
         }//constructor
 
-        private void ButtonJson_Click(object sender, EventArgs e)
+        private async void ButtonJson_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
-        }
+            try
+            {
+                if (htmlContent == null)
+                {
+                    htmlContent = await ConnectHttpGetHtmlString();
+                }
+
+                //---- JSON / JSONの解析 ----
+                
+
+                //---- Excel ----
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().Name);
+            }
+            finally
+            {
+                client.CancelPendingRequests();
+            }
+        }//ButtonJson_Click()
 
         private async void ButtonXml_Click(object sender, EventArgs e)
         {
             try
             {
-                string htmlContent = await ConnectHttpGetHtmlString();
+                if(htmlContent == null)
+                {
+                    htmlContent = await ConnectHttpGetHtmlString();
+                }
 
                 //---- XDocument / XMLの解析 ----
                 XDocument doc = XDocument.Load(new StringReader(htmlContent));
@@ -209,7 +237,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR18_Excel
         private void FormHttpClientJsonXmlSample_FormClosed(object sender, FormClosedEventArgs e)
         {
             client.Dispose();
-            workbook.Save();
+            //workbook.Save();
             excelApp.Quit();
             mutex.Close();
         }//Form1_FormClosed()
