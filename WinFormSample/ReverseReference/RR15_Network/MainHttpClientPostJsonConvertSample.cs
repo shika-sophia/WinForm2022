@@ -164,6 +164,176 @@
  *         + PreserveReferencesHandling      jsonSerializerSettings.PreserveReferencesHandling { get; set; } 
  *         + MetadataPropertyHandling        jsonSerializerSettings.MetadataPropertyHandling { get; set; } 
  *         
+ *@subject ◆class JsonSerializer -- Newtonsoft.Json
+ *         + JsonSerializer  new JsonSerializer() 
+ *         
+ *         ＊Property
+ *         + JsonConverterCollection  jsonSerializer.Converters { get; } 
+ *         + int?                     jsonSerializer.MaxDepth { get; set; } 
+ *         + StreamingContext         jsonSerializer.Context { get; set; } 
+ *         + SerializationBinder      jsonSerializer.Binder { get; set; } 
+ *         + ISerializationBinder     jsonSerializer.SerializationBinder { get; set; } 
+ *         + CultureInfo              jsonSerializer.Culture { get; set; } 
+ *         + Formatting               jsonSerializer.Formatting { get; set; } 
+ *         + string                   jsonSerializer.DateFormatString { get; set; } 
+ *         + FormatterAssemblyStyle   jsonSerializer.TypeNameAssemblyFormat { get; set; } 
+ *         + IContractResolver        jsonSerializer.ContractResolver { get; set; } 
+ *         + IReferenceResolver?      jsonSerializer.ReferenceResolver { get; set; } 
+ *         + IEqualityComparer?       jsonSerializer.EqualityComparer { get; set; } 
+ *         + bool                     jsonSerializer.CheckAdditionalContent { get; set; } 
+ *         + ITraceWriter?            jsonSerializer.TraceWriter { get; set; } 
+ *         
+ *         ＊Handling Property
+ *         + MissingMemberHandling  jsonSerializer.MissingMemberHandling { get; set; } 
+ *         + NullValueHandling  jsonSerializer.NullValueHandling { get; set; } 
+ *         + DefaultValueHandling  jsonSerializer.DefaultValueHandling { get; set; } 
+ *         + ObjectCreationHandling  jsonSerializer.ObjectCreationHandling { get; set; } 
+ *         + ConstructorHandling  jsonSerializer.ConstructorHandling { get; set; } 
+ *         + MetadataPropertyHandling  jsonSerializer.MetadataPropertyHandling { get; set; } 
+ *         + DateFormatHandling  jsonSerializer.DateFormatHandling { get; set; } 
+ *         + DateTimeZoneHandling  jsonSerializer.DateTimeZoneHandling { get; set; } 
+ *         + DateParseHandling  jsonSerializer.DateParseHandling { get; set; } 
+ *         + FloatParseHandling  jsonSerializer.FloatParseHandling { get; set; } 
+ *         + FloatFormatHandling  jsonSerializer.FloatFormatHandling { get; set; } 
+ *         + StringEscapeHandling  jsonSerializer.StringEscapeHandling { get; set; } 
+ *         + ReferenceLoopHandling  jsonSerializer.ReferenceLoopHandling { get; set; } 
+ *         + PreserveReferencesHandling  jsonSerializer.PreserveReferencesHandling { get; set; } 
+ *         + TypeNameAssemblyFormatHandling  jsonSerializer.TypeNameAssemblyFormatHandling { get; set; } 
+ *         + TypeNameHandling  jsonSerializer.TypeNameHandling { get; set; } 
+ *         
+ *         ＊Method
+ *         + static JsonSerializer  JsonSerializer.Create() 
+ *         + static JsonSerializer  JsonSerializer.Create(JsonSerializerSettings? settings) 
+ *         + static JsonSerializer  JsonSerializer.CreateDefault() 
+ *         + static JsonSerializer  JsonSerializer.CreateDefault(JsonSerializerSettings? settings) 
+ *         + void     jsonSerializer.Populate(TextReader reader, object target) 
+ *         + void     jsonSerializer.Populate(JsonReader reader, object target) 
+ *         + void     jsonSerializer.Serialize(TextWriter textWriter, object? value) 
+ *         + void     jsonSerializer.Serialize(TextWriter textWriter, object? value, Type objectType) 
+ *         + void     jsonSerializer.Serialize(JsonWriter jsonWriter, object? value) 
+ *         + void     jsonSerializer.Serialize(JsonWriter jsonWriter, object? value, Type? objectType) 
+ *         + object?  jsonSerializer.Deserialize(JsonReader reader, Type? objectType) 
+ *         + object?  jsonSerializer.Deserialize(TextReader reader, Type objectType) 
+ *         + object?  jsonSerializer.Deserialize(JsonReader reader) 
+ *         + T?       jsonSerializer.Deserialize<T>(JsonReader reader) 
+ *         
+ *         ＊Event
+ *         + event EventHandler<Serialization.ErrorEventArgs>?  jsonSerializer.Error 
+
+ *@subject ◆class JObject : JContainer, IDictionary<string, JToken?>, ICollection<KeyValuePair<string, JToken?>>, IEnumerable<KeyValuePair<string, JToken?>>, IEnumerable, INotifyPropertyChanged, ICustomTypeDescriptor, INotifyPropertyChanging
+ *                       -- Newtonsoft.Json.Linq
+ *         + JObject  new JObject() 
+ *         + JObject  new JObject(JObject other) 
+ *         + JObject  new JObject(params object[] content) 
+ *         + JObject  new JObject(object content) 
+ *         
+ *         + JToken?  this[object key] { get; set; } 
+ *         + JToken?  this[string propertyName] { get; set; } 
+ *         
+ *         + JTokenType     jObject.Type { get; } 
+ *         # IList<JToken>  jObject.ChildrenTokens { get; } 
+ *         
+ *         + static JObject  JObject.FromObject(object o) 
+ *         + static JObject  JObject.FromObject(object o, JsonSerializer jsonSerializer) 
+ *         + static JObject  JObject.Load(JsonReader reader) 
+ *         + static JObject  JObject.Load(JsonReader reader, JsonLoadSettings? settings) 
+ *         + static Task<JObject>  JObject.LoadAsync(JsonReader reader, CancellationToken cancellationToken = default) 
+ *         + static Task<JObject>  JObject.LoadAsync(JsonReader reader, JsonLoadSettings? settings, CancellationToken cancellationToken = default) 
+ *         + static JObject  JObject.Parse(string json, JsonLoadSettings? settings) 
+ *         + static JObject  JObject.Parse(string json) 
+ *         
+ *         + void  jObject.Add(string propertyName, JToken? value) 
+ *         + bool  jObject.ContainsKey(string propertyName) 
+ *         + IEnumerator<KeyValuePair<string, JToken?>>  jObject.GetEnumerator() 
+ *         + JEnumerable<JToken>  jObject.PropertyValues() 
+ *         + IEnumerable<JProperty>  jObject.Properties() 
+ *         + JProperty?  jObject.Property(string name) 
+ *         + JProperty?  jObject.Property(string name, StringComparison comparison) 
+ *         + JToken?  jObject.GetValue(string? propertyName) 
+ *         + JToken?  jObject.GetValue(string? propertyName, StringComparison comparison) 
+ *         + bool  jObject.TryGetValue(string propertyName, [NotNullWhenAttribute(true)] out JToken? value) 
+ *         + bool  jObject.TryGetValue(string propertyName, StringComparison comparison, [NotNullWhenAttribute(true)] out JToken? value) 
+ *         + void  jObject.WriteTo(JsonWriter writer, params JsonConverter[] converters) 
+ *         + Task  jObject.WriteToAsync(JsonWriter writer, CancellationToken cancellationToken, params JsonConverter[] converters) 
+ *         # DynamicMetaObject  jObject.GetMetaObject(Expression parameter) 
+ *         + bool  jObject.Remove(string propertyName) 
+ *         
+ *         # void  jObject.OnPropertyChanged(string propertyName) 
+ *         # void  jObject.OnPropertyChanging(string propertyName) 
+ *         + event PropertyChangedEventHandler?  jObject.PropertyChanged 
+ *         + event PropertyChangingEventHandler?  jObject.PropertyChanging 
+ *
+ *@subject ◆abstract class JToken : IJEnumerable<JToken>, IEnumerable<JToken>, IEnumerable, IJsonLineInfo, ICloneable, IDynamicMetaObjectProvider
+ *                      -- Newtonsoft.Json.Linq
+ *         + JToken?  this[object key] { get; set; } 
+ *         + static   JTokenEqualityComparer  JToken.EqualityComparer { get; } 
+ *         + abstract JTokenType  jToken.Type { get; } 
+ *         + abstract bool  jToken.HasValues { get; } 
+ *         + JContainer?  jToken.Parent { get; } 
+ *         + JToken   jToken.Root { get; } 
+ *         + JToken?  jToken.Next { get; } 
+ *         + JToken?  jToken.Previous { get; } 
+ *         + JToken?  jToken.First { get; } 
+ *         + JToken?  jToken.Last { get; } 
+ *         + string   jToken.Path { get; } 
+ *         
+ *         + static JToken  JToken.FromObject(object o) 
+ *         + static JToken  JToken.FromObject(object o, JsonSerializer jsonSerializer) 
+ *         + static JToken  JToken.Load(JsonReader reader, JsonLoadSettings? settings) 
+ *         + static JToken  JToken.Load(JsonReader reader) 
+ *         + static JToken  JToken.Parse(string json) 
+ *         + static JToken  JToken.Parse(string json, JsonLoadSettings? settings) 
+ *         + static JToken  JToken.ReadFrom(JsonReader reader) 
+ *         + static JToken  JToken.ReadFrom(JsonReader reader, JsonLoadSettings? settings) 
+ *         + static bool    JToken.DeepEquals(JToken? t1, JToken? t2) 
+ *         
+ *         + T?       jToken.Value<T>(object key) 
+ *         + IEnumerable<T?>  jToken.Values<T>() 
+ *         + void  jToken.AddBeforeSelf(object? content) 
+ *         + void  jToken.AddAfterSelf(object? content) 
+ *         + void  jToken.AddAnnotation(object annotation) 
+ *         + IEnumerable<JToken>  jToken.BeforeSelf() 
+ *         + IEnumerable<JToken>  jToken.AfterSelf() 
+ *         + JEnumerable<JToken>  jToken.Children() 
+ *         + JEnumerable<T>       jToken.Children<T>() where T : JToken 
+ *         + IEnumerable<JToken>  jToken.Ancestors() 
+ *         + IEnumerable<JToken>  jToken.AncestorsAndSelf() 
+ *         + object?              jToken.Annotation(Type type) 
+ *         + T?                   jToken.Annotation<T>() where T : class 
+ *         + IEnumerable<object>  jToken.Annotations(Type type) 
+ *         + IEnumerable<T>       jToken.Annotations<T>() where T : class 
+ *         + JsonReader  jToken.CreateReader() 
+ *         + JToken      jToken.DeepClone() 
+ *         + void        jToken.Replace(JToken value) 
+ *         + JToken?     jToken.SelectToken(string path) 
+ *         + JToken?     jToken.SelectToken(string path, JsonSelectSettings? settings) 
+ *         + JToken?     jToken.SelectToken(string path, bool errorWhenNoMatch) 
+ *         + IEnumerable<JToken>  jToken.SelectTokens(string path) 
+ *         + IEnumerable<JToken>  jToken.SelectTokens(string path, bool errorWhenNoMatch) 
+ *         + IEnumerable<JToken>  jToken.SelectTokens(string path, JsonSelectSettings? settings) 
+ *         + void  jToken.Remove() 
+ *         + void  jToken.RemoveAnnotations(Type type) 
+ *         + void  jToken.RemoveAnnotations<T>() where T : class 
+ *         + object?  jToken.ToObject(Type objectType) 
+ *         + object?  jToken.ToObject(Type objectType, JsonSerializer jsonSerializer) 
+ *         + T?       jToken.ToObject<T>() 
+ *         + T?       jToken.ToObject<T>(JsonSerializer jsonSerializer) 
+ *         + string   jToken.ToString() 
+ *         + string   jToken.ToString(Formatting formatting, params JsonConverter[] converters) 
+ *         + abstract void  jToken.WriteTo(JsonWriter writer, params JsonConverter[] converters) 
+ *         # DynamicMetaObject  jToken.GetMetaObject(Expression parameter) 
+ *
+ *         + static Task<JToken>  JToken.LoadAsync(JsonReader reader, JsonLoadSettings? settings, CancellationToken cancellationToken = default) 
+ *         + static Task<JToken>  JToken.LoadAsync(JsonReader reader, CancellationToken cancellationToken = default) 
+ *         + static Task<JToken>  JToken.ReadFromAsync(JsonReader reader, JsonLoadSettings? settings, CancellationToken cancellationToken = default) 
+ *         + static Task<JToken>  JToken.ReadFromAsync(JsonReader reader, CancellationToken cancellationToken = default) 
+ *         + Task                 jToken.WriteToAsync(JsonWriter writer, CancellationToken cancellationToken, params JsonConverter[] converters) 
+ *         + Task                 jToken.WriteToAsync(JsonWriter writer, params JsonConverter[] converters) 
+ *
+ *@subject ◆class TextReader 
+ *@subject ◆class JsonTextReader 
+ *         => 〔RR18_Excel\MainExcelHttpClientJsonXmlSample.cs〕
+ *         
  */
 #endregion
 /*

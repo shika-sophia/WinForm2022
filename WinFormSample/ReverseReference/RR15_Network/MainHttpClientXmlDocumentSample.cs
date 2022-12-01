@@ -217,7 +217,10 @@
  *         + abstract void     xmlNode.WriteTo(XmlWriter w) 
  *         + abstract void     xmlNode.WriteContentTo(XmlWriter w) 
  *         + abstract XmlNode  xmlNode.CloneNode(bool deep) 
- *               
+ *
+ *@subject ◆class TextReader 
+ *         => 〔RR18_Excel\MainExcelHttpClientJsonXmlSample.cs〕
+ *         
  *@see No Image (ImageHttpClientXmlDocumentSample.jpg)
  *@see 
  *@author shika
