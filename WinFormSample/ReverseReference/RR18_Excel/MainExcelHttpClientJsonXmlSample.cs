@@ -11,15 +11,96 @@
  *          
  *@content RR[496] p834 / Excel, HttpClient / JsonXmlSample
  *         HttpClientでネット接続し、
- *         Webページの HTML を JSON形式, XML形式で Excelに出力
+ *         Webページを JSON形式, XML形式で Excelに出力 〔未完成〕
  *         
- *@subject 
+ *        【註】Webページの元データが、JSON形式, XML形式でないと、機能しない
+ *         (HTMLなどを JSON, XMLに Convertするわけではない)
+ *        
+ *@NOTE【Exception】System.Xml.XmlException: 
+ *      'src' は予期しないトークンです。予期していたトークンは '=' です。 行 40、位置 15。
  *
- *@see ImageHttpClientJsonXmlSample.jpg
+ *@summary 
+ *         void  XDocument.Load(TextReader)
+ *@subject ◆abstract class TextReader : MarshalByRefObject, IDisposable
+ *                          -- System.IO
+ *         + static readonly TextReader  TextReader.Null 
+ *         # TextReader  TextReader()
+ *           [×] 'new' is not available, but 'base()' is OK from constructor of inherited class ONLY.
+ *         
+ *         + static TextReader  TextReader.Synchronized(TextReader reader) 
+ *         + int  textReader.Read() 
+ *         + int  textReader.Read(char[] buffer, int index, int count) 
+ *         + int  textReader.ReadBlock(char[] buffer, int index, int count) 
+ *         + string  textReader.ReadLine() 
+ *         + string  textReader.ReadToEnd() 
+ *         + int  textReader.Peek() 
+ *         + Task<int>  textReader.ReadAsync(char[] buffer, int index, int count) 
+ *         + Task<int>  textReader.ReadBlockAsync(char[] buffer, int index, int count) 
+ *         + Task<string>  textReader.ReadLineAsync() 
+ *         + Task<string>  textReader.ReadToEndAsync() 
+ *         + void  textReader.Close() 
+ *         + void  textReader.Dispose() 
+ *         # void  textReader.Dispose(bool disposing) 
+ *                    ↑
+ *@subject ◆class StringReader : TextReader -- System.IO
+ *         + StringReader  new StringReader(string s) 
+ *         + int  stringReader.Read() 
+ *         + int  stringReader.Read(char[] buffer, int index, int count) 
+ *         + string  stringReader.ReadLine() 
+ *         + string  stringReader.ReadToEnd() 
+ *         + int  stringReader.Peek() 
+ *         + Task<int>  stringReader.ReadAsync(char[] buffer, int index, int count) 
+ *         + Task<int>  stringReader.ReadBlockAsync(char[] buffer, int index, int count) 
+ *         + Task<string>  stringReader.ReadLineAsync() 
+ *         + Task<string>  stringReader.ReadToEndAsync() 
+ *         + void  stringReader.Close() 
+ *         # void  stringReader.Dispose(bool disposing) 
+ *
+ *@subject ◆class JsonTextReader : JsonReader, IJsonLineInfo
+ *                              -- Newtonsoft.Json
+ *         + JsonTextReader  new JsonTextReader(TextReader reader) 
+ *         + int        jsonTextReader.LineNumber { get; } 
+ *         + int        jsonTextReader.LinePosition { get; } 
+ *         + bool       jsonTextReader.HasLineInfo() 
+ *         + JsonNameTable?     jsonTextReader.PropertyNameTable { get; set; } 
+ *         + IArrayPool<char>?  jsonTextReader.ArrayPool { get; set; } 
+ *         
+ *         ＊Method
+ *         + bool       jsonTextReader.Read() 
+ *         + bool?      jsonTextReader.ReadAsBoolean() 
+ *         + string?    jsonTextReader.ReadAsString() 
+ *         + int?       jsonTextReader.ReadAsInt32() 
+ *         + double?    jsonTextReader.ReadAsDouble() 
+ *         + decimal?   jsonTextReader.ReadAsDecimal() 
+ *         + byte[]?    jsonTextReader.ReadAsBytes() 
+ *         + DateTime?  jsonTextReader.ReadAsDateTime() 
+ *         + DateTimeOffset?  jsonTextReader.ReadAsDateTimeOffset() 
+ *         + void  jsonTextReader.Close() 
+ *         
+ *         ＊Async Method
+ *         + Task<bool>       jsonTextReader.ReadAsync(CancellationToken cancellationToken = default) 
+ *         + Task<bool?>      jsonTextReader.ReadAsBooleanAsync(CancellationToken cancellationToken = default) 
+ *         + Task<string?>    jsonTextReader.ReadAsStringAsync(CancellationToken cancellationToken = default) 
+ *         + Task<int?>       jsonTextReader.ReadAsInt32Async(CancellationToken cancellationToken = default) 
+ *         + Task<double?>    jsonTextReader.ReadAsDoubleAsync(CancellationToken cancellationToken = default) 
+ *         + Task<decimal?>   jsonTextReader.ReadAsDecimalAsync(CancellationToken cancellationToken = default) 
+ *         + Task<byte[]?>    jsonTextReader.ReadAsBytesAsync(CancellationToken cancellationToken = default) 
+ *         + Task<DateTime?>  jsonTextReader.ReadAsDateTimeAsync(CancellationToken cancellationToken = default) 
+ *         + Task<DateTimeOffset?>  jsonTextReader.ReadAsDateTimeOffsetAsync(CancellationToken cancellationToken = default) 
+ *
+ *@subject JsonConverter, JsonSerializer, JObject, JToken
+ *         => 〔RR15_Network\MainHttpClientPostJsonConvertSample.cs〕
+ *         
+ *@subject XDocument
+ *         => 〔RR15_Network\MainHttpClientXmlDocumentSample.cs〕
+ *         
+ *@see (No Image) [×] ImageHttpClientJsonXmlSample.jpg
  *@see 
  *@author shika
  *@date 2022-11-30
  */
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Drawing;
 using System.IO;
@@ -34,9 +115,9 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR18_Excel
 {
     class MainExcelHttpClientJsonXmlSample
     {
-        [STAThread]
-        static void Main()
-        //public void Main()
+        //[STAThread]
+        //static void Main()
+        public void Main()
         {
             Console.WriteLine("new FormHttpClientJsonXmlSample()");
 
@@ -94,7 +175,6 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR18_Excel
                 sheet2.Range["D1"].Value = "Description";
             }
 
-
             //---- Controls ----
             table = new TableLayoutPanel()
             {
@@ -130,7 +210,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR18_Excel
 
             buttonJson = new Button()
             {
-                Text = "Convert to JSON",
+                Text = "Show JSON",
                 Dock = DockStyle.Fill,
                 AutoSize = true,
             };
@@ -139,7 +219,7 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR18_Excel
             
             buttonXml = new Button()
             {
-                Text = "Convert to XML",
+                Text = "Show XML",
                 Dock = DockStyle.Fill,
                 AutoSize = true,
             };
@@ -173,12 +253,26 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR18_Excel
                 {
                     htmlContent = await ConnectHttpGetHtmlString();
                 }
+                textBoxContent.Text = htmlContent;
 
-                //---- JSON / JSONの解析 ----
-                
-
+                //---- JsonSerializer / JSONの解析 ----
+                //JsonSerializer json = new JsonSerializer();  //利用していない
+                var reader = new JsonTextReader(new StringReader(htmlContent));
+                JArray jsonAry = (JArray) JObject.ReadFrom(reader)["projects"];
+                    
                 //---- Excel ----
+                int row = 2;
+                foreach (JToken element in jsonAry)
+                {
+                    sheet2.Cells[row, 1] = element["id"].Value<int>();
+                    sheet2.Cells[row, 2] = element["identifer"].Value<string>();
+                    sheet2.Cells[row, 3] = element["name"].Value<string>();
+                    sheet2.Cells[row, 4] = element["description"].Value<string>().Replace("\r\n", "");
 
+                    row++;
+                }//foreach
+
+                excelApp.Visible = true;
             }
             catch (Exception ex)
             {
@@ -203,12 +297,23 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR18_Excel
                 XDocument doc = XDocument.Load(new StringReader(htmlContent));
 
                 //---- Excel ----
-                
+                int row = 2;
+                foreach (XElement element in doc.Root.Elements())
+                {
+                    sheet2.Cells[row, 1] = element.Element(XName.Get("id")).Value;
+                    sheet2.Cells[row, 2] = element.Element(XName.Get("identifer")).Value;
+                    sheet2.Cells[row, 3] = element.Element(XName.Get("name")).Value;
+                    sheet2.Cells[row, 4] = element.Element(XName.Get("description")).Value;
+
+                    row++;
+                }//foreach
+
+                excelApp.Visible = true;
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, ex.GetType().Name);
-            }
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show(ex.Message, ex.GetType().Name);
+            //}
             finally
             {
                 client.CancelPendingRequests();
