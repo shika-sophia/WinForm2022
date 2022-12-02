@@ -18,6 +18,14 @@
  *@NOTE   【註】上記サイトがリンクアウトのため、サンプルコードのみ記述
  *         Here is described SampleCode ONLY, because above site is linkout.
  *
+ *@subject JsonTextReader  new JsonTextReader(TextReader)
+ *         JToken  JObject.ReadFrom(TextReader)
+ *         JToken  IEnumerable<JToken>.Value<JToken>()
+ *         JToken  JArray[object key]
+ *         
+ *         => 〔MainExcelHttpClientJsonXmlSample.cs〕
+ *         => 〔RR15_Network\MainHttpClientPostJsonConvertSample.cs〕
+ *         
  *@see (No Image)  [×] ImageExcelHttpClientWeatherSample.jpg
  *@see 
  *@author shika

@@ -88,7 +88,7 @@
  *         + Task<DateTime?>  jsonTextReader.ReadAsDateTimeAsync(CancellationToken cancellationToken = default) 
  *         + Task<DateTimeOffset?>  jsonTextReader.ReadAsDateTimeOffsetAsync(CancellationToken cancellationToken = default) 
  *
- *@subject JsonConverter, JsonSerializer, JObject, JToken
+ *@subject JsonConvert, JsonSerializer, JObject, JToken, JArray
  *         => 〔RR15_Network\MainHttpClientPostJsonConvertSample.cs〕
  *         
  *@subject XDocument
