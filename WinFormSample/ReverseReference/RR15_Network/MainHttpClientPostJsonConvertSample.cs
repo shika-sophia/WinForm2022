@@ -48,7 +48,7 @@
  *          textBoxName.Text = objReturn.Name;
  *          textBoxAge.Text = objReturn.Age;
  */
-#region -> XDocument, XmlDocument
+#region -> JsonConvert, JObject / XDocument, XmlDocument
 /*
 *@subject ◆static class JsonConvert -- Newtonsoft.Json
  *         + static readonly string  JsonConvert.True 
@@ -329,6 +329,41 @@
  *         + static Task<JToken>  JToken.ReadFromAsync(JsonReader reader, CancellationToken cancellationToken = default) 
  *         + Task                 jToken.WriteToAsync(JsonWriter writer, CancellationToken cancellationToken, params JsonConverter[] converters) 
  *         + Task                 jToken.WriteToAsync(JsonWriter writer, params JsonConverter[] converters) 
+ *         
+ *@subject ◆class JArray : JContainer, IList<JToken>, ICollection<JToken>, IEnumerable<JToken>, IEnumerable
+ *                      -- Newtonsoft.Json.Linq
+ *         + JArray  new JArray() 
+ *         + JArray  new JArray(JArray other) 
+ *         + JArray  new JArray(params object[] content) 
+ *         + JArray  new JArray(object content) 
+ *         
+ *         + JToken? this[object key] { get; set; } 
+ *         + JToken  this[int index] { get; set; } 
+ *         
+ *         + JTokenType  jArray.Type { get; } 
+ *         + bool  jArray.IsReadOnly { get; } 
+ *         # IList<JToken>  jArray.ChildrenTokens { get; } 
+ *         
+ *         + static JArray  JArray.FromObject(object o) 
+ *         + static JArray  JArray.FromObject(object o, JsonSerializer jsonSerializer) 
+ *         + static JArray  JArray.Load(JsonReader reader) 
+ *         + static JArray  JArray.Load(JsonReader reader, JsonLoadSettings? settings) 
+ *         + static JArray  JArray.Parse(string json, JsonLoadSettings? settings) 
+ *         + static JArray  JArray.Parse(string json) 
+ *         + int   jArray.IndexOf(JToken item) 
+ *         + bool  jArray.Contains(JToken item) 
+ *         + void  jArray.Add(JToken item) 
+ *         + void  jArray.Insert(int index, JToken item) 
+ *         + void  jArray.CopyTo(JToken[] array, int arrayIndex) 
+ *         + IEnumerator<JToken>  jArray.GetEnumerator() 
+ *         + void  jArray.WriteTo(JsonWriter writer, params JsonConverter[] converters) 
+ *         + bool  jArray.Remove(JToken item) 
+ *         + void  jArray.RemoveAt(int index) 
+ *         + void  jArray.Clear() 
+ *         
+ *         + static Task<JArray>  JArray.LoadAsync(JsonReader reader, CancellationToken cancellationToken = default) 
+ *         + static Task<JArray>  JArray.LoadAsync(JsonReader reader, JsonLoadSettings? settings, CancellationToken cancellationToken = default) 
+ *         + Task                 jArray.WriteToAsync(JsonWriter writer, CancellationToken cancellationToken, params JsonConverter[] converters) 
  *
  *@subject ◆class TextReader 
  *@subject ◆class JsonTextReader 
