@@ -76,7 +76,7 @@
  *       ・dataList値を取得して、TemperatureDataの 各Propertyに値を代入
  *       ・TemperatureDataの 各Propertyを取得して、Excelの 各Cellに値を代入
  *       
- *@see ImageExcelCSVEncodingSample.jpg
+ *@see ImageExcelHttpClientCSVEncodingSample.jpg
  *@see 
  *@author shika
  *@date 2022-12-03
