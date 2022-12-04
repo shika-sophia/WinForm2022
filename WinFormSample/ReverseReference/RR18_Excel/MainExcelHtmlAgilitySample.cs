@@ -5,13 +5,17 @@
  *@class       └ new HttpClient()
  *@class       └ new Excel.Application()
  *@class       └ new HtmlAgilityPack.HtmlDocument()
+ *@class       └ new BookInfomation()  //self defined
  *@using Excel = Microsoft.Office.Interop.Excel;
- *@using HtmlAgilityPack = 
+ *@using HtmlAgilityPack
  *@reference CS 山田祥寛『独習 C＃ [新版] 』 翔泳社, 2017
  *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
  *          
  *@content RR[499] p843 / Excel / HtmlAgilityPack
+ *         秀和システム(=RRの出版社)の Home Page から、新刊情報を取得し、
+ *         HTMLを解析した後、Excelで表示
+ *         
  *         HtmlAgilityPackをインストール
  *         ・HtmlDocument.LoadHtml()  HTMLデータを解析できる
  *         ・DOMツリーを探索可能 ??
@@ -22,10 +26,12 @@
  *           :
  *         パッケージ 'HtmlAgilityPack.1.11.46' を 'packages.config' に追加しました
  *         'HtmlAgilityPack 1.11.46' が WinFormGUI に正常にインストールされました
- *
+ */
+#region -> HtmlAgilityPack.HtmlDocument, 
+/*
  *@subject ◆interface IXPathNavigable -- System.Xml.XPath
  *         XPathNavigator  IXPathNavigable.CreateNavigator() 
- *
+ *             ↑
  *@subject ◆class HtmlDocument : IXPathNavigable
  *                            -- HtmlAgilityPack
  *         + HtmlDocument  new HtmlDocument() 
@@ -36,6 +42,7 @@
  *         + Encoding  htmlDocument.OptionDefaultStreamEncoding 
  *         + int     htmlDocument.OptionMaxNestedChildNodes 
  *         + string  htmlDocument.OptionStopperNodeName 
+ *         + bool    htmlDocument.DisableServerSideCode 
  *         + bool    htmlDocument.OptionWriteEmptyNodes 
  *         + bool    htmlDocument.OptionUseIdAttribute 
  *         + bool    htmlDocument.OptionDefaultUseOriginalName 
@@ -48,7 +55,6 @@
  *         + bool    htmlDocument.OptionOutputUpperCase 
  *         + bool    htmlDocument.OptionExtractErrorSourceText 
  *         + bool    htmlDocument.OptionXmlForceOriginalComment 
- *         + bool    htmlDocument.DisableServerSideCode 
  *         + bool    htmlDocument.OptionFixNestedTags 
  *         + bool    htmlDocument.OptionEmptyCollection 
  *         + bool    htmlDocument.OptionComputeChecksum 
@@ -61,38 +67,41 @@
  *         + static int  HtmlDocument.MaxDepthLevel { get; set; } 
  *         + static Action<HtmlDocument>  HtmlDocument.DefaultBuilder { get; set; } 
  *         + static bool  HtmlDocument.DisableBehaviorTagP { get; set; } 
+ *         
  *         + string  htmlDocument.ParsedText { get; } 
  *         + int  htmlDocument.CheckSum { get; } 
  *         + HtmlNode  htmlDocument.DocumentNode { get; } 
  *         + IEnumerable<HtmlParseError>  htmlDocument.ParseErrors { get; } 
  *         + Action<HtmlDocument>  htmlDocument.ParseExecuting { get; set; } 
  *         + Encoding  htmlDocument.Encoding { get; } 
- *         + Encoding  htmlDocument.DeclaredEncoding { get; } 
- *         + string  htmlDocument.Remainder { get; } 
- *         + int  htmlDocument.RemainderOffset { get; } 
  *         + Encoding  htmlDocument.StreamEncoding { get; } 
+ *         + Encoding  htmlDocument.DeclaredEncoding { get; } 
+ *         + string    htmlDocument.Remainder { get; } 
+ *         + int       htmlDocument.RemainderOffset { get; } 
  *         
  *         ＊Method
  *         + static string  HtmlDocument.GetXmlName(string name) 
  *         + static string  HtmlDocument.GetXmlName(string name, bool isAttribute, bool preserveXmlNamespaces) 
  *         + static string  HtmlDocument.HtmlEncode(string html) 
- *         + static bool  HtmlDocument.IsWhiteSpace(int c) 
- *         + HtmlAttribute  htmlDocument.CreateAttribute(string name) 
- *         + HtmlAttribute  htmlDocument.CreateAttribute(string name, string value) 
+ *         + static bool    HtmlDocument.IsWhiteSpace(int c) 
+ *         
+ *         + XPathNavigator   htmlDocument.CreateNavigator() 
+ *         + HtmlNode         htmlDocument.CreateElement(string name) 
+ *         + HtmlNode         htmlDocument.GetElementbyId(string id) 
+ *         + HtmlTextNode     htmlDocument.CreateTextNode() 
+ *         + HtmlTextNode     htmlDocument.CreateTextNode(string text) 
  *         + HtmlCommentNode  htmlDocument.CreateComment() 
  *         + HtmlCommentNode  htmlDocument.CreateComment(string comment) 
- *         + HtmlNode  htmlDocument.CreateElement(string name) 
- *         + XPathNavigator  htmlDocument.CreateNavigator() 
- *         + HtmlTextNode  htmlDocument.CreateTextNode(string text) 
- *         + HtmlTextNode  htmlDocument.CreateTextNode() 
+ *         + HtmlAttribute  htmlDocument.CreateAttribute(string name) 
+ *         + HtmlAttribute  htmlDocument.CreateAttribute(string name, string value) 
+ *         + void           htmlDocument.UseAttributeOriginalName(string tagName) 
  *         + Encoding  htmlDocument.DetectEncoding(Stream stream) 
  *         + Encoding  htmlDocument.DetectEncoding(string path) 
  *         + Encoding  htmlDocument.DetectEncoding(Stream stream, bool checkHtml) 
  *         + Encoding  htmlDocument.DetectEncoding(TextReader reader) 
- *         + void  htmlDocument.DetectEncodingAndLoad(string path) 
- *         + void  htmlDocument.DetectEncodingAndLoad(string path, bool detectEncoding) 
+ *         + void      htmlDocument.DetectEncodingAndLoad(string path) 
+ *         + void      htmlDocument.DetectEncodingAndLoad(string path, bool detectEncoding) 
  *         + Encoding  htmlDocument.DetectEncodingHtml(string html) 
- *         + HtmlNode  htmlDocument.GetElementbyId(string id) 
  *         + void  htmlDocument.Load(string path) 
  *         + void  htmlDocument.Load(string path, bool detectEncodingFromByteOrderMarks) 
  *         + void  htmlDocument.Load(string path, Encoding encoding) 
@@ -112,8 +121,9 @@
  *         + void  htmlDocument.Save(StreamWriter writer) 
  *         + void  htmlDocument.Save(TextWriter writer) 
  *         + void  htmlDocument.Save(XmlWriter writer) 
- *         + void  htmlDocument.UseAttributeOriginalName(string tagName) 
- *
+ */
+#endregion
+/*
  *@see ImageExcelHtmlAgilitySample.jpg
  *@see 
  *@author shika
