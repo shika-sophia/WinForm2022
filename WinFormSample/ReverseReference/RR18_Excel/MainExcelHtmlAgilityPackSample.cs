@@ -12,20 +12,29 @@
  *@reference NT 山田祥寛『独習 ASP.NET [第６版] 』 翔泳社, 2019
  *@reference RR 増田智明・国本温子『Visual C＃2019 逆引き大全 500の極意』 秀和システム, 2019
  *          
- *@content RR[499][500] p843 / Excel / HtmlAgilityPack
- *         秀和システム(=RRの出版社)の Home Page から、新刊情報を取得し、
- *         HTMLを解析した後、Excelで表示
- *         
- *         HtmlAgilityPackをインストール
- *         ・HtmlDocument.LoadHtml()  HTMLデータを解析できる
- *         ・DOMツリーを探索可能
- *         
  *@prepare HtmlAgilityPack Install
  *         NuGet
  *         PM> Install-Package HtmlAgilityPack
  *           :
  *         パッケージ 'HtmlAgilityPack.1.11.46' を 'packages.config' に追加しました
  *         'HtmlAgilityPack 1.11.46' が WinFormGUI に正常にインストールされました
+ *         
+ *@content RR[499][500] p843 / Excel / HtmlAgilityPack
+ *         秀和システム(=RRの出版社)の Home Page から、新刊情報を取得し、
+ *         HTMLを解析した後、Excelで表示
+ *         
+ *         ・HtmlAgilityPackをインストール〔above〕
+ *         ・HtmlAgilityPack.HtmlDocumentクラスは 
+ *           System.Wondows.Forms.HtmlDocumentと同名のクラスと重複
+ *           new時は、名前空間を付ける。
+ *           [Example] new HtmlAgilityPack.HtmlDocument();
+ *           
+ *         ・void  htmlDocument.LoadHtml(string html)  HTMLデータを解析できる
+ *           [×]   htmlDocument.Load(string)           引数に HTML を代入すると InvalidOperationException (無効なパスがあります)
+ *         
+ *         ・DOMツリーを探索可能 
+ *           HtmlNodeCollection  htmlDocument.DocumentNode.SelectNodes(string xpath)
+ *           HtmlNode            htmlDocument.DocumentNode.SelectSingle(string xpath)
  *         
  *@subject ButtonNewBook_Click() / 新刊情報の取得
  *         ・HTML<li> タグ内   class=""属性 'items' の NodeCollection を取得
@@ -35,8 +44,15 @@
  *         ・Excelで表示
  *         
  *        【註】サンプルコードの HTML解析が、ここのページに特化し過ぎていて一般的ではない。
- *         <img alt="">に、書籍タイトルが記述されているかどうかは Webページの制作者次第で、
- *         検索の仕方に正確性を欠く
+ *         ・<img alt="">に、書籍タイトルが記述されているかどうかは Webページの制作者次第で、
+ *           検索の仕方に正確性を欠く。
+ *         ・Webページの仕様変更時に、このプログラムでデータを取得できなくなる可能性がある。
+ *
+ *@subject ButtonBookInfo_Click()
+ *         ・link: Link Property of ListBox selected item, gotton by above method
+ *         ・title:  in HTML<h1>
+ *         ・author, isbn, date:
+ *             in HTML<div class="right"> / <table> / <tr><td>
  */
 #region -> HtmlAgilityPack.HtmlDocument, 
 /*
@@ -339,11 +355,12 @@
 #endregion
 /*
  *@see ImageExcelHtmlAgilityPackSample.jpg
- *@see 
+ *@see ImageExcelHtmlAgilityPack_withBookDetail.jpg
  *@author shika
  *@date 2022-12-04
  * -->
  */
+using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -381,12 +398,14 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR18_Excel
         private readonly Button buttonNewBook;
         private readonly Button buttonBookInfo;
         private readonly ListBox listBox;
+        private readonly TextBox textBox;
+        private List<BookInfoRR18> bookList;
 
         public FormExcelHtmlAgilityPackSample()
         {
             this.Text = "FormExcelHtmlAgilityPackSample";
             this.Font = new Font("consolas", 12, FontStyle.Regular);
-            this.ClientSize = new Size(480, 480);
+            this.ClientSize = new Size(640, 480);
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             //this.AutoSize = true;
             this.BackColor = SystemColors.Window;
@@ -452,7 +471,15 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR18_Excel
                 AutoSize = true,
             };
             table.Controls.Add(listBox, 0, 1);
-            table.SetColumnSpan(listBox, table.ColumnCount);
+            
+            textBox = new TextBox()
+            {
+                Multiline = true,
+                ReadOnly = true,
+                BorderStyle = BorderStyle.Fixed3D,
+                Dock = DockStyle.Fill,
+            };
+            table.Controls.Add(textBox, 1, 1);
 
             //---- Deployment ----
             this.Controls.AddRange(new Control[]
@@ -472,16 +499,16 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR18_Excel
                 var htmlDoc = new HtmlAgilityPack.HtmlDocument();
                 htmlDoc.LoadHtml(htmlContent);
 
-                HtmlAgilityPack.HtmlNodeCollection nodeCollection = 
+                HtmlNodeCollection nodeCollection = 
                     htmlDoc.DocumentNode.SelectNodes("//li[@class='items']");
                 List<string> itemList = new List<string>();
-                List<BookInfoRR18> bookList = new List<BookInfoRR18>();
+                bookList = new List<BookInfoRR18>();
 
-                foreach(HtmlAgilityPack.HtmlNode node in nodeCollection)
+                foreach(HtmlNode node in nodeCollection)
                 {
-                    HtmlAgilityPack.HtmlNode imgTag = node.SelectSingleNode(".//img");
+                    HtmlNode imgTag = node.SelectSingleNode(".//img");
                     string title = imgTag.GetAttributeValue("alt", def: "");
-                    HtmlAgilityPack.HtmlNode aTag = node.SelectSingleNode(".//a");
+                    HtmlNode aTag = node.SelectSingleNode(".//a");
                     string link = aTag.GetAttributeValue("href", def: "");
 
                     itemList.Add(title);
@@ -521,11 +548,57 @@ namespace WinFormGUI.WinFormSample.ReverseReference.RR18_Excel
             }
         }//ButtonNewBook_Click()
 
-        private void ButtonBookInfo_Click(object sender, EventArgs e)
+        private async void ButtonBookInfo_Click(object sender, EventArgs e)
         {
+            if (listBox.SelectedItem == null) { return; }
+
+            string link = bookList[listBox.SelectedIndex].Link
+                .Replace("./", "").Trim();
+            //Console.WriteLine(url + link);
+            //https://www.shuwasystem.co.jp/book/9784798068251.html
+
             try
             {
+                //---- HttpClient ----
+                string bookHtml = await client.GetStringAsync(url + link);
 
+                //---- HtmlDocument ----
+                var bookDoc = new HtmlAgilityPack.HtmlDocument();
+                bookDoc.LoadHtml(bookHtml);
+
+                string title = bookDoc.DocumentNode.SelectSingleNode(
+                    "//h1[@class='titleType1']").InnerText.Trim();
+                HtmlNode divTag = bookDoc.DocumentNode.SelectSingleNode("//div[@class='right']");
+                HtmlNode tableTag = divTag.SelectSingleNode(".//table");
+                HtmlNodeCollection itemCollection = tableTag.SelectNodes("*/tr/td");
+                string author = itemCollection[0].InnerText.Trim();
+                string isbn = itemCollection[3].InnerText.Trim();
+                string date = itemCollection[2].InnerText.Trim();
+
+                textBox.Text =
+                    $"Title:  {title}{Environment.NewLine}" +
+                    $"Author: {author}{Environment.NewLine}" +
+                    $"ISBN:   {isbn}{Environment.NewLine}" +
+                    $"Date:   {date}{Environment.NewLine}";
+
+                //---- Excel ----
+                Excel.Worksheet sheet2 = workbook.Sheets[2];
+
+                if (sheet2.Cells[1, 1].Value != "Title")
+                {
+                    sheet2.Cells[1, 1].Value = "Title";
+                    sheet2.Cells[2, 1].Value = "Author";
+                    sheet2.Cells[3, 1].Value = "ISBN";
+                    sheet2.Cells[4, 1].Value = "Published Date";
+                }
+
+                sheet2.Cells[1, 2].Value = title;
+                sheet2.Cells[2, 2].Value = author;
+                sheet2.Cells[3, 2].Value = isbn;
+                sheet2.Cells[4, 2].Value = date;
+
+                excelApp.Visible = true;
+                workbook.Save();
             }
             catch (Exception ex)
             {
