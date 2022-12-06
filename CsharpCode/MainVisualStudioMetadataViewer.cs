@@ -54,9 +54,9 @@ namespace WinFormGUI.CsharpCode
 {
     class MainVisualStudioMetadataViewer
     {
-        [STAThread]
-        static void Main()
-        //public void Main()
+        //[STAThread]
+        //static void Main()
+        public void Main()
         {
             Console.WriteLine("new FormVisualStudioMetadataViewer()");
 
